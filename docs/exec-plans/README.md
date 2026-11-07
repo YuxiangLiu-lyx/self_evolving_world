@@ -12,7 +12,7 @@ Plans help humans and agents track tasks, scope, progress, and evidence. Every P
 
 - [PR-06](completed/pr-06-strict-pr-requirements.md): numbered requirements, complete tests, and current PR review gates.
 
-- [PR-07](active/pr-07-three-agent-decision.md): local OAuth / Responses experiment for three agents with one decision each.
+- [PR-07](completed/pr-07-three-agent-decision.md): local OAuth / Responses experiment for three agents with one decision each.
 
 ## Format and lifecycle
 
