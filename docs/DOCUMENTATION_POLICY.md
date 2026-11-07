@@ -2,17 +2,20 @@
 
 ## Authoritative sources
 
-| Content                                                       | Owning document                                                 |
-| ------------------------------------------------------------- | --------------------------------------------------------------- |
-| Feature status, acceptance criteria, and evidence             | [PRODUCT](PRODUCT.md)                                           |
-| Module responsibilities, interfaces, and dependency direction | [ARCHITECTURE](../ARCHITECTURE.md)                              |
-| Context and tradeoffs for important choices                   | [ADRs](decisions/README.md)                                     |
-| Task scope, implementation, and actual validation             | [Execution plans](exec-plans/README.md)                         |
-| Human explanation and first-run instructions                  | [PROJECT_OVERVIEW](PROJECT_OVERVIEW.md), [README](../README.md) |
-| Agent navigation and language policy                          | [AGENTS](../AGENTS.md)                                          |
-| Task validation, visual review, and completion gate           | [VALIDATION](VALIDATION.md)                                     |
+| Content                                                          | Owning document                                                 |
+| ---------------------------------------------------------------- | --------------------------------------------------------------- |
+| Feature status, acceptance criteria, and evidence                | [PRODUCT](PRODUCT.md)                                           |
+| Fixed founding items, base skills, and environment specification | [WORLD_FOUNDATION](WORLD_FOUNDATION.md)                         |
+| Module responsibilities, interfaces, and dependency direction    | [ARCHITECTURE](../ARCHITECTURE.md)                              |
+| Context and tradeoffs for important choices                      | [ADRs](decisions/README.md)                                     |
+| Task scope, implementation, and actual validation                | [Execution plans](exec-plans/README.md)                         |
+| Human explanation and first-run instructions                     | [PROJECT_OVERVIEW](PROJECT_OVERVIEW.md), [README](../README.md) |
+| Agent navigation and language policy                             | [AGENTS](../AGENTS.md)                                          |
+| Task validation, visual review, and completion gate              | [VALIDATION](VALIDATION.md)                                     |
 
 All repository content is in English. Conversations with the user remain in Chinese. Translation of historical records must preserve their original scope, results, and limitations rather than claiming current capabilities existed earlier.
+
+WORLD_FOUNDATION preserves version-1 semantics. Ordinary feature synchronization and world evolution must not rewrite its catalogue, base skills, or initial conditions. Keep future extension definitions and runtime discoveries separate. Wording corrections may clarify existing meaning; a different foundation requires explicit authorization and a separate versioned specification preserving the original.
 
 ## Synchronization triggers
 

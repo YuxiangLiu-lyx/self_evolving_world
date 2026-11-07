@@ -22,6 +22,8 @@ Agents automatically observe other agents and ground items within an inclusive c
 
 ## Fixed rules and changing state
 
+The [World Foundation](WORLD_FOUNDATION.md) records the permanent starting item catalogue, base skills, and environment. It is not updated with live inventories or future discoveries; evolution must keep extensions separate.
+
 Base settings, types, and skills are concentrated in [world.ts](../packages/world-core/src/world.ts). Rules, settings, and all snapshots are frozen. Actions produce new snapshots without changing history.
 
 Agents can move, collect items, and submit requests while the rules remain fixed. They cannot resize the world or add skills during a run.

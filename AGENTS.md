@@ -21,6 +21,7 @@ This project prioritizes Human Legibility, Agent Legibility, Enforceable Archite
 - Use `origin` for `https://github.com/YuxiangLiu-lyx/self_evolving_world.git`. Follow the [version control workflow](docs/DEVELOPMENT.md#version-control-and-ci): base focused branches on `main`, retain history, and inspect GitHub Actions for published commits. Local success does not establish remote CI success.
 - Core logic must not depend on UI, applications, Node I/O, networking, or external AI services. Cross-package imports use public entry points.
 - Keep base rules in `packages/world-core/src/world.ts`. Runtime settings and the skill set are immutable; `try` only records unsupported requests.
+- Read [WORLD_FOUNDATION](docs/WORLD_FOUNDATION.md) before changing items, skills, or world behavior. Preserve its version-1 semantics during evolution; document future extensions separately instead of rewriting the founding catalogue or base skills.
 - Preserve strict types. Do not introduce explicit `any`, implicit randomness, or system-clock-driven core behavior.
 - `PRODUCT.md` is the sole source of feature status. Never describe Planned functionality as implemented or invent validation results.
 - Synchronize feature records, architecture, ADRs, and execution plans when functionality, boundaries, important decisions, or completion status changes.
