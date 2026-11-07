@@ -30,7 +30,9 @@
     "task:finish": "tsx scripts/validate.ts finish",
     "demo:check": "tsx scripts/check-demo.ts",
     "demo": "pnpm build && node apps/simulator/dist/main.js",
-    "pr:check": "tsx scripts/check-pr.ts"
+    "pr:check": "tsx scripts/check-pr.ts",
+    "experiment:login": "tsx apps/simulator/src/login.ts",
+    "experiment:once": "tsx apps/simulator/src/experiment-cli.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.65.0",

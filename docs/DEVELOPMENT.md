@@ -18,6 +18,10 @@ Follow the [language policy](../AGENTS.md#language-policy): user conversations a
 6. Follow the [validation workflow](VALIDATION.md): run `pnpm validate -- "task name"`, including the full `pnpm check`; inspect every current screenshot and behavior result; fix problems and rerun. Also run `pnpm demo` when CLI or package exports change.
 7. Repeat the requirements in the PR, map every requirement and changed path to implementation and verification, and record the latest reviewed head SHA. Record actual evidence and limitations in the [PR template](../.github/pull_request_template.md) and plan. Finish documentation, rerun validation after edits, review the new evidence, and complete only after `pnpm task:finish -- "task name"` succeeds. Archive completed plans; archival changes require a final validation run too. After committing the reviewed files, run `pnpm pr:check -- validation-results/pr-body.md origin/main`; it checks the PR contract and actual completed local evidence.
 
+## Optional model experiment
+
+Follow [One-Round Experiment](ONE_ROUND_EXPERIMENT.md) for `pnpm experiment:login` and `pnpm experiment:once`. These commands are explicit local operations and are excluded from `pnpm check`, demo determinism checks, and CI. Unit tests substitute network transports; they cannot prove live account entitlement or model decision quality. Record real request counts and failed rounds separately, and do not repeat inference automatically to obtain a passing result.
+
 ## Debugging failures
 
 `pnpm check` runs typecheck → lint → format → architecture → test → build → demo:check → test:e2e → docs, stopping at the first failure. After fixing a failure, run its individual check as needed, then rerun the full workflow. `pnpm format` fixes formatting only. `pnpm demo:check` compares complete built CLI output from two independent processes in different timezones.

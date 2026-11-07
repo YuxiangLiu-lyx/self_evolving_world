@@ -12,6 +12,8 @@ ADRs explain why a design was chosen rather than duplicating module descriptions
 
 - [0006](0006-requirement-traceability.md): numbered requirements, complete test execution, and current PR review gates.
 
+- [0007](0007-single-round-model-adapter.md): local ChatGPT authorization, bounded external decisions, and unchanged core semantics.
+
 ## Writing requirements
 
 Each ADR includes its date, decision status (Accepted / Superseded), context, decision, alternatives, reasons, costs, and future consequences. Decision status describes the decision lifecycle, not PRODUCT feature status.

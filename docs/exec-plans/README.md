@@ -12,6 +12,8 @@ Plans help humans and agents track tasks, scope, progress, and evidence. Every P
 
 - [PR-06](completed/pr-06-strict-pr-requirements.md): numbered requirements, complete tests, and current PR review gates.
 
+- [PR-07](active/pr-07-three-agent-decision.md): local OAuth / Responses experiment for three agents with one decision each.
+
 ## Format and lifecycle
 
 Use `pr-NN-short-title.md` and include `Requirement summary`, numbered `Requirements` (`- R1: ...`), `Scope and exclusions`, `Acceptance criteria`, steps, results, unexecuted checks, limitations, and follow-up suggestions. See the [PR contract](../PULL_REQUESTS.md). Historical completed plans preserve their original format; new PRs and newly submitted work follow this contract. Create plans in active, update them during implementation, then move completed plans to completed and repair references.

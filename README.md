@@ -4,7 +4,7 @@
 
 A TypeScript project exploring autonomous AI agents and controlled world evolution. The current foundation includes a bounded grid, agents, items, movement, pickup, unsupported skill attempts, automatic vision, visualization, and history replay. Browser validation and a task completion gate are part of the development workflow.
 
-Current behavior comes from manual controls or scripted demos. Autonomous AI decisions and skill evolution are not implemented. [PRODUCT](docs/PRODUCT.md) is the single source of feature status.
+The observatory uses manual controls and scripted demos. An optional [single-round experiment](docs/ONE_ROUND_EXPERIMENT.md) requests one model decision for each of its three founding agents through ChatGPT OAuth and Responses. Continuous NPC control and skill evolution remain future work. [PRODUCT](docs/PRODUCT.md) is the single source of feature status.
 
 ## Design goals
 
@@ -57,6 +57,8 @@ Before completing each task, run `pnpm validate -- "task name"`. It opens the cu
 | `pnpm dev`                                                   | Build the core and start the viewer; restart after core changes                      |
 | `pnpm build`                                                 | Build the core, CLI, and static viewer                                               |
 | `pnpm preview`                                               | Serve the built viewer on port 4173                                                  |
+| `pnpm experiment:login`                                      | Authorize the optional experiment through ChatGPT in the browser                     |
+| `pnpm experiment:once`                                       | Request one decision for each of three agents and save a replay                      |
 | `pnpm demo`                                                  | Run the CLI and print initial, move, pickup, and try snapshots                       |
 | `pnpm check`                                                 | Run all automated checks, including real Chromium interactions                       |
 | `pnpm validate -- "task name"`                               | Run full checks and capture screenshots; create a pending review                     |
@@ -82,7 +84,7 @@ The canonical repository is [YuxiangLiu-lyx/self_evolving_world](https://github.
 
 ```text
 packages/world-core/  All base rules in world.ts; index.ts only re-exports
-apps/simulator/       Fixed three-action CLI example
+apps/simulator/       Fixed CLI example and optional single-round model experiment
 apps/viewer/          Map, manual controls, vision, and history replay
 scripts/              Documentation, built-output, and completion checks
 docs/                 Overview, product, policies, ADRs, and execution plans

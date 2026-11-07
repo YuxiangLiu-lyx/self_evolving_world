@@ -38,7 +38,7 @@ Review the browser assertions and key frames, compare states before and after ac
 - Playback, pause, and stepping do not create actions or rewrite history. Exports before and after replay must be identical. Historical controls are disabled; only the latest state can accept actions.
 - No browser exceptions, console errors, failed resources, or HTTP errors occur.
 
-Add scenarios and expected outcomes for changed behavior. Import `test` from `apps/viewer/e2e/validators.ts` in new browser tests so runtime health checks remain automatic. Both local and CI unit/browser runs forbid `.only`; skipped, todo, expected-failure, or incomplete tests cannot pass task validation. Every PR runs the full unfiltered suite, including documentation-only changes. Screenshots wait for notifications to disappear naturally rather than injecting styles that conceal problems. Automation cannot judge unmodeled autonomous decisions; current agents only follow scripts and manual controls.
+Add scenarios and expected outcomes for changed behavior. Import `test` from `apps/viewer/e2e/validators.ts` in new browser tests so runtime health checks remain automatic. Both local and CI unit/browser runs forbid `.only`; skipped, todo, expected-failure, or incomplete tests cannot pass task validation. Every PR runs the full unfiltered suite, including documentation-only changes. Screenshots wait for notifications to disappear naturally rather than injecting styles that conceal problems. Automation cannot judge model decision quality. The optional one-round CLI is tested with deterministic transports; live OAuth/inference results are recorded separately and never run by CI.
 
 ## Evidence and invalidation
 
@@ -47,7 +47,7 @@ Add scenarios and expected outcomes for changed behavior. Import `test` from `ap
 - `playwright-report/index.html`: test details and attachments, opened with `pnpm exec playwright show-report`.
 - `test-results/`: screenshots, exported histories, and failure traces; browser summary in `browser-validation.json`.
 
-These local generated directories are ignored by Git. New validation replaces current evidence. Archive the report, review, and browser attachments together if long-term retention is needed. Plans record readable conclusions and the environment instead of linking uncommitted temporary images. Plan edits also require revalidation; finalize documentation before the last run.
+These local generated directories and the optional `experiment-results/` directory are ignored by Git. Experiment artifacts are also excluded from source fingerprints; simulator source and tests remain included. New validation replaces current evidence. Archive the report, review, and browser attachments together if long-term retention is needed. Plans record readable conclusions and the environment instead of linking uncommitted temporary images. Plan edits also require revalidation; finalize documentation before the last run.
 
 The source fingerprint includes untracked files, documentation, tests, configuration, and the lockfile. It excludes dependencies, build outputs, evidence directories, system caches, and private `.env*` files; `.env.example` is included. Source symlinks are currently rejected. The current page does not depend on private environment variables; future use requires an explicit environment validation strategy.
 

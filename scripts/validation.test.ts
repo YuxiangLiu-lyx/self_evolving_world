@@ -93,6 +93,8 @@ describe('task completion evidence', () => {
   );
   it('ignores generated review files without ignoring source changes', () => {
     writeFileSync(join(root, 'validation-results/review.json'), '{}');
+    mkdirSync(join(root, 'experiment-results'));
+    writeFileSync(join(root, 'experiment-results/decisions.json'), '{}');
     expect(check()).toEqual([]);
   });
   it('rejects deleted source', () => {
