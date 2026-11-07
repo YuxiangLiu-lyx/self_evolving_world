@@ -7,7 +7,7 @@ Every development task, including documentation-only changes, must follow this w
 1. Finish implementation and documentation, resolve known problems, and choose a clear English task name.
 2. Run `pnpm validate -- "task name"`. It reruns the complete `pnpm check`, builds the page, and opens `http://127.0.0.1:4173/` in real Chromium for layout/behavior checks and screenshots.
 3. Open the current report with `pnpm exec playwright show-report` and inspect **every screenshot** listed in `validation-results/report.json`. Codex may use an image viewer to inspect the original artifacts. Checking file existence, reading the DOM, or repeating test names does not count as visual inspection.
-4. Apply the criteria below and complete `validation-results/review.json`. Record the reviewer, each image's `verdict` and specific `notes`, and the `behavior` result. Use `pass` only after actual review, `fail` for problems, and `pending` for unreviewed evidence. Keep the generated `runId`.
+4. Apply the criteria below and complete `validation-results/review.json`. Record the reviewer, each image's `verdict` and specific `notes`, the `behavior` result, and a `requirements` review of the complete diff against the task plan. Requirement notes identify requirement IDs, implementation/evidence, scope coverage, and resolved mismatches; follow [PULL_REQUESTS](PULL_REQUESTS.md). Use `pass` only after actual review, `fail` for problems, and `pending` for unreviewed evidence. Keep the generated `runId`.
 5. If anything fails, fix it and restart at step 2. A new run invalidates the prior review. Source/documentation edits and missing or changed screenshots invalidate earlier evidence.
 6. Run `pnpm task:finish -- "same task name"`. Complete only after exit code 0 and report status `passed`. The final response must state actual results and evidence locations.
 
@@ -38,12 +38,12 @@ Review the browser assertions and key frames, compare states before and after ac
 - Playback, pause, and stepping do not create actions or rewrite history. Exports before and after replay must be identical. Historical controls are disabled; only the latest state can accept actions.
 - No browser exceptions, console errors, failed resources, or HTTP errors occur.
 
-Add scenarios and expected outcomes for changed behavior. Import `test` from `apps/viewer/e2e/validators.ts` in new browser tests so runtime health checks remain automatic. Both local and CI runs forbid `.only`; skipped or expected-failure tests cannot pass task validation. Screenshots wait for notifications to disappear naturally rather than injecting styles that conceal problems. Automation cannot judge unmodeled autonomous decisions; current agents only follow scripts and manual controls.
+Add scenarios and expected outcomes for changed behavior. Import `test` from `apps/viewer/e2e/validators.ts` in new browser tests so runtime health checks remain automatic. Both local and CI unit/browser runs forbid `.only`; skipped, todo, expected-failure, or incomplete tests cannot pass task validation. Every PR runs the full unfiltered suite, including documentation-only changes. Screenshots wait for notifications to disappear naturally rather than injecting styles that conceal problems. Automation cannot judge unmodeled autonomous decisions; current agents only follow scripts and manual controls.
 
 ## Evidence and invalidation
 
 - `validation-results/report.json`: task name, run ID, source fingerprint, automated result, screenshot paths/hashes, and final state.
-- `validation-results/review.json`: reviewer, per-image findings, and behavior conclusions, initially pending.
+- `validation-results/review.json`: reviewer, per-image findings, behavior conclusions, and requirement/full-diff review, initially pending.
 - `playwright-report/index.html`: test details and attachments, opened with `pnpm exec playwright show-report`.
 - `test-results/`: screenshots, exported histories, and failure traces; browser summary in `browser-validation.json`.
 
@@ -59,4 +59,4 @@ Install the specified Node, pnpm, and Chromium using the [development workflow](
 
 Fix every automated, visual, or behavior failure and rerun the full workflow. Resolve browser installation, port, or environment problems before continuing. If a blocker cannot be resolved, report incomplete work instead of claiming success. Do not skip tests, weaken assertions, or use old screenshots to complete a task.
 
-CI runs the same automated validation on the [canonical repository](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions) and produces pending review. Each run uploads available reports, screenshots, and traces with 14-day retention, including failed runs. Download the complete artifact to preserve the report's relative evidence paths. There is no remote visual review service or automatic branch protection setup. The task executor performs actual visual and behavior review and references the plan and findings in the PR.
+CI runs the same automated validation on the [canonical repository](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions) and produces pending review. Each run uploads available reports, screenshots, and traces with 14-day retention, including failed runs. Download the complete artifact to preserve the report's relative evidence paths. There is no remote visual or semantic review service. GitHub protection is configured and verified separately under the [PR contract](PULL_REQUESTS.md#github-checks-and-merge-restrictions). The task executor performs actual visual and behavior review and references the plan and findings in the PR.

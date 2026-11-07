@@ -79,7 +79,7 @@ History lives in page memory and does not survive refreshes automatically; JSON 
 - `pnpm check` runs types, lint, formatting, dependencies, Vitest, builds, CLI output, Chromium interactions, and documentation. See the [development workflow](docs/DEVELOPMENT.md).
 - `pnpm validate` wraps the full automated checks and produces pending evidence. Browser [validators](apps/viewer/e2e/validators.ts) check runtime health and layout; [anomaly scenarios](apps/viewer/e2e/anomalies.spec.ts) check invalid movement, ownership, and vision. After inspecting current visuals and behavior, `pnpm task:finish` can mark completion. Source fingerprints include documentation and exclude generated output. See [VALIDATION](docs/VALIDATION.md) and [ADR-0005](docs/decisions/0005-browser-validation-gate.md).
 
-These mechanisms do not prove arbitrary program purity, documentation semantics, or honest aesthetic review, and do not configure remote branch protection.
+The [PR contract](docs/PULL_REQUESTS.md) adds Markdown requirement/changed-file traceability, a current-head CI check, and local preflight against completed evidence. The unit reporter rejects skipped or incomplete suites; the task completion gate also requires an explicit requirement/full-diff review. These checks remain development tooling outside the core. GitHub protection is separately configured and verified. None of these mechanisms proves arbitrary program purity, semantic correctness, or honest review; see [ADR-0006](docs/decisions/0006-requirement-traceability.md).
 
 ## Future modules (Planned)
 

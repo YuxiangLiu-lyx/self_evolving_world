@@ -80,6 +80,7 @@ try {
           notes: '',
         })),
         behavior: { verdict: 'pending', notes: '' },
+        requirements: { verdict: 'pending', notes: '' },
       });
       console.log(
         '\nAutomated validation passed; review is still required. Open playwright-report and every screenshot, complete validation-results/review.json, then run pnpm task:finish -- "same task name".',
@@ -101,7 +102,7 @@ try {
       completedAt: new Date().toISOString(),
     });
     console.log(
-      `Task validation passed: ${task}. Automated checks, visual and behavior reviews are complete; source and screenshot fingerprints match.`,
+      `Task validation passed: ${task}. Automated checks, visual, behavior and requirement reviews are complete; source and screenshot fingerprints match.`,
     );
   }
 } catch (error) {

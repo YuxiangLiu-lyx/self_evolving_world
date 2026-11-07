@@ -210,6 +210,9 @@ export function completionErrors(
     const behavior = object(review.behavior);
     if (behavior.verdict !== 'pass' || !nonempty(behavior.notes))
       errors.push('Behavior review has not passed.');
+    const requirements = object(review.requirements);
+    if (requirements.verdict !== 'pass' || !nonempty(requirements.notes))
+      errors.push('Requirement and full-diff review has not passed.');
     return errors;
   } catch (error) {
     return [

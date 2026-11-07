@@ -14,6 +14,8 @@
 
 All repository content is in English. Conversations with the user remain in Chinese. Translation of historical records must preserve their original scope, results, and limitations rather than claiming current capabilities existed earlier.
 
+Requirement summaries, the PR requirement-to-change matrix, full-diff review, and current-head acceptance follow [PULL_REQUESTS](PULL_REQUESTS.md). Every requirement and changed file must be accounted for; green structural checks do not substitute for this semantic review.
+
 ## Synchronization triggers
 
 1. New or changed functionality: update the corresponding Feature ID, status, acceptance criteria, and evidence in PRODUCT within the same PR.
