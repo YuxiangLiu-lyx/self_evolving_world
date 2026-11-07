@@ -7,7 +7,7 @@ Plans help humans and agents track substantial tasks, scope, progress, and evide
 - [PR-01](completed/pr-01-world-foundation.md): fixed world core, visualization, and replay.
 - [PR-02](completed/pr-02-validation.md): real browser validation, behavior checks, and completion gate.
 - [PR-03](completed/pr-03-english-repository.md): English repository content and Chinese user communication.
-- [PR-04](active/pr-04-github-integration.md): GitHub version control, CI execution, and retained validation evidence.
+- [PR-04](completed/pr-04-github-integration.md): GitHub version control, CI execution, and retained validation evidence.
 
 ## Format and lifecycle
 
