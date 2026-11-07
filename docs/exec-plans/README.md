@@ -8,6 +8,7 @@ Plans help humans and agents track tasks, scope, progress, and evidence. Every P
 - [PR-02](completed/pr-02-validation.md): real browser validation, behavior checks, and completion gate.
 - [PR-03](completed/pr-03-english-repository.md): English repository content and Chinese user communication.
 - [PR-04](completed/pr-04-github-integration.md): GitHub version control, CI execution, and retained validation evidence.
+- [PR-05](completed/pr-05-world-foundation.md): permanent founding items, base skills, and environment specification.
 
 - [PR-06](completed/pr-06-strict-pr-requirements.md): numbered requirements, complete tests, and current PR review gates.
 

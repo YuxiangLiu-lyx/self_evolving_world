@@ -15,6 +15,8 @@ Current behavior comes from manual controls or scripted demos. Autonomous AI dec
 
 Repository content is written in English; conversations with the user are in Chinese. See the [language policy](AGENTS.md#language-policy).
 
+The [World Foundation](docs/WORLD_FOUNDATION.md) is the fixed reference for starting items, base skills, and environment settings. Evolution must preserve this foundation and record extensions separately.
+
 ## Five-minute quick start
 
 Use Node.js **24.22.2** from [.node-version](.node-version) and pnpm **10.34.9**. Switch through your Node version manager or use the [official release download](https://nodejs.org/dist/v24.22.2/) if needed.

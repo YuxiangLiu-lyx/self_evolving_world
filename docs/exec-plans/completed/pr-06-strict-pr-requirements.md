@@ -4,6 +4,8 @@
 
 The user requires a summary before development, explicit requirements in every PR, all tests to pass, and a review of whether the actual changes satisfy the requested work. This summary was recorded before implementation.
 
+After PR-05 was merged under an explicit owner-authorized rollout exception, the user requested merging PR-06. This continuation integrates the current main branch, preserves the foundation and policy changes, and requires fresh local and remote acceptance before the authorized merge.
+
 ## Requirements
 
 - R1: Summarize each task before implementation with numbered requirements, scope exclusions, and observable acceptance criteria.
@@ -11,10 +13,11 @@ The user requires a summary before development, explicit requirements in every P
 - R3: Require the complete automated suite, current visual and behavior review, and the task completion gate; skipped, incomplete, or failed tests cannot count as success.
 - R4: Review the full diff against the requirements and bind the PR review to its latest head commit; changes invalidate earlier review evidence.
 - R5: Enforce the PR contract in CI, document remote merge restrictions and their actual activation state, and preserve unrelated work and world behavior.
+- R6: Integrate the merged PR-05 foundation, resolve conflicts without losing either change set, and merge PR-06 only after fresh local acceptance and both current remote checks pass.
 
 ## Scope and exclusions
 
-Change repository development policy, the PR template, validation tooling, focused regression tests, and CI. Work on `chore/strict-pr-requirements` from `origin/main` in an isolated worktree. Keep the separately published PR-05 foundation changes out of this PR. Do not change world rules, application behavior, the founding catalogue, or historical experimental data. Do not merge the resulting PR.
+Change repository development policy, the PR template, validation tooling, focused regression tests, and CI. Work on `chore/strict-pr-requirements` from `origin/main` in an isolated worktree. Preserve PR-05 as existing main-branch content; review this PR against the updated main baseline. Do not change world rules, application behavior, the founding catalogue, or historical experimental data. The user's subsequent instruction authorizes merging this PR after current validation and required checks pass; no protection bypass is authorized for PR-06.
 
 ## Acceptance criteria
 
@@ -24,6 +27,7 @@ Change repository development policy, the PR template, validation tooling, focus
 - Local completion still requires a new full validation and inspection of all five screenshots after the last source/documentation edit.
 - CI runs the full suite for every PR, including documentation changes, and checks the PR body again after edits and new commits.
 - GitHub checks and repository protection are reported separately and verified before claiming remote enforcement.
+- The integrated branch retains F-115 and F-116, both archived plans, foundation navigation and required-document checks, and the complete PR policy. It includes current main without rewriting history, passes fresh validation and both required remote checks, and merges with the reviewed head pinned.
 
 ## Steps
 
@@ -69,7 +73,15 @@ The user authorized completing and publishing PR-05 and PR-06 in that order. PR-
 
 Published this work as [GitHub PR 2](https://github.com/YuxiangLiu-lyx/self_evolving_world/pull/2), after PR-05. Commit `b595e887800aabb6ea639cc12c6783563f5a5f6b` passed the current local completion gate for run `5810c793-1b59-4fc7-8d85-70284bfda1c2` and `pnpm pr:check`, covering every requirement and all 27 changed files. Its remote [quality run 42336164870](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/runs/42336164870) and [policy run 42336164933](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/runs/42336164933) both passed. The policy log confirms the exact reviewed head and complete 27-file mapping; quality logs confirm 97 unit tests, 7 browser tests, and 26 Markdown documents, and retained browser evidence is available from the run.
 
-This result record and F-116 status update require fresh full local validation, actual screenshot/behavior/requirement review, and a completion-gate pass before their follow-up commit. The PR body records the final run ID, head, and remote check results for that revision. Both PRs remain open for human review; neither has been merged.
+This result record and F-116 status update required fresh full local validation, actual screenshot/behavior/requirement review, and a completion-gate pass before their follow-up commit. The PR body recorded the final run ID, head, and remote check results for that revision. Both PRs were open at that point.
+
+## Authorized integration and merge
+
+PR-05 was subsequently merged as `9f42c019bd9dafc7415e58bb5d1557f079e1907b` after the owner explicitly exempted it from the not-yet-available policy check. Its [main quality run 42337947211](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/runs/42337947211) passed. The original branch protection was restored immediately afterward. This supersedes the earlier PR-05 rollout prerequisite; its unavailable check is never reported as a pass.
+
+The user now authorizes merging PR-06. Merge current main into this branch without rewriting commits, resolve overlapping documentation and required-document lists by retaining both features, and review the full resulting diff against R1-R6. Run `pnpm validate -- "PR-06 integration and merge"`, inspect all current images and behavior, record requirement findings, and pass `pnpm task:finish` before committing. Update the PR's current head and run ID, pass local preflight, and verify both current remote checks before merging. The PR body records actual final validation and merge results; no future result is assumed here.
+
+Integrated main commit `9f42c019bd9dafc7415e58bb5d1557f079e1907b`. Conflicts were limited to PRODUCT's feature table and DOCUMENTATION_POLICY's adjacent guidance: retained both F-115 and F-116 and both foundation preservation and PR requirement-review rules. Reviewed automatic merges of agent guidance, architecture, README, plan navigation, overview and required-document lists; the foundation document and archived PR-05 plan remain unchanged from main. Runtime source and existing tests are unchanged by integration. Fresh validation and remote-check outcomes belong to the current PR evidence, not the earlier publication runs above.
 
 ## Limitations and follow-up
 

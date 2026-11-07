@@ -23,6 +23,7 @@ export const REQUIRED_DOCUMENTS = [
   'agent.md',
   'ARCHITECTURE.md',
   'docs/PROJECT_OVERVIEW.md',
+  'docs/WORLD_FOUNDATION.md',
   'docs/PRODUCT.md',
   'docs/DEVELOPMENT.md',
   'docs/PULL_REQUESTS.md',
