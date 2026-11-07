@@ -39,6 +39,7 @@ const ignoredDirectories = new Set([
   'test-results',
   'playwright-report',
   'validation-results',
+  'experiment-results',
 ]);
 
 export function hashFile(path: string): string {

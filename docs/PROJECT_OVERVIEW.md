@@ -10,7 +10,7 @@ The current focus is a stable, understandable foundation: base rules stay fixed 
 
 The world is a bounded two-dimensional grid, 16×12 by default, with origin `(0, 0)` at the top left. Agents have names, positions, and inventories. Items start on the ground. World dimensions and vision radius are configured at creation and remain fixed.
 
-Each well-formed action from a known agent advances the logical tick by one. Successful actions, boundary collisions, and unsupported skill attempts all leave records. A tick counts actions, not elapsed seconds. There is currently no automatic AI decision-making.
+Each well-formed action from a known agent advances the logical tick by one. Successful actions, boundary collisions, and unsupported skill attempts all leave records. A tick counts actions, not elapsed seconds. An optional CLI experiment requests one model decision per founding agent and then stops; the browser never starts model requests.
 
 ## Three base skills
 
@@ -32,7 +32,7 @@ Agents can move, collect items, and submit requests while the rules remain fixed
 
 ```mermaid
 flowchart LR
-    CLI[CLI example] --> Core[Fixed world core]
+    CLI[CLI example / bounded model experiment] --> Core[Fixed world core]
     Human[Manual controls] --> Viewer[Browser observatory]
     Viewer --> Core
     Core --> Snapshots[Read-only state and automatic vision]
@@ -41,7 +41,7 @@ flowchart LR
 ```
 
 - The **core** owns rules and transitions, with no UI, networking, or AI service dependency.
-- The **CLI** runs a fixed sequence of move, pickup, and try actions.
+- The **CLI** runs a fixed demo or the separately invoked [one-round model experiment](ONE_ROUND_EXPERIMENT.md). The experiment submits each agent's own observation to ChatGPT and validates its returned action before applying it.
 - The **observatory** displays the map, inventory, vision, and results, and supports interaction and replay. It loads a 12-action demo with three agents, then allows manual continuation.
 
 Module contracts are in [ARCHITECTURE](../ARCHITECTURE.md). Current feature status and evidence are maintained only in [PRODUCT](PRODUCT.md#current-scope).
@@ -56,7 +56,7 @@ Export stores initial conditions and actions. Import reconstructs history under 
 
 ## NPC Agent (Planned)
 
-Existing agent entities have positions, inventories, and vision, but their actions come from scripts or manual input. Future NPCs would have needs, goals, memory, and independent decisions submitted through the action protocol. No model is connected.
+Existing entities have positions, inventories, and vision. The optional model experiment adds a single decision opportunity per agent to scripts and manual input. Future NPCs would have persistent goals, memory, and a continuous decision loop; those capabilities are outside this experiment.
 
 ## World Agent (Planned)
 
@@ -70,4 +70,4 @@ Future requests may become capabilities through specification, review, isolated 
 
 There is no terrain collision, occlusion, diagonal movement, continuous physics, trade, or coordinated autonomous decision-making. The browser stores at most 500 actions in memory and accepts replay files up to 1 MB. There is no database, autosave, long-running service, or cross-version migration.
 
-A useful next step is a clear observation-to-action decision interface, tested first with a simple deterministic strategy. The scripted demo must not be presented as autonomous behavior, and attempts must not execute new code without a separate validation and governance design.
+Any expansion beyond one round needs a separate decision on goals, scheduling, memory, and account usage. The scripted demo must not be presented as model behavior, and attempts must not execute new code without a separate validation and governance design.
