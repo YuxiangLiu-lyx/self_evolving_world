@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#193b32" />
+    <meta
+      name="description"
+      content="Self-Evolving World: explore fixed rules, observe agent vision, and replay every step."
+    />
+    <title>World Observatory · Self-Evolving World</title>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="World Observatory home"
+        ><span class="brand-symbol">◈</span
+        ><span>SELF-EVOLVING <b>WORLD</b></span></a
+      >
+      <span class="edition">FOUNDATION / 01</span>
+      <div class="header-actions">
+        <button id="import-button" class="button quiet">
+          ↥ Import history
+        </button>
+        <button id="export-button" class="button quiet">
+          ↧ Export history
+        </button>
+        <input
+          id="import-file"
+          type="file"
+          accept=".json,application/json"
+          hidden
+        />
+      </div>
+    </header>
+    <main class="workspace">
+      <section class="page-heading">
+        <div>
+          <p class="eyebrow">A SMALL WORLD, EVERY STEP VISIBLE</p>
+          <h1>World Observatory<span class="title-dot">.</span></h1>
+          <p class="subtitle">Observe the world now. Revisit every step.</p>
+        </div>
+        <div class="session-actions">
+          <span class="rule-badge">◇ Core rules locked</span
+          ><button id="reset-button" class="button">New world ↗</button>
+        </div>
+      </section>
+      <div class="main-layout">
+        <div class="world-column">
+          <section class="panel world-panel" aria-label="World visualization">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">WORLD / LIVE VIEW</span>
+                <h2>
+                  First grounds <span id="world-size" class="mono"></span>
+                </h2>
+              </div>
+              <div
+                class="view-switch"
+                role="group"
+                aria-label="Observation view"
+              >
+                <button id="global-view" aria-pressed="true">Global view</button
+                ><button id="agent-view" aria-pressed="false">
+                  Agent vision
+                </button>
+              </div>
+            </div>
+            <div class="map-stats">
+              <span
+                ><i class="status-dot"></i
+                ><span id="frame-status">Latest state</span></span
+              ><span id="entity-count"></span
+              ><span class="mono">TICK <b id="tick-value">0</b></span>
+            </div>
+            <div class="map-surround">
+              <div id="x-axis" class="x-axis" aria-hidden="true"></div>
+              <div class="map-row">
+                <div id="y-axis" class="y-axis" aria-hidden="true"></div>
+                <div
+                  id="world-grid"
+                  class="world-grid"
+                  role="grid"
+                  aria-label="World map"
+                ></div>
+              </div>
+              <div class="map-caption">
+                <span id="vision-caption"></span
+                ><span>Origin (0, 0) · top left</span>
+              </div>
+            </div>
+            <div class="map-legend">
+              <span><i class="legend-agent"></i> Agents</span
+              ><span><i class="legend-item"></i> Items</span
+              ><span><i class="legend-vision"></i> Vision</span
+              ><span class="map-tip">Select an agent to inspect</span>
+            </div>
+            <div class="replay-panel">
+              <div class="replay-title">
+                <div>
+                  <span class="eyebrow">TIMELINE</span>
+                  <h3>Every step of the world</h3>
+                </div>
+                <span id="history-count" class="mono"></span>
+              </div>
+              <label class="sr-only" for="timeline">History frame</label
+              ><input
+                id="timeline"
+                type="range"
+                min="0"
+                max="0"
+                value="0"
+                step="1"
+              />
+              <div class="playback-controls">
+                <div class="transport">
+                  <button
+                    id="first-frame"
+                    class="icon-button"
+                    aria-label="First frame"
+                  >
+                    ⏮</button
+                  ><button
+                    id="previous-frame"
+                    class="icon-button"
+                    aria-label="Previous frame"
+                  >
+                    ‹</button
+                  ><button id="play-button" class="button play">▶ Play</button
+                  ><button
+                    id="next-frame"
+                    class="icon-button"
+                    aria-label="Next frame"
+                  >
+                    ›
+                  </button>
+                </div>
+                <div class="playback-options">
+                  <label for="speed" class="sr-only">Playback speed</label
+                  ><select id="speed" aria-label="Playback speed">
+                    <option value="0.5">0.5×</option>
+                    <option value="1" selected>1×</option>
+                    <option value="2">2×</option>
+                    <option value="4">4×</option></select
+                  ><button id="latest-frame" class="button quiet">
+                    Latest frame ↗
+                  </button>
+                </div>
+              </div>
+              <p id="current-event" class="current-event"></p>
+              <p class="history-storage-note">
+                History lives in this page. Export it before leaving or starting
+                over.
+              </p>
+            </div>
+          </section>
+          <section class="panel activity-panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">FIELD NOTES</span>
+                <h2>Action log</h2>
+              </div>
+              <button id="demo-button" class="button quiet">Load demo</button>
+            </div>
+            <p class="activity-note">
+              Scripted and manual actions. Select an entry to revisit that
+              moment.
+            </p>
+            <div id="event-list" class="event-list"></div>
+          </section>
+        </div>
+        <aside class="inspector" aria-label="Agent and base skills">
+          <section class="panel agent-panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">OBSERVER</span>
+                <h2>Agent profile</h2>
+              </div>
+              <span class="small-label">Auto sensing</span>
+            </div>
+            <label for="agent-select" class="sr-only">Select agent</label
+            ><select id="agent-select" class="agent-select"></select>
+            <div class="agent-meta">
+              <div>
+                <span>Position</span
+                ><strong id="agent-position" class="mono"></strong>
+              </div>
+              <div>
+                <span>Vision radius</span
+                ><strong id="agent-radius" class="mono"></strong>
+              </div>
+            </div>
+            <div class="inspector-block">
+              <h3>Inventory <span id="inventory-count"></span></h3>
+              <div id="inventory" class="chips"></div>
+            </div>
+            <div class="inspector-block">
+              <h3>Visible now <span class="auto-label">Always on</span></h3>
+              <p id="visible-summary" class="muted"></p>
+              <div id="visible-entities" class="visible-entities"></div>
+            </div>
+          </section>
+          <section class="panel skills-panel">
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">BASE SKILLS</span>
+                <h2>Interact</h2>
+              </div>
+              <span class="small-label">3 fixed skills</span>
+            </div>
+            <p id="action-hint" class="action-hint"></p>
+            <fieldset id="action-controls">
+              <legend class="sr-only">Base skill controls</legend>
+              <div class="skill-heading">
+                <span class="skill-number">01</span>
+                <div>
+                  <h3>Move</h3>
+                  <p>One cell at a time. No overlap or escape.</p>
+                </div>
+                <span class="key-hint">W A S D</span>
+              </div>
+              <div class="move-pad">
+                <button
+                  data-direction="north"
+                  aria-label="Move north"
+                  class="north"
+                >
+                  ↑</button
+                ><button
+                  data-direction="west"
+                  aria-label="Move west"
+                  class="west"
+                >
+                  ←</button
+                ><span class="move-center">◉</span
+                ><button
+                  data-direction="east"
+                  aria-label="Move east"
+                  class="east"
+                >
+                  →</button
+                ><button
+                  data-direction="south"
+                  aria-label="Move south"
+                  class="south"
+                >
+                  ↓
+                </button>
+              </div>
+              <div class="skill-divider"></div>
+              <div class="skill-heading">
+                <span class="skill-number">02</span>
+                <div>
+                  <h3>Pick up</h3>
+                  <p>Collect an item from your cell.</p>
+                </div>
+              </div>
+              <div id="pickup-options"></div>
+              <div class="skill-divider"></div>
+              <div class="skill-heading">
+                <span class="skill-number">03</span>
+                <div>
+                  <h3>Try</h3>
+                  <p>Request an unavailable ability.</p>
+                </div>
+                <span class="try-tag">Record only</span>
+              </div>
+              <form id="try-form">
+                <label class="sr-only" for="skill-name">Skill to try</label>
+                <div class="try-input">
+                  <input
+                    id="skill-name"
+                    maxlength="80"
+                    value="fly"
+                    placeholder="For example: fly, build…"
+                    required
+                  /><button type="submit" aria-label="Try skill">↗</button>
+                </div>
+              </form>
+              <p class="try-note">
+                Unavailable skills are logged, never executed or unlocked.
+              </p>
+            </fieldset>
+          </section>
+        </aside>
+      </div>
+      <footer class="footer">
+        <span
+          >SELF-EVOLVING WORLD <span class="footer-dot">/</span> Foundation
+          experiment</span
+        ><span>Fixed rules · Visible state · Replayable history</span>
+      </footer>
+    </main>
+    <div
+      id="notice"
+      class="notice"
+      role="status"
+      aria-live="polite"
+      hidden
+    ></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

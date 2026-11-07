@@ -1,0 +1,86 @@
+# System Architecture
+
+This document owns current modules, interfaces, and dependency boundaries. Feature status belongs to [PRODUCT](docs/PRODUCT.md); context is in the [project overview](docs/PROJECT_OVERVIEW.md). Base world rules are implemented in one file and consumed by the CLI and browser through a public entry point.
+
+## Current modules and data flow
+
+```mermaid
+flowchart LR
+    Input[Manual actions / scripted demo] --> Core[world-core: fixed rules]
+    Core --> State[Immutable state / observations / action result]
+    State --> History[viewer: snapshot history]
+    History --> View[Map / agent vision / replay]
+    History --> File[Export initial conditions and actions]
+    File --> Validate[Import validation]
+    Validate --> Core
+    CLI[simulator CLI] --> Core
+```
+
+Runtime dependencies are `simulator → world-core` and `viewer → world-core`. The applications do not depend on each other. Playback reads existing snapshots without running transitions; only new actions and import reconstruction execute actions.
+
+| Module            | Location                                                                                                | Responsibilities and interfaces                                                                                                                                | Allowed dependencies                               | Excluded responsibilities                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------- |
+| world-core        | [world.ts](packages/world-core/src/world.ts); [index.ts](packages/world-core/src/index.ts) only exports | Base rules, settings, entities, three skills, validation, immutable transitions, automatic vision; `createWorld`, `stepWorld`, `parseWorldAction`, `isVisible` | Its own source and ECMAScript                      | UI, Node I/O, network, clocks, randomness, AI, dynamic skills             |
+| simulator         | [apps/simulator/src](apps/simulator/src/)                                                               | `runDemo()` produces a fixed three-action history; CLI prints JSON                                                                                             | Own source, public core API, Node built-ins        | Rules, visualization, autonomous decisions                                |
+| viewer            | [apps/viewer/src](apps/viewer/src/)                                                                     | Map and controls; `timeline.ts` manages snapshots and replay files; `scenario.ts` defines the demo                                                             | Own source, public core API, browser APIs          | Defining skills, model decisions, server persistence, editing past frames |
+| repository checks | [scripts](scripts/)                                                                                     | Documentation and CLI checks, browser evidence, source/screenshot fingerprints, task completion gate                                                           | Node, development tools, CLI source for validation | World rules, automatic aesthetic judgment, proof of honest review         |
+
+Cross-package imports must use `@self-evolving-world/world-core`, never internal source paths. Vite and Playwright are development tools. The browser application has no frontend framework or external service dependency.
+
+## One fixed core file
+
+`world.ts` contains all base settings, types, and skill implementations. There is no plugin registry. `CORE_RULES` and its skill array are frozen, with version `1` and exactly `move`, `pickup`, and `try`.
+
+`createWorld(setup)` accepts optional initial settings and entities, copies inputs, validates them, and freezes the result. Defaults are `width=16`, `height=12`, and `visionRadius=4`. Coordinates are integers with origin `(0, 0)` at the top left; `0 ≤ x < width` and `0 ≤ y < height`. Each dimension supports 1–64 cells, vision radius 0–64, at most 32 agents, and at most 256 items. With no arguments it creates an empty world. Demo entities belong to the application layer.
+
+Settings, rules, positions, entities, inventories, observations, and events are frozen at runtime. Every action returns a new snapshot; unchanged frozen data may safely be shared. **Rules and initial settings stay fixed while positions, item ownership, and tick change.** No action can resize the world or change vision or the skill set during a run.
+
+## Actions and error semantics
+
+```typescript
+type WorldAction =
+  | {
+      type: 'move';
+      agentId: string;
+      direction: 'north' | 'east' | 'south' | 'west';
+    }
+  | { type: 'pickup'; agentId: string; itemId: string }
+  | { type: 'try'; agentId: string; skill: string };
+```
+
+- `move` travels one cardinal cell without wrapping, crossing boundaries, or entering another agent's cell. Items do not block movement.
+- `pickup` collects a ground item from the same cell, removes it from the ground, and transfers it to the acting agent's inventory. An item has one owner.
+- `try` returns `skill-unavailable` for unknown skills and records the request without execution, generation, or registration. Existing skills return `skill-already-exists` without implicit execution. Legacy aliases remain accepted for old replay compatibility; their source literals use Unicode escapes under the English content policy.
+- A well-formed command from a known agent consumes one logical tick even when movement, pickup, or a skill request is rejected. The result is stored in a `WorldEvent`.
+- Malformed commands, unknown agents, invalid ticks, or integer overflow throw `RangeError`; the caller retains the previous world. No path mutates input snapshots.
+
+Public TypeScript types do not replace validation of external data. `parseWorldAction(unknown)` validates commands; imports must not bypass it with a type assertion.
+
+## Automatic observations
+
+Creation and every transition generate an `Observation` for each agent without a separate observation skill. Vision uses inclusive Euclidean distance with no facing direction, walls, or occlusion.
+
+An observation includes the agent's own state and inventory, public details of visible agents, and visible ground items. Other agents' inventories are excluded. All observations update after movement and pickup. Global view is a human inspection tool; agent view renders only the selected observation. This is not client-side data secrecy or an authorization boundary.
+
+## History, playback, and files
+
+`Timeline` stores the initial snapshot and a snapshot after every action, up to 500 actions or 501 frames. `frameAt` only reads existing snapshots. The playback timer belongs to the viewer and neither advances core time nor repeats actions. Historical frames and active playback disable actions. Returning to the latest frame allows appending; branching and editing history are unsupported.
+
+The `self-evolving-world/replay` format contains file and core versions, initial settings/entities, and an action sequence. Import is limited to 1 MB and validates versions, fields, counts, and world constraints before reconstructing all snapshots deterministically. The current session is replaced only after success. Executable code, rule definitions, and arbitrary snapshots are not accepted. Importing different initial settings opens another world rather than modifying the current world's rules.
+
+History lives in page memory and does not survive refreshes automatically; JSON export supports later replay. Interface text uses `textContent`, so imported names are never executed as HTML. Project-authored copy and demo names are English; imported user data retains its original text and Unicode support.
+
+## Executable constraints and builds
+
+- [dependency-cruiser](dependency-cruiser.config.cjs) enforces core independence, public APIs, no viewer imports from Node/CLI, and no cycles or unresolved dependencies.
+- [Strict TypeScript and ESLint](tsconfig.base.json) cover source, tests, and scripts. The independent core check excludes Node and DOM types; the independent viewer check uses browser types only.
+- Root TypeScript, Vitest, and viewer type checks resolve core source, so a clean checkout needs no prebuilt `dist`. `pnpm build` builds the core before applications; Vite bundles the actual package export.
+- `pnpm dev` builds the core before starting the viewer; rerun after core changes. `pnpm test:e2e` uses a dedicated preview process rather than an existing user server.
+- `pnpm check` runs types, lint, formatting, dependencies, Vitest, builds, CLI output, Chromium interactions, and documentation. See the [development workflow](docs/DEVELOPMENT.md).
+- `pnpm validate` wraps the full automated checks and produces pending evidence. Browser [validators](apps/viewer/e2e/validators.ts) check runtime health and layout; [anomaly scenarios](apps/viewer/e2e/anomalies.spec.ts) check invalid movement, ownership, and vision. After inspecting current visuals and behavior, `pnpm task:finish` can mark completion. Source fingerprints include documentation and exclude generated output. See [VALIDATION](docs/VALIDATION.md) and [ADR-0005](docs/decisions/0005-browser-validation-gate.md).
+
+These mechanisms do not prove arbitrary program purity, documentation semantics, or honest aesthetic review, and do not configure remote branch protection.
+
+## Future modules (Planned)
+
+Autonomous NPC decisions, goals and memory, model adapters, World Agent review, skill evolution, databases, and migrations remain unimplemented. Future skills require a separately designed extension layer, explicit authorization, rule versioning, and an ADR. They must not rewrite this base core during a run. Current `try` actions only record requests.

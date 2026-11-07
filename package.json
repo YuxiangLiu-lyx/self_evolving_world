@@ -1,0 +1,50 @@
+{
+  "name": "self-evolving-world",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/YuxiangLiu-lyx/self_evolving_world.git"
+  },
+  "packageManager": "pnpm@10.34.9",
+  "engines": {
+    "node": "24.22.2",
+    "pnpm": "10.34.9"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "tsc --noEmit && pnpm --filter @self-evolving-world/world-core typecheck && pnpm --filter @self-evolving-world/viewer exec tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "architecture:check": "depcruise --config dependency-cruiser.config.cjs apps packages",
+    "docs:check": "markdownlint-cli2 && tsx scripts/check-docs.ts",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm architecture:check && pnpm test && pnpm build && pnpm demo:check && pnpm test:e2e && pnpm docs:check",
+    "dev": "pnpm --filter @self-evolving-world/world-core build && pnpm --filter @self-evolving-world/viewer dev",
+    "preview": "pnpm --filter @self-evolving-world/viewer preview",
+    "test:e2e": "playwright test",
+    "validate": "tsx scripts/validate.ts run",
+    "task:finish": "tsx scripts/validate.ts finish",
+    "demo:check": "tsx scripts/check-demo.ts",
+    "demo": "pnpm build && node apps/simulator/dist/main.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.0",
+    "@eslint/js": "10.0.1",
+    "@types/markdown-it": "14.2.0",
+    "@types/node": "24.19.2",
+    "dependency-cruiser": "17.4.3",
+    "eslint": "10.14.0",
+    "github-slugger": "2.0.0",
+    "markdown-it": "14.3.3",
+    "markdownlint-cli2": "0.24.0",
+    "prettier": "3.9.10",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "4.1.12"
+  }
+}
