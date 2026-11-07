@@ -52,24 +52,25 @@ pnpm check
 
 Before completing each task, run `pnpm validate -- "task name"`. It opens the current build in Chromium and captures evidence. Inspect all five screenshots and behavior results, complete `validation-results/review.json`, and run `pnpm task:finish -- "same task name"`. Complete the task only when this gate succeeds. See the [validation workflow](docs/VALIDATION.md).
 
-| Command                             | Purpose                                                                 |
-| ----------------------------------- | ----------------------------------------------------------------------- |
-| `pnpm dev`                          | Build the core and start the viewer; restart after core changes         |
-| `pnpm build`                        | Build the core, CLI, and static viewer                                  |
-| `pnpm preview`                      | Serve the built viewer on port 4173                                     |
-| `pnpm demo`                         | Run the CLI and print initial, move, pickup, and try snapshots          |
-| `pnpm check`                        | Run all automated checks, including real Chromium interactions          |
-| `pnpm validate -- "task name"`      | Run full checks and capture screenshots; create a pending review        |
-| `pnpm task:finish -- "task name"`   | Require successful reviews and current evidence before completion       |
-| `pnpm typecheck`                    | Check the root project, host-independent core, and browser module       |
-| `pnpm lint`                         | Run strict ESLint checks                                                |
-| `pnpm architecture:check`           | Check allowed dependencies, public entry points, cycles, and resolution |
-| `pnpm test` / `pnpm test:watch`     | Test the core, replay, CLI, documentation checker, and completion gate  |
-| `pnpm test:e2e`                     | Test the built viewer, replay, file round trips, and mobile layout      |
-| `pnpm exec playwright show-report`  | Open browser test details and screenshot attachments                    |
-| `pnpm demo:check`                   | Compare built CLI output in two independent processes                   |
-| `pnpm docs:check`                   | Check Markdown, required documents, local links, and heading anchors    |
-| `pnpm format:check` / `pnpm format` | Check or fix formatting                                                 |
+| Command                                                      | Purpose                                                                              |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `pnpm dev`                                                   | Build the core and start the viewer; restart after core changes                      |
+| `pnpm build`                                                 | Build the core, CLI, and static viewer                                               |
+| `pnpm preview`                                               | Serve the built viewer on port 4173                                                  |
+| `pnpm demo`                                                  | Run the CLI and print initial, move, pickup, and try snapshots                       |
+| `pnpm check`                                                 | Run all automated checks, including real Chromium interactions                       |
+| `pnpm validate -- "task name"`                               | Run full checks and capture screenshots; create a pending review                     |
+| `pnpm task:finish -- "task name"`                            | Require successful reviews and current evidence before completion                    |
+| `pnpm pr:check -- validation-results/pr-body.md origin/main` | Verify PR requirements, all changed paths, latest head, and completed local evidence |
+| `pnpm typecheck`                                             | Check the root project, host-independent core, and browser module                    |
+| `pnpm lint`                                                  | Run strict ESLint checks                                                             |
+| `pnpm architecture:check`                                    | Check allowed dependencies, public entry points, cycles, and resolution              |
+| `pnpm test` / `pnpm test:watch`                              | Test the core, replay, CLI, documentation checker, and completion gate               |
+| `pnpm test:e2e`                                              | Test the built viewer, replay, file round trips, and mobile layout                   |
+| `pnpm exec playwright show-report`                           | Open browser test details and screenshot attachments                                 |
+| `pnpm demo:check`                                            | Compare built CLI output in two independent processes                                |
+| `pnpm docs:check`                                            | Check Markdown, required documents, local links, and heading anchors                 |
+| `pnpm format:check` / `pnpm format`                          | Check or fix formatting                                                              |
 
 The toolchain uses pnpm Workspace, TypeScript Strict / ESM, Vitest, Playwright, ESLint, Prettier, dependency-cruiser, and GitHub Actions. The interface uses native TypeScript/CSS and Vite without a frontend framework. Exact dependencies are in [package.json](package.json) and [pnpm-lock.yaml](pnpm-lock.yaml). Initial installation requires network access; the built simulation and replay run offline.
 
@@ -77,7 +78,7 @@ CLI output contains full snapshots. The viewer imports the replay format produce
 
 ## Repository map and reading guide
 
-The canonical repository is [YuxiangLiu-lyx/self_evolving_world](https://github.com/YuxiangLiu-lyx/self_evolving_world), with `main` as the integration branch. Pushes and pull requests run the complete validation in [GitHub Actions](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions). Each run retains available browser reports, screenshots, and validation records for 14 days. See [version control and CI](docs/DEVELOPMENT.md#version-control-and-ci) for the contribution workflow.
+The canonical repository is [YuxiangLiu-lyx/self_evolving_world](https://github.com/YuxiangLiu-lyx/self_evolving_world), with `main` as the integration branch. Pushes and pull requests run the complete validation in [GitHub Actions](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions). Each run retains available browser reports, screenshots, and validation records for 14 days. Before implementation, summarize numbered requirements in a task plan. Every PR repeats those requirements, reviews every changed file against them, and requires full tests plus current evidence. Follow the [PR contract](docs/PULL_REQUESTS.md). See [version control and CI](docs/DEVELOPMENT.md#version-control-and-ci) for the contribution workflow.
 
 ```text
 packages/world-core/  All base rules in world.ts; index.ts only re-exports

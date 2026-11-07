@@ -11,12 +11,12 @@ Follow the [language policy](../AGENTS.md#language-policy): user conversations a
 ## A PR from start to completion
 
 1. Inspect existing changes and read [PRODUCT](PRODUCT.md), [ARCHITECTURE](../ARCHITECTURE.md), and relevant ADRs.
-2. Define the objective, scope, and acceptance criteria. Create a plan in [active](exec-plans/active/README.md) for substantial work.
+2. Before implementation, summarize the request to the user and record numbered requirements, exclusions, and acceptance criteria in a plan in [active](exec-plans/active/README.md). Every PR needs a plan, including small and documentation-only work. Follow the [PR contract](PULL_REQUESTS.md).
 3. Implement the smallest complete behavior. Keep transitions pure and I/O at boundaries.
-4. Test meaningful behavior and failure paths. Do not add tests that merely mirror simple copy edits.
+4. Review the actual complete diff against each numbered requirement, including all changed files, and resolve mismatches or unrelated work. Test meaningful behavior and failure paths. Do not add tests that merely mirror simple copy edits.
 5. Update feature records, architecture, ADRs, and plans according to the [synchronization policy](DOCUMENTATION_POLICY.md).
 6. Follow the [validation workflow](VALIDATION.md): run `pnpm validate -- "task name"`, including the full `pnpm check`; inspect every current screenshot and behavior result; fix problems and rerun. Also run `pnpm demo` when CLI or package exports change.
-7. Record actual evidence and limitations in the [PR template](../.github/pull_request_template.md) and plan. Finish documentation, rerun validation after edits, review the new evidence, and complete only after `pnpm task:finish -- "task name"` succeeds. Archive completed plans; archival changes require a final validation run too.
+7. Repeat the requirements in the PR, map every requirement and changed path to implementation and verification, and record the latest reviewed head SHA. Record actual evidence and limitations in the [PR template](../.github/pull_request_template.md) and plan. Finish documentation, rerun validation after edits, review the new evidence, and complete only after `pnpm task:finish -- "task name"` succeeds. Archive completed plans; archival changes require a final validation run too. After committing the reviewed files, run `pnpm pr:check -- validation-results/pr-body.md origin/main`; it checks the PR contract and actual completed local evidence.
 
 ## Debugging failures
 
@@ -40,13 +40,13 @@ git commit -m "Describe the completed change"
 git push -u origin HEAD
 ```
 
-Open a PR against `main` using the repository's [PR template](../.github/pull_request_template.md). Inspect the `quality` check for the pushed commit and resolve failures before merging. Keep commits and PR content in English. Do not force-push shared history or commit dependencies, build outputs, local credentials, or generated validation directories.
+Open a PR against `main` using the repository's [PR template](../.github/pull_request_template.md). Inspect both `quality` and `pr-policy` for the latest PR revision and resolve failures before merging. Every PR must run the complete test suite; failed, skipped, unavailable, or stale results cannot pass acceptance. Keep commits and PR content in English. Do not force-push shared history or commit dependencies, build outputs, local credentials, or generated validation directories.
 
 [GitHub Actions](../.github/workflows/ci.yml) runs frozen install and `pnpm validate` on pushes, pull requests, and manual dispatch. This invokes the complete `pnpm check`, including the built CLI and Chromium. CI installs Chromium and its system dependencies. Actions use verified full commit SHAs. Toolchain upgrades must synchronize versions, lockfile, relevant ADR impacts, and validation.
 
 Available HTML reports, screenshots, traces, and validation records are uploaded even when validation fails, under `validation-<commit SHA>-<run attempt>` with 14-day retention. Download them from the [Actions run](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions), extract the archive, and open its HTML report with Playwright. Failures before browser execution may have no screenshots. CI records automated success as pending review; it never fabricates visual approval. The task executor still performs the local visual/behavior review and completion gate.
 
-Branch protection is an independent repository setting, not established by these files. A repository administrator can make the `quality` job required and choose review requirements. This integration does not enable branch protection, create releases, or publish packages.
+The [PR contract](PULL_REQUESTS.md#github-checks-and-merge-restrictions) defines required GitHub protection and its rollout. Repository settings must require `quality` and `pr-policy`, an up-to-date branch, resolved conversations, and PR-based updates for administrators too. Configuration files alone do not establish remote enforcement; inspect the current settings and task-plan activation evidence. Do not merge a PR or bypass required checks to finish implementation.
 
 ## Viewer development and browser tests
 

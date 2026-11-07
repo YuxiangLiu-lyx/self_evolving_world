@@ -1,37 +1,50 @@
 # Pull Request
 
-## Objective and scope
+Copy numbered requirements from the task plan created before implementation. Replace every `REPLACE_ME`, review the complete diff, and check boxes only after the work and evidence exist. Draft PRs may be incomplete, but cannot pass this gate. Write the PR in English.
 
-Describe the concrete problem, resulting behavior, and Feature IDs. Link the execution plan.
+## Requirements
 
-## Changes and validation
+- R1: REPLACE_ME with the exact requirement from the task plan.
 
-- Main changes:
-- Commands actually run, environment, and results:
-- Unexecuted checks and reasons:
-- Known limitations and risks:
-- Validation task name, run ID, plan, report, and screenshot locations:
-- Visual review findings for desktop, mobile, vision, actions, and replay:
-- Agent behavior review findings:
+## Scope
+
+- Plan: `docs/exec-plans/active/pr-00-replace-me.md`
+- In scope: REPLACE_ME with authorized changes and Feature IDs.
+- Out of scope: REPLACE_ME with explicit exclusions.
+
+## Requirement review
+
+List exact changed paths in code spans. Include every changed file, including tests, documentation, deletions, and configuration. Use multiple rows for a requirement when useful. Describe what was inspected and verified; filenames alone are insufficient.
+
+| Requirement | Changed files and implementation                | Verification evidence and findings                        | Result  |
+| ----------- | ----------------------------------------------- | --------------------------------------------------------- | ------- |
+| R1          | `REPLACE_ME` implements the requested behavior. | REPLACE_ME with actual checks and requirement comparison. | PENDING |
+
+## Validation
+
+- Reviewed head: REPLACE_ME with the full latest PR head commit SHA.
+- Task: REPLACE_ME with the actual validation task name.
+- Run ID: REPLACE_ME with the completed local validation run ID.
+- Full suite: PENDING
+- Results: REPLACE_ME with environment, complete test counts, commands, evidence locations, and actual remote CI state.
+- Visual and behavior review: REPLACE_ME with concrete findings from every current screenshot and behavior result.
+
+Remote `quality` and `pr-policy` checks must both pass for the current revision before merging. An unavailable check is a blocker, not a waiver. New source or documentation edits require fresh validation and review; a new head requires updating this description.
+
+## Code review
+
+- Reviewer: REPLACE_ME
+- Findings: REPLACE_ME with the full-diff comparison against each requirement, regression risks, scope deviations, and their resolution. All requirement mismatches must be resolved before PASS.
 
 ## Documentation synchronization
 
-Explain any items that do not apply. Write repository content and this PR description in English; communicate with the user in Chinese.
+REPLACE_ME with affected PRODUCT records, architecture, ADRs, execution plan, and usage documentation, or a specific reason each is unchanged. Planned functionality must remain distinct from delivered behavior.
 
-- [ ] PRODUCT reflects changed features, acceptance criteria, and evidence.
-- [ ] ARCHITECTURE and dependency checks reflect module or interface changes.
-- [ ] Important decisions have an ADR with alternatives, reasons, costs, and consequences.
-- [ ] The execution plan records results and is archived when complete.
-- [ ] README and development instructions match current commands and navigation.
-- [ ] `pnpm check` ran; failed or unavailable checks are reported honestly.
-- [ ] The [validation workflow](../docs/VALIDATION.md) was followed: `pnpm validate` opened the actual page, every current screenshot was inspected, and findings were recorded.
-- [ ] All issues are fixed; validation ran after the final edit; `pnpm task:finish` succeeded and the report is `passed`.
+## Completion checklist
 
-## Semantic review
-
-Static checks cannot establish complete agreement between documentation and implementation.
-
-- [ ] Documented behavior, interfaces, and architecture diagrams match the code.
-- [ ] Planned work is distinct from delivered features; PRODUCT alone owns status.
-- [ ] Evidence and claims are accurate; local results do not substitute for remote CI or branch protection.
-- [ ] The PR matches its plan without unrelated refactors or premature future features.
+- [ ] All requirements are satisfied.
+- [ ] Every changed file was reviewed against the requirements.
+- [ ] No unrelated changes or unresolved requirement mismatches remain.
+- [ ] The full test suite passed without skipped or focused tests.
+- [ ] Current visual, behavior, and requirement reviews passed.
+- [ ] The task completion gate passed after the final edit.

@@ -26,6 +26,7 @@ export const REQUIRED_DOCUMENTS = [
   'docs/WORLD_FOUNDATION.md',
   'docs/PRODUCT.md',
   'docs/DEVELOPMENT.md',
+  'docs/PULL_REQUESTS.md',
   'docs/VALIDATION.md',
   'docs/DOCUMENTATION_POLICY.md',
   'docs/decisions/README.md',

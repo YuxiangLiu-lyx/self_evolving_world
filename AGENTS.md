@@ -14,7 +14,8 @@ This project prioritizes Human Legibility, Agent Legibility, Enforceable Archite
 1. Inspect Git status and preserve unrelated changes.
 2. Read the [project overview](docs/PROJECT_OVERVIEW.md) and [feature inventory](docs/PRODUCT.md); distinguish delivered behavior from plans.
 3. Before changing a module, read the [architecture](ARCHITECTURE.md) and relevant [ADRs](docs/decisions/README.md).
-4. Follow the [development workflow](docs/DEVELOPMENT.md) and [documentation policy](docs/DOCUMENTATION_POLICY.md). Maintain an [execution plan](docs/exec-plans/README.md) for substantial tasks.
+4. Before implementation, summarize the current request to the user in Chinese and record numbered requirements, exclusions, and acceptance criteria in an English task plan. Every PR repeats these requirements and maps them to the actual changes and evidence; follow the [PR contract](docs/PULL_REQUESTS.md).
+5. Follow the [development workflow](docs/DEVELOPMENT.md) and [documentation policy](docs/DOCUMENTATION_POLICY.md). Maintain an [execution plan](docs/exec-plans/README.md) for substantial tasks.
 
 ## Required constraints
 
@@ -25,6 +26,7 @@ This project prioritizes Human Legibility, Agent Legibility, Enforceable Archite
 - Preserve strict types. Do not introduce explicit `any`, implicit randomness, or system-clock-driven core behavior.
 - `PRODUCT.md` is the sole source of feature status. Never describe Planned functionality as implemented or invent validation results.
 - Synchronize feature records, architecture, ADRs, and execution plans when functionality, boundaries, important decisions, or completion status changes.
+- Require the complete unfiltered test suite for every PR. Review every changed file against the numbered requirements, resolve all mismatches, and record current findings. Skipped tests, incomplete checks, stale reviews, or missing requirements block acceptance. Run `pnpm pr:check` before publishing and verify current `quality` and `pr-policy` checks before merging.
 - Keep each PR focused. Escalate destructive changes, major architectural conflicts, and substantial scope expansion to the user.
 - Before completing every task, including documentation tasks, follow the [validation workflow](docs/VALIDATION.md): run `pnpm validate -- "task name"` to open the current build; inspect every current screenshot and behavior result; record the review; complete only after `pnpm task:finish -- "task name"` succeeds.
 - Fix validation failures and rerun. Any source or documentation edit requires fresh validation. Do not reuse old task evidence, skip the browser, approve unseen screenshots, or substitute automated assertions for visual review. Report unresolved environment blockers as incomplete work.

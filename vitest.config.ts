@@ -17,5 +17,7 @@ export default defineConfig({
       'scripts/**/*.test.ts',
     ],
     clearMocks: true,
+    allowOnly: false,
+    reporters: ['default', './scripts/unit-reporter.ts'],
   },
 });

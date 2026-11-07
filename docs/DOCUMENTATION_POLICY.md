@@ -15,6 +15,8 @@
 
 All repository content is in English. Conversations with the user remain in Chinese. Translation of historical records must preserve their original scope, results, and limitations rather than claiming current capabilities existed earlier.
 
+Requirement summaries, the PR requirement-to-change matrix, full-diff review, and current-head acceptance follow [PULL_REQUESTS](PULL_REQUESTS.md). Every requirement and changed file must be accounted for; green structural checks do not substitute for this semantic review.
+
 WORLD_FOUNDATION preserves version-1 semantics. Ordinary feature synchronization and world evolution must not rewrite its catalogue, base skills, or initial conditions. Keep future extension definitions and runtime discoveries separate. Wording corrections may clarify existing meaning; a different foundation requires explicit authorization and a separate versioned specification preserving the original.
 
 ## Synchronization triggers

@@ -19,6 +19,7 @@ describe('task completion evidence', () => {
     reviewer: string;
     visual: { id: string; verdict: string; notes: string }[];
     behavior: { verdict: string; notes: string };
+    requirements: { verdict: string; notes: string };
   };
   beforeEach(() => {
     root = mkdtempSync(join(tmpdir(), 'world-validation-'));
@@ -54,6 +55,10 @@ describe('task completion evidence', () => {
         notes: 'Fixture notes',
       })),
       behavior: { verdict: 'pass', notes: 'Fixture behavior observations' },
+      requirements: {
+        verdict: 'pass',
+        notes: 'Fixture requirement and diff review',
+      },
     };
   });
   afterEach(() => {
@@ -121,6 +126,20 @@ describe('task completion evidence', () => {
     expect(check().join()).toContain('Missing reviewer');
     expect(check().join()).toContain('Behavior review');
     expect(check().join()).toContain('desktop');
+  });
+  it('rejects an absent, pending, failed or empty requirement review', () => {
+    expect(
+      completionErrors(root, 'fixture task', report, {
+        ...review,
+        requirements: undefined,
+      }).join(),
+    ).toContain('Incomplete');
+    for (const verdict of ['pending', 'fail']) {
+      review.requirements = { verdict, notes: 'Requirement mismatch remains' };
+      expect(check().join()).toContain('Requirement and full-diff review');
+    }
+    review.requirements = { verdict: 'pass', notes: ' ' };
+    expect(check().join()).toContain('Requirement and full-diff review');
   });
   it('rejects altered and deleted screenshot evidence', () => {
     writeFileSync(join(root, 'test-results/desktop.png'), 'different pixels');
