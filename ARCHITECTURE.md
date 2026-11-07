@@ -29,6 +29,8 @@ Cross-package imports must use `@self-evolving-world/world-core`, never internal
 
 ## One fixed core file
 
+The [World Foundation](docs/WORLD_FOUNDATION.md) owns the fixed version-1 specification, including the viewer's starting item catalogue. Future evolution must use separate extension definitions while preserving that specification and the base skill semantics. This document owns the implementation contracts below.
+
 `world.ts` contains all base settings, types, and skill implementations. There is no plugin registry. `CORE_RULES` and its skill array are frozen, with version `1` and exactly `move`, `pickup`, and `try`.
 
 `createWorld(setup)` accepts optional initial settings and entities, copies inputs, validates them, and freezes the result. Defaults are `width=16`, `height=12`, and `visionRadius=4`. Coordinates are integers with origin `(0, 0)` at the top left; `0 ≤ x < width` and `0 ≤ y < height`. Each dimension supports 1–64 cells, vision radius 0–64, at most 32 agents, and at most 256 items. With no arguments it creates an empty world. Demo entities belong to the application layer.
