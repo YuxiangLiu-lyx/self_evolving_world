@@ -56,7 +56,7 @@ pnpm exec playwright install chromium
 pnpm check
 ```
 
-Before completing each task, run `pnpm validate -- "task name"`. It opens the current build in Chromium and captures evidence. Inspect all standard and experiment screenshots and behavior results, complete `validation-results/review.json`, and run `pnpm task:review -- "same task name"`. After this local gate succeeds, commit reviewed files and run `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"`. Every task type follows PR, conflict checks and guarded merge automatically; the publisher then runs `task:finish` to verify integration. Explicit no-PR or no-merge instructions require a current plan exception. See the [validation workflow](docs/VALIDATION.md).
+Use `pnpm task -- start validation-results/intent.json` for every task. Follow its current structured requests for implementation, every screenshot and behavior result, complete diff review, PR description and GitHub COMMENT self-review. Submit results and continue with `pnpm task -- next ID`; the program controls full validation, reviewed commit, publication, separately authorized merge and independent completion. Explicit no-PR/no-merge instructions remain current-plan exceptions. Legacy task commands resolve the same recorded task and cannot bypass its authorization or evidence. Standalone `pnpm validate` produces automated evidence only. See the [task entry](docs/TASK_HARNESS.md) and [validation criteria](docs/VALIDATION.md).
 
 | Command                                                                  | Purpose                                                                                                                |
 | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
@@ -66,17 +66,17 @@ Before completing each task, run `pnpm validate -- "task name"`. It opens the cu
 | `pnpm experiment:run -- [seed] [rounds]`                                 | Create the next offline random experiment with results and browser visuals                                             |
 | `pnpm experiment:resume -- exN`                                          | Finish failed browser capture without replacing saved simulation data                                                  |
 | `pnpm experiment:check`                                                  | Validate all retained experiment records and deterministic results                                                     |
-| `pnpm harness -- "task name"`                                            | Classify code/experiment/mixed changes and execute the corresponding validation flow                                   |
+| `pnpm harness -- "task name"`                                            | Continue the matching recorded task through the unified coordinator                                                    |
 | `pnpm experiment:login`                                                  | Authorize the optional experiment through ChatGPT in the browser                                                       |
 | `pnpm experiment:survival`                                               | Run the next plan-funded survival experiment: 60 rounds, at most five requests per actor                               |
 | `pnpm experiment:once`                                                   | Request one decision for each of three agents and save a replay                                                        |
 | `pnpm demo`                                                              | Run the CLI and print initial, move, pickup, and try snapshots                                                         |
 | `pnpm check`                                                             | Run all automated checks, including real Chromium interactions                                                         |
 | `pnpm validate -- "task name"`                                           | Run full checks and capture screenshots; create a pending review                                                       |
-| `pnpm task:review -- "task name"`                                        | Accept actual current visual, behavior and requirement review before publication                                       |
-| `pnpm task:finish -- "task name"`                                        | Verify reviewed evidence, remote delivery and integration before completion                                            |
+| `pnpm task:review -- "task name"`                                        | Continue the matching task; submit actual review through its structured request                                        |
+| `pnpm task:finish -- "task name"`                                        | Continue the matching task through the independent completion gate                                                     |
 | `pnpm pr:check -- validation-results/pr-body.md origin/main`             | Verify PR requirements, all changed paths, latest head, and completed local evidence                                   |
-| `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"` | Preflight, push, create/update PR, verify checks/conflicts, merge and verify completion                                |
+| `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"` | Submit the current PR body or continue the recorded task; no independent merge path                                    |
 | `pnpm typecheck`                                                         | Check the root project, host-independent core, and browser module                                                      |
 | `pnpm lint`                                                              | Run strict ESLint checks                                                                                               |
 | `pnpm architecture:check`                                                | Check allowed dependencies, public entry points, cycles, and resolution                                                |
@@ -111,4 +111,4 @@ Decisions and acceptance records live in [ADRs](docs/decisions/README.md) and [e
 
 ## Development task entry
 
-Use the [programmatic harness](docs/TASK_HARNESS.md) for new code, documentation and experiment tasks: `pnpm task -- start validation-results/intent.json`. It returns structured requests to the current conversation and resumes with `submit` or `next`; `status` shows current evidence and blockers. Existing low-level commands remain available. Every experiment also retains a [behavioral analysis](experiment/README.md#behavioral-analysis) with recommendations only.
+Use the [programmatic harness](docs/TASK_HARNESS.md) for new code, documentation and experiment tasks: `pnpm task -- start validation-results/intent.json`. It returns structured requests to the current conversation and resumes with `submit` or `next`; `status` shows current evidence and blockers. Legacy task commands are guarded compatibility entries; standalone diagnostic checks remain available. Every experiment also retains a [behavioral analysis](experiment/README.md#behavioral-analysis) with recommendations only.

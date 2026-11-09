@@ -9,6 +9,7 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { resolve } from 'node:path';
+import { readTask } from './task-worker.js';
 import { checkAnalyses } from './experiment-review.js';
 import {
   digest,
@@ -18,8 +19,8 @@ import {
   type TaskContext,
 } from './task-context.js';
 import { TaskFlow } from './task-flow.js';
-import { LocalTaskEffects } from './task-runtime.js';
-import { object, readJson } from './validation.js';
+import { LocalTaskEffects, requestCaptureRecovery } from './task-runtime.js';
+import { readJson } from './validation.js';
 
 const root = process.cwd(),
   directory = resolve(root, 'validation-results/tasks');
@@ -30,27 +31,6 @@ function statePath(id: string): string {
   if (!/^[a-z0-9][a-z0-9-]{1,79}$/.test(id))
     throw new Error('Invalid task ID.');
   return resolve(directory, `${id}.json`);
-}
-function load(id: string): TaskContext {
-  const value = object(readJson(statePath(id)));
-  if (
-    value.version !== 1 ||
-    !Array.isArray(value.history) ||
-    !Array.isArray(value.amendments) ||
-    typeof value.prepared !== 'boolean'
-  )
-    throw new Error('Invalid task journal.');
-  const intent = parseIntent(value.intent),
-    originalIntent = parseIntent(value.originalIntent);
-  if (intent.id !== id || originalIntent.id !== id)
-    throw new Error('Task journal identity mismatch.');
-  // Derived/evidence fields are never authority: next rechecks actual source, legacy gates and remote receipts.
-  return {
-    ...value,
-    intent,
-    originalIntent,
-    amendments: value.amendments.map(parseIntent),
-  } as unknown as TaskContext;
 }
 function lock(): () => void {
   const path = resolve(directory, 'execution.lock');
@@ -84,11 +64,20 @@ try {
   } else {
     if (
       !target ||
-      !['start', 'next', 'submit', 'status', 'amend'].includes(command ?? '') ||
-      args.length !== (command === 'submit' || command === 'amend' ? 3 : 2)
+      ![
+        'start',
+        'next',
+        'submit',
+        'status',
+        'amend',
+        'verify',
+        'recover',
+      ].includes(command ?? '') ||
+      args.length !==
+        (['submit', 'amend', 'recover'].includes(command ?? '') ? 3 : 2)
     )
       throw new Error(
-        'Usage: pnpm task -- start intent.json | next ID | submit ID response.json | status ID | amend ID intent.json',
+        'Usage: pnpm task -- start intent.json | next ID | submit ID response.json | status ID | amend ID intent.json | verify ID | recover ID exN',
       );
     mkdirSync(directory, { recursive: true });
     if (command !== 'status') unlock = lock();
@@ -100,7 +89,7 @@ try {
         JSON.stringify(context, null, 2) + '\n',
         { flag: 'wx' },
       );
-    } else context = load(target);
+    } else context = readTask(root, target);
     const save = (): void => {
       const path = statePath(context.intent.id),
         temporary = `${path}.tmp`;
@@ -109,6 +98,14 @@ try {
     };
     const effects = new LocalTaskEffects(root, save);
     const flow = new TaskFlow(context, effects, save);
+    if (command === 'recover') {
+      requestCaptureRecovery(
+        root,
+        context,
+        text(response, 'recovery experiment ID'),
+      );
+      save();
+    }
     if (command === 'amend') {
       const intent = parseIntent(
         readJson(resolve(root, text(response, 'amended intent file'))),
@@ -164,7 +161,9 @@ try {
           ? await flow.submit(
               readJson(resolve(root, text(response, 'response file'))),
             )
-          : await flow.next();
+          : command === 'verify'
+            ? await flow.verify()
+            : await flow.next();
       console.log(
         JSON.stringify(
           { ...context, continue: `pnpm task -- next ${context.intent.id}` },

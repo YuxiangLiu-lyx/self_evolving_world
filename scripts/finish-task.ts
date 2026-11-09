@@ -1,3 +1,5 @@
+import { requireTaskWorker } from './task-worker.js';
+import { verifyRemoteReview } from './task-review.js';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
@@ -19,6 +21,7 @@ const index = args.indexOf('--plan');
 const task = (index < 0 ? args : args.slice(0, index)).join(' ').trim();
 const requestedPlan = index < 0 ? undefined : args[index + 1];
 try {
+  const context = requireTaskWorker(root, 'finish', args);
   if (!task || (index >= 0 && (!requestedPlan || index + 2 !== args.length)))
     throw new Error(
       'Usage: pnpm task:finish -- "task name" [--plan docs/exec-plans/active/pr-NN-task.md]',
@@ -124,6 +127,9 @@ try {
       base: receipt.base,
     };
     const request = githubRequest(root);
+    const remoteReview = await verifyRemoteReview(root, context, request);
+    if (!remoteReview)
+      throw new Error('Current GitHub self-review is missing or stale.');
     const pr = await request(`/pulls/${String(receipt.number)}`);
     const identity = verifyPullRequest(
       pr,
@@ -180,6 +186,7 @@ try {
       JSON.stringify(
         {
           ...receipt,
+          remoteReview,
           status:
             policy.mode === 'merge' ? 'completed' : 'completed-with-exception',
           verifiedAt: new Date().toISOString(),

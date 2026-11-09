@@ -1,6 +1,8 @@
 import { spawnSync } from 'node:child_process';
 import { closeSync, openSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, relative, isAbsolute } from 'node:path';
+import { githubRequest } from './github.js';
+import { reviewBody, verifyRemoteReview } from './task-review.js';
 import { currentDeliveryPolicy, git } from './delivery-git.js';
 import { checkArchivePreservation, taskRoute } from './harness.js';
 import { experimentIds, readExperiment } from './experiments.js';
@@ -30,8 +32,32 @@ import type { TaskEffects } from './task-flow.js';
 
 export type CommandRunner = (
   args: string[],
-  options: { cwd: string; stdio: ['ignore', number, number] },
+  options: {
+    cwd: string;
+    stdio: ['ignore', number, number];
+    env: NodeJS.ProcessEnv;
+  },
 ) => { status: number | null; error?: Error };
+
+/** The explicit legacy resume command confirms capture recovery; it never restarts inference. */
+export function requestCaptureRecovery(
+  root: string,
+  c: TaskContext,
+  id: string,
+): void {
+  if (
+    c.intent.experiment.mode === 'none' ||
+    c.experiment?.id !== id ||
+    c.experiment.phase !== 'started'
+  )
+    throw new Error(
+      'Capture recovery requires the already allocated incomplete experiment.',
+    );
+  if (readExperiment(root, id, true).manifest.status === 'completed')
+    throw new Error('Completed experiments cannot be overwritten.');
+  c.experiment.error = `Explicit capture-only recovery requested for ${id}; the caller must first confirm the interrupted process stopped.`;
+  c.history.push({ step: 'experiment', detail: c.experiment.error });
+}
 
 /** Node boundary: all acceptance and external checks remain in the original commands. */
 export class LocalTaskEffects implements TaskEffects {
@@ -53,6 +79,11 @@ export class LocalTaskEffects implements TaskEffects {
       const result = this.execute(args, {
         cwd: this.root,
         stdio: ['ignore', fd, fd],
+        env: {
+          ...process.env,
+          SEW_TASK_ID: context.intent.id,
+          SEW_TASK_OWNER: String(process.pid),
+        },
       });
       if (result.error) throw result.error;
       if (result.status !== 0)
@@ -320,6 +351,23 @@ export class LocalTaskEffects implements TaskEffects {
       JSON.stringify(review, null, 2) + '\n',
     );
     this.command(c, ['task:review', '--', c.intent.task]);
+  }
+  reviewEvidenceHash(): string {
+    return hashFile(resolve(this.root, 'validation-results/review.json'));
+  }
+  remoteReview(c: TaskContext) {
+    return verifyRemoteReview(this.root, c, githubRequest(this.root));
+  }
+  remoteReviewMaterials(c: TaskContext): unknown {
+    return {
+      operation: 'github.add_review_to_pr',
+      repo_full_name: 'YuxiangLiu-lyx/self_evolving_world',
+      pr_number: c.publication?.number,
+      commit_id: c.body?.head,
+      action: 'COMMENT',
+      review: reviewBody(this.root, c),
+      independent: false,
+    };
   }
   commit(message: string, files: readonly string[], c: TaskContext): void {
     if (this.validationState(c) !== 'passed')

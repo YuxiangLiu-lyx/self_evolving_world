@@ -10,12 +10,15 @@ This uses subscription entitlement, subject to account availability and plan lim
 
 ```bash
 pnpm experiment:login
+# First record explicit survival intent using the unified task entry.
+pnpm task -- start validation-results/intent.json
+# The structured preparation response advances the existing task.
 pnpm experiment:survival
 pnpm experiment:check
 pnpm dev
 ```
 
-Login opens the user's browser and verifies identity and granted scopes. Credentials stay outside the repository under the user's private application configuration directory. An expired authorization must be renewed with the login command. The experiment command builds the current viewer, checks previous archives, verifies authorization/catalogue access and exclusively allocates the next exN. Never invoke it again just to view a completed run. Select the run in **Experiment archive** or use its `?experiment=exN` URL.
+Login opens the user's browser and verifies identity and granted scopes. Credentials stay outside the repository under the user's private application configuration directory. An expired authorization must be renewed with the login command. The [unified task](TASK_HARNESS.md) must record explicit `mode: "survival"`, allocation and instruction basis before execution. The compatibility experiment command continues that task and rejects missing context; it builds the current viewer, checks previous archives, verifies authorization/catalogue access and exclusively allocates the next exN. Never invoke it again just to view a completed run. Select the run in **Experiment archive** or use its `?experiment=exN` URL.
 
 ## Survival-v1 rules
 

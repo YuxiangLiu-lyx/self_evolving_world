@@ -4,17 +4,17 @@ Every development task, including documentation-only changes, must follow this w
 
 ## Execution sequence
 
-Execution order is implemented in the [unified task coordinator](TASK_HARNESS.md), which invokes the existing `validate`, `task:review`, `pr:check`, publication and final gates. Use its structured requests and continuation commands instead of maintaining a second manual sequence. `pnpm validate -- "task name"` still runs the full `pnpm check` and captures the current build in real Chromium. `pnpm harness` remains its compatibility alias.
+Execution order is implemented in the [unified task coordinator](TASK_HARNESS.md), which invokes the existing `validate`, `task:review`, `pr:check`, publication and final gates. Use its structured requests and continuation commands instead of maintaining a second manual sequence. `pnpm validate -- "task name"` still runs the full `pnpm check` and captures the current build in real Chromium. `pnpm harness` aliases the coordinator, including its continuation and authorization boundaries.
 
 At a review request, open the current HTML report with `pnpm exec playwright show-report` or inspect its original artifacts. Inspect **every screenshot** listed in `validation-results/report.json`, all behavior results and the complete diff against the numbered requirements. File existence, DOM assertions and test names are not visual inspection. Fill the original review schema with the reviewer, unchanged run ID, each image's verdict and specific notes, behavior findings, and requirement/file/evidence coverage. Use `pass` only for actual accepted review, `fail` for defects and `pending` for unseen evidence. The coordinator validates the submission with the existing gate.
 
-Source/documentation changes, changed requirements, new runs and missing or changed screenshots invalidate acceptance. Fix failures and continue for fresh full evidence. Local review alone is not delivery: the [publication contract](PULL_REQUESTS.md#automatic-pr-delivery-for-every-task) and independent completion still apply, with separately recorded merge authority and explicit task exceptions.
+Source/documentation changes, changed requirements, new runs and missing or changed screenshots invalidate acceptance. Changed local review content also invalidates its accepted binding and remote self-review record. Fix failures and continue for fresh full evidence. Local review alone is not delivery: the [publication contract](PULL_REQUESTS.md#automatic-pr-delivery-for-every-task) and independent completion still apply, with separately recorded merge authority and explicit task exceptions.
 
 Automated success produces `awaiting-review` and never supplies visual judgments. `pnpm check`, `pnpm test:e2e`, or green CI alone cannot complete a task.
 
 ## Task harness routing
 
-`pnpm harness -- "task name"` and `pnpm validate -- "task name"` use the same harness. The report records `route.kind`, all changed paths and affected experiment IDs. Classification compares `origin/main...HEAD` and includes staged/unstaged changes, deletions and untracked files. A missing baseline fails rather than guessing; CI fetches full history. Before checks, archive preservation rejects edits/deletions/additions within existing records unless the current plan documents explicit user-requested reuse. Every new experiment uses a fresh exN by default.
+The coordinator and standalone `pnpm validate -- "task name"` reuse the same classifier and complete automated gate. The report records `route.kind`, all changed paths and affected experiment IDs. Classification compares `origin/main...HEAD` and includes staged/unstaged changes, deletions and untracked files. A missing baseline fails rather than guessing; CI fetches full history. Before checks, archive preservation rejects edits/deletions/additions within existing records unless the current plan documents explicit user-requested reuse. Every new experiment uses a fresh exN by default.
 
 | Task type  | Classification                                                                                          | Workflow                                                                                                                                            |
 | ---------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -71,6 +71,7 @@ Add scenarios and expected outcomes for changed behavior. Import `test` from `ap
 - `validation-results/report.json`: task name, run ID, source fingerprint, automated result, screenshot paths/hashes, and final state.
 - `validation-results/publication.json`: current delivery identity, policy, checks and merge result, written by task:publish after local review and commit.
 - `validation-results/completion.json`: independently verified final integration or explicit exception; failures record an error and return nonzero. New validation removes both prior delivery records.
+- `validation-results/tasks/<id>.json` also binds the accepted review hash and verified GitHub COMMENT URL, account, head, body digest and explicit non-independent provenance. Published delivery requires this current record; local-only remains offline.
 - `validation-results/review.json`: reviewer, per-image findings, behavior conclusions, and requirement/full-diff review, initially pending.
 - `playwright-report/index.html`: test details and attachments, opened with `pnpm exec playwright show-report`.
 - `test-results/`: screenshots, exported histories, and failure traces; browser summary in `browser-validation.json`.

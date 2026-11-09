@@ -55,6 +55,8 @@ function fixture(input = intent(), paths = ['source.ts']) {
     commits: 0,
     allocations: 0,
     analysis: new Set<string>(),
+    remoteReview: true,
+    reviewHash: 'review-1',
   };
   const effects: TaskEffects = {
     snapshot: () => ({
@@ -110,6 +112,27 @@ function fixture(input = intent(), paths = ['source.ts']) {
         throw new Error('Screenshot or requirement review not passed');
       state.accepted = true;
     },
+    reviewEvidenceHash: () => state.reviewHash,
+    remoteReview: () =>
+      Promise.resolve(
+        state.remoteReview
+          ? {
+              id: 12,
+              url: 'https://github.com/fixture/review',
+              author: 'Fixture',
+              head: state.head,
+              runId: c.validation?.runId ?? '',
+              bodyHash: state.reviewHash,
+              kind: 'current-conversation-self-review' as const,
+              independent: false as const,
+            }
+          : undefined,
+      ),
+    remoteReviewMaterials: () => ({
+      action: 'COMMENT',
+      commit_id: state.head,
+      independent: false,
+    }),
     commit: () => {
       if (!state.accepted) throw new Error('Unreviewed commit');
       if (!state.commits) {
@@ -208,6 +231,66 @@ describe('programmatic task boundaries', () => {
       expect(f.calls).not.toContain('independent-finish');
     },
   );
+  it('verifies existing remote delivery without publishing, committing, allocating or inventing authority', async () => {
+    const f = fixture(intent('merge', true));
+    await f.flow().verify();
+    expect(f.c.status).toBe('blocked');
+    expect(f.calls).toEqual([]);
+    await f.prepare();
+    await f.review();
+    await f.body();
+    const count = f.calls.length;
+    await f.flow().verify();
+    expect(f.c.status).toBe('blocked');
+    expect(f.calls.slice(count)).toEqual(['independent-finish']);
+    f.state.merged = true;
+    await f.flow().verify();
+    expect(f.c.status).toBe('completed');
+    expect(f.state.prs).toBe(1);
+    f.c.intent = { ...f.c.intent, merge: { status: 'missing' } };
+    if (f.c.validation) f.c.validation.intentHash = digest(f.c.intent);
+    await f.flow().verify();
+    expect(f.c.reason).toContain('missing merge authorization');
+  });
+  it('requires remote self-review facts before merge and does not trust a submitted result', async () => {
+    const f = fixture(intent('merge', true));
+    f.state.remoteReview = false;
+    await f.prepare();
+    await f.review();
+    await f.body();
+    expect(f.c.step).toBe('remote-review');
+    expect(f.c.request?.materials).toEqual({
+      action: 'COMMENT',
+      commit_id: 'reviewed-head',
+      independent: false,
+    });
+    await f.submit({ kind: 'remote-review-result', result: { id: 12 } });
+    expect(f.c.status).toBe('blocked');
+    expect(f.calls).not.toContain('independent-finish');
+    await f.flow().next();
+    f.state.remoteReview = true;
+    await f.submit({ kind: 'remote-review-result', result: { id: 12 } });
+    expect(f.c.step).toBe('merge');
+    expect(f.state.prs).toBe(1);
+    f.state.reviewHash = 'altered-review';
+    await f.flow().next();
+    expect(f.c.step).toBe('review');
+    expect(f.calls).not.toContain('independent-finish');
+  });
+  it('requires the remote record for PR-only delivery while preserving no-merge behavior', async () => {
+    const f = fixture(intent('pr-only'));
+    f.state.remoteReview = false;
+    await f.prepare();
+    await f.review();
+    await f.body();
+    expect(f.c.step).toBe('remote-review');
+    expect(f.c.status).not.toBe('completed');
+    f.state.remoteReview = true;
+    await f.flow().next();
+    expect(f.c.status).toBe('completed');
+    expect(f.state.prs).toBe(1);
+    expect(f.state.merged).toBe(false);
+  });
   it('keeps local-only dirty-worktree completion free of commits and remote actions', async () => {
     const f = fixture(intent('local-only'));
     await f.prepare();

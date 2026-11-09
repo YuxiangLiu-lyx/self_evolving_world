@@ -1,3 +1,4 @@
+import { requireTaskWorker } from './task-worker.js';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -65,6 +66,7 @@ try {
       `Experiment artifacts passed: ${ids.join(', ') || 'no recorded experiments'}.`,
     );
   } else if (command === 'resume' && args.length === 1 && args[0]) {
+    requireTaskWorker(root, 'resume', args);
     const { directory, manifest } = readExperiment(root, args[0], true);
     if (manifest.status === 'completed')
       throw new Error('Completed experiments cannot be overwritten.');
@@ -89,6 +91,7 @@ try {
       `Completed visual evidence for ${args[0]}; the saved simulation was preserved.`,
     );
   } else if (command === 'run' && args.length <= 2) {
+    requireTaskWorker(root, 'random', args);
     const seed = args[0] === undefined ? DEFAULT_SEED : Number(args[0]);
     const steps = args[1] === undefined ? DEFAULT_ROUNDS : Number(args[1]);
     validateParameters(seed, steps);

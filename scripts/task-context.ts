@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { object } from './validation.js';
 import type { TaskRoute } from './harness.js';
+import type { RemoteReview } from './task-review.js';
 import type { DeliveryMode } from './delivery.js';
 
 export interface Basis {
@@ -42,6 +43,7 @@ export type Step =
   | 'commit'
   | 'pr-body'
   | 'publish'
+  | 'remote-review'
   | 'merge'
   | 'finish';
 export type Status =
@@ -99,10 +101,12 @@ export interface TaskContext {
     sourceHash: string;
     files: string[];
     commitMessage: string;
+    evidenceHash: string;
   };
   body?: { path: string; title: string; head: string; runId: string };
   publication?: Record<string, unknown>;
   completion?: Record<string, unknown>;
+  remoteReview?: RemoteReview;
   readonly history: { step: Step; detail: string }[];
   status: Status;
   step: Step;

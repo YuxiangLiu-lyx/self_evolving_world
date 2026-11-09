@@ -7,6 +7,7 @@ import {
   type Step,
   type TaskContext,
 } from './task-context.js';
+import type { RemoteReview } from './task-review.js';
 import { object } from './validation.js';
 
 /** Effects are existing gates/commands, not a second implementation of their policy. */
@@ -22,6 +23,9 @@ export interface TaskEffects {
   validate(context: TaskContext): NonNullable<TaskContext['validation']>;
   reviewMaterials(context: TaskContext): unknown;
   review(file: string, context: TaskContext): void;
+  reviewEvidenceHash(): string;
+  remoteReview(context: TaskContext): Promise<RemoteReview | undefined>;
+  remoteReviewMaterials(context: TaskContext): unknown;
   commit(message: string, files: readonly string[], context: TaskContext): void;
   preflight(context: TaskContext): void;
   publish(context: TaskContext): Record<string, unknown>;
@@ -85,7 +89,7 @@ export class TaskFlow {
   }
   private failed(error: unknown): TaskContext {
     const c = this.context;
-    c.status = ['publish', 'merge', 'finish'].includes(c.step)
+    c.status = ['publish', 'remote-review', 'merge', 'finish'].includes(c.step)
       ? 'blocked'
       : 'needs_fix';
     c.reason = error instanceof Error ? error.message : String(error);
@@ -139,6 +143,7 @@ export class TaskFlow {
       ) {
         delete c.review;
         delete c.body;
+        delete c.remoteReview;
         delete c.completion;
         c.validation = this.effects.validate(c);
         this.save();
@@ -152,7 +157,8 @@ export class TaskFlow {
         validation !== 'passed' ||
         !c.review ||
         c.review.runId !== c.validation.runId ||
-        c.review.sourceHash !== this.snapshot().sourceHash
+        c.review.sourceHash !== this.snapshot().sourceHash ||
+        c.review.evidenceHash !== this.effects.reviewEvidenceHash()
       )
         return this.handoff(
           'review',
@@ -187,6 +193,17 @@ export class TaskFlow {
         this.effects.preflight(c);
         c.publication = this.effects.publish(c);
         this.save();
+        this.step('remote-review');
+        const remoteReview = await this.effects.remoteReview(c);
+        if (remoteReview) c.remoteReview = remoteReview;
+        else delete c.remoteReview;
+        this.save();
+        if (!c.remoteReview)
+          return this.handoff(
+            'remote-review',
+            'Publish these actual findings as a GitHub COMMENT review for this exact commit. This is current-conversation self-review, not independent approval or proof of judgment quality. Submit the tool result; remote facts are verified before merge or completion.',
+            this.effects.remoteReviewMaterials(c),
+          );
         if (c.intent.delivery.mode === 'merge') {
           this.step('merge');
           if (c.intent.merge.status !== 'granted')
@@ -221,6 +238,54 @@ export class TaskFlow {
       c.status = 'completed';
       c.reason = c.completion.status;
       delete c.request;
+      this.save();
+      return c;
+    } catch (error) {
+      return this.failed(error);
+    }
+  }
+  /** Compatibility verification never prepares, commits, publishes or merges. */
+  async verify(): Promise<TaskContext> {
+    const c = this.context;
+    try {
+      const snapshot = this.snapshot();
+      this.step('finish');
+      if (
+        !c.prepared ||
+        this.effects.validationState(c) !== 'passed' ||
+        c.validation?.intentHash !== digest(c.intent) ||
+        !c.review ||
+        c.review.runId !== c.validation.runId ||
+        c.review.sourceHash !== snapshot.sourceHash ||
+        c.review.evidenceHash !== this.effects.reviewEvidenceHash()
+      )
+        throw new Error(
+          'Verify-only requires current accepted task evidence; use next for preparation.',
+        );
+      if (
+        c.intent.delivery.mode === 'merge' &&
+        c.intent.merge.status !== 'granted'
+      )
+        throw new Error(
+          'Verify-only cannot waive missing merge authorization.',
+        );
+      if (c.intent.delivery.mode !== 'local-only') {
+        const review = await this.effects.remoteReview(c);
+        if (!review)
+          throw new Error('Verify-only requires current remote self-review.');
+        c.remoteReview = review;
+      }
+      c.completion = this.effects.finish(c);
+      if (
+        !['completed', 'completed-with-exception'].includes(
+          String(c.completion.status),
+        )
+      )
+        throw new Error(
+          'Independent verification did not establish completion.',
+        );
+      c.status = 'completed';
+      c.reason = String(c.completion.status);
       this.save();
       return c;
     } catch (error) {
@@ -276,6 +341,9 @@ export class TaskFlow {
             'Review must identify the complete actual changed-file list.',
           );
         const message = text(response.commitMessage, 'reviewed commit message');
+        delete c.body;
+        delete c.remoteReview;
+        this.step('review');
         this.effects.review(text(response.file, 'review file'), c);
         if (this.effects.validationState(c) !== 'passed' || !c.validation)
           throw new Error('Actual review gate has not accepted the evidence.');
@@ -284,6 +352,7 @@ export class TaskFlow {
           sourceHash: this.snapshot().sourceHash,
           files: [...actual],
           commitMessage: message,
+          evidenceHash: this.effects.reviewEvidenceHash(),
         };
       } else if (request.step === 'pr-body' && kind === 'pr-body') {
         if (!c.validation) throw new Error('Missing current validation.');
@@ -294,6 +363,20 @@ export class TaskFlow {
           runId: c.validation.runId,
         };
         this.effects.preflight(c);
+      } else if (
+        request.step === 'remote-review' &&
+        kind === 'remote-review-result'
+      ) {
+        const remoteReview = await this.effects.remoteReview(c);
+        if (!remoteReview)
+          throw new Error(
+            'The submitted review result was not independently confirmed for this head and evidence.',
+          );
+        c.remoteReview = remoteReview;
+        c.history.push({
+          step: 'remote-review',
+          detail: JSON.stringify(c.remoteReview),
+        });
       } else if (
         request.step === 'merge' &&
         kind === 'authorization' &&

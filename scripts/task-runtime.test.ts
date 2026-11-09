@@ -11,7 +11,11 @@ import { resolve } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { git } from './delivery-git.js';
 import { digest, newContext, parseIntent } from './task-context.js';
-import { LocalTaskEffects, type CommandRunner } from './task-runtime.js';
+import {
+  LocalTaskEffects,
+  requestCaptureRecovery,
+  type CommandRunner,
+} from './task-runtime.js';
 import { hashFile, REVIEW_SCENES, sourceFingerprint } from './validation.js';
 import {
   analysisMaterial,
@@ -23,6 +27,7 @@ import {
   type ExperimentAnalysis,
 } from './experiment-review.js';
 import { allocateExperiment, experimentIds } from './experiments.js';
+import { reviewBody } from './task-review.js';
 import { classifyChanges } from './harness.js';
 
 const repository = process.cwd(),
@@ -153,6 +158,7 @@ describe('existing gates behind the task runtime', () => {
       sourceHash: snapshot.sourceHash,
       files: [...snapshot.route.files],
       commitMessage: 'Reviewed fixture',
+      evidenceHash: hashFile(resolve(root, 'validation-results/review.json')),
     };
     save('validation-results/tasks/fixture-task.json', {
       ignored: 'Generated journal',
@@ -165,6 +171,43 @@ describe('existing gates behind the task runtime', () => {
     runtime.commit('Reviewed fixture', c.review.files, c);
     expect(git(root, 'rev-parse', 'HEAD')).toBe(committed);
     expect(git(root, 'show', '--format=', '--name-only', 'HEAD')).toBe(plan);
+  });
+  it('binds actual self-review findings and screenshot hashes to the exact current commit', () => {
+    const c = makeContext(),
+      runtime = new LocalTaskEffects(root, () => {});
+    evidence(c);
+    const snapshot = runtime.snapshot(c);
+    c.review = {
+      runId: 'fixture-run',
+      sourceHash: snapshot.sourceHash,
+      files: [...snapshot.route.files],
+      commitMessage: 'Fixture',
+      evidenceHash: runtime.reviewEvidenceHash(),
+    };
+    c.body = {
+      path: 'validation-results/body.md',
+      title: 'Fixture',
+      head: snapshot.head,
+      runId: 'fixture-run',
+    };
+    const body = reviewBody(root, c);
+    expect(body).toContain('not independent approval');
+    expect(body).toContain(snapshot.head);
+    expect(body).toContain('fixture-run');
+    expect(body).toContain('Synthetic fixture image review.');
+    expect(body).toContain(hashFile(resolve(root, 'test-results/desktop.png')));
+    expect(body).toContain(plan);
+    c.body.head = 'old-head';
+    expect(() => reviewBody(root, c)).toThrow('current reviewed head');
+    c.body.head = snapshot.head;
+    writeFileSync(
+      resolve(root, 'validation-results/review.json'),
+      readFileSync(
+        resolve(root, 'validation-results/review.json'),
+        'utf8',
+      ).replace('Gate fixture', 'Changed reviewer'),
+    );
+    expect(() => reviewBody(root, c)).toThrow('evidence changed');
   });
   it('uses prepare-only publication and verify-only completion, never the default merging command', () => {
     const calls: string[][] = [],
@@ -294,6 +337,9 @@ describe('existing gates behind the task runtime', () => {
       readFileSync(resolve(root, 'experiment/ex3/manifest.json'), 'utf8'),
     ) as Record<string, unknown>;
     save('experiment/ex3/manifest.json', { ...manifest, status: 'failed' });
+    delete c.experiment.error;
+    requestCaptureRecovery(root, c, 'ex3');
+    expect(c.experiment.error).toContain('capture-only');
     const calls: string[][] = [];
     const runtime = new LocalTaskEffects(
       root,
@@ -306,6 +352,9 @@ describe('existing gates behind the task runtime', () => {
     );
     await runtime.experiment(c, () => {});
     expect(calls).toEqual([['experiment:resume', '--', 'ex3']]);
+    expect(() => {
+      requestCaptureRecovery(root, c, 'ex3');
+    }).toThrow('already allocated incomplete');
     c.intent = {
       ...c.intent,
       experiment: {

@@ -1,3 +1,4 @@
+import { requireTaskWorker } from './task-worker.js';
 import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -30,6 +31,7 @@ try {
       'Usage: pnpm validate -- "task name" / pnpm task:review -- "same task name"',
     );
   }
+  if (command === 'review') requireTaskWorker(root, 'review', [task]);
   if (command === 'run') {
     mkdirSync(output, { recursive: true });
     // Invalidate old approvals before running anything that might fail/interrupted.
@@ -101,7 +103,7 @@ try {
         requirements: { verdict: 'pending', notes: '' },
       });
       console.log(
-        '\nAutomated validation passed; review is still required. Open playwright-report and every screenshot, complete validation-results/review.json, then run pnpm task:review -- "same task name".',
+        "\nAutomated validation passed; review is still required. Open playwright-report and every screenshot, complete validation-results/review.json, then submit it with the coordinator's current structured review response.",
       );
     } catch (error) {
       report.status = 'failed';

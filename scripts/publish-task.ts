@@ -1,3 +1,4 @@
+import { requireTaskWorker } from './task-worker.js';
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -8,11 +9,7 @@ import {
   git,
   verifyIntegrated,
 } from './delivery-git.js';
-import {
-  mergeReadiness,
-  mergeReviewedPullRequest,
-  mergedCommit,
-} from './delivery.js';
+import { mergeReadiness, mergedCommit } from './delivery.js';
 import { githubRequest } from './github.js';
 import { taskRoute } from './harness.js';
 import {
@@ -42,6 +39,7 @@ function run(command: string, args: string[]): void {
 }
 try {
   const args = process.argv.slice(2).filter((arg) => arg !== '--');
+  requireTaskWorker(root, 'publish', args);
   const [bodyFile, title, mode] = args;
   if (
     !bodyFile ||
@@ -53,7 +51,7 @@ try {
       mode !== '--prepare-only')
   )
     throw new Error(
-      'Usage: pnpm task:publish -- validation-results/pr-body.md "Concrete PR title" [--prepare-only|--verify-only]',
+      'Usage: pnpm task:publish -- validation-results/pr-body.md "Concrete PR title" --prepare-only|--verify-only',
     );
   const branch = git(root, 'branch', '--show-current');
   publicationTarget(git(root, 'remote', 'get-url', 'origin'), branch);
@@ -127,7 +125,8 @@ try {
         );
       verifyIntegrated(root, head, mergeSha);
       write('merged', { mergeSha });
-      run('pnpm', ['task:finish', '--', fields.task]);
+      if (mode === '--verify-only')
+        run('pnpm', ['task:finish', '--', fields.task]);
       process.exit(0);
     }
   }
@@ -215,12 +214,9 @@ try {
       'PR is still open. Default task completion requires a confirmed merge; verify-only cannot merge.',
     );
   } else {
-    write('merging');
-    const mergeSha = await mergeReviewedPullRequest(request, expected);
-    run('git', ['fetch', 'origin']);
-    verifyIntegrated(root, head, mergeSha);
-    write('merged', { mergeSha });
-    run('pnpm', ['task:finish', '--', fields.task]);
+    throw new Error(
+      'Publication cannot merge. Continue the coordinator for a scoped connector handoff.',
+    );
   }
 } catch (error) {
   const message = error instanceof Error ? error.message : String(error);
