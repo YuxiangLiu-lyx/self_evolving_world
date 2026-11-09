@@ -274,6 +274,8 @@ describe('mandatory task entry', () => {
         process.execPath,
         [
           resolve(repository, 'node_modules/tsx/dist/cli.mjs'),
+          '--tsconfig',
+          resolve(repository, 'tsconfig.json'),
           resolve(repository, 'scripts', args[0]),
           ...args.slice(1),
         ],

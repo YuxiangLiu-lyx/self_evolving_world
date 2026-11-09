@@ -46,6 +46,8 @@ Tests retain all previous cases and adapt the four original final-gate fixtures 
 
 The earlier PR-13 evidence and PR-only delivery are preserved as history. This continuation updates PR #8 and uses the latest scoped grant for both changes together. Final remote CI and merge are still prerequisites at the time this plan is finalized; only independently verified receipts establish completion.
 
+The first published correction passed local full validation with 272 unit tests and 17 browser tests, but Linux CI exposed a clean-checkout test-launch issue: raw CLI subprocess fixtures launched from a temporary directory omitted the repository tsconfig and resolved missing pre-build package outputs. The fixture now passes the explicit repository tsconfig, matching the existing final-gate fixtures. The failure blocked delivery; local build output is moved aside before another complete validation, review and current-head publication. No test assertion, required check or production world behavior is weakened.
+
 ## Delivery
 
 - Task: PR-14 enforced task entry and traceable self-review
