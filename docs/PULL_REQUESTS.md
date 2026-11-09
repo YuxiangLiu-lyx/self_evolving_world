@@ -62,6 +62,8 @@ The publisher checks canonical origin, a focused branch and the clean reviewed c
 
 `validation-results/publication.json` binds task, run, source, plan, body, branch, base, head, checks and merge result. The publisher invokes `task:finish`, which independently checks current evidence, PR identity/checks, archive preservation and integration and writes `completion.json`. Failures return nonzero and record incomplete delivery. A retry with the same current receipt detects an already merged PR and verifies it without a second merge. Keep the receipt/body until completion; new validation invalidates them.
 
+Delivery HTTP calls pin the supported [2022-11-28 REST contract](https://docs.github.com/en/rest/pulls/pulls?apiVersion=2022-11-28), which retains the merged commit SHA required for independent confirmation. Do not upgrade this version without verifying the live merge response contract.
+
 Authentication uses `GITHUB_TOKEN` or an existing HTTPS Git credential helper without logging secrets; gh is not required. A connected GitHub tool may create/update the same reviewed PR. `--prepare-only` verifies readiness and saves the receipt without merging or completing; this supports a connector merge guarded by the same head. Then `--verify-only` confirms that merge and completes. Verify-only cannot complete a default task whose PR is still open, and never pushes, creates, edits or merges a PR.
 
 ### Explicit delivery exceptions
