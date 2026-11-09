@@ -10,21 +10,15 @@ Follow the [language policy](../AGENTS.md#language-policy): user conversations a
 
 ## A PR from start to completion
 
-1. Inspect existing changes and read [PRODUCT](PRODUCT.md), [ARCHITECTURE](../ARCHITECTURE.md), and relevant ADRs.
-2. Before implementation, summarize the request to the user and record numbered requirements, exclusions, and acceptance criteria in a plan in [active](exec-plans/active/README.md). Every PR needs a plan, including small and documentation-only work. Follow the [PR contract](PULL_REQUESTS.md).
-3. Implement the smallest complete behavior. Keep transitions pure and I/O at boundaries.
-4. Review the actual complete diff against each numbered requirement, including all changed files, and resolve mismatches or unrelated work. Test meaningful behavior and failure paths. Do not add tests that merely mirror simple copy edits.
-5. Update feature records, architecture, ADRs, and plans according to the [synchronization policy](DOCUMENTATION_POLICY.md).
-6. Follow the [validation workflow](VALIDATION.md): run `pnpm validate -- "task name"`, including the full `pnpm check`; inspect every current screenshot and behavior result; fix problems and rerun. Also run `pnpm demo` when CLI or package exports change.
-7. Repeat the requirements in the PR, map every requirement and changed path to implementation and verification, and record the latest reviewed head SHA. Record actual evidence and limitations in the [PR template](../.github/pull_request_template.md) and plan. Finish documentation, rerun validation after edits, review the new evidence, and accept local evidence with `pnpm task:review -- "task name"`. Archive completed plans; archival changes require a final validation run too. After committing the reviewed files, run `pnpm pr:check -- validation-results/pr-body.md origin/main`; it checks the PR contract and actual accepted local evidence.
+Use the [unified task entry](TASK_HARNESS.md) for preparation, deterministic execution and continuation. The coordinator owns step ordering and branch conditions; this document retains environment and development constraints. Read the current project documents and record numbered requirements before implementation. Review every changed file and every current screenshot against the plan. Complete documentation before final validation; moving a plan also invalidates evidence.
 
-8. For every task route, automatically run `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"` after the reviewed commit/body. It pushes, creates/updates the PR, verifies current remote checks and conflict status, then performs a head-guarded merge and final `task:finish`; no extra publication or merge confirmation is needed under the user-authorized default. Only explicit task-scoped instructions to avoid PR or merge use a [recorded exception](PULL_REQUESTS.md#automatic-pr-delivery-for-every-task). Report failures as incomplete work. An open green PR does not complete a default task.
+The program calls the existing full validation, review, reviewed commit, PR preflight, publication and final gates. Every route requires PR delivery by default. Merge requires its own actual instruction evidence; explicit no-PR/no-merge exceptions retain the [delivery contract](PULL_REQUESTS.md#automatic-pr-delivery-for-every-task). A local-only exception preserves the existing reviewed dirty-worktree path. Record outcomes honestly; failed checks and unresolved remote states remain incomplete.
 
 ## Offline world experiments and task harness
 
 Follow the [numbered experiment workflow](../experiment/README.md) for `pnpm experiment:run` and `pnpm experiment:check`. The run command allocates the next `experiment/exN`, uses an explicit seed without model calls, and records objectives, results, replay and actual browser visualizations. Inspect an existing run without creating another number by importing its replay or checking its artifacts.
 
-`pnpm harness -- "task name"` is an alias of `pnpm validate`. It [classifies actual changes](VALIDATION.md#task-harness-routing) as code, experiment-only or mixed, and records the chosen route. Experiment-only and mixed work validates the archive before running full regression/browser checks. Code work runs the full suite, including any archived experiments. Every PR still needs an execution plan, full unfiltered tests, current visual/behavior review, requirement mapping and `task:finish`. Retained experiment files are tracked and source-fingerprinted; temporary validation output remains ignored.
+`pnpm harness` is an alias of the unified coordinator; the old task-name form continues an existing task. Standalone `pnpm validate` only produces automated evidence. It [classifies actual changes](VALIDATION.md#task-harness-routing) as code, experiment-only or mixed, and records the chosen route. Experiment-only and mixed work validates the archive before running full regression/browser checks. Code work runs the full suite, including any archived experiments. Every PR still needs an execution plan, full unfiltered tests, current visual/behavior review, requirement mapping and `task:finish`. Retained experiment files are tracked and source-fingerprinted; temporary validation output remains ignored.
 
 ## Optional model experiment
 
@@ -32,7 +26,7 @@ Follow [One-Round Experiment](ONE_ROUND_EXPERIMENT.md) for `pnpm experiment:logi
 
 ## Debugging failures
 
-`pnpm check` runs typecheck → lint → format → architecture → test → build → demo:check → experiment:check → test:e2e → docs, stopping at the first failure. After fixing a failure, run its individual check as needed, then rerun the full workflow. `pnpm format` fixes formatting only. `pnpm demo:check` compares complete built CLI output from two independent processes in different timezones.
+`pnpm check` runs typecheck → lint → format → architecture → test → build → demo:check → experiment:check → analysis:check → test:e2e → docs, stopping at the first failure. After fixing a failure, run its individual check as needed, then rerun the full workflow. `pnpm format` fixes formatting only. `pnpm demo:check` compares complete built CLI output from two independent processes in different timezones.
 
 If engine checks fail, switch to the specified Node and pnpm versions instead of disabling `engine-strict`. If frozen installation reports a lockfile mismatch, confirm the manifest change, update the lockfile with `pnpm install`, and review the difference. Do not disable rules or delete tests to make CI pass.
 
@@ -42,15 +36,7 @@ Tests resolve source aliases without requiring an existing build. The core and v
 
 The canonical repository is [YuxiangLiu-lyx/self_evolving_world](https://github.com/YuxiangLiu-lyx/self_evolving_world). Use `origin` for `https://github.com/YuxiangLiu-lyx/self_evolving_world.git` and `main` as the integration branch. The initial import establishes the baseline; subsequent work should use focused feature branches and pull requests targeting `main`.
 
-```bash
-git switch main
-git pull --ff-only origin main
-git switch -c feat/describe-the-change
-# Implement and complete the local validation and review workflow.
-git add <reviewed-files>
-git commit -m "Describe the completed change"
-pnpm task:publish -- validation-results/pr-body.md "Describe the completed change"
-```
+Create a focused branch from current main after preserving existing changes, then start the unified task entry. Its review handoff precedes any commit; its PR-body handoff precedes publication. Legacy task commands route through the same coordinator and worker guards. Direct Git use is outside this command boundary; never use it to bypass actual review. Published delivery includes a version-bound GitHub COMMENT explicitly labeled current-conversation self-review, followed by independently verified delivery.
 
 The publisher opens/updates a PR against `main` using the repository's [PR template](../.github/pull_request_template.md). Inspect both `quality` and `pr-policy` for the latest PR revision and resolve failures before merging. Every PR must run the complete test suite; failed, skipped, unavailable, or stale results cannot pass acceptance. Keep commits and PR content in English. Do not force-push shared history or commit dependencies, build outputs, local credentials, or generated validation directories.
 

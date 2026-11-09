@@ -1,3 +1,5 @@
+import { requireTaskWorker } from './task-worker.js';
+import { renameSync } from 'node:fs';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -22,6 +24,11 @@ import {
 
 const root = process.cwd();
 try {
+  const context = requireTaskWorker(
+    root,
+    'survival',
+    process.argv.slice(2).filter((a) => a !== '--'),
+  );
   if (process.argv.slice(2).filter((a) => a !== '--').length !== 0)
     throw new Error(
       'Usage: pnpm experiment:survival. Fixed protocol: 60 rounds, five calls per actor maximum.',
@@ -31,6 +38,15 @@ try {
   const model = await selectModel(token);
   const id = allocateExperiment(root),
     directory = resolve(root, 'experiment', id);
+  if (!context.experiment) throw new Error('Missing allocation journal.');
+  context.experiment.id = id;
+  const journal = resolve(
+    root,
+    'validation-results/tasks',
+    `${context.intent.id}.json`,
+  );
+  writeFileSync(`${journal}.tmp`, JSON.stringify(context, null, 2) + '\n');
+  renameSync(`${journal}.tmp`, journal);
   const git = (...args: string[]) =>
     execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
   const manifest = {

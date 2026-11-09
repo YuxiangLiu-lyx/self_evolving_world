@@ -126,3 +126,11 @@ The [PR contract](docs/PULL_REQUESTS.md) adds Markdown requirement/changed-file 
 ## Future modules (Planned)
 
 Continuous NPC control, persistent goals and memory, generalized model adapters, World Agent review, skill evolution, databases, and migrations remain unimplemented. Future skills require a separately designed extension layer, explicit authorization, rule versioning, and an ADR. They must not rewrite this base core during a run. Current `try` actions only record requests.
+
+## Task orchestration boundary
+
+The repository-only [task entry](docs/TASK_HARNESS.md) uses `scripts/task-context.ts` for original intent, derived facts and evidence; `task-flow.ts` controls transitions; `task-runtime.ts` calls the existing validation, experiment and delivery commands. `task.ts` persists ignored journals and returns structured work to the current conversation. `task-entry.ts` adapts legacy task commands to the same coordinator; `task-worker.ts` checks the live execution lease and current context at internal mutation/acceptance boundaries. Standalone automated validation stays available to CI. The publisher has no default HTTP merge branch. `task-review.ts` builds and verifies the current-head GitHub COMMENT from actual accepted local findings; its provenance explicitly denotes current-conversation self-review, not independent approval. No core, viewer or model adapter depends on this layer. Original acceptance gates, source fingerprints, PR contract, conflict checks and independent remote verification remain authoritative.
+
+`scripts/experiment-review.ts` binds retained semantic analyses to original archive digests and every actor. Companion JSON/Markdown live in `experiment/analyses/exN/`; the existing classifier recognizes these as experiment artifacts, while numbered allocation ignores this reserved directory. The original exN contents and reconstruction algorithms remain unchanged. Structural checks cannot substitute for judgment or authorize recommended changes. See [ADR-0013](docs/decisions/0013-programmatic-task-harness.md).
+
+The strengthened command and review boundaries are recorded in [ADR-0014](docs/decisions/0014-enforced-task-entry.md). They do not sandbox direct Git/GitHub access or prove honest judgment.
