@@ -3,6 +3,7 @@ import {
   createWorld,
   parseWorldAction,
   stepWorld,
+  stepWorldRound,
 } from '@self-evolving-world/world-core';
 import type {
   AgentSeed,
@@ -16,6 +17,7 @@ export const MAX_ACTIONS = 500;
 export const MAX_REPLAY_BYTES = 1_000_000;
 export interface Timeline {
   readonly frames: readonly WorldState[];
+  readonly schedule?: 'simultaneous-v1';
 }
 
 export function createTimeline(setup: WorldSetup): Timeline {
@@ -34,6 +36,10 @@ export function appendAction(
   timeline: Timeline,
   action: WorldAction,
 ): Timeline {
+  if (timeline.schedule !== undefined)
+    throw new RangeError(
+      'Round histories are read-only. Start a new world to act.',
+    );
   if (timeline.frames.length > MAX_ACTIONS)
     throw new RangeError(
       'History has reached 500 steps. Export it and start a new world.',
@@ -47,8 +53,11 @@ export function serializeReplay(timeline: Timeline): string {
   return JSON.stringify(
     {
       format: 'self-evolving-world/replay',
-      version: 1,
+      version: timeline.schedule === undefined ? 1 : 2,
       coreVersion: CORE_RULES.version,
+      ...(timeline.schedule === undefined
+        ? {}
+        : { schedule: timeline.schedule }),
       initial: {
         settings: first.settings,
         agents: first.agents.map(({ id, name, position }) => ({
@@ -58,11 +67,21 @@ export function serializeReplay(timeline: Timeline): string {
         })),
         items: first.items,
       },
-      actions: timeline.frames.slice(1).map((frame) => {
-        if (frame.event === null)
-          throw new Error('Recorded frame has no action.');
-        return frame.event.action;
-      }),
+      ...(timeline.schedule === undefined
+        ? {
+            actions: timeline.frames.slice(1).map((frame) => {
+              if (frame.event === null)
+                throw new Error('Recorded frame has no action.');
+              return frame.event.action;
+            }),
+          }
+        : {
+            rounds: timeline.frames.slice(1).map((frame) => {
+              if (frame.events === undefined)
+                throw new Error('Recorded round has no actions.');
+              return frame.events.map((event) => event.action);
+            }),
+          }),
     },
     null,
     2,
@@ -109,7 +128,7 @@ export function parseReplay(source: string): Timeline {
   const data = record(parsed);
   if (
     data.format !== 'self-evolving-world/replay' ||
-    data.version !== 1 ||
+    (data.version !== 1 && data.version !== 2) ||
     data.coreVersion !== CORE_RULES.version
   ) {
     throw new RangeError(
@@ -127,7 +146,25 @@ export function parseReplay(source: string): Timeline {
     agents: array(initial.agents, 32).map(entity),
     items: array(initial.items, 256).map(entity),
   });
-  for (const input of array(data.actions, MAX_ACTIONS))
-    timeline = appendAction(timeline, parseWorldAction(input));
+  if (data.version === 1) {
+    for (const input of array(data.actions, MAX_ACTIONS))
+      timeline = appendAction(timeline, parseWorldAction(input));
+  } else {
+    if (data.schedule !== 'simultaneous-v1')
+      throw new RangeError('Unsupported round schedule.');
+    const frames = [...timeline.frames];
+    for (const inputs of array(data.rounds, MAX_ACTIONS)) {
+      frames.push(
+        stepWorldRound(
+          frameAt({ frames }, frames.length - 1),
+          array(inputs, 32).map(parseWorldAction),
+        ),
+      );
+    }
+    timeline = Object.freeze({
+      schedule: 'simultaneous-v1',
+      frames: Object.freeze(frames),
+    });
+  }
   return timeline;
 }

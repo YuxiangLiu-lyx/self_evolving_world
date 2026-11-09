@@ -1,0 +1,2490 @@
+{
+  "format": "self-evolving-world/replay",
+  "version": 1,
+  "coreVersion": "1",
+  "initial": {
+    "settings": {
+      "width": 16,
+      "height": 12,
+      "visionRadius": 4
+    },
+    "agents": [
+      {
+        "id": "lin",
+        "name": "Lin",
+        "position": {
+          "x": 2,
+          "y": 3
+        }
+      },
+      {
+        "id": "moss",
+        "name": "Moss",
+        "position": {
+          "x": 8,
+          "y": 5
+        }
+      },
+      {
+        "id": "sol",
+        "name": "Sol",
+        "position": {
+          "x": 12,
+          "y": 8
+        }
+      }
+    ],
+    "items": [
+      {
+        "id": "wood",
+        "name": "Wood",
+        "position": {
+          "x": 3,
+          "y": 3
+        }
+      },
+      {
+        "id": "stone",
+        "name": "Stone",
+        "position": {
+          "x": 5,
+          "y": 2
+        }
+      },
+      {
+        "id": "berry",
+        "name": "Berry",
+        "position": {
+          "x": 8,
+          "y": 4
+        }
+      },
+      {
+        "id": "crystal",
+        "name": "Crystal",
+        "position": {
+          "x": 11,
+          "y": 8
+        }
+      },
+      {
+        "id": "seed",
+        "name": "Seed",
+        "position": {
+          "x": 13,
+          "y": 3
+        }
+      },
+      {
+        "id": "water",
+        "name": "Water",
+        "position": {
+          "x": 3,
+          "y": 8
+        }
+      }
+    ]
+  },
+  "actions": [
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "berry"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "pickup",
+      "agentId": "sol",
+      "itemId": "crystal"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "stone"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "pickup",
+      "agentId": "sol",
+      "itemId": "crystal"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "water"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "stone"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "stone"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "trade"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "fly"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "water"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "trade"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "water"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "pickup",
+      "agentId": "sol",
+      "itemId": "unseen-item"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "fly"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "trade"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "fly"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "water"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "trade"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "stone"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "pickup",
+      "agentId": "sol",
+      "itemId": "crystal"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "stone"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "pickup",
+      "agentId": "sol",
+      "itemId": "unseen-item"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "water"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "trade"
+    },
+    {
+      "type": "pickup",
+      "agentId": "sol",
+      "itemId": "crystal"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "fly"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "pickup",
+      "agentId": "sol",
+      "itemId": "crystal"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "pickup",
+      "agentId": "sol",
+      "itemId": "crystal"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "pickup",
+      "agentId": "sol",
+      "itemId": "crystal"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "plant"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "trade"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "trade"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "stone"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "water"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "trade"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "water"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "stone"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "fly"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "stone"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "wood"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "trade"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "pickup",
+      "agentId": "lin",
+      "itemId": "water"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "trade"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "trade"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "pickup",
+      "agentId": "sol",
+      "itemId": "seed"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "lin",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "wood"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "north"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "south"
+    },
+    {
+      "type": "try",
+      "agentId": "moss",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "plant"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "south"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "west"
+    },
+    {
+      "type": "pickup",
+      "agentId": "moss",
+      "itemId": "water"
+    },
+    {
+      "type": "try",
+      "agentId": "sol",
+      "skill": "fly"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "west"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "south"
+    },
+    {
+      "type": "move",
+      "agentId": "lin",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "moss",
+      "direction": "east"
+    },
+    {
+      "type": "move",
+      "agentId": "sol",
+      "direction": "north"
+    }
+  ]
+}

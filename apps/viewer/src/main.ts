@@ -4,8 +4,10 @@ import type {
   Outcome,
   WorldAction,
   WorldState,
+  WorldEvent,
 } from '@self-evolving-world/world-core';
 import { createDemoTimeline, DEMO_SETUP } from './scenario.js';
+import { ExperimentBrowser } from './experiments.js';
 import {
   appendAction,
   createTimeline,
@@ -16,6 +18,7 @@ import {
   serializeReplay,
 } from './timeline.js';
 import type { Timeline } from './timeline.js';
+import { characterIllustration, itemIllustration } from './illustrations.js';
 import './style.css';
 
 function element(id: string): HTMLElement {
@@ -49,6 +52,8 @@ let selectedId = 'lin';
 let view: 'global' | 'agent' = 'global';
 let playback: number | undefined;
 let noticeTimer: number | undefined;
+let archivedExperiment: string | undefined;
+let experimentLoading = false;
 
 const outcomes: Record<Outcome, string> = {
   moved: 'Move succeeded',
@@ -72,9 +77,12 @@ function countLabel(count: number, singular: string): string {
 }
 
 function eventText(frame: WorldState): string {
-  const event = frame.event;
-  if (event === null)
-    return 'World created. Every agent has an initial observation.';
+  const events = frame.events ?? (frame.event === null ? [] : [frame.event]);
+  return events.length === 0
+    ? 'World created. Every agent has an initial observation.'
+    : events.map((event) => actionText(frame, event)).join('\n');
+}
+function actionText(frame: WorldState, event: WorldEvent): string {
   const action = event.action;
   const name =
     frame.agents.find((agent) => agent.id === action.agentId)?.name ??
@@ -108,6 +116,9 @@ function stop(): void {
 }
 function canAct(): boolean {
   return (
+    history.schedule === undefined &&
+    archivedExperiment === undefined &&
+    !experimentLoading &&
     playback === undefined &&
     cursor === history.frames.length - 1 &&
     history.frames.length <= MAX_ACTIONS
@@ -195,11 +206,10 @@ function renderMap(frame: WorldState, actor: AgentState | undefined): void {
         (item) => item.position.x === x && item.position.y === y,
       );
       if (ground.length > 0) {
-        const token = node(
-          'span',
-          'item-token',
-          ground.length > 1 ? String(ground.length) : '◆',
-        );
+        const token = node('span', 'item-token');
+        token.append(itemIllustration(ground[0]?.id ?? ''));
+        if (ground.length > 1)
+          token.append(node('b', 'item-count', String(ground.length)));
         token.title = ground.map((item) => item.name).join(', ');
         token.setAttribute('aria-label', token.title);
         token.dataset.mapItem = ground.map((item) => item.id).join(',');
@@ -211,8 +221,8 @@ function renderMap(frame: WorldState, actor: AgentState | undefined): void {
         const token = node(
           'button',
           `agent-token color-${String(color)}${agent.id === selectedId ? ' selected' : ''}`,
-          agent.name.slice(0, 1),
         );
+        token.append(characterIllustration(color));
         token.title = `${agent.name} (${String(x)}, ${String(y)})`;
         token.setAttribute('aria-label', `Observe ${agent.name}`);
         token.dataset.mapAgent = agent.id;
@@ -273,9 +283,14 @@ function renderInspector(
   ).padStart(2, '0');
   element('inventory').replaceChildren(
     ...(actor?.inventory.length
-      ? actor.inventory.map((item) =>
-          node('span', 'inventory-item', `◆ ${item.name}`),
-        )
+      ? actor.inventory.map((item) => {
+          const chip = node('span', 'inventory-item');
+          chip.append(
+            itemIllustration(item.id),
+            document.createTextNode(item.name),
+          );
+          return chip;
+        })
       : [node('span', 'empty-note', 'Inventory is empty')]),
   );
   const observation = frame.observations.find(
@@ -323,20 +338,26 @@ function renderInspector(
           node(
             'p',
             'empty-pickup',
-            'Nothing here. Move onto a ◆ to collect it.',
+            'Nothing here. Move onto an item to collect it.',
           ),
         ]),
   );
   control('action-controls', 'fieldset').disabled =
     !canAct() || actor === undefined;
   element('action-hint').textContent =
-    history.frames.length > MAX_ACTIONS
-      ? '500-step limit reached. Export, then start a new world.'
-      : !canAct()
-        ? 'Viewing history. Return to the latest frame to act.'
-        : actor === undefined
-          ? 'Import a world with agents to start interacting.'
-          : 'Control the selected agent. Each action records one step.';
+    archivedExperiment !== undefined
+      ? 'Archived experiment. Replay and inspect; actions are read-only.'
+      : experimentLoading
+        ? 'Loading experiment. The current history is preserved.'
+        : history.schedule !== undefined
+          ? 'Round histories are read-only. Start a new world to act.'
+          : history.frames.length > MAX_ACTIONS
+            ? '500-step limit reached. Export, then start a new world.'
+            : !canAct()
+              ? 'Viewing history. Return to the latest frame to act.'
+              : actor === undefined
+                ? 'Import a world with agents to start interacting.'
+                : 'Control the selected agent. Each action records one step.';
 }
 
 function renderEvents(): void {
@@ -378,6 +399,7 @@ function render(): void {
   selectedId = actor?.id ?? '';
   element('world-size').textContent =
     `${String(frame.settings.width)} × ${String(frame.settings.height)}`;
+  element('tick-unit').textContent = history.schedule ? 'ROUND' : 'TICK';
   element('tick-value').textContent = String(frame.tick).padStart(3, '0');
   const observation = frame.observations.find(
     (entry) => entry.self.id === actor?.id,
@@ -392,6 +414,10 @@ function render(): void {
       : cursor === history.frames.length - 1
         ? 'Latest state'
         : 'History frame';
+  element('history-storage-note').textContent =
+    archivedExperiment === undefined
+      ? 'History lives in this page. Export it before leaving or starting over.'
+      : `Saved in ${archivedExperiment}. This URL reopens the full archive; playback never changes it.`;
   element('history-count').textContent =
     `${String(cursor).padStart(3, '0')} / ${String(history.frames.length - 1).padStart(3, '0')}`;
   const slider = control('timeline', 'input');
@@ -463,10 +489,14 @@ element('speed').addEventListener('change', () => {
   }
 });
 element('reset-button').addEventListener('click', () => {
+  experimentBrowser.localSession();
+  archivedExperiment = undefined;
   replaceHistory(createTimeline(DEMO_SETUP));
   notify('New world ready. You can import previously exported history.');
 });
 element('demo-button').addEventListener('click', () => {
+  experimentBrowser.localSession();
+  archivedExperiment = undefined;
   replaceHistory(createDemoTimeline());
   notify('Loaded the 12-step scripted demo. Replay it or continue manually.');
 });
@@ -483,11 +513,6 @@ for (const button of document.querySelectorAll<HTMLButtonElement>(
     );
   });
 }
-element('try-form').addEventListener('submit', (event) => {
-  event.preventDefault();
-  const skill = control('skill-name', 'input').value.trim();
-  if (skill !== '') execute({ type: 'try', agentId: selectedId, skill });
-});
 document.addEventListener('keydown', (event) => {
   if (
     event.target instanceof HTMLInputElement ||
@@ -535,6 +560,8 @@ async function importFile(file: File): Promise<void> {
     if (file.size > MAX_REPLAY_BYTES)
       throw new RangeError('Replay files must not exceed 1 MB.');
     const next = parseReplay(await file.text());
+    experimentBrowser.localSession();
+    archivedExperiment = undefined;
     replaceHistory(next);
     notify(`Imported history with ${String(next.frames.length - 1)} steps.`);
   } catch (error) {
@@ -551,4 +578,16 @@ element('import-file').addEventListener('change', (event) => {
   }
 });
 
+const experimentBrowser = new ExperimentBrowser(
+  (next, id) => {
+    archivedExperiment = id;
+    replaceHistory(next ?? createDemoTimeline());
+  },
+  (pending) => {
+    experimentLoading = pending;
+    if (pending) stop();
+    render();
+  },
+);
 render();
+void experimentBrowser.start();

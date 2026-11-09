@@ -14,6 +14,12 @@ ADRs explain why a design was chosen rather than duplicating module descriptions
 
 - [0007](0007-single-round-model-adapter.md): local ChatGPT authorization, bounded external decisions, and unchanged core semantics.
 
+- [0008](0008-numbered-experiments-and-task-routing.md): numbered offline experiments, validated artifacts and task-specific harness routing.
+
+- [0009](0009-static-experiment-browser.md): static validated experiment data, dropdown navigation and read-only archived histories.
+
+- [0010](0010-synchronous-rounds-and-pr-delivery.md): simultaneous collection rounds, preserved legacy archives and mandatory PR delivery for every task route.
+
 ## Writing requirements
 
 Each ADR includes its date, decision status (Accepted / Superseded), context, decision, alternatives, reasons, costs, and future consequences. Decision status describes the decision lifecycle, not PRODUCT feature status.

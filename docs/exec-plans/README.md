@@ -14,6 +14,12 @@ Plans help humans and agents track tasks, scope, progress, and evidence. Every P
 
 - [PR-07](completed/pr-07-three-agent-decision.md): local OAuth / Responses experiment for three agents with one decision each.
 
+- [PR-08](completed/pr-08-random-experiment-harness.md): first offline random world experiment, retained results and visualizations, and code/experiment task routing.
+
+- [PR-09](completed/pr-09-experiment-browser.md): persistent local pnpm repair and a shared interactive experiment browser.
+
+- [PR-10](completed/pr-10-synchronous-ex2.md): synchronous collection, ex2, illustrated entities and automatic PR delivery.
+
 ## Format and lifecycle
 
 Use `pr-NN-short-title.md` and include `Requirement summary`, numbered `Requirements` (`- R1: ...`), `Scope and exclusions`, `Acceptance criteria`, steps, results, unexecuted checks, limitations, and follow-up suggestions. See the [PR contract](../PULL_REQUESTS.md). Historical completed plans preserve their original format; new PRs and newly submitted work follow this contract. Create plans in active, update them during implementation, then move completed plans to completed and repair references.

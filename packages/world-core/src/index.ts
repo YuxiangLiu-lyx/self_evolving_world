@@ -3,6 +3,7 @@ export {
   DEFAULT_SETTINGS,
   createWorld,
   stepWorld,
+  stepWorldRound,
   isVisible,
   parseWorldAction,
 } from './world.js';

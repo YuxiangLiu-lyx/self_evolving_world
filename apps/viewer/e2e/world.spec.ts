@@ -33,7 +33,7 @@ test('renders the real world, isolates the selected view and works on mobile', a
   await captureReview(page, testInfo, 'mobile');
 });
 
-test('moves, picks up and records an unsupported skill without unlocking it', async ({
+test('moves and picks up with illustrated entities and no learning control', async ({
   page,
 }, testInfo) => {
   await page.goto('/');
@@ -44,18 +44,12 @@ test('moves, picks up and records an unsupported skill without unlocking it', as
   await page.getByRole('button', { name: /Pick up Wood/ }).click();
   await expect(page.locator('#inventory')).toContainText('Wood');
   await expect(page.locator('[data-map-item="wood"]')).toHaveCount(0);
-  await page.getByRole('textbox', { name: 'Skill to try' }).fill('fly');
-  await page.getByRole('button', { name: 'Try skill', exact: true }).click();
-  await expect(page.locator('#tick-value')).toHaveText('003');
-  await expect(page.locator('#current-event')).toContainText(
-    'Skill unavailable',
-  );
-  await expect(page.locator('#agent-position')).toHaveText('03 , 03');
-  await page.getByRole('button', { name: 'Try skill', exact: true }).click();
-  await expect(page.locator('#current-event')).toContainText(
-    'Skill unavailable',
-  );
-  await expect(page.locator('#tick-value')).toHaveText('004');
+  await expect(page.locator('#tick-value')).toHaveText('002');
+  await expect(
+    page.getByRole('button', { name: 'Try skill', exact: true }),
+  ).toHaveCount(0);
+  await expect(page.locator('[data-map-agent] svg')).toHaveCount(3);
+  await expect(page.locator('#inventory svg')).toHaveCount(1);
   await captureReview(page, testInfo, 'after-actions');
 });
 

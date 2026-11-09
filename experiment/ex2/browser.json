@@ -1,0 +1,20 @@
+{
+  "id": "ex2",
+  "status": "passed",
+  "replayHash": "e4f0d47c1129bd0b623165dc4e977941019b928f342837f97e5d6a337f1d6601",
+  "frameTicks": [
+    0,
+    80,
+    160
+  ],
+  "assertions": [
+    "replay-import",
+    "initial-midpoint-final-state",
+    "all-agent-positions-and-inventories",
+    "historical-controls-disabled",
+    "playback-and-export-invariance",
+    "layout-and-runtime-health",
+    "visuals-decode"
+  ],
+  "errors": []
+}

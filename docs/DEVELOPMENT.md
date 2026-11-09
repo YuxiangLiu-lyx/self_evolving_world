@@ -18,13 +18,21 @@ Follow the [language policy](../AGENTS.md#language-policy): user conversations a
 6. Follow the [validation workflow](VALIDATION.md): run `pnpm validate -- "task name"`, including the full `pnpm check`; inspect every current screenshot and behavior result; fix problems and rerun. Also run `pnpm demo` when CLI or package exports change.
 7. Repeat the requirements in the PR, map every requirement and changed path to implementation and verification, and record the latest reviewed head SHA. Record actual evidence and limitations in the [PR template](../.github/pull_request_template.md) and plan. Finish documentation, rerun validation after edits, review the new evidence, and complete only after `pnpm task:finish -- "task name"` succeeds. Archive completed plans; archival changes require a final validation run too. After committing the reviewed files, run `pnpm pr:check -- validation-results/pr-body.md origin/main`; it checks the PR contract and actual completed local evidence.
 
+8. For every task route, automatically run `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"` after the reviewed commit/body. It pushes, creates/updates the PR and verifies current remote checks; no extra publication confirmation is needed. Keep the PR open for human acceptance; never merge without an explicit instruction.
+
+## Offline world experiments and task harness
+
+Follow the [numbered experiment workflow](../experiment/README.md) for `pnpm experiment:run` and `pnpm experiment:check`. The run command allocates the next `experiment/exN`, uses an explicit seed without model calls, and records objectives, results, replay and actual browser visualizations. Inspect an existing run without creating another number by importing its replay or checking its artifacts.
+
+`pnpm harness -- "task name"` is an alias of `pnpm validate`. It [classifies actual changes](VALIDATION.md#task-harness-routing) as code, experiment-only or mixed, and records the chosen route. Experiment-only and mixed work validates the archive before running full regression/browser checks. Code work runs the full suite, including any archived experiments. Every PR still needs an execution plan, full unfiltered tests, current visual/behavior review, requirement mapping and `task:finish`. Retained experiment files are tracked and source-fingerprinted; temporary validation output remains ignored.
+
 ## Optional model experiment
 
 Follow [One-Round Experiment](ONE_ROUND_EXPERIMENT.md) for `pnpm experiment:login` and `pnpm experiment:once`. These commands are explicit local operations and are excluded from `pnpm check`, demo determinism checks, and CI. Unit tests substitute network transports; they cannot prove live account entitlement or model decision quality. Record real request counts and failed rounds separately, and do not repeat inference automatically to obtain a passing result.
 
 ## Debugging failures
 
-`pnpm check` runs typecheck → lint → format → architecture → test → build → demo:check → test:e2e → docs, stopping at the first failure. After fixing a failure, run its individual check as needed, then rerun the full workflow. `pnpm format` fixes formatting only. `pnpm demo:check` compares complete built CLI output from two independent processes in different timezones.
+`pnpm check` runs typecheck → lint → format → architecture → test → build → demo:check → experiment:check → test:e2e → docs, stopping at the first failure. After fixing a failure, run its individual check as needed, then rerun the full workflow. `pnpm format` fixes formatting only. `pnpm demo:check` compares complete built CLI output from two independent processes in different timezones.
 
 If engine checks fail, switch to the specified Node and pnpm versions instead of disabling `engine-strict`. If frozen installation reports a lockfile mismatch, confirm the manifest change, update the lockfile with `pnpm install`, and review the difference. Do not disable rules or delete tests to make CI pass.
 
@@ -41,10 +49,10 @@ git switch -c feat/describe-the-change
 # Implement and complete the local validation and review workflow.
 git add <reviewed-files>
 git commit -m "Describe the completed change"
-git push -u origin HEAD
+pnpm task:publish -- validation-results/pr-body.md "Describe the completed change"
 ```
 
-Open a PR against `main` using the repository's [PR template](../.github/pull_request_template.md). Inspect both `quality` and `pr-policy` for the latest PR revision and resolve failures before merging. Every PR must run the complete test suite; failed, skipped, unavailable, or stale results cannot pass acceptance. Keep commits and PR content in English. Do not force-push shared history or commit dependencies, build outputs, local credentials, or generated validation directories.
+The publisher opens/updates a PR against `main` using the repository's [PR template](../.github/pull_request_template.md). Inspect both `quality` and `pr-policy` for the latest PR revision and resolve failures before merging. Every PR must run the complete test suite; failed, skipped, unavailable, or stale results cannot pass acceptance. Keep commits and PR content in English. Do not force-push shared history or commit dependencies, build outputs, local credentials, or generated validation directories.
 
 [GitHub Actions](../.github/workflows/ci.yml) runs frozen install and `pnpm validate` on pushes, pull requests, and manual dispatch. This invokes the complete `pnpm check`, including the built CLI and Chromium. CI installs Chromium and its system dependencies. Actions use verified full commit SHAs. Toolchain upgrades must synchronize versions, lockfile, relevant ADR impacts, and validation.
 
@@ -54,8 +62,10 @@ The [PR contract](PULL_REQUESTS.md#github-checks-and-merge-restrictions) defines
 
 ## Viewer development and browser tests
 
-`pnpm dev` builds the core before starting Vite. Browser source changes reload automatically; restart after changing the core. `pnpm build && pnpm test:e2e` starts a dedicated preview on port 4173 to test built output. Resolve port conflicts instead of reusing an unknown server. Tests work locally on macOS; Linux setup uses `pnpm exec playwright install --with-deps chromium`.
+`pnpm dev` builds the core before starting Vite. Browser source changes reload automatically; restart after changing the core or completing a new experiment. The Vite configuration validates completed experiment records and serves their catalogue, replay and chart. `pnpm build` includes the same files in the static viewer output; rebuild to update that snapshot. Running/failed records are omitted so capture/resume builds remain possible, while full validation still rejects incomplete records. `pnpm build && pnpm test:e2e` starts a dedicated preview on port 4173 to test built output. Resolve port conflicts instead of reusing an unknown server. Tests work locally on macOS; Linux setup uses `pnpm exec playwright install --with-deps chromium`.
 
-Browser tests cover move/pickup/try, boundaries and occupancy, vision updates, unchanged replay exports, import/export round trips, invalid imports, empty worlds, and 390px layout. Every test monitors runtime and resource failures. The layout validator is also tested against injected horizontal overflow. Screenshots and failure traces are in ignored `test-results/`; the HTML report is in `playwright-report/`; review and completion records are in `validation-results/`. Replay tests live in `apps/viewer/test/`, core semantics in `packages/world-core/test/`, and gate tests in `scripts/validation.test.ts`.
+If the shell cannot find pnpm, follow the [quick-start troubleshooting](../README.md#five-minute-quick-start). Check `pnpm --version` and `pnpm exec node --version` in a fresh zsh session and verify `pnpm dev` serves both the page and `/experiments/index.json`; a toolchain available only under a temporary agent PATH is insufficient.
+
+Browser tests cover move/pickup, legacy imported try records, synchronous rounds and successful collection, boundaries and occupancy, vision updates, unchanged replay exports, import/export round trips, invalid imports, empty worlds, and 390px layout. Every test monitors runtime and resource failures. The layout validator is also tested against injected horizontal overflow. Screenshots and failure traces are in ignored `test-results/`; the HTML report is in `playwright-report/`; review and completion records are in `validation-results/`. Replay tests live in `apps/viewer/test/`, core semantics in `packages/world-core/test/`, and gate tests in `scripts/validation.test.ts`.
 
 Base world behavior stays in `world.ts`. Rule changes require explicit versioning, replay compatibility decisions, ADR updates, and tests. Never connect `try` directly to arbitrary code execution.

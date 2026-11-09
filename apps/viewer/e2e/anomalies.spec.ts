@@ -1,8 +1,9 @@
+import { readFile } from 'node:fs/promises';
 import { expect, test, checkLayout } from './validators.js';
 
 test('rejects boundary/collision moves, conserves items and never executes a try', async ({
   page,
-}) => {
+}, testInfo) => {
   await page.goto('/');
   await page.locator('#import-file').setInputFiles({
     name: 'boundary-world.json',
@@ -59,9 +60,22 @@ test('rejects boundary/collision moves, conserves items and never executes a try
   await expect(page.locator('#visible-summary')).toHaveText(
     '0 other agents · 0 ground items',
   );
+  // The control is deliberately absent; legacy imported try events still preserve state.
+  const pending = page.waitForEvent('download');
+  await page.getByRole('button', { name: /Export history/ }).click();
+  const download = await pending;
+  const path = testInfo.outputPath('legacy.json');
+  await download.saveAs(path);
+  const replay = JSON.parse(await readFile(path, 'utf8')) as {
+    actions: unknown[];
+  };
   for (const skill of ['fly', 'fly', 'move']) {
-    await page.getByRole('textbox', { name: 'Skill to try' }).fill(skill);
-    await page.getByRole('button', { name: 'Try skill', exact: true }).click();
+    replay.actions.push({ type: 'try', agentId: 'a', skill });
+    await page.locator('#import-file').setInputFiles({
+      name: 'legacy.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(JSON.stringify(replay)),
+    });
     await expect(page.locator('#current-event')).toContainText(
       skill === 'move' ? 'Skill already exists' : 'Skill unavailable',
     );

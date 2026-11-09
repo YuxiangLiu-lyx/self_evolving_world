@@ -2,6 +2,8 @@ import { randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { checkExperiments } from './experiments.js';
+import { checkArchivePreservation, taskRoute } from './harness.js';
 import {
   browserEvidence,
   completionErrors,
@@ -48,6 +50,19 @@ try {
     };
     write(reportPath, report);
     try {
+      if (process.env.WORLD_EXPERIMENT_CAPTURE !== undefined)
+        throw new Error('Full validation cannot use experiment capture mode.');
+      checkArchivePreservation(root);
+      const route = taskRoute(root);
+      report.route = route;
+      console.log(
+        `Harness route: ${route.kind}. ${route.kind === 'experiment' ? 'Validate recorded experiments, then run the complete regression and browser suite.' : 'Run the complete code, documentation and browser suite, including any recorded experiments.'}`,
+      );
+      if (route.kind !== 'code') {
+        const ids = checkExperiments(root);
+        if (route.experiments.some((id) => !ids.includes(id)))
+          throw new Error('Recorded experiment directories cannot be deleted.');
+      }
       const fingerprint = sourceFingerprint(root);
       report.sourceHash = fingerprint;
       write(reportPath, report);
@@ -62,6 +77,7 @@ try {
         );
       if (sourceFingerprint(root) !== fingerprint)
         throw new Error('Files changed during validation. Rerun validation.');
+      checkExperiments(root);
       const browser = browserEvidence(
         root,
         readJson(resolve(root, 'test-results/browser-validation.json')),
@@ -102,7 +118,7 @@ try {
       completedAt: new Date().toISOString(),
     });
     console.log(
-      `Task validation passed: ${task}. Automated checks, visual, behavior and requirement reviews are complete; source and screenshot fingerprints match.`,
+      `Task validation passed: ${task}. Automated checks, visual, behavior and requirement reviews are complete; source and screenshot fingerprints match. All task routes must now commit reviewed changes and run task:publish; local validation alone is not PR delivery.`,
     );
   }
 } catch (error) {

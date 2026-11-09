@@ -28,6 +28,7 @@ export const REQUIRED_DOCUMENTS = [
   'docs/DEVELOPMENT.md',
   'docs/PULL_REQUESTS.md',
   'docs/VALIDATION.md',
+  'experiment/README.md',
   'docs/DOCUMENTATION_POLICY.md',
   'docs/decisions/README.md',
   'docs/exec-plans/README.md',

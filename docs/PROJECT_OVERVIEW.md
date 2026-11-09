@@ -10,7 +10,9 @@ The current focus is a stable, understandable foundation: base rules stay fixed 
 
 The world is a bounded two-dimensional grid, 16×12 by default, with origin `(0, 0)` at the top left. Agents have names, positions, and inventories. Items start on the ground. World dimensions and vision radius are configured at creation and remain fixed.
 
-Each well-formed action from a known agent advances the logical tick by one. Successful actions, boundary collisions, and unsupported skill attempts all leave records. A tick counts actions, not elapsed seconds. An optional CLI experiment requests one model decision per founding agent and then stops; the browser never starts model requests.
+In the original single-action API, each well-formed action from a known agent advances the logical tick by one. Successful actions, boundary collisions, and unsupported skill attempts all leave records. A tick counts actions, not elapsed seconds. An optional CLI experiment requests one model decision per founding agent and then stops; the browser never starts model requests.
+
+New offline experiments use the [simultaneous-round extension](SYNCHRONOUS_ROUNDS.md): all agents choose from their own round-start observations and commit together. One tick is one complete round; results distinguish rounds from total actions. Existing single-action demos and ex1 retain their original semantics.
 
 ## Three base skills
 
@@ -41,7 +43,7 @@ flowchart LR
 ```
 
 - The **core** owns rules and transitions, with no UI, networking, or AI service dependency.
-- The **CLI** runs a fixed demo or the separately invoked [one-round model experiment](ONE_ROUND_EXPERIMENT.md). The experiment submits each agent's own observation to ChatGPT and validates its returned action before applying it.
+- The **CLI** runs a fixed demo, a [seeded random experiment](../experiment/README.md) without external agents, or the separately invoked [one-round model experiment](ONE_ROUND_EXPERIMENT.md). The model experiment submits each agent's own observation to ChatGPT and validates its returned action before applying it.
 - The **observatory** displays the map, inventory, vision, and results, and supports interaction and replay. It loads a 12-action demo with three agents, then allows manual continuation.
 
 Module contracts are in [ARCHITECTURE](../ARCHITECTURE.md). Current feature status and evidence are maintained only in [PRODUCT](PRODUCT.md#current-scope).
@@ -50,9 +52,11 @@ Module contracts are in [ARCHITECTURE](../ARCHITECTURE.md). Current feature stat
 
 Start the viewer using the [quick start](../README.md#five-minute-quick-start). Select an agent on the map or from the dropdown. Global view shows the whole world; agent vision hides entities outside the selected observation. The inspector always shows that agent's inventory and observation at the current frame.
 
-Use direction buttons or WASD to move, then collect items from the same cell. The try field records new capability requests. The timeline supports play, pause, speed changes, stepping, and seeking. Actions are disabled in historical frames; select **Latest frame** to continue.
+Use direction buttons or WASD to move, then collect items from the same cell. The current interface exposes move and pickup; legacy try records remain readable without a learning-attempt control. The timeline supports play, pause, speed changes, stepping, and seeking. Actions are disabled in historical frames; select **Latest frame** to continue.
 
-Export stores initial conditions and actions. Import reconstructs history under the same rules version. Page memory is not automatically persisted across refreshes, so export before leaving. Invalid imports preserve the current world.
+Use **Experiment archive** to select a retained run such as **ex2** or **ex1**. The page opens its full interactive timeline, objective, seed and overview chart without file import. Its `?experiment=ex1` URL restores the archive after refresh and supports browser navigation. Archived histories remain read-only at every frame. New runs appear after restarting development or rebuilding the static viewer.
+
+Export stores initial conditions and actions. Import reconstructs history under the same rules version. Local session memory is not automatically persisted across refreshes, so export before leaving. Invalid imports or experiment loads preserve the current world. **Demo / local session**, **New world** and valid file imports leave archive mode.
 
 ## NPC Agent (Planned)
 
@@ -68,6 +72,6 @@ Future requests may become capabilities through specification, review, isolated 
 
 ## Limitations and next steps
 
-There is no terrain collision, occlusion, diagonal movement, continuous physics, trade, or coordinated autonomous decision-making. The browser stores at most 500 actions in memory and accepts replay files up to 1 MB. There is no database, autosave, long-running service, or cross-version migration.
+There is no terrain collision, occlusion, diagonal movement, continuous physics, trade, or coordinated autonomous decision-making. The browser stores at most 500 single actions or simultaneous rounds in memory and accepts replay files up to 1 MB. There is no database, autosave, long-running service, or cross-version migration.
 
 Any expansion beyond one round needs a separate decision on goals, scheduling, memory, and account usage. The scripted demo must not be presented as model behavior, and attempts must not execute new code without a separate validation and governance design.

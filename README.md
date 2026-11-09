@@ -6,6 +6,8 @@ A TypeScript project exploring autonomous AI agents and controlled world evoluti
 
 The observatory uses manual controls and scripted demos. An optional [single-round experiment](docs/ONE_ROUND_EXPERIMENT.md) requests one model decision for each of its three founding agents through ChatGPT OAuth and Responses. Continuous NPC control and skill evolution remain future work. [PRODUCT](docs/PRODUCT.md) is the single source of feature status.
 
+Run a [numbered offline experiment](experiment/README.md) to check the founding world with seeded random actions and no model connection. Each run retains its objective, measured results, replay and visualizations under `experiment/exN/`. [ex2](experiment/ex2/report.md) adds simultaneous rounds and successful collection; [ex1](experiment/ex1/report.md) remains the original sequential baseline.
+
 ## Design goals
 
 - **Human legibility:** clear explanations, responsibilities, diagrams, decisions, and acceptance evidence.
@@ -32,12 +34,16 @@ pnpm dev
 
 Open the local URL printed in the terminal, normally `http://127.0.0.1:5173`. No API key or external service is required.
 
+If zsh reports `command not found: pnpm`, install the pinned pnpm after selecting Node 24.22.2 with the commands above. Ensure the npm global prefix's `bin` directory is on your shell PATH, then run `rehash` or reopen the terminal. Verify both `pnpm --version` and `pnpm exec node --version`; do not disable engine checks.
+
+- Choose **ex2** (160 rounds / 480 actions) or **ex1** in **Experiment archive**, or open `http://127.0.0.1:5173/?experiment=ex1`, to inspect its saved 480-step history. Select any later completed experiment in the same dropdown. Refresh and browser back/forward reopen the selected archive.
+- Saved experiments are read-only: seek, play, inspect agents and vision, export the replay, or open the overview chart. Choose **Demo / local session**, **New world**, or import a file to work in a local session.
 - The default demo has 3 agents, 6 initial items, and 12 scripted actions. Select **Play** to replay it or continue manually.
 - Select an agent on the map or in the dropdown. Switch between **Global view** and **Agent vision**.
 - Use arrow buttons or WASD to move one cell. Pick up an item when standing on its cell.
-- Try a skill such as `fly`. The request is recorded as unavailable; it is neither executed nor unlocked.
+- Characters and founding items have distinct illustrations. Move and pickup are the current controls; legacy try records remain readable in old histories.
 - Play, pause, change speed, step through frames, or seek on the timeline. Historical frames cannot receive actions; return to **Latest frame** to continue.
-- History lives in page memory. Export JSON before refreshing or starting a new world; import it to replay later.
+- Local session history lives in page memory. Export JSON before refreshing or starting a new world; import it to replay later. Archived experiments remain in `experiment/exN/` and reload through their URLs.
 
 All base rules live in [world.ts](packages/world-core/src/world.ts). Defaults are a 16×12 world and a vision radius of 4. Configure an initial world with `createWorld(setup)` or edit the viewer's [demo setup](apps/viewer/src/scenario.ts). Settings are fixed after initialization.
 
@@ -50,29 +56,34 @@ pnpm exec playwright install chromium
 pnpm check
 ```
 
-Before completing each task, run `pnpm validate -- "task name"`. It opens the current build in Chromium and captures evidence. Inspect all five screenshots and behavior results, complete `validation-results/review.json`, and run `pnpm task:finish -- "same task name"`. Complete the task only when this gate succeeds. See the [validation workflow](docs/VALIDATION.md).
+Before completing each task, run `pnpm validate -- "task name"`. It opens the current build in Chromium and captures evidence. Inspect all standard and experiment screenshots and behavior results, complete `validation-results/review.json`, and run `pnpm task:finish -- "same task name"`. After this local gate succeeds, commit reviewed files and run `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"`. Every task type follows PR delivery automatically; merging is excluded. See the [validation workflow](docs/VALIDATION.md).
 
-| Command                                                      | Purpose                                                                              |
-| ------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| `pnpm dev`                                                   | Build the core and start the viewer; restart after core changes                      |
-| `pnpm build`                                                 | Build the core, CLI, and static viewer                                               |
-| `pnpm preview`                                               | Serve the built viewer on port 4173                                                  |
-| `pnpm experiment:login`                                      | Authorize the optional experiment through ChatGPT in the browser                     |
-| `pnpm experiment:once`                                       | Request one decision for each of three agents and save a replay                      |
-| `pnpm demo`                                                  | Run the CLI and print initial, move, pickup, and try snapshots                       |
-| `pnpm check`                                                 | Run all automated checks, including real Chromium interactions                       |
-| `pnpm validate -- "task name"`                               | Run full checks and capture screenshots; create a pending review                     |
-| `pnpm task:finish -- "task name"`                            | Require successful reviews and current evidence before completion                    |
-| `pnpm pr:check -- validation-results/pr-body.md origin/main` | Verify PR requirements, all changed paths, latest head, and completed local evidence |
-| `pnpm typecheck`                                             | Check the root project, host-independent core, and browser module                    |
-| `pnpm lint`                                                  | Run strict ESLint checks                                                             |
-| `pnpm architecture:check`                                    | Check allowed dependencies, public entry points, cycles, and resolution              |
-| `pnpm test` / `pnpm test:watch`                              | Test the core, replay, CLI, documentation checker, and completion gate               |
-| `pnpm test:e2e`                                              | Test the built viewer, replay, file round trips, and mobile layout                   |
-| `pnpm exec playwright show-report`                           | Open browser test details and screenshot attachments                                 |
-| `pnpm demo:check`                                            | Compare built CLI output in two independent processes                                |
-| `pnpm docs:check`                                            | Check Markdown, required documents, local links, and heading anchors                 |
-| `pnpm format:check` / `pnpm format`                          | Check or fix formatting                                                              |
+| Command                                                                  | Purpose                                                                                                                |
+| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`                                                               | Build the core and start the viewer with the current experiment archive; restart after core changes or new experiments |
+| `pnpm build`                                                             | Build the core, CLI, and static viewer                                                                                 |
+| `pnpm preview`                                                           | Serve the built viewer on port 4173                                                                                    |
+| `pnpm experiment:run -- [seed] [rounds]`                                 | Create the next offline random experiment with results and browser visuals                                             |
+| `pnpm experiment:resume -- exN`                                          | Finish failed browser capture without replacing saved simulation data                                                  |
+| `pnpm experiment:check`                                                  | Validate all retained experiment records and deterministic results                                                     |
+| `pnpm harness -- "task name"`                                            | Classify code/experiment/mixed changes and execute the corresponding validation flow                                   |
+| `pnpm experiment:login`                                                  | Authorize the optional experiment through ChatGPT in the browser                                                       |
+| `pnpm experiment:once`                                                   | Request one decision for each of three agents and save a replay                                                        |
+| `pnpm demo`                                                              | Run the CLI and print initial, move, pickup, and try snapshots                                                         |
+| `pnpm check`                                                             | Run all automated checks, including real Chromium interactions                                                         |
+| `pnpm validate -- "task name"`                                           | Run full checks and capture screenshots; create a pending review                                                       |
+| `pnpm task:finish -- "task name"`                                        | Require successful reviews and current evidence before completion                                                      |
+| `pnpm pr:check -- validation-results/pr-body.md origin/main`             | Verify PR requirements, all changed paths, latest head, and completed local evidence                                   |
+| `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"` | Preflight, push, create/update a PR and verify current remote checks without merging                                   |
+| `pnpm typecheck`                                                         | Check the root project, host-independent core, and browser module                                                      |
+| `pnpm lint`                                                              | Run strict ESLint checks                                                                                               |
+| `pnpm architecture:check`                                                | Check allowed dependencies, public entry points, cycles, and resolution                                                |
+| `pnpm test` / `pnpm test:watch`                                          | Test the core, replay, CLI, documentation checker, and completion gate                                                 |
+| `pnpm test:e2e`                                                          | Test the built viewer, replay, file round trips, and mobile layout                                                     |
+| `pnpm exec playwright show-report`                                       | Open browser test details and screenshot attachments                                                                   |
+| `pnpm demo:check`                                                        | Compare built CLI output in two independent processes                                                                  |
+| `pnpm docs:check`                                                        | Check Markdown, required documents, local links, and heading anchors                                                   |
+| `pnpm format:check` / `pnpm format`                                      | Check or fix formatting                                                                                                |
 
 The toolchain uses pnpm Workspace, TypeScript Strict / ESM, Vitest, Playwright, ESLint, Prettier, dependency-cruiser, and GitHub Actions. The interface uses native TypeScript/CSS and Vite without a frontend framework. Exact dependencies are in [package.json](package.json) and [pnpm-lock.yaml](pnpm-lock.yaml). Initial installation requires network access; the built simulation and replay run offline.
 
@@ -84,9 +95,10 @@ The canonical repository is [YuxiangLiu-lyx/self_evolving_world](https://github.
 
 ```text
 packages/world-core/  All base rules in world.ts; index.ts only re-exports
-apps/simulator/       Fixed CLI example and optional single-round model experiment
+apps/simulator/       Fixed demo, offline random runner and optional model experiment
 apps/viewer/          Map, manual controls, vision, and history replay
-scripts/              Documentation, built-output, and completion checks
+scripts/              Task harness, experiment records and validation checks
+experiment/           Numbered goals, results, replays and visualizations
 docs/                 Overview, product, policies, ADRs, and execution plans
 .github/              CI and PR template
 ```

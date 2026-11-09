@@ -1,6 +1,7 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { checkArchivePreservation } from './harness.js';
 import { planPath, pullRequestErrors, validationFields } from './pr-policy.js';
 import { completionErrors, object, readJson } from './validation.js';
 
@@ -42,6 +43,7 @@ try {
       !Number.isSafeInteger(eventPR.number)
     )
       throw new Error('Invalid PR identity.');
+    checkArchivePreservation(root);
     const prPath = `${repository}/pulls/${String(eventPR.number)}`;
     const pr = object(await github(prPath));
     body = text(pr.body);
@@ -79,6 +81,7 @@ try {
       throw new Error(
         'Commit the reviewed changes before checking a PR; the worktree must be clean.',
       );
+    checkArchivePreservation(root, base);
     body = readFileSync(resolve(root, bodyFile), 'utf8');
     head = git('rev-parse', 'HEAD');
     files = git('diff', '--name-only', '--find-renames', `${base}...HEAD`)

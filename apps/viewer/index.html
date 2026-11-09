@@ -44,12 +44,42 @@
           ><button id="reset-button" class="button">New world ↗</button>
         </div>
       </section>
+      <section class="experiment-browser" aria-label="Experiment archive">
+        <div class="experiment-picker">
+          <label for="experiment-select" class="eyebrow"
+            >EXPERIMENT ARCHIVE</label
+          >
+          <select
+            id="experiment-select"
+            disabled
+            aria-describedby="experiment-feedback"
+          >
+            <option value="">Demo / local session</option>
+          </select>
+        </div>
+        <div class="experiment-description">
+          <p id="experiment-details">
+            Choose a saved experiment to explore its full history.
+          </p>
+          <p id="experiment-feedback" aria-live="polite">
+            Loading experiment catalogue…
+          </p>
+        </div>
+        <a
+          id="experiment-chart"
+          class="button quiet"
+          target="_blank"
+          rel="noopener"
+          hidden
+          >Overview chart ↗</a
+        >
+      </section>
       <div class="main-layout">
         <div class="world-column">
           <section class="panel world-panel" aria-label="World visualization">
             <div class="panel-heading">
               <div>
-                <span class="eyebrow">WORLD / LIVE VIEW</span>
+                <span class="eyebrow">WORLD / OBSERVATION</span>
                 <h2>
                   First grounds <span id="world-size" class="mono"></span>
                 </h2>
@@ -70,7 +100,9 @@
                 ><i class="status-dot"></i
                 ><span id="frame-status">Latest state</span></span
               ><span id="entity-count"></span
-              ><span class="mono">TICK <b id="tick-value">0</b></span>
+              ><span class="mono"
+                ><span id="tick-unit">TICK</span> <b id="tick-value">0</b></span
+              >
             </div>
             <div class="map-surround">
               <div id="x-axis" class="x-axis" aria-hidden="true"></div>
@@ -147,7 +179,7 @@
                 </div>
               </div>
               <p id="current-event" class="current-event"></p>
-              <p class="history-storage-note">
+              <p id="history-storage-note" class="history-storage-note">
                 History lives in this page. Export it before leaving or starting
                 over.
               </p>
@@ -162,8 +194,7 @@
               <button id="demo-button" class="button quiet">Load demo</button>
             </div>
             <p class="activity-note">
-              Scripted and manual actions. Select an entry to revisit that
-              moment.
+              Recorded actions. Select an entry to revisit that moment.
             </p>
             <div id="event-list" class="event-list"></div>
           </section>
@@ -255,30 +286,6 @@
                 </div>
               </div>
               <div id="pickup-options"></div>
-              <div class="skill-divider"></div>
-              <div class="skill-heading">
-                <span class="skill-number">03</span>
-                <div>
-                  <h3>Try</h3>
-                  <p>Request an unavailable ability.</p>
-                </div>
-                <span class="try-tag">Record only</span>
-              </div>
-              <form id="try-form">
-                <label class="sr-only" for="skill-name">Skill to try</label>
-                <div class="try-input">
-                  <input
-                    id="skill-name"
-                    maxlength="80"
-                    value="fly"
-                    placeholder="For example: fly, build…"
-                    required
-                  /><button type="submit" aria-label="Try skill">↗</button>
-                </div>
-              </form>
-              <p class="try-note">
-                Unavailable skills are logged, never executed or unlocked.
-              </p>
             </fieldset>
           </section>
         </aside>

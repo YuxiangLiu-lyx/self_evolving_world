@@ -13,6 +13,8 @@
 | Agent navigation and language policy                             | [AGENTS](../AGENTS.md)                                          |
 | Task validation, visual review, and completion gate              | [VALIDATION](VALIDATION.md)                                     |
 
+Experiment objectives, configurations, measured results and visualizations live in the [numbered archive](../experiment/README.md). These records describe individual runs; PRODUCT alone owns feature status.
+
 All repository content is in English. Conversations with the user remain in Chinese. Translation of historical records must preserve their original scope, results, and limitations rather than claiming current capabilities existed earlier.
 
 Requirement summaries, the PR requirement-to-change matrix, full-diff review, and current-head acceptance follow [PULL_REQUESTS](PULL_REQUESTS.md). Every requirement and changed file must be accounted for; green structural checks do not substitute for this semantic review.
