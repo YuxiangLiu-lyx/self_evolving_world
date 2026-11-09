@@ -27,7 +27,7 @@
     "preview": "pnpm --filter @self-evolving-world/viewer preview",
     "test:e2e": "playwright test",
     "validate": "tsx scripts/validate.ts run",
-    "task:finish": "tsx scripts/validate.ts finish",
+    "task:finish": "tsx scripts/finish-task.ts",
     "demo:check": "tsx scripts/check-demo.ts",
     "demo": "pnpm build && node apps/simulator/dist/main.js",
     "pr:check": "tsx scripts/check-pr.ts",
@@ -37,7 +37,8 @@
     "experiment:check": "tsx scripts/experiment-cli.ts check",
     "harness": "tsx scripts/validate.ts run",
     "experiment:resume": "tsx scripts/experiment-cli.ts resume",
-    "task:publish": "tsx scripts/publish-task.ts"
+    "task:publish": "tsx scripts/publish-task.ts",
+    "task:review": "tsx scripts/validate.ts review"
   },
   "devDependencies": {
     "@playwright/test": "1.65.0",

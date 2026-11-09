@@ -56,7 +56,7 @@ pnpm exec playwright install chromium
 pnpm check
 ```
 
-Before completing each task, run `pnpm validate -- "task name"`. It opens the current build in Chromium and captures evidence. Inspect all standard and experiment screenshots and behavior results, complete `validation-results/review.json`, and run `pnpm task:finish -- "same task name"`. After this local gate succeeds, commit reviewed files and run `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"`. Every task type follows PR delivery automatically; merging is excluded. See the [validation workflow](docs/VALIDATION.md).
+Before completing each task, run `pnpm validate -- "task name"`. It opens the current build in Chromium and captures evidence. Inspect all standard and experiment screenshots and behavior results, complete `validation-results/review.json`, and run `pnpm task:review -- "same task name"`. After this local gate succeeds, commit reviewed files and run `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"`. Every task type follows PR, conflict checks and guarded merge automatically; the publisher then runs `task:finish` to verify integration. Explicit no-PR or no-merge instructions require a current plan exception. See the [validation workflow](docs/VALIDATION.md).
 
 | Command                                                                  | Purpose                                                                                                                |
 | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
@@ -72,9 +72,10 @@ Before completing each task, run `pnpm validate -- "task name"`. It opens the cu
 | `pnpm demo`                                                              | Run the CLI and print initial, move, pickup, and try snapshots                                                         |
 | `pnpm check`                                                             | Run all automated checks, including real Chromium interactions                                                         |
 | `pnpm validate -- "task name"`                                           | Run full checks and capture screenshots; create a pending review                                                       |
-| `pnpm task:finish -- "task name"`                                        | Require successful reviews and current evidence before completion                                                      |
+| `pnpm task:review -- "task name"`                                        | Accept actual current visual, behavior and requirement review before publication                                       |
+| `pnpm task:finish -- "task name"`                                        | Verify reviewed evidence, remote delivery and integration before completion                                            |
 | `pnpm pr:check -- validation-results/pr-body.md origin/main`             | Verify PR requirements, all changed paths, latest head, and completed local evidence                                   |
-| `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"` | Preflight, push, create/update a PR and verify current remote checks without merging                                   |
+| `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"` | Preflight, push, create/update PR, verify checks/conflicts, merge and verify completion                                |
 | `pnpm typecheck`                                                         | Check the root project, host-independent core, and browser module                                                      |
 | `pnpm lint`                                                              | Run strict ESLint checks                                                                                               |
 | `pnpm architecture:check`                                                | Check allowed dependencies, public entry points, cycles, and resolution                                                |

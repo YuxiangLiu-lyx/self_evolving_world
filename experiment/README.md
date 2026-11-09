@@ -20,7 +20,7 @@ pnpm experiment:run -- 20261107 160
 pnpm experiment:check
 pnpm validate -- "Describe this experiment"
 # Inspect all current screenshots and complete validation-results/review.json.
-pnpm task:finish -- "Describe this experiment"
+pnpm task:review -- "Describe this experiment"
 # Commit reviewed files and prepare the requirement-mapped PR body.
 pnpm task:publish -- validation-results/pr-body.md "Describe the experiment result"
 ```
@@ -29,7 +29,7 @@ Each invocation of `experiment:run` creates the next number above the largest ex
 
 The default seed is `20261107`, with 160 simultaneous rounds (480 total actions, 160 per agent). Seeds are integers from 1 to 4294967295; round counts are 3–500. All agents choose from the same starting snapshot, then commit together. The [synchronous extension](../docs/SYNCHRONOUS_ROUNDS.md) defines collisions, replay version 2 and the collection policy: always pick up same-cell items, otherwise combine visible-item attraction with random exploration. No try actions, model connections or implicit randomness participate. Collection experiments must demonstrate a successful pickup to pass.
 
-The ex1 generator remains available only for reconstructing its original sequential version-1 archive, including its 80/10/10 move/pickup/try weights. Do not regenerate ex1 with the new policy. Every new experiment defaults to a new exN; user-requested reuse requires a documented [exception](../docs/PULL_REQUESTS.md#automatic-pr-delivery-for-every-task). Both code and experiment tasks automatically proceed to PR publication after complete validation and actual review. `task:publish` requires a reviewed commit and PR body; it verifies current remote checks and never merges.
+The ex1 generator remains available only for reconstructing its original sequential version-1 archive, including its 80/10/10 move/pickup/try weights. Do not regenerate ex1 with the new policy. Every new experiment defaults to a new exN; user-requested reuse requires a documented [exception](../docs/PULL_REQUESTS.md#automatic-pr-delivery-for-every-task). Both code and experiment tasks automatically proceed to PR publication after complete validation and actual review. `task:publish` requires a reviewed commit and PR body; it verifies current remote checks and merge conflicts, merges the reviewed head, then invokes `task:finish` to verify integration into main. Explicit no-PR or no-merge instructions require the current plan exception; incomplete delivery is an error.
 
 ## Required record
 

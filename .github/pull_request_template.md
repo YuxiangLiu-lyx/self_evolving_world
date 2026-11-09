@@ -47,4 +47,4 @@ REPLACE_ME with affected PRODUCT records, architecture, ADRs, execution plan, an
 - [ ] No unrelated changes or unresolved requirement mismatches remain.
 - [ ] The full test suite passed without skipped or focused tests.
 - [ ] Current visual, behavior, and requirement reviews passed.
-- [ ] The task completion gate passed after the final edit.
+- [ ] The local review gate passed after the final edit.

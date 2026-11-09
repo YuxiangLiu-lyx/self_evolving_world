@@ -5,7 +5,7 @@ export const ORIGIN = `https://github.com/${REPOSITORY}.git`;
 export const REQUIRED_CHECKS = ['quality', 'pr-policy'] as const;
 export type GithubRequest = (
   path: string,
-  method?: 'GET' | 'POST' | 'PATCH',
+  method?: 'GET' | 'POST' | 'PATCH' | 'PUT',
   body?: Readonly<Record<string, unknown>>,
 ) => Promise<unknown>;
 
@@ -20,10 +20,13 @@ export function verifyPullRequest(
   branch: string,
   head: string,
   body: string,
+  merged = false,
 ): { number: number; url: string; checksSince: string } {
   const pr = object(value);
   if (
-    pr.state !== 'open' ||
+    (merged
+      ? pr.state !== 'closed' || pr.merged !== true
+      : pr.state !== 'open') ||
     pr.draft !== false ||
     object(pr.base).ref !== 'main' ||
     object(pr.head).ref !== branch ||
