@@ -108,3 +108,7 @@ docs/                 Overview, product, policies, ADRs, and execution plans
 Start with the [project overview](docs/PROJECT_OVERVIEW.md), then the [architecture](ARCHITECTURE.md) and [feature inventory](docs/PRODUCT.md). Before developing, read the [development workflow](docs/DEVELOPMENT.md), [validation workflow](docs/VALIDATION.md), [documentation policy](docs/DOCUMENTATION_POLICY.md), and [agent guide](AGENTS.md).
 
 Decisions and acceptance records live in [ADRs](docs/decisions/README.md) and [execution plans](docs/exec-plans/README.md).
+
+## Development task entry
+
+Use the [programmatic harness](docs/TASK_HARNESS.md) for new code, documentation and experiment tasks: `pnpm task -- start validation-results/intent.json`. It returns structured requests to the current conversation and resumes with `submit` or `next`; `status` shows current evidence and blockers. Existing low-level commands remain available. Every experiment also retains a [behavioral analysis](experiment/README.md#behavioral-analysis) with recommendations only.

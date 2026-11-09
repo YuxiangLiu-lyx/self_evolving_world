@@ -91,6 +91,8 @@ export function experimentIds(root: string): string[] {
   return readdirSync(directory, { withFileTypes: true })
     .flatMap((entry) => {
       if (entry.name === 'README.md' && entry.isFile()) return [];
+      // Behavioral reviews are companions, never additional numbered runs.
+      if (entry.name === 'analyses' && entry.isDirectory()) return [];
       experimentId(entry.name);
       if (!entry.isDirectory())
         throw new Error(`Expected experiment directory: ${entry.name}`);

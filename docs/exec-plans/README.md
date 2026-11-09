@@ -24,6 +24,8 @@ Plans help humans and agents track tasks, scope, progress, and evidence. Every P
 
 - [PR-12](completed/pr-12-subscription-survival-ex3.md): plan-funded survival programs and a real 60-round ex3.
 
+- [PR-13](completed/pr-13-programmatic-harness.md): programmatic task continuation and retained behavioral analysis of ex3.
+
 ## Format and lifecycle
 
 Use `pr-NN-short-title.md` and include `Requirement summary`, numbered `Requirements` (`- R1: ...`), `Scope and exclusions`, `Acceptance criteria`, steps, results, unexecuted checks, limitations, and follow-up suggestions. See the [PR contract](../PULL_REQUESTS.md). Historical completed plans preserve their original format; new PRs and newly submitted work follow this contract. Create plans in active, update them during implementation, then move completed plans to completed and repair references.

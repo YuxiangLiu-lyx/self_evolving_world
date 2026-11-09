@@ -1,0 +1,66 @@
+# ex3: Behavioral Analysis
+
+Reviewer: Current Codex conversation; original archived prompts, all 12 inputs/outputs and 180 action outcomes inspected. Task: pr-13-programmatic-harness. Recommendations are analysis only; no world, prompt or agent change is authorized by this report.
+
+## Summary
+
+ex3 passed its invocation and mild-survival smoke-test objective: all 12 attempted calls completed and were accepted, four per actor; all 180 intents came from model-authored programs, with zero fallback rounds, three survivors, no invariant failures, four pickups and three denied learning requests. Behavior was highly concentrated: 167 waits (92.78%), six moves, four pickups and three learn requests. All actors chose shelter once in their first program, then never asked again. These observations do not establish an isolation defect. The shared prompt explicitly requires an initial learning request and uses shelter in its syntax example; the mild environment and lack of item utility also make waiting a sufficient survival policy. The run demonstrates the interface and bounded scheduling, not exploration, independent personalities or challenging long-term survival.
+
+## Per-agent findings
+
+### lin
+
+Lin received four accepted 15-round programs at ticks 0, 15, 30 and 45. The first was learn("shelter"); move("east", 1); pickup("wood"); move("east", 2); move("north", 1); pickup("stone"); wait(8);. From (2,3), Lin followed initially visible Wood at (3,3) and Stone at (5,2). Across 60 rounds: four moves, two pickups, one denied learn and 53 waits (88.33%). All three later programs were wait(15);. Final position (5,2), inventory Wood/Stone, health 100, satiety 70, cold/heat 0; no fallback or rejected program.
+
+The distinct path and two target choices agree with Lin's private initial observation. Later inputs had no visible ground items, and their summaries selected waiting under safe conditions. The long idle tail is intentional output, not stalled execution. Lin shows observation-dependent behavior but no evidence of a persistent individual preference beyond its different starting location.
+
+Evidence: [experiment/ex3/model-calls.json#attempts (agentId lin; ticks 0,15,30,45)](../../../experiment/ex3/model-calls.json), [experiment/ex3/results.json#agents/0 and events](../../../experiment/ex3/results.json), [experiment/ex3/replay.json](../../../experiment/ex3/replay.json), [experiment/ex3/initial.png](../../../experiment/ex3/initial.png), [experiment/ex3/final.png](../../../experiment/ex3/final.png).
+
+### moss
+
+Moss received four accepted 15-round programs at ticks 0, 15, 30 and 45. The first was learn("shelter"); move("north", 1); pickup("berry"); wait(12);. Moss moved from (8,5) to initially visible Berry at (8,4), picked it up on round 3, then waited through round 60. Totals: one move, one pickup, one denied learn and 57 waits (95%). Later programs were each wait(15);. Final inventory Berry, health 100, satiety 70, cold/heat 0; no fallback or rejected program.
+
+Moss used its own visible opportunity and then selected a stable waiting policy. Berry is not consumable under this protocol, so possessing it cannot improve satiety. The record contains no missed visible-item opportunity at the later planning boundaries. This does not demonstrate that the world was fully explored or that a useful exploration policy was learned.
+
+Evidence: [experiment/ex3/model-calls.json#attempts (agentId moss; ticks 0,15,30,45)](../../../experiment/ex3/model-calls.json), [experiment/ex3/results.json#agents/1 and events](../../../experiment/ex3/results.json), [experiment/ex3/replay.json](../../../experiment/ex3/replay.json), [experiment/ex3/midpoint.png](../../../experiment/ex3/midpoint.png).
+
+### sol
+
+Sol received four accepted 15-round programs at ticks 0, 15, 30 and 45. The first was learn("shelter"); move("west", 1); pickup("crystal"); wait(12);. Sol moved from (12,8) to initially visible Crystal at (11,8), collected it on round 3, then waited through round 60. Totals: one move, one pickup, one denied learn and 57 waits (95%). Later programs were each wait(15);. Final inventory Crystal, health 100, satiety 70, cold/heat 0; no fallback or rejected program.
+
+Sol's private inputs showed no other agents, yet it selected the same learning label and idle tail. Shared public instructions and safe conditions are sufficient candidate explanations; another actor's private state is not needed to produce this pattern. Its first path differs from the others in the direction required by its own visible target.
+
+Evidence: [experiment/ex3/model-calls.json#attempts (agentId sol; ticks 0,15,30,45)](../../../experiment/ex3/model-calls.json), [experiment/ex3/results.json#agents/2 and events](../../../experiment/ex3/results.json), [experiment/ex3/replay.json](../../../experiment/ex3/replay.json), [experiment/ex3/final.png](../../../experiment/ex3/final.png).
+
+## Isolation
+
+Observed client-side evidence supports per-actor input separation: the 12 archived requests use the matching observation.self, own inventory, own prior outcome/program and remaining budgets. Visible other actors, when present for Lin/Moss, expose identity and position, not private inventories or programs; Sol sees no other actors. Initial collection targets differ exactly with visible items. The archived request template has store=false and contains no shared previous_response_id; the existing reconstruction gate verifies input/response correspondence. There is no observed cross-agent private-state reference in these outputs. This single trace cannot establish provider-internal isolation or rule out every possible leak. Identical shelter text is not a valid leakage test because it appears in shared instructions.
+
+## Individuality
+
+All actors use the same model (gpt-6.1-sol), same rules, shared instructions, equal starting vitals and the same survival objective. Their identities, positions and observations differ, but no persistent personality, preference, role-specific incentive or distinct long-term objective is supplied. Different first paths demonstrate sensitivity to observations; convergent later actions show limited observed policy diversity under this scenario. That is weaker than proving the model cannot exhibit individuality, and separate contexts alone do not guarantee diverse choices.
+
+## Behavior
+
+All three first-round learning requests are shelter and are denied, with no unlocked skills and zero world-model calls. The prompt explicitly says "In your first program, include one learn request to exercise the diagnostic path" and supplies learn("shelter") as syntax. Therefore these are prompted diagnostics, not evidence of three spontaneous shelter discoveries. Later 15-round waits are accepted, finite programs executed normally. Health remains 100; satiety at decision boundaries is 100, 92.5, 85 and 77.5, ending at 70; cold and heat remain zero at 22 C. Waiting is compatible with the stated short smoke-test objective. It is an experimental-design limitation if this run is used to claim exploration, adaptive survival or differentiated actors.
+
+## Causes
+
+Strongest supported explanation for learning convergence: a compulsory first learning request plus the shared shelter example creates an anchoring confound. For waiting, the supplied prompt makes item collection optional and explicitly says items have no consumption or survival effects. Temperature is safely between exposure thresholds, and 60 rounds cannot bring starting satiety 100 below the damage threshold of 20. After initial collection, all later observations contain no visible ground items; Seed at (13,3) and Water at (3,8) remain outside those views. Exploration can discover them but yields no implemented survival utility. All later summaries explicitly choose waiting under safe vitals. The 12-20-round guidance and five-call budget plausibly encourage long simple programs; this is a hypothesis, not a measured causal effect. Waiting does not save satiety relative to moving: the same per-round decay applies, so no nonexistent movement energy cost is claimed.
+
+## Limitations
+
+One mild run with three actors and one shared model/prompt cannot distinguish prompt anchoring, deterministic instruction following, model preferences and general strategy quality causally. The experiment intentionally minimized death to test invocation; no starvation/temperature challenge occurs. Own prior program/outcome is available, but this is not a test of richer long-term memory. The archive validates protocol execution and reconstructed histories; structural validation does not certify behavioral quality or the correctness of this analysis. All proposed interventions below need a later authorized task and fresh experiment IDs; none is applied here. Original ex1/ex2/ex3 artifacts, prompt text, item semantics, survival rules and success thresholds remain unchanged.
+
+## Proposed improvements
+
+1. Separate forced diagnostic learning from spontaneous learning assessment in a future controlled experiment. The current first-call instruction guarantees a learning attempt; using shelter in the syntax example makes identical requests ambiguous. A diagnostic test and an autonomy test answer different questions. Verification: Keep the current smoke-test baseline; compare authorized prompt variants with no mandatory learn request and neutral or counterbalanced examples. Report learning frequency and requested-skill distribution across repeated matched runs, including denied attempts.
+2. Test client isolation directly with controlled private-state probes instead of using action similarity as a proxy. Actors can behave identically from shared public instructions without leaking state. Conversely, differing actions alone cannot prove privacy. Verification: In isolated fixtures or later authorized runs, assign distinguishable actor-only canaries, inspect every outbound input, assert no other inventory/program/private marker appears, and use a provider test double to inspect payloads. Report what is verified locally and what remains unknown about provider internals.
+3. Evaluate individuality with explicit, persistent, controlled actor preferences only if that becomes a product requirement. Names and separate observations provide identity but no stable behavioral preference; shared objectives can rationally yield similar actions. Forced randomness alone would not demonstrate coherent individuality. Verification: Compare identical observations under shared versus differing role/preference conditions, then swap roles while holding environment and model settings fixed. Measure consistent preference effects separately from starting-position effects and chance variation.
+4. Design a later survival challenge with meaningful available choices before judging exploration or waiting as failure. In the current mild protocol every actor remains safe and collected items have no survival effect. Merely telling actors to explore would measure compliance, while changing item utility or environmental exposure would require separately authorized versioned world design. Verification: First specify the intended survival utility and decision tradeoffs in a future plan. Compare waiting and active baselines under matched authorized conditions, report survival and damage, and preserve this invocation test as its own unchanged protocol.
+5. Track behavioral coverage alongside execution success in subsequent analyses. A successful API call and zero invariant failures do not establish informative behavior. ex3 has 92.78% waits and zero fallback, two different explanations that aggregate success alone hides. Verification: Report per-actor wait share, movement/collection counts, visited positions, visible opportunities at decision boundaries, learning timing, program lengths, attempted/accepted calls and fallback rounds. Use these as descriptive diagnostics first; do not silently add pass/fail thresholds to ex2 or other archives.
+6. Evaluate program duration and replanning cadence separately from behavior quality. All actors chose 15-round programs within the shared 12-20 guidance and needed four calls, below the five-call cap. This satisfies the bounded-call requirement but may hide responsiveness if future conditions change mid-program. Verification: For a later authorized scenario with meaningful changes, compare fixed-length and observation-driven replanning policies within the same explicit call budget; record response delay, budget exhaustion and survival. Do not rerun the present archive or increase call limits automatically.
+
+## Evidence binding
+
+The companion JSON records SHA-256 digests of every original archive artifact. Validation checks completeness and freshness, not the truth of the reviewer's causal judgment.

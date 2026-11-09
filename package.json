@@ -22,7 +22,7 @@
     "test:watch": "vitest",
     "architecture:check": "depcruise --config dependency-cruiser.config.cjs apps packages",
     "docs:check": "markdownlint-cli2 && tsx scripts/check-docs.ts",
-    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm architecture:check && pnpm test && pnpm build && pnpm demo:check && pnpm experiment:check && pnpm test:e2e && pnpm docs:check",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm architecture:check && pnpm test && pnpm build && pnpm demo:check && pnpm experiment:check && pnpm analysis:check && pnpm test:e2e && pnpm docs:check",
     "dev": "pnpm --filter @self-evolving-world/world-core build && pnpm --filter @self-evolving-world/viewer dev",
     "preview": "pnpm --filter @self-evolving-world/viewer preview",
     "test:e2e": "playwright test",
@@ -39,7 +39,9 @@
     "harness": "tsx scripts/validate.ts run",
     "experiment:resume": "tsx scripts/experiment-cli.ts resume",
     "task:publish": "tsx scripts/publish-task.ts",
-    "task:review": "tsx scripts/validate.ts review"
+    "task:review": "tsx scripts/validate.ts review",
+    "task": "tsx scripts/task.ts",
+    "analysis:check": "tsx scripts/task.ts analyses"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

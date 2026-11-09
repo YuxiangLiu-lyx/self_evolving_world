@@ -9,14 +9,13 @@ This project prioritizes Human Legibility, Agent Legibility, Enforceable Archite
 - Keep this policy in effect for future tasks. Preserve support for user-provided Unicode data and legacy replay inputs; compatibility fixtures may use Unicode escapes with English explanations.
 - [agent.md](agent.md) is the user-requested entry point; this file remains the canonical agent guide.
 
-## Start a task
+## Unified task entry
 
-1. Inspect Git status and preserve unrelated changes.
-2. Read the [project overview](docs/PROJECT_OVERVIEW.md) and [feature inventory](docs/PRODUCT.md); distinguish delivered behavior from plans.
-3. Before changing a module, read the [architecture](ARCHITECTURE.md) and relevant [ADRs](docs/decisions/README.md).
-4. Before implementation, summarize the current request to the user in Chinese and record numbered requirements, exclusions, and acceptance criteria in an English task plan. Every PR repeats these requirements and maps them to the actual changes and evidence; follow the [PR contract](docs/PULL_REQUESTS.md).
-5. Follow the [development workflow](docs/DEVELOPMENT.md) and [documentation policy](docs/DOCUMENTATION_POLICY.md). Maintain an [execution plan](docs/exec-plans/README.md) for substantial tasks.
-6. Identify code, experiment-only, or mixed work using the [task harness](docs/VALIDATION.md#task-harness-routing). For requested offline experiments, follow [experiment/README.md](experiment/README.md): allocate a fresh next `exN` for every new experiment unless the user explicitly requests reuse, retain goals/results/visuals, and validate the record. Mixed work must satisfy both flows; never call a model for a random-only experiment.
+Use the [programmatic task harness](docs/TASK_HARNESS.md): `pnpm task -- start validation-results/intent.json`. The program controls execution order and returns structured work to this current conversation; `submit`, `next`, `amend` and `status` continue the same task. Do not invent approval, permission or completion evidence.
+
+Before preparation, inspect Git status and preserve unrelated work; read the [overview](docs/PROJECT_OVERVIEW.md), [feature inventory](docs/PRODUCT.md), [architecture](ARCHITECTURE.md) and relevant [ADRs](docs/decisions/README.md). Summarize the user's request in Chinese and record numbered requirements, exclusions and acceptance criteria in an English [execution plan](docs/exec-plans/README.md) before implementation. Follow the [documentation policy](docs/DOCUMENTATION_POLICY.md) and [PR contract](docs/PULL_REQUESTS.md).
+
+Task routing uses actual changes, not an input label. Every newly requested experiment gets the next exN unless explicit reuse is recorded. Random-only experiments never call a model. Each experiment needs retained goals, results, visuals and [behavioral analysis](experiment/README.md#behavioral-analysis); recommendations remain analysis only unless separately requested.
 
 ## Required constraints
 
@@ -28,8 +27,8 @@ This project prioritizes Human Legibility, Agent Legibility, Enforceable Archite
 - `PRODUCT.md` is the sole source of feature status. Never describe Planned functionality as implemented or invent validation results.
 - Synchronize feature records, architecture, ADRs, and execution plans when functionality, boundaries, important decisions, or completion status changes.
 - Require the complete unfiltered test suite for every PR. Review every changed file against the numbered requirements, resolve all mismatches, and record current findings. Skipped tests, incomplete checks, stale reviews, or missing requirements block acceptance. Run `pnpm pr:check` before publishing and verify current `quality` and `pr-policy` checks before merging.
-- Code, documentation, experiment-only and mixed tasks automatically proceed through reviewed commit, PR and guarded merge into `main`. After `pnpm task:review`, prepare the complete PR body and run `pnpm task:publish`; require current `quality` and `pr-policy`, no merge conflicts, and verified integration before `pnpm task:finish`. The user has authorized this default workflow. Only an explicit task-scoped no-PR or no-merge instruction permits the recorded exception in the [delivery contract](docs/PULL_REQUESTS.md#automatic-pr-delivery-for-every-task). Missing access, checks or unresolved conflicts mean incomplete work, never an inferred exception.
+- Code, documentation, experiment-only and mixed tasks automatically proceed through reviewed commit, PR and guarded merge into `main`. The unified entry enforces current review, the complete PR body, current `quality` and `pr-policy`, no merge conflicts, and independently verified integration. Publication and merge authority are separate; a missing grant stops before merge. The user has authorized this default workflow. Only an explicit task-scoped no-PR or no-merge instruction permits the recorded exception in the [delivery contract](docs/PULL_REQUESTS.md#automatic-pr-delivery-for-every-task). Missing access, checks or unresolved conflicts mean incomplete work, never an inferred exception.
 - Preserve existing experiment archives. An explicit user-requested reuse must be recorded in the current plan using the [exception contract](docs/PULL_REQUESTS.md#automatic-pr-delivery-for-every-task).
 - Keep each PR focused. Escalate destructive changes, major architectural conflicts, and substantial scope expansion to the user.
-- Before completing every task, including documentation tasks, follow the [validation workflow](docs/VALIDATION.md): run `pnpm validate -- "task name"` to open the current build; inspect every current screenshot and behavior result; record the review; complete only after `pnpm task:finish -- "task name"` succeeds.
+- Before completing every task, including documentation tasks, use the unified entry and [validation criteria](docs/VALIDATION.md). Inspect every current screenshot, behavior result and changed file when requested. Only the independent completion gate establishes completion.
 - Fix validation failures and rerun. Any source or documentation edit requires fresh validation. Do not reuse old task evidence, skip the browser, approve unseen screenshots, or substitute automated assertions for visual review. Report unresolved environment blockers as incomplete work.

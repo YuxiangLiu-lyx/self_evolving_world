@@ -8,19 +8,20 @@ export interface TaskRoute {
   readonly experiments: readonly string[];
 }
 
-/** Only numbered run artifacts and their task plans qualify as experiment-only changes. */
+/** Run artifacts, companion analyses and their plans qualify as experiment-only changes. */
 export function classifyChanges(paths: readonly string[]): TaskRoute {
   const files = [...new Set(paths)].sort();
   const experiments = [
     ...new Set(
       files.flatMap(
-        (path) => /^experiment\/(ex[1-9]\d*)\//.exec(path)?.[1] ?? [],
+        (path) =>
+          /^experiment\/(?:analyses\/)?(ex[1-9]\d*)\//.exec(path)?.[1] ?? [],
       ),
     ),
   ].sort();
   const code = files.some(
     (path) =>
-      !/^experiment\/ex[1-9]\d*\//.test(path) &&
+      !/^experiment\/(?:analyses\/)?ex[1-9]\d*\//.test(path) &&
       !/^docs\/exec-plans\/(active|completed)\/pr-\d+-.+\.md$/.test(path),
   );
   return {

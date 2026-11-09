@@ -4,14 +4,11 @@ Every development task, including documentation-only changes, must follow this w
 
 ## Execution sequence
 
-1. Finish implementation and documentation, resolve known problems, and choose a clear English task name.
-2. Run `pnpm validate -- "task name"`. It reruns the complete `pnpm check`, builds the page, and opens `http://127.0.0.1:4173/` in real Chromium for layout/behavior checks and screenshots.
-3. Open the current report with `pnpm exec playwright show-report` and inspect **every screenshot** listed in `validation-results/report.json`. Codex may use an image viewer to inspect the original artifacts. Checking file existence, reading the DOM, or repeating test names does not count as visual inspection.
-4. Apply the criteria below and complete `validation-results/review.json`. Record the reviewer, each image's `verdict` and specific `notes`, the `behavior` result, and a `requirements` review of the complete diff against the task plan. Requirement notes identify requirement IDs, implementation/evidence, scope coverage, and resolved mismatches; follow [PULL_REQUESTS](PULL_REQUESTS.md). Use `pass` only after actual review, `fail` for problems, and `pending` for unreviewed evidence. Keep the generated `runId`.
-5. If anything fails, fix it and restart at step 2. A new run invalidates the prior review. Source/documentation edits and missing or changed screenshots invalidate earlier evidence.
-6. Run `pnpm task:review -- "same task name"`. The local gate requires exit code 0 and report status `passed`. It does not complete delivery.
+Execution order is implemented in the [unified task coordinator](TASK_HARNESS.md), which invokes the existing `validate`, `task:review`, `pr:check`, publication and final gates. Use its structured requests and continuation commands instead of maintaining a second manual sequence. `pnpm validate -- "task name"` still runs the full `pnpm check` and captures the current build in real Chromium. `pnpm harness` remains its compatibility alias.
 
-7. Automatically commit reviewed files, prepare the complete requirement-mapped PR body, and run `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"`. All task routes use this step. The publisher verifies current checks and conflicts, merges the reviewed head, then calls `task:finish` to independently verify the merged PR and integration into main. Only then is the default task complete. Explicit no-PR or no-merge instructions require the current plan exception. Report the PR URL and actual delivery result; failures remain incomplete. See the [publication contract](PULL_REQUESTS.md#automatic-pr-delivery-for-every-task).
+At a review request, open the current HTML report with `pnpm exec playwright show-report` or inspect its original artifacts. Inspect **every screenshot** listed in `validation-results/report.json`, all behavior results and the complete diff against the numbered requirements. File existence, DOM assertions and test names are not visual inspection. Fill the original review schema with the reviewer, unchanged run ID, each image's verdict and specific notes, behavior findings, and requirement/file/evidence coverage. Use `pass` only for actual accepted review, `fail` for defects and `pending` for unseen evidence. The coordinator validates the submission with the existing gate.
+
+Source/documentation changes, changed requirements, new runs and missing or changed screenshots invalidate acceptance. Fix failures and continue for fresh full evidence. Local review alone is not delivery: the [publication contract](PULL_REQUESTS.md#automatic-pr-delivery-for-every-task) and independent completion still apply, with separately recorded merge authority and explicit task exceptions.
 
 Automated success produces `awaiting-review` and never supplies visual judgments. `pnpm check`, `pnpm test:e2e`, or green CI alone cannot complete a task.
 
@@ -19,17 +16,19 @@ Automated success produces `awaiting-review` and never supplies visual judgments
 
 `pnpm harness -- "task name"` and `pnpm validate -- "task name"` use the same harness. The report records `route.kind`, all changed paths and affected experiment IDs. Classification compares `origin/main...HEAD` and includes staged/unstaged changes, deletions and untracked files. A missing baseline fails rather than guessing; CI fetches full history. Before checks, archive preservation rejects edits/deletions/additions within existing records unless the current plan documents explicit user-requested reuse. Every new experiment uses a fresh exN by default.
 
-| Task type  | Classification                                                                | Workflow                                                                                                                                            |
-| ---------- | ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Code       | Source, configuration or documentation changes; safe default for no changes   | Complete `pnpm check`, including archived experiments; current browser screenshots; visual, behavior and requirement review; completion gate        |
-| Experiment | Only `experiment/exN/` records, optionally with numbered execution-plan files | Validate completed records first; full regression suite and saved replay import in Chromium; experiment and standard visual review; completion gate |
-| Mixed      | Both numbered experiment records and code/documentation/configuration         | Validate experiment records, then the complete code workflow and all experiment browser scenes                                                      |
+| Task type  | Classification                                                                                          | Workflow                                                                                                                                            |
+| ---------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Code       | Source, configuration or documentation changes; safe default for no changes                             | Complete `pnpm check`, including archived experiments; current browser screenshots; visual, behavior and requirement review; completion gate        |
+| Experiment | Only `experiment/exN/` records or `experiment/analyses/exN/` companions, optionally with numbered plans | Validate completed records first; full regression suite and saved replay import in Chromium; experiment and standard visual review; completion gate |
+| Mixed      | Both experiment artifacts/analyses and code/documentation/configuration                                 | Validate experiment records, then the complete code workflow and all experiment browser scenes                                                      |
 
 Creating a survival model experiment is explicit: `pnpm experiment:survival` runs the separately authorized bounded protocol and records real calls in a new exN. Its validator reconstructs saved programs, checks per-actor budgets and observation/response correspondence, verifies survival trajectories, and requires the same full task gates. Checks and replay never issue inference.
 
 Creating a random experiment is explicit: `pnpm experiment:run` generates the next `exN` with an objective, random configuration, results, report and real visual evidence. Its additional browser capture does not replace full validation. `pnpm experiment:check` verifies all records without creating another run. The capture environment variable is forbidden in full validation so it cannot restrict the suite. See the [archive contract](../experiment/README.md) and [ADR-0008](decisions/0008-numbered-experiments-and-task-routing.md).
 
 Every saved run adds four required scenes: `exN-initial`, `exN-midpoint`, `exN-final`, and `exN-overview`. Inspect all of them alongside the eleven standard scenes below. Review positions, ownership, event feedback, trajectories, counts and chart readability. The completion gate revalidates artifacts and requires fresh per-scene approval; expected action rejections do not imply execution failure.
+
+Every new/changed experiment also returns a [behavioral analysis request](../experiment/README.md#behavioral-analysis) before final validation. Explicit retrospective targets use existing archives without another run. The separately requested analysis gate checks completeness and artifact freshness, while the current conversation judges causes and recommendations. It does not change execution-success metrics.
 
 ## Visual review
 
@@ -68,6 +67,7 @@ Add scenarios and expected outcomes for changed behavior. Import `test` from `ap
 
 ## Evidence and invalidation
 
+- `validation-results/tasks/<id>.json`: original/amended intent, derived route/version, command journal, evidence references and current structured handoff; excluded from source fingerprints.
 - `validation-results/report.json`: task name, run ID, source fingerprint, automated result, screenshot paths/hashes, and final state.
 - `validation-results/publication.json`: current delivery identity, policy, checks and merge result, written by task:publish after local review and commit.
 - `validation-results/completion.json`: independently verified final integration or explicit exception; failures record an error and return nonzero. New validation removes both prior delivery records.

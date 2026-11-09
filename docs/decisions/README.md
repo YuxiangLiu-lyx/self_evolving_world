@@ -24,6 +24,8 @@ ADRs explain why a design was chosen rather than duplicating module descriptions
 
 - [0012](0012-survival-programs.md): bounded ChatGPT plan-funded behavior code, survival-v1, denied learning and version-3 archives.
 
+- [0013](0013-programmatic-task-harness.md): programmatic task continuation, unchanged acceptance boundaries and retained experiment analysis.
+
 ## Writing requirements
 
 Each ADR includes its date, decision status (Accepted / Superseded), context, decision, alternatives, reasons, costs, and future consequences. Decision status describes the decision lifecycle, not PRODUCT feature status.

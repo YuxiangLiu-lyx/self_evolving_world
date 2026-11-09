@@ -2,6 +2,8 @@
 
 This policy owns requirement traceability and PR acceptance. [VALIDATION](VALIDATION.md) owns full test execution and evidence review; [PRODUCT](PRODUCT.md) alone owns feature status. Requirements, plans, PR bodies, and review records are written in English. Summarize the task to the user in Chinese before implementation.
 
+Use the [unified task entry](TASK_HARNESS.md) to execute this contract. The coordinator returns current-head PR-body and separately authorized merge requests; it preserves the template and checks below.
+
 ## Before implementation
 
 Every PR needs an execution plan, including a concise plan for small or documentation-only work. Before editing implementation, record:

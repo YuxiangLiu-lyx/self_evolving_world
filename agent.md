@@ -1,10 +1,7 @@
 # Agent Instructions
 
-- Use Chinese when communicating with the user.
-- Use English for all repository content, including documentation, code comments, interface text, examples, tests, and validation records.
+Communicate with the user in Chinese. Write all repository content in English. Follow the canonical [AGENTS.md](AGENTS.md) for project principles, compatibility and authorization boundaries.
 
-Follow the canonical [AGENTS.md](AGENTS.md) for the full workflow, compatibility requirements, and mandatory task completion checks.
+Use [the unified task entry](docs/TASK_HARNESS.md): `pnpm task -- start validation-results/intent.json`, then answer the current structured requests with `submit`; use `next` to continue and `status` to inspect. The program owns deterministic sequence and checks. This current conversation owns actual implementation, semantic/visual review and authorized connector actions.
 
-Use the [task harness](docs/VALIDATION.md#task-harness-routing) to distinguish code and experiment changes. Offline experiments follow the [numbered experiment workflow](experiment/README.md) and retain their goals, measured results, replay and visualizations.
-
-Every new experiment uses a fresh exN unless the user explicitly requests reuse. All code and experiment tasks automatically continue from validation and `task:review` to commit, PR, current remote checks and guarded merge via `pnpm task:publish`. `task:finish` requires verified integration into main. Explicit task-scoped no-PR or no-merge instructions use the recorded exceptions in the [delivery contract](docs/PULL_REQUESTS.md#automatic-pr-delivery-for-every-task); failures leave the task incomplete.
+Every requested experiment gets a new exN unless explicit reuse is recorded. [Experiment analysis](experiment/README.md#behavioral-analysis) is retained after each run and proposes improvements without implementing them. All routes retain the [delivery contract](docs/PULL_REQUESTS.md#automatic-pr-delivery-for-every-task), including explicit no-PR/no-merge exceptions. Green CI does not supply merge authorization, and unresolved failures remain incomplete.

@@ -10,3 +10,4 @@ experiment-results/
 
 # Retained experiment artifacts use the generator-owned canonical format.
 experiment/ex*/
+experiment/analyses/
