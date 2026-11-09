@@ -1,0 +1,4575 @@
+{
+  "status": "completed",
+  "steps": 480,
+  "framesChecked": 481,
+  "invariantFailures": 0,
+  "externalModelCalls": 0,
+  "actions": {
+    "move": 373,
+    "pickup": 41,
+    "try": 66
+  },
+  "outcomes": {
+    "moved": 341,
+    "skill-unavailable": 66,
+    "item-out-of-reach": 39,
+    "out-of-bounds": 30,
+    "item-not-found": 2,
+    "occupied": 2
+  },
+  "successfulActions": 341,
+  "expectedRejections": 139,
+  "groundItems": 6,
+  "collectedItems": 0,
+  "agents": [
+    {
+      "id": "lin",
+      "name": "Lin",
+      "turns": 160,
+      "finalPosition": {
+        "x": 3,
+        "y": 11
+      },
+      "inventory": [],
+      "visitedCells": 55
+    },
+    {
+      "id": "moss",
+      "name": "Moss",
+      "turns": 160,
+      "finalPosition": {
+        "x": 2,
+        "y": 6
+      },
+      "inventory": [],
+      "visitedCells": 34
+    },
+    {
+      "id": "sol",
+      "name": "Sol",
+      "turns": 160,
+      "finalPosition": {
+        "x": 10,
+        "y": 7
+      },
+      "inventory": [],
+      "visitedCells": 37
+    }
+  ],
+  "events": [
+    {
+      "tick": 1,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 2,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 3,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 4,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 5,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 6,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 7,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 8,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "berry"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 9,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 10,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 11,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 12,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 13,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 14,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 15,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 16,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 17,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 18,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "crystal"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 19,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 20,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 21,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 22,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 23,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 24,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 25,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 26,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 27,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 28,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 29,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 30,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 31,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 32,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 33,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 34,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 35,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 36,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 37,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 38,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 39,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 40,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "stone"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 41,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 42,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 43,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 44,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 45,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 46,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 47,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 48,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "crystal"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 49,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 50,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 51,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 52,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 53,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "water"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 54,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 55,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 56,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 57,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 58,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "stone"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 59,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 60,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 61,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 62,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 63,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 64,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 65,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 66,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 67,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 68,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 69,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 70,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 71,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 72,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 73,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "stone"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 74,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "trade"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 75,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 76,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 77,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 78,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 79,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 80,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 81,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 82,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 83,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 84,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 85,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 86,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "water"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 87,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 88,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 89,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 90,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 91,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 92,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 93,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 94,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "trade"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 95,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 96,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 97,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 98,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "water"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 99,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 100,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 101,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 102,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 103,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 104,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 105,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 106,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 107,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 108,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 109,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 110,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 111,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 112,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 113,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 114,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 115,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 116,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 117,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 118,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 119,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 120,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 121,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 122,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 123,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 124,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 125,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 126,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 127,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 128,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 129,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 130,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 131,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 132,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 133,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 134,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 135,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 136,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 137,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 138,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 139,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 140,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 141,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 142,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 143,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 144,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 145,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 146,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 147,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 148,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 149,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 150,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 151,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 152,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 153,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 154,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 155,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 156,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "unseen-item"
+      },
+      "outcome": "item-not-found"
+    },
+    {
+      "tick": 157,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 158,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 159,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 160,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 161,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 162,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 163,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 164,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 165,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 166,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 167,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 168,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 169,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "trade"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 170,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 171,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 172,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 173,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 174,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 175,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 176,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 177,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 178,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 179,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 180,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 181,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 182,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 183,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 184,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 185,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "water"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 186,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "trade"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 187,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "stone"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 188,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 189,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 190,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 191,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 192,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "crystal"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 193,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 194,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 195,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 196,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "stone"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 197,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 198,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 199,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 200,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 201,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 202,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 203,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 204,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "unseen-item"
+      },
+      "outcome": "item-not-found"
+    },
+    {
+      "tick": 205,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 206,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 207,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 208,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 209,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "water"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 210,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 211,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 212,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "trade"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 213,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "crystal"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 214,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 215,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 216,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 217,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 218,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 219,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 220,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 221,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 222,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 223,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 224,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 225,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 226,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 227,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 228,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 229,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 230,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 231,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 232,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 233,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 234,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 235,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 236,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 237,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 238,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 239,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 240,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 241,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 242,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 243,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 244,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 245,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 246,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "crystal"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 247,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 248,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "occupied"
+    },
+    {
+      "tick": 249,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "crystal"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 250,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "occupied"
+    },
+    {
+      "tick": 251,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 252,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "crystal"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 253,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 254,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 255,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 256,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 257,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "trade"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 258,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 259,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "trade"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 260,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 261,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 262,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 263,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 264,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 265,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 266,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 267,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 268,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 269,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 270,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 271,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "stone"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 272,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 273,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 274,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 275,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 276,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 277,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "water"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 278,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 279,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 280,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 281,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 282,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 283,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 284,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 285,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 286,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 287,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 288,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 289,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 290,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 291,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 292,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 293,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 294,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 295,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 296,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 297,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 298,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 299,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 300,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 301,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 302,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 303,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 304,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 305,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "trade"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 306,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 307,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 308,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 309,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 310,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 311,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 312,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 313,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 314,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 315,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 316,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 317,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 318,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 319,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 320,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 321,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 322,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 323,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 324,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 325,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 326,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 327,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 328,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 329,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 330,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 331,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 332,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 333,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 334,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 335,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 336,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 337,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "water"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 338,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 339,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 340,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 341,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 342,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 343,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 344,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 345,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 346,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 347,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "stone"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 348,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 349,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 350,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 351,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 352,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 353,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 354,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 355,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 356,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 357,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 358,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 359,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 360,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 361,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 362,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 363,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 364,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 365,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 366,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 367,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 368,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 369,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 370,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 371,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 372,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 373,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 374,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 375,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 376,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 377,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 378,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 379,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 380,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "stone"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 381,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 382,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 383,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 384,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 385,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 386,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 387,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 388,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 389,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 390,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 391,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "trade"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 392,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 393,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 394,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "water"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 395,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 396,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 397,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 398,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 399,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 400,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 401,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 402,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 403,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 404,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 405,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 406,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "trade"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 407,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 408,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 409,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "trade"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 410,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 411,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 412,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 413,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 414,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "seed"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 415,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 416,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 417,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 418,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 419,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 420,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 421,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 422,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 423,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 424,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 425,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 426,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 427,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 428,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 429,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 430,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 431,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 432,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 433,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 434,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 435,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 436,
+      "action": {
+        "type": "try",
+        "agentId": "lin",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 437,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 438,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 439,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 440,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 441,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 442,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 443,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 444,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 445,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 446,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 447,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 448,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 449,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "wood"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 450,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 451,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 452,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 453,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 454,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 455,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 456,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 457,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 458,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 459,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 460,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 461,
+      "action": {
+        "type": "try",
+        "agentId": "moss",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 462,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 463,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 464,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 465,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "plant"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 466,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 467,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 468,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 469,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 470,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 471,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 472,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 473,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "water"
+      },
+      "outcome": "item-out-of-reach"
+    },
+    {
+      "tick": 474,
+      "action": {
+        "type": "try",
+        "agentId": "sol",
+        "skill": "fly"
+      },
+      "outcome": "skill-unavailable"
+    },
+    {
+      "tick": 475,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 476,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 477,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 478,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 479,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 480,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    }
+  ],
+  "finalState": {
+    "tick": 480,
+    "rules": {
+      "version": "1",
+      "skills": [
+        "move",
+        "pickup",
+        "try"
+      ],
+      "movement": "one-cardinal-cell",
+      "pickup": "same-cell",
+      "vision": "euclidean-without-occlusion"
+    },
+    "settings": {
+      "width": 16,
+      "height": 12,
+      "visionRadius": 4
+    },
+    "agents": [
+      {
+        "id": "lin",
+        "name": "Lin",
+        "position": {
+          "x": 3,
+          "y": 11
+        },
+        "inventory": []
+      },
+      {
+        "id": "moss",
+        "name": "Moss",
+        "position": {
+          "x": 2,
+          "y": 6
+        },
+        "inventory": []
+      },
+      {
+        "id": "sol",
+        "name": "Sol",
+        "position": {
+          "x": 10,
+          "y": 7
+        },
+        "inventory": []
+      }
+    ],
+    "items": [
+      {
+        "id": "wood",
+        "name": "Wood",
+        "position": {
+          "x": 3,
+          "y": 3
+        }
+      },
+      {
+        "id": "stone",
+        "name": "Stone",
+        "position": {
+          "x": 5,
+          "y": 2
+        }
+      },
+      {
+        "id": "berry",
+        "name": "Berry",
+        "position": {
+          "x": 8,
+          "y": 4
+        }
+      },
+      {
+        "id": "crystal",
+        "name": "Crystal",
+        "position": {
+          "x": 11,
+          "y": 8
+        }
+      },
+      {
+        "id": "seed",
+        "name": "Seed",
+        "position": {
+          "x": 13,
+          "y": 3
+        }
+      },
+      {
+        "id": "water",
+        "name": "Water",
+        "position": {
+          "x": 3,
+          "y": 8
+        }
+      }
+    ],
+    "observations": [
+      {
+        "tick": 480,
+        "self": {
+          "id": "lin",
+          "name": "Lin",
+          "position": {
+            "x": 3,
+            "y": 11
+          },
+          "inventory": []
+        },
+        "agents": [],
+        "items": [
+          {
+            "id": "water",
+            "name": "Water",
+            "position": {
+              "x": 3,
+              "y": 8
+            }
+          }
+        ]
+      },
+      {
+        "tick": 480,
+        "self": {
+          "id": "moss",
+          "name": "Moss",
+          "position": {
+            "x": 2,
+            "y": 6
+          },
+          "inventory": []
+        },
+        "agents": [],
+        "items": [
+          {
+            "id": "wood",
+            "name": "Wood",
+            "position": {
+              "x": 3,
+              "y": 3
+            }
+          },
+          {
+            "id": "water",
+            "name": "Water",
+            "position": {
+              "x": 3,
+              "y": 8
+            }
+          }
+        ]
+      },
+      {
+        "tick": 480,
+        "self": {
+          "id": "sol",
+          "name": "Sol",
+          "position": {
+            "x": 10,
+            "y": 7
+          },
+          "inventory": []
+        },
+        "agents": [],
+        "items": [
+          {
+            "id": "berry",
+            "name": "Berry",
+            "position": {
+              "x": 8,
+              "y": 4
+            }
+          },
+          {
+            "id": "crystal",
+            "name": "Crystal",
+            "position": {
+              "x": 11,
+              "y": 8
+            }
+          }
+        ]
+      }
+    ],
+    "event": {
+      "tick": 480,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    }
+  }
+}

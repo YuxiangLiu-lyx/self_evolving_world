@@ -1,0 +1,33 @@
+{
+  "format": "self-evolving-world/experiment",
+  "version": 1,
+  "id": "ex1",
+  "objective": "Check whether the founding world runs normally under bounded random actions without an external agent or model, and preserve reproducible results and visual evidence.",
+  "seed": 20261107,
+  "steps": 480,
+  "policy": "xorshift32-observation-v1",
+  "controller": "seeded-random",
+  "externalModelCalls": 0,
+  "createdAt": "2026-11-08T03:44:13.589Z",
+  "provenance": {
+    "revision": "5fd2fc8ad514418fba94b2ac4c80f5d95b7fb228",
+    "dirty": true,
+    "node": "v24.22.2",
+    "platform": "darwin"
+  },
+  "status": "completed",
+  "captureFailures": [
+    "pnpm exec playwright test experiments.spec.ts failed."
+  ],
+  "artifacts": {
+    "replay.json": "35ae18df5b2f4ccbf29851c846eac631344ebe03e02749dbb697fb4276a036c9",
+    "results.json": "80d413e532fa056f90f8ded25be80acc9fa4b85dcdcaedbedb99420f031af6d2",
+    "report.md": "9bf481839034c45347a990108276a8f061e28d5fc068b7b4a2037a29312075fd",
+    "overview.svg": "44957be5fbf35f88ba3474f72b291f0ada72eb1474cf251cc980f3b657e2eb7a",
+    "browser.json": "719f35ac70732651f1e0e7311fffea3ad5222feed775b5e8fa7cb1551ca84849",
+    "initial.png": "1a21db7f7bca06036da658bf7e94a8be25750f3070b7d35676f4eb496a54fd7c",
+    "midpoint.png": "3096b8f3db32bace87cee1099e561b3486d2ff328cbfb0924c0b68f2a46e3f76",
+    "final.png": "d51de36c772bd098d83f1a16489fa2d56ad6cd0617aa154c2c7a37d439d6ff9f",
+    "overview.png": "e3c89c37b99f8a453bffead32dda4eb7b8d677029ea82914efff0032fc47caf0"
+  }
+}

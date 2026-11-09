@@ -50,6 +50,28 @@ pnpm pr:check -- validation-results/pr-body.md origin/main
 
 This requires a clean worktree, compares the PR body with the committed plan and changed paths, checks the head SHA, and verifies that its task/run ID matches the actual completed local evidence. Committing without changing source does not invalidate the source fingerprint. After another source edit, repeat validation, review, completion, commit, and PR preflight.
 
+## Automatic PR delivery for every task
+
+Code, documentation-only, experiment-only and mixed tasks all proceed automatically to PR delivery. The task executor performs implementation, full validation and actual review, commits the reviewed files, and prepares the requirement-mapped body from the task plan and complete changed-file list. Do not wait for another publication confirmation once the task is authorized. A user instruction to keep work local takes precedence. Publication does not authorize merging.
+
+After the completed local gate and clean reviewed commit, run:
+
+```bash
+pnpm task:publish -- validation-results/pr-body.md "Concrete problem and resulting behavior"
+```
+
+This command verifies canonical origin and a focused branch, fetches main and requires it as an ancestor, runs `pr:check`, pushes without force, creates or updates that branch's open PR against main, and waits for successful current `quality` and `pr-policy` checks. A matching existing PR is reused, so retrying does not create duplicate PRs. It verifies the PR head/body before and after checks and reruns preflight. Checks must start at or after the observed PR update time, so an older green run cannot approve a new description on the same commit. This is conservative: a later comment or metadata update may require rerunning CI before verification. `validation-results/publication.json` records task, run ID, route, exact head, PR URL and remote-check result. Missing authentication, failed/stale checks, concurrent edits or timeout leave delivery incomplete. The script never merges or approves reviews.
+
+Authentication uses `GITHUB_TOKEN` or an existing HTTPS Git credential helper without logging secrets. No gh installation is required. A connected GitHub tool may create/update the same reviewed PR; then append `--verify-only` to require the existing matching PR and verify delivery without publishing mutations. Source changes still require fresh validation, review, commit and an updated body.
+
+New experiments always allocate the next unused exN by default. The harness and preflight compare every previously committed archive file with origin/main and block changed, removed or added files within existing exN directories. Only an explicit user reuse request may be recorded in the current changed plan as:
+
+```text
+- Experiment reuse: exN — Quote or explain the explicit user instruction and why this record must change.
+```
+
+The reason must contain at least twenty characters. Reviewers verify the actual authorization; the parser cannot prove it. No exception bypasses complete artifact reconstruction, browser evidence, tests or PR review. Explicit capture resumption is limited to failed/incomplete runs and preserves their simulation and error history. Never add a reuse line merely to silence a failure. Code-only tasks do not allocate experiment directories.
+
 ## GitHub checks and merge restrictions
 
 [CI](../.github/workflows/ci.yml) runs `quality` for all PRs without path filters. The [PR workflow](../.github/workflows/pr-policy.yml) runs `pr-policy` on opening, reopening, new commits, description edits, and readiness changes. It fetches the current body and complete changed-file list, reads the plan at the exact head, and rejects concurrent changes. Both jobs use read-only permissions; untrusted PR text is data, never interpolated into shell commands. No privileged `pull_request_target` workflow executes PR code.

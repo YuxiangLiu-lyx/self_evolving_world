@@ -4,7 +4,6 @@ import {
   type Page,
   type TestInfo,
 } from '@playwright/test';
-import type { ReviewScene } from '../../../scripts/validation.js';
 
 // Automatic fixture: every browser test observes runtime and resource failures.
 export const test = base.extend<{ runtimeHealth: boolean }>({
@@ -42,9 +41,10 @@ export async function checkLayout(page: Page): Promise<void> {
     '#world-grid',
     '#timeline',
     '#agent-select',
-    '#try-form',
+    '#pickup-options',
     '#play-button',
     '#export-button',
+    '#experiment-select',
   ]) {
     await expect(page.locator(selector)).toBeVisible();
   }
@@ -53,7 +53,7 @@ export async function checkLayout(page: Page): Promise<void> {
     if (document.documentElement.scrollWidth > innerWidth + 1)
       problems.push('Page overflows horizontally');
     for (const node of document.querySelectorAll(
-      'h1, .panel, .topbar, .playback-controls, .try-input, #current-event',
+      'h1, .panel, .topbar, .playback-controls, #current-event, .experiment-browser',
     )) {
       const rect = node.getBoundingClientRect();
       if (
@@ -93,7 +93,7 @@ export async function checkLayout(page: Page): Promise<void> {
 export async function captureReview(
   page: Page,
   info: TestInfo,
-  id: ReviewScene,
+  id: string,
 ): Promise<void> {
   // Wait for the real notification lifecycle, without hiding UI via test CSS.
   await expect(page.getByRole('status')).toBeHidden({ timeout: 6000 });

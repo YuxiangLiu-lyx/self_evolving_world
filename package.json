@@ -22,7 +22,7 @@
     "test:watch": "vitest",
     "architecture:check": "depcruise --config dependency-cruiser.config.cjs apps packages",
     "docs:check": "markdownlint-cli2 && tsx scripts/check-docs.ts",
-    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm architecture:check && pnpm test && pnpm build && pnpm demo:check && pnpm test:e2e && pnpm docs:check",
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm architecture:check && pnpm test && pnpm build && pnpm demo:check && pnpm experiment:check && pnpm test:e2e && pnpm docs:check",
     "dev": "pnpm --filter @self-evolving-world/world-core build && pnpm --filter @self-evolving-world/viewer dev",
     "preview": "pnpm --filter @self-evolving-world/viewer preview",
     "test:e2e": "playwright test",
@@ -32,7 +32,12 @@
     "demo": "pnpm build && node apps/simulator/dist/main.js",
     "pr:check": "tsx scripts/check-pr.ts",
     "experiment:login": "tsx apps/simulator/src/login.ts",
-    "experiment:once": "tsx apps/simulator/src/experiment-cli.ts"
+    "experiment:once": "tsx apps/simulator/src/experiment-cli.ts",
+    "experiment:run": "tsx scripts/experiment-cli.ts run",
+    "experiment:check": "tsx scripts/experiment-cli.ts check",
+    "harness": "tsx scripts/validate.ts run",
+    "experiment:resume": "tsx scripts/experiment-cli.ts resume",
+    "task:publish": "tsx scripts/publish-task.ts"
   },
   "devDependencies": {
     "@playwright/test": "1.65.0",

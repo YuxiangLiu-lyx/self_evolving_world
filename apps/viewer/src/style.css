@@ -171,6 +171,48 @@ h1 {
   gap: 24px;
   align-items: start;
 }
+.experiment-browser {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  border: 1px solid #d9e2d2;
+  border-radius: 12px;
+  background: #edf1e7;
+}
+.experiment-picker {
+  display: grid;
+  gap: 8px;
+  flex: 0 1 220px;
+  min-width: 0;
+}
+#experiment-select {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 12px;
+  color: var(--ink);
+  border: 1px solid #c8d5c3;
+  border-radius: 6px;
+  background: #fdfef9;
+  font-size: 13px;
+}
+.experiment-description {
+  flex: 1 1 330px;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+#experiment-feedback {
+  color: #61715f;
+  font-size: 11px;
+  margin-top: 4px;
+}
+#experiment-chart {
+  text-decoration: none;
+}
 .world-column,
 .inspector {
   display: grid;
@@ -332,43 +374,57 @@ h3 {
 }
 .agent-token {
   padding: 0;
-  border: 1px solid #ecdbbc;
-  border-radius: 50%;
-  width: 63%;
+  border: 0;
+  border-radius: 30%;
+  width: 88%;
   aspect-ratio: 1;
   z-index: 2;
-  font-size: clamp(9px, 1vw, 14px);
-  background: #e5bd7d;
-  color: #473e29;
-  font-weight: 600;
-  box-shadow: 0 2px 7px #091a2390;
+  background: transparent;
+  filter: drop-shadow(0 1px 1px #0b282a90);
 }
 .agent-token.selected {
-  outline: 1px solid #e9d8a68a;
-  outline-offset: 4px;
+  outline: 1px solid #f3d997;
+  outline-offset: 1px;
+  background: #f5dc8c1c;
 }
-.agent-token.color-1,
-.agent-token.color-4 {
-  background: #a7c4b7;
-  border-color: #d1e6d9;
-  color: #2e4a41;
-}
-.agent-token.color-2,
-.agent-token.color-5 {
-  background: #d89e86;
-  border-color: #f0c6af;
-  color: #563c2d;
+.agent-token svg,
+.item-token svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 .item-token {
-  color: #d2ce99;
-  font-size: clamp(8px, 1vw, 13px);
-  text-shadow: 0 0 9px #dae6b235;
+  width: 70%;
+  aspect-ratio: 1;
   position: absolute;
+  filter: drop-shadow(0 1px 2px #102b3280);
 }
 .cell:has(.agent-token) .item-token {
   top: 0;
-  right: 1px;
-  font-size: 8px;
+  right: 0;
+  width: 43%;
+  z-index: 3;
+}
+.item-count {
+  position: absolute;
+  right: -2px;
+  bottom: 0;
+  color: white;
+  font-size: 9px;
+}
+.inventory-item {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+.inventory-item svg {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+#current-event,
+.event-description {
+  white-space: pre-line;
 }
 .map-caption {
   margin-left: 22px;
@@ -710,44 +766,6 @@ fieldset {
   margin-top: 12px;
   border-radius: 5px;
   padding: 10px;
-}
-.try-tag {
-  margin-left: auto;
-  color: #ba9a69;
-  background: #f8f3e7;
-  border-radius: 3px;
-  padding: 4px 6px;
-  font-size: 9px;
-  white-space: nowrap;
-}
-.try-input {
-  display: flex;
-  border: 1px solid #dfe5d5;
-  border-radius: 5px;
-  overflow: hidden;
-  margin-top: 14px;
-}
-.try-input input {
-  width: 0;
-  flex: 1;
-  border: 0;
-  background: #fbfcf7;
-  padding: 10px 11px;
-  font-size: 11px;
-  color: #647557;
-}
-.try-input button {
-  border: 0;
-  background: #edf2e5;
-  width: 36px;
-  font-size: 17px;
-  color: #768b65;
-}
-.try-note {
-  color: #6e7e65;
-  font-size: 11px;
-  line-height: 1.8;
-  margin-top: 8px;
 }
 .activity-panel .panel-heading {
   padding-bottom: 9px;

@@ -103,7 +103,7 @@ describe('task completion evidence', () => {
   });
   it('rejects missing, pending and failed visual reviews', () => {
     review.visual.pop();
-    expect(check().join()).toContain('history');
+    expect(check().join()).toContain(REVIEW_SCENES.at(-1));
     review.visual = REVIEW_SCENES.map((id) => ({
       id,
       verdict: 'pending',

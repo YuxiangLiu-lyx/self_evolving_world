@@ -83,6 +83,8 @@ export interface WorldState {
   readonly items: readonly GroundItem[];
   readonly observations: readonly Observation[];
   readonly event: WorldEvent | null;
+  /** Present only for the separately versioned simultaneous-round extension. */
+  readonly events?: readonly WorldEvent[];
 }
 
 const DIRECTIONS: Readonly<Record<Direction, Position>> = Object.freeze({
@@ -350,4 +352,63 @@ export function stepWorld(state: WorldState, input: WorldAction): WorldState {
     items,
     Object.freeze({ tick, action, outcome }),
   );
+}
+
+/** All intents see the same starting state; no intermediate transition is committed. */
+export function stepWorldRound(
+  state: WorldState,
+  inputs: readonly WorldAction[],
+): WorldState {
+  if (
+    !Array.isArray(inputs) ||
+    state.agents.length === 0 ||
+    inputs.length !== state.agents.length
+  )
+    throw new RangeError('A round requires exactly one action per agent.');
+  const actions = inputs.map((input: unknown) => parseWorldAction(input));
+  const byActor = new Map(actions.map((action) => [action.agentId, action]));
+  if (
+    byActor.size !== state.agents.length ||
+    state.agents.some((agent) => !byActor.has(agent.id))
+  )
+    throw new RangeError('A round requires each known agent exactly once.');
+  const candidates = state.agents.map((actor) => {
+    const action = byActor.get(actor.id);
+    if (action === undefined) throw new RangeError('Missing round action.');
+    const candidate = stepWorld(state, action);
+    const agent = candidate.agents.find((entry) => entry.id === actor.id);
+    if (agent === undefined || candidate.event === null)
+      throw new Error('Incomplete round candidate.');
+    return { actor, agent, event: candidate.event };
+  });
+  const targets = new Map<string, number>();
+  for (const { agent, event } of candidates) {
+    if (event.outcome === 'moved') {
+      const key = `${String(agent.position.x)},${String(agent.position.y)}`;
+      targets.set(key, (targets.get(key) ?? 0) + 1);
+    }
+  }
+  const events: WorldEvent[] = [];
+  const collected = new Set<string>();
+  const agents = candidates.map(({ actor, agent, event }) => {
+    const key = `${String(agent.position.x)},${String(agent.position.y)}`;
+    if (event.outcome === 'moved' && (targets.get(key) ?? 0) > 1) {
+      events.push(Object.freeze({ ...event, outcome: 'occupied' }));
+      return actor;
+    }
+    events.push(event);
+    if (event.outcome === 'picked-up' && event.action.type === 'pickup')
+      collected.add(event.action.itemId);
+    return agent;
+  });
+  return Object.freeze({
+    ...snapshot(
+      state.tick + 1,
+      state.settings,
+      agents,
+      state.items.filter((item) => !collected.has(item.id)),
+      null,
+    ),
+    events: Object.freeze(events),
+  });
 }

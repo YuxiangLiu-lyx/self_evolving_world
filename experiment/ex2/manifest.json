@@ -1,0 +1,31 @@
+{
+  "format": "self-evolving-world/experiment",
+  "version": 2,
+  "id": "ex2",
+  "objective": "Check synchronous world rounds with reproducible random exploration, successful same-cell collection, no learning attempts and no external agent or model.",
+  "seed": 20261107,
+  "steps": 160,
+  "policy": "xorshift32-collection-v2",
+  "schedule": "simultaneous-v1",
+  "controller": "seeded-random",
+  "externalModelCalls": 0,
+  "createdAt": "2026-11-09T02:09:01.469Z",
+  "provenance": {
+    "revision": "5fd2fc8ad514418fba94b2ac4c80f5d95b7fb228",
+    "dirty": true,
+    "node": "v24.22.2",
+    "platform": "darwin"
+  },
+  "status": "completed",
+  "artifacts": {
+    "replay.json": "e4f0d47c1129bd0b623165dc4e977941019b928f342837f97e5d6a337f1d6601",
+    "results.json": "64bfd10afc28a26ebb2cc0d41ab334c85523d1a4a140e98827b182ac71783de4",
+    "report.md": "1641a7a603e63518abc94ce9f0d1505abdd8b4e9a6f2d90964543c4056648ce4",
+    "overview.svg": "5882162155a5da436bb001bf3380319159e758fe76fc145167f36c7e11e4bd9c",
+    "browser.json": "0834bd0f994a50590f120161af06c03d03aac4cc5b7da01cf89489b81178af17",
+    "initial.png": "db013f74ea57358944f2ef95ea5a12326508fc6c3b385f9eb65cb01e986f4b4d",
+    "midpoint.png": "202a459a2e1dfe7d76ff6650d89161654865bfa6ac9821d7fb4c3b25474415aa",
+    "final.png": "212730d7a66da20f90d8df8b57b5e296a940320ce6b9a320b9a90fccee39880e",
+    "overview.png": "3652f34570c092a8491cd154b14bcc6f4f6d3f2412cb49f9990f7b25c9632acd"
+  }
+}

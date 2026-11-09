@@ -16,6 +16,7 @@ This project prioritizes Human Legibility, Agent Legibility, Enforceable Archite
 3. Before changing a module, read the [architecture](ARCHITECTURE.md) and relevant [ADRs](docs/decisions/README.md).
 4. Before implementation, summarize the current request to the user in Chinese and record numbered requirements, exclusions, and acceptance criteria in an English task plan. Every PR repeats these requirements and maps them to the actual changes and evidence; follow the [PR contract](docs/PULL_REQUESTS.md).
 5. Follow the [development workflow](docs/DEVELOPMENT.md) and [documentation policy](docs/DOCUMENTATION_POLICY.md). Maintain an [execution plan](docs/exec-plans/README.md) for substantial tasks.
+6. Identify code, experiment-only, or mixed work using the [task harness](docs/VALIDATION.md#task-harness-routing). For requested offline experiments, follow [experiment/README.md](experiment/README.md): allocate a fresh next `exN` for every new experiment unless the user explicitly requests reuse, retain goals/results/visuals, and validate the record. Mixed work must satisfy both flows; never call a model for a random-only experiment.
 
 ## Required constraints
 
@@ -27,6 +28,8 @@ This project prioritizes Human Legibility, Agent Legibility, Enforceable Archite
 - `PRODUCT.md` is the sole source of feature status. Never describe Planned functionality as implemented or invent validation results.
 - Synchronize feature records, architecture, ADRs, and execution plans when functionality, boundaries, important decisions, or completion status changes.
 - Require the complete unfiltered test suite for every PR. Review every changed file against the numbered requirements, resolve all mismatches, and record current findings. Skipped tests, incomplete checks, stale reviews, or missing requirements block acceptance. Run `pnpm pr:check` before publishing and verify current `quality` and `pr-policy` checks before merging.
+- Code, documentation, experiment-only and mixed tasks all automatically proceed to a reviewed commit and PR targeting `main`. After the local gate, prepare the complete PR body and run `pnpm task:publish`; inspect its current `quality` and `pr-policy` checks before reporting delivery. Do not stop at local changes or ask again for already-authorized publication. Never merge unless explicitly instructed.
+- Preserve existing experiment archives. An explicit user-requested reuse must be recorded in the current plan using the [exception contract](docs/PULL_REQUESTS.md#automatic-pr-delivery-for-every-task).
 - Keep each PR focused. Escalate destructive changes, major architectural conflicts, and substantial scope expansion to the user.
 - Before completing every task, including documentation tasks, follow the [validation workflow](docs/VALIDATION.md): run `pnpm validate -- "task name"` to open the current build; inspect every current screenshot and behavior result; record the review; complete only after `pnpm task:finish -- "task name"` succeeds.
 - Fix validation failures and rerun. Any source or documentation edit requires fresh validation. Do not reuse old task evidence, skip the browser, approve unseen screenshots, or substitute automated assertions for visual review. Report unresolved environment blockers as incomplete work.

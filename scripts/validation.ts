@@ -1,6 +1,12 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
+import {
+  checkExperiments,
+  experimentIds,
+  EXPERIMENT_SCENES,
+} from './experiments.js';
+import type { TaskRoute } from './harness.js';
 
 export const REVIEW_SCENES = [
   'desktop',
@@ -8,11 +14,15 @@ export const REVIEW_SCENES = [
   'agent-vision',
   'after-actions',
   'history',
+  'experiment-browser',
+  'experiment-mobile',
+  'synchronous-browser',
+  'synchronous-mobile',
 ] as const;
 export type ReviewScene = (typeof REVIEW_SCENES)[number];
 
 export interface Evidence {
-  readonly id: ReviewScene;
+  readonly id: string;
   readonly path: string;
   readonly sha256: string;
 }
@@ -27,7 +37,17 @@ export interface ValidationReport {
   status: 'running' | 'failed' | 'awaiting-review' | 'passed';
   browserTests: number;
   evidence: Evidence[];
+  route?: TaskRoute;
   error?: string;
+}
+
+export function requiredScenes(root: string): string[] {
+  return [
+    ...REVIEW_SCENES,
+    ...experimentIds(root).flatMap((id) =>
+      EXPERIMENT_SCENES.map((scene) => `${id}-${scene}`),
+    ),
+  ];
 }
 
 const ignoredDirectories = new Set([
@@ -126,7 +146,7 @@ export function browserEvidence(
   if (!Array.isArray(report.screenshots))
     throw new Error('Missing screenshots.');
   const screenshots = report.screenshots.map(object);
-  const evidence = REVIEW_SCENES.map((id) => {
+  const evidence = requiredScenes(root).map((id) => {
     const matches = screenshots.filter((entry) => entry.id === id);
     const shot = matches[0];
     if (matches.length !== 1 || shot === undefined || !nonempty(shot.path)) {
@@ -157,6 +177,7 @@ export function completionErrors(
     const report = object(rawReport);
     const review = object(rawReview);
     const errors: string[] = [];
+    checkExperiments(root);
     if (
       report.version !== 1 ||
       !nonempty(report.runId) ||
@@ -185,11 +206,11 @@ export function completionErrors(
     const evidence = report.evidence.map(object);
     const visual = review.visual.map(object);
     if (
-      evidence.length !== REVIEW_SCENES.length ||
-      visual.length !== REVIEW_SCENES.length
+      evidence.length !== requiredScenes(root).length ||
+      visual.length !== requiredScenes(root).length
     )
       errors.push('Every required screenshot must be reviewed.');
-    for (const id of REVIEW_SCENES) {
+    for (const id of requiredScenes(root)) {
       const shots = evidence.filter((entry) => entry.id === id);
       const reviews = visual.filter((entry) => entry.id === id);
       const shot = shots[0];

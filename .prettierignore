@@ -7,3 +7,6 @@ test-results/
 playwright-report/
 validation-results/
 experiment-results/
+
+# Retained experiment artifacts use the generator-owned canonical format.
+experiment/ex*/

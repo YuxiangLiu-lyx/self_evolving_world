@@ -1,0 +1,4585 @@
+{
+  "status": "completed",
+  "steps": 160,
+  "rounds": 160,
+  "totalActions": 480,
+  "framesChecked": 161,
+  "invariantFailures": 0,
+  "externalModelCalls": 0,
+  "actions": {
+    "move": 474,
+    "pickup": 6,
+    "try": 0
+  },
+  "outcomes": {
+    "moved": 434,
+    "picked-up": 6,
+    "occupied": 7,
+    "out-of-bounds": 33
+  },
+  "successfulActions": 440,
+  "expectedRejections": 40,
+  "groundItems": 0,
+  "collectedItems": 6,
+  "agents": [
+    {
+      "id": "lin",
+      "name": "Lin",
+      "turns": 160,
+      "finalPosition": {
+        "x": 0,
+        "y": 7
+      },
+      "inventory": [
+        {
+          "id": "wood",
+          "name": "Wood"
+        }
+      ],
+      "visitedCells": 58
+    },
+    {
+      "id": "moss",
+      "name": "Moss",
+      "turns": 160,
+      "finalPosition": {
+        "x": 7,
+        "y": 9
+      },
+      "inventory": [
+        {
+          "id": "berry",
+          "name": "Berry"
+        },
+        {
+          "id": "stone",
+          "name": "Stone"
+        },
+        {
+          "id": "water",
+          "name": "Water"
+        }
+      ],
+      "visitedCells": 57
+    },
+    {
+      "id": "sol",
+      "name": "Sol",
+      "turns": 160,
+      "finalPosition": {
+        "x": 12,
+        "y": 1
+      },
+      "inventory": [
+        {
+          "id": "crystal",
+          "name": "Crystal"
+        },
+        {
+          "id": "seed",
+          "name": "Seed"
+        }
+      ],
+      "visitedCells": 44
+    }
+  ],
+  "events": [
+    {
+      "tick": 1,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 1,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 1,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 2,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "wood"
+      },
+      "outcome": "picked-up"
+    },
+    {
+      "tick": 2,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "berry"
+      },
+      "outcome": "picked-up"
+    },
+    {
+      "tick": 2,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "crystal"
+      },
+      "outcome": "picked-up"
+    },
+    {
+      "tick": 3,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 3,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 3,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 4,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 4,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 4,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 5,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 5,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 5,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 6,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 6,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 6,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 7,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "occupied"
+    },
+    {
+      "tick": 7,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "occupied"
+    },
+    {
+      "tick": 7,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 8,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 8,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 8,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 9,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 9,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "stone"
+      },
+      "outcome": "picked-up"
+    },
+    {
+      "tick": 9,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 10,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 10,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 10,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 11,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 11,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "occupied"
+    },
+    {
+      "tick": 11,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 12,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 12,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 12,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 13,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 13,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 13,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 14,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 14,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 14,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 15,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 15,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 15,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 16,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 16,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 16,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 17,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 17,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 17,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 18,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 18,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 18,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 19,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "occupied"
+    },
+    {
+      "tick": 19,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "occupied"
+    },
+    {
+      "tick": 19,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 20,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 20,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 20,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "seed"
+      },
+      "outcome": "picked-up"
+    },
+    {
+      "tick": 21,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "occupied"
+    },
+    {
+      "tick": 21,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "occupied"
+    },
+    {
+      "tick": 21,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 22,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 22,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 22,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 23,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 23,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 23,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 24,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 24,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 24,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 25,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 25,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 25,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 26,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 26,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 26,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 27,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 27,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 27,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 28,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 28,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 28,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 29,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 29,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 29,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 30,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 30,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 30,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 31,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 31,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 31,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 32,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 32,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 32,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 33,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 33,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 33,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 34,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 34,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 34,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 35,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 35,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 35,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 36,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 36,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 36,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 37,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 37,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "water"
+      },
+      "outcome": "picked-up"
+    },
+    {
+      "tick": 37,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 38,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 38,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 38,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 39,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 39,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 39,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 40,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 40,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 40,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 41,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 41,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 41,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 42,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 42,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 42,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 43,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 43,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 43,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 44,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 44,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 44,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 45,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 45,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 45,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 46,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 46,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 46,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 47,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 47,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 47,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 48,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 48,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 48,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 49,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 49,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 49,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 50,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 50,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 50,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 51,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 51,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 51,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 52,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 52,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 52,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 53,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 53,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 53,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 54,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 54,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 54,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 55,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 55,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 55,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 56,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 56,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 56,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 57,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 57,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 57,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 58,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 58,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 58,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 59,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 59,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 59,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 60,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 60,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 60,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 61,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 61,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 61,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 62,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 62,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 62,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 63,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 63,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 63,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 64,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 64,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 64,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 65,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 65,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 65,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 66,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 66,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 66,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 67,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 67,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 67,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 68,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 68,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 68,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 69,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 69,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 69,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 70,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 70,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 70,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 71,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 71,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 71,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 72,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 72,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 72,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 73,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 73,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 73,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 74,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 74,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 74,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 75,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 75,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 75,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 76,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 76,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 76,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 77,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 77,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 77,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 78,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 78,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 78,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 79,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 79,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 79,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 80,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 80,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 80,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 81,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 81,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 81,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 82,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 82,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 82,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 83,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 83,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 83,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 84,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 84,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 84,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 85,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 85,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 85,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 86,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 86,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 86,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 87,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 87,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 87,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 88,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 88,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 88,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 89,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 89,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 89,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 90,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 90,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 90,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 91,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 91,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 91,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 92,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 92,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 92,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 93,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 93,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 93,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 94,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 94,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 94,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 95,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 95,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 95,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 96,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 96,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 96,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 97,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 97,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 97,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 98,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 98,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 98,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 99,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 99,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 99,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 100,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 100,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 100,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 101,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 101,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 101,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 102,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 102,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 102,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 103,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 103,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 103,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 104,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 104,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 104,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 105,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 105,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 105,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 106,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 106,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 106,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 107,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 107,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 107,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 108,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 108,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 108,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 109,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 109,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 109,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 110,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 110,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 110,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 111,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 111,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 111,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 112,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 112,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 112,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 113,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 113,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 113,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 114,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 114,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 114,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 115,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 115,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 115,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 116,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 116,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 116,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 117,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 117,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 117,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 118,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 118,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 118,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 119,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 119,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 119,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 120,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 120,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 120,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 121,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 121,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 121,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 122,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 122,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 122,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 123,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 123,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 123,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 124,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 124,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 124,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 125,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 125,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 125,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 126,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 126,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 126,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 127,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 127,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 127,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 128,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 128,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 128,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 129,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 129,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 129,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 130,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 130,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 130,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 131,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 131,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 131,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 132,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 132,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 132,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 133,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 133,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 133,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 134,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 134,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 134,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 135,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 135,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 135,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 136,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 136,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 136,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 137,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 137,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 137,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 138,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 138,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 138,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 139,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 139,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 139,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 140,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 140,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 140,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 141,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 141,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 141,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 142,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 142,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 142,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 143,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 143,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 143,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 144,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 144,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 144,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 145,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 145,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 145,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 146,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 146,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 146,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 147,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 147,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 147,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 148,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 148,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 148,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 149,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 149,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 149,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "out-of-bounds"
+    },
+    {
+      "tick": 150,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 150,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 150,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 151,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 151,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 151,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 152,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 152,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 152,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 153,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 153,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 153,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 154,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 154,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 154,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 155,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 155,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 155,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 156,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 156,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 156,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 157,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 157,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 157,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 158,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 158,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 158,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 159,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 159,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 159,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 160,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 160,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "south"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 160,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    }
+  ],
+  "finalState": {
+    "tick": 160,
+    "rules": {
+      "version": "1",
+      "skills": [
+        "move",
+        "pickup",
+        "try"
+      ],
+      "movement": "one-cardinal-cell",
+      "pickup": "same-cell",
+      "vision": "euclidean-without-occlusion"
+    },
+    "settings": {
+      "width": 16,
+      "height": 12,
+      "visionRadius": 4
+    },
+    "agents": [
+      {
+        "id": "lin",
+        "name": "Lin",
+        "position": {
+          "x": 0,
+          "y": 7
+        },
+        "inventory": [
+          {
+            "id": "wood",
+            "name": "Wood"
+          }
+        ]
+      },
+      {
+        "id": "moss",
+        "name": "Moss",
+        "position": {
+          "x": 7,
+          "y": 9
+        },
+        "inventory": [
+          {
+            "id": "berry",
+            "name": "Berry"
+          },
+          {
+            "id": "stone",
+            "name": "Stone"
+          },
+          {
+            "id": "water",
+            "name": "Water"
+          }
+        ]
+      },
+      {
+        "id": "sol",
+        "name": "Sol",
+        "position": {
+          "x": 12,
+          "y": 1
+        },
+        "inventory": [
+          {
+            "id": "crystal",
+            "name": "Crystal"
+          },
+          {
+            "id": "seed",
+            "name": "Seed"
+          }
+        ]
+      }
+    ],
+    "items": [],
+    "observations": [
+      {
+        "tick": 160,
+        "self": {
+          "id": "lin",
+          "name": "Lin",
+          "position": {
+            "x": 0,
+            "y": 7
+          },
+          "inventory": [
+            {
+              "id": "wood",
+              "name": "Wood"
+            }
+          ]
+        },
+        "agents": [],
+        "items": []
+      },
+      {
+        "tick": 160,
+        "self": {
+          "id": "moss",
+          "name": "Moss",
+          "position": {
+            "x": 7,
+            "y": 9
+          },
+          "inventory": [
+            {
+              "id": "berry",
+              "name": "Berry"
+            },
+            {
+              "id": "stone",
+              "name": "Stone"
+            },
+            {
+              "id": "water",
+              "name": "Water"
+            }
+          ]
+        },
+        "agents": [],
+        "items": []
+      },
+      {
+        "tick": 160,
+        "self": {
+          "id": "sol",
+          "name": "Sol",
+          "position": {
+            "x": 12,
+            "y": 1
+          },
+          "inventory": [
+            {
+              "id": "crystal",
+              "name": "Crystal"
+            },
+            {
+              "id": "seed",
+              "name": "Seed"
+            }
+          ]
+        },
+        "agents": [],
+        "items": []
+      }
+    ],
+    "event": null,
+    "events": [
+      {
+        "tick": 160,
+        "action": {
+          "type": "move",
+          "agentId": "lin",
+          "direction": "west"
+        },
+        "outcome": "moved"
+      },
+      {
+        "tick": 160,
+        "action": {
+          "type": "move",
+          "agentId": "moss",
+          "direction": "south"
+        },
+        "outcome": "moved"
+      },
+      {
+        "tick": 160,
+        "action": {
+          "type": "move",
+          "agentId": "sol",
+          "direction": "north"
+        },
+        "outcome": "moved"
+      }
+    ]
+  }
+}
