@@ -2,6 +2,7 @@
 
 Each numbered experiment is a retained, numbered record: `ex1`, `ex2`, `ex3`, and so on. Numbering is independent of the older optional model rounds in ignored `experiment-results/`. This directory is tracked and included in task fingerprints.
 
+- [ex4 report](ex4/report.md): real survival-driven skill generation, reuse and learning; three survivors over18 rounds.
 - [ex3 report](ex3/report.md): ChatGPT-authored survival programs, 60 rounds per actor and denied learning.
 - [ex2 report](ex2/report.md): simultaneous rounds with successful collection and no learning attempts.
 - [ex1 report](ex1/report.md): the first founding-world random-action run, without an external agent or model.
@@ -43,7 +44,7 @@ Version 3 records the exact request template, per-actor observations and complet
 | `model-calls.json` (version 3)               | Request template, private inputs, attempt statuses and completed ordinary outputs; no credentials or reasoning traces                 |
 | `browser.json`                               | Replay identity, frame ticks and successful automated browser assertions                                                              |
 
-The validator checks canonical IDs, required files, objective/parameters, completed execution, provenance, artifact hashes, seeded reconstruction, report/chart agreement and PNG structure. The browser additionally decodes saved images, imports the replay, checks positions/inventories and vision, plus survival vitals/programs when present, verifies historical controls, and compares exports before/after playback. Fresh screenshots enter the same individual visual review gate as the eleven standard viewer scenes, including desktop/mobile archive navigation. Missing, corrupted, inconsistent, stale or failed evidence blocks completion.
+The validator checks canonical IDs, required files, objective/parameters, completed execution, provenance, artifact hashes, seeded reconstruction, report/chart agreement and PNG structure. The browser additionally decodes saved images, imports the replay, checks positions/inventories and vision, plus survival vitals/programs when present, verifies historical controls, and compares exports before/after playback. Fresh screenshots enter the same individual visual review gate as the thirteen standard viewer scenes, including desktop/mobile archive navigation. Missing, corrupted, inconsistent, stale or failed evidence blocks completion.
 
 Successful execution means every configured action completed through the world API and all checked invariants held. A rejected move, failed pickup or unavailable skill is a normal result, counted separately from a crash or invariant failure. One bounded random run does not establish intelligent behavior or long-term reliability. Feature acceptance belongs to [PRODUCT](../docs/PRODUCT.md); task routing belongs to [VALIDATION](../docs/VALIDATION.md#task-harness-routing).
 
@@ -56,3 +57,7 @@ Store companion records in `experiment/analyses/exN/<task-id>.json` and `.md`, o
 `pnpm analysis:check` validates all stored companions and participates in full `pnpm check`. Missing actors, stale artifacts, invalid references or a mismatched readable report fail. These structural checks cannot establish that a causal explanation is correct. Absence of behavioral diversity is not by itself proof of cross-agent information leakage. Recommendations do not change prompts, policies, world rules or experiment-success thresholds. Older archives need no invented retrospective judgments; explicitly requested targets such as ex3 receive their own companion.
 
 - [ex3 behavioral analysis](analyses/ex3/pr-13-programmatic-harness.md): per-actor findings, shelter convergence, waiting, isolation limits and proposed controlled follow-ups.
+
+## Run a skill-learning experiment
+
+Use an explicitly authorized `learning` intent with `allocation: "new"`, then continue the unified task. `pnpm experiment:learning` is its guarded alias. The [version-4 protocol](../docs/SKILL_LEARNING_EXPERIMENT.md) uses three actors, 18 rounds and finite ordinary/world call budgets; it adds `execution.json`, `skills.json` and both prompts in `model-calls.json` to the existing artifacts. A saved development barrier returns to the current conversation and consumes no game time. Resumption never reallocates the ID or repeats accepted decisions. Uncertain calls or changed execution code block continuation. Full checks, actual visual review and the following behavioral analysis remain mandatory.

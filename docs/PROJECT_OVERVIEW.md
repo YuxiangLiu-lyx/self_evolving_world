@@ -28,7 +28,7 @@ The [World Foundation](WORLD_FOUNDATION.md) records the permanent starting item 
 
 Base settings, types, and skills are concentrated in [world.ts](../packages/world-core/src/world.ts). Rules, settings, and all snapshots are frozen. Actions produce new snapshots without changing history.
 
-Agents can move, collect items, and submit requests while the rules remain fixed. They cannot resize the world or add skills during a run.
+Agents can move, collect items, and submit requests while the rules remain fixed. They cannot resize the world or alter the foundation. The separate learning-v1 protocol can register constrained capabilities under fixed resource rules.
 
 ## Main modules
 
@@ -66,16 +66,16 @@ The [survival-v1 extension](SURVIVAL_EXPERIMENT.md) adds satiety, cold, heat and
 
 Existing entities have positions, inventories, and vision. The optional model experiments add a single decision opportunity or a bounded 60-round program controller to scripts and manual input. Future NPCs would have persistent goals, memory, and a continuous decision loop; those capabilities are outside this experiment.
 
-## World Agent (Planned)
+## Bounded World Agent and learning
 
-A future World Agent would assess capability requests for suitability, compatibility, permissions, and validation. It would not automatically gain permission to edit production code or execute arbitrary code. No such reviewer currently exists.
+The [learning-v1 experiment](SKILL_LEARNING_EXPERIMENT.md) uses a separate World Agent to assess functional requests, reuse or generate resource-checked code, and assign individual learning time. A 24 by 18 map adds finite food, terrain, materials and river crossings. Ordinary agents receive survival goals and private recent feedback; plans interrupt on failures, learning feedback and worsening vitals. World development pauses game time and returns to the current coding conversation when needed.
 
 ## Skill Evolution (Planned)
 
-Future requests may become capabilities through specification, review, isolated testing, and versioning. Current `try` actions only record unavailable names. The survival controller generates only bounded behavior commands, not new skills. There is no skill-code generation, host-code sandbox, dynamic skill registration, activation, or rollback. Attempts do not change the base core.
+Future requests may become capabilities through specification, review, isolated testing, and versioning. Current `try` actions only record unavailable names. The survival controller generates only bounded behavior commands, not new skills. Learning-v1 separately generates bounded resource-operation compositions and tracks individual proficiency. Arbitrary host code, unrestricted new physics and rollback remain outside scope; base try never changes the core.
 
 ## Limitations and next steps
 
-There is no terrain collision, occlusion, diagonal movement, continuous physics, trade, or coordinated autonomous decision-making. The browser stores at most 500 single actions or simultaneous rounds in memory and accepts replay files up to 1 MB. There is no database, autosave, long-running service, or cross-version migration.
+The foundation has no terrain collision; learning-v1 adds tree/rock/deep-water blocking. Neither version has occlusion, diagonal movement, continuous physics or trade. The browser stores at most 500 single actions or simultaneous rounds in memory and accepts replay files up to 1 MB. There is no database, autosave, long-running service, or cross-version migration.
 
 Any expansion beyond the bounded 60-round protocol needs a separate decision on goals, scheduling, memory and account usage. The scripted demo must not be presented as model behavior, and skill attempts must not execute new capability code without a separate validation and governance design.

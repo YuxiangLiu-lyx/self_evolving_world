@@ -7,6 +7,8 @@ import {
   createSurvivalWorld,
   parseSurvivalConfig,
   replayPrograms,
+  createLearningWorld,
+  reconstructLearningRun,
 } from '@self-evolving-world/world-core';
 import type {
   AgentSeed,
@@ -15,14 +17,18 @@ import type {
   WorldSetup,
   WorldState,
   ProgramRecord,
+  LearningProgram,
+  LearningRound,
 } from '@self-evolving-world/world-core';
 
 export const MAX_ACTIONS = 500;
 export const MAX_REPLAY_BYTES = 1_000_000;
 export interface Timeline {
   readonly frames: readonly WorldState[];
-  readonly schedule?: 'simultaneous-v1' | 'survival-v1';
+  readonly schedule?: 'simultaneous-v1' | 'survival-v1' | 'learning-v1';
   readonly programs?: readonly ProgramRecord[];
+  readonly learningPrograms?: readonly LearningProgram[];
+  readonly learningRounds?: readonly LearningRound[];
 }
 
 export function createTimeline(setup: WorldSetup): Timeline {
@@ -61,9 +67,11 @@ export function serializeReplay(timeline: Timeline): string {
       version:
         timeline.schedule === undefined
           ? 1
-          : timeline.schedule === 'survival-v1'
-            ? 3
-            : 2,
+          : timeline.schedule === 'learning-v1'
+            ? 4
+            : timeline.schedule === 'survival-v1'
+              ? 3
+              : 2,
       coreVersion: CORE_RULES.version,
       ...(timeline.schedule === undefined
         ? {}
@@ -77,27 +85,33 @@ export function serializeReplay(timeline: Timeline): string {
         })),
         items: first.items,
       },
-      ...(timeline.schedule === 'survival-v1'
+      ...(timeline.schedule === 'learning-v1'
         ? {
-            survival: first.survival?.config,
-            programs: timeline.programs,
-            roundCount: timeline.frames.length - 1,
+            environment: first.learning?.environment,
+            programs: timeline.learningPrograms,
+            rounds: timeline.learningRounds,
           }
-        : timeline.schedule === undefined
+        : timeline.schedule === 'survival-v1'
           ? {
-              actions: timeline.frames.slice(1).map((frame) => {
-                if (frame.event === null)
-                  throw new Error('Recorded frame has no action.');
-                return frame.event.action;
-              }),
+              survival: first.survival?.config,
+              programs: timeline.programs,
+              roundCount: timeline.frames.length - 1,
             }
-          : {
-              rounds: timeline.frames.slice(1).map((frame) => {
-                if (frame.events === undefined)
-                  throw new Error('Recorded round has no actions.');
-                return frame.events.map((event) => event.action);
+          : timeline.schedule === undefined
+            ? {
+                actions: timeline.frames.slice(1).map((frame) => {
+                  if (frame.event === null)
+                    throw new Error('Recorded frame has no action.');
+                  return frame.event.action;
+                }),
+              }
+            : {
+                rounds: timeline.frames.slice(1).map((frame) => {
+                  if (frame.events === undefined)
+                    throw new Error('Recorded round has no actions.');
+                  return frame.events.map((event) => event.action);
+                }),
               }),
-            }),
     },
     null,
     2,
@@ -144,7 +158,10 @@ export function parseReplay(source: string): Timeline {
   const data = record(parsed);
   if (
     data.format !== 'self-evolving-world/replay' ||
-    (data.version !== 1 && data.version !== 2 && data.version !== 3) ||
+    (data.version !== 1 &&
+      data.version !== 2 &&
+      data.version !== 3 &&
+      data.version !== 4) ||
     data.coreVersion !== CORE_RULES.version
   ) {
     throw new RangeError(
@@ -165,6 +182,24 @@ export function parseReplay(source: string): Timeline {
   if (data.version === 1) {
     for (const input of array(data.actions, MAX_ACTIONS))
       timeline = appendAction(timeline, parseWorldAction(input));
+  } else if (data.version === 4) {
+    if (data.schedule !== 'learning-v1')
+      throw new RangeError('Unsupported learning schedule.');
+    const first = frameAt(timeline, 0);
+    const run = reconstructLearningRun(
+      createLearningWorld(
+        { settings: first.settings, agents: first.agents, items: first.items },
+        data.environment,
+      ),
+      data.programs,
+      data.rounds,
+    );
+    timeline = Object.freeze({
+      schedule: 'learning-v1',
+      frames: run.frames,
+      learningPrograms: run.programs,
+      learningRounds: run.rounds,
+    });
   } else if (data.version === 3) {
     if (data.schedule !== 'survival-v1')
       throw new RangeError('Unsupported survival schedule.');

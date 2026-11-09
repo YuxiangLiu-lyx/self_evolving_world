@@ -1,0 +1,76 @@
+{
+  "rounds": 18,
+  "framesChecked": 19,
+  "totalActions": 54,
+  "invariantFailures": 0,
+  "externalModelCalls": 27,
+  "acceptedCalls": 26,
+  "failedCalls": 0,
+  "worldCalls": 3,
+  "developmentBarriers": 1,
+  "registeredSkills": 2,
+  "survivors": 3,
+  "actors": [
+    {
+      "id": "lin",
+      "health": 100,
+      "satiety": 81,
+      "cold": 0,
+      "heat": 0,
+      "calls": 9,
+      "learned": [
+        "skill-1",
+        "skill-2"
+      ],
+      "requests": 2,
+      "successfulUses": 9,
+      "waits": 4,
+      "deathRound": null
+    },
+    {
+      "id": "moss",
+      "health": 100,
+      "satiety": 81,
+      "cold": 0,
+      "heat": 0,
+      "calls": 8,
+      "learned": [
+        "skill-1",
+        "skill-2"
+      ],
+      "requests": 2,
+      "successfulUses": 9,
+      "waits": 4,
+      "deathRound": null
+    },
+    {
+      "id": "sol",
+      "health": 100,
+      "satiety": 81,
+      "cold": 0,
+      "heat": 0,
+      "calls": 7,
+      "learned": [
+        "skill-1",
+        "skill-2"
+      ],
+      "requests": 2,
+      "successfulUses": 9,
+      "waits": 4,
+      "deathRound": null
+    }
+  ],
+  "goals": {
+    "realWorldReview": true,
+    "generatedSkillExecuted": true,
+    "survivedBeyondIdle": true
+  },
+  "control": {
+    "kind": "deterministic-all-wait-no-model",
+    "survivors": 0,
+    "deathRound": 15,
+    "healthRound5": 100,
+    "healthRound6": 90
+  },
+  "interpretation": "The idle control demonstrates the starvation baseline, not a causal estimate of learning benefit. Model decisions and additional actions differ together. See the required conversation analysis for hypotheses and proposed improvements."
+}

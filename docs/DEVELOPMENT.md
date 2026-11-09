@@ -55,3 +55,7 @@ If the shell cannot find pnpm, follow the [quick-start troubleshooting](../READM
 Browser tests cover move/pickup, legacy imported try records, synchronous rounds and successful collection, boundaries and occupancy, vision updates, unchanged replay exports, import/export round trips, invalid imports, empty worlds, and 390px layout. Every test monitors runtime and resource failures. The layout validator is also tested against injected horizontal overflow. Screenshots and failure traces are in ignored `test-results/`; the HTML report is in `playwright-report/`; review and completion records are in `validation-results/`. Replay tests live in `apps/viewer/test/`, core semantics in `packages/world-core/test/`, and gate tests in `scripts/validation.test.ts`.
 
 Base world behavior stays in `world.ts`. Rule changes require explicit versioning, replay compatibility decisions, ADR updates, and tests. Never connect `try` directly to arbitrary code execution.
+
+## Survival-driven learning experiments
+
+Record the explicitly authorized [learning protocol](SKILL_LEARNING_EXPERIMENT.md) as `experiment.mode: "learning"` in the unified task. The guarded `pnpm experiment:learning` entry continues the same state machine; development handoffs return to the current conversation. Offline test providers and deterministic controls never establish live model success. Old survival-v1 commands, budgets and archives are unchanged.

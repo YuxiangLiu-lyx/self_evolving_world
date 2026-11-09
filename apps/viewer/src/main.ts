@@ -24,6 +24,11 @@ import {
 } from './timeline.js';
 import type { Timeline } from './timeline.js';
 import { characterIllustration, itemIllustration } from './illustrations.js';
+import {
+  decorateLearningCell,
+  renderLearningPanel,
+  learningEventText,
+} from './learning-view.js';
 import './style.css';
 
 function element(id: string): HTMLElement {
@@ -85,6 +90,7 @@ function countLabel(count: number, singular: string): string {
 }
 
 function eventText(frame: WorldState): string {
+  if (frame.learning) return learningEventText(frame);
   const events =
     frame.survival?.events ??
     frame.events ??
@@ -219,6 +225,7 @@ function renderMap(frame: WorldState, actor: AgentState | undefined): void {
         'aria-label',
         fog ? 'Unobserved area' : `Cell ${String(x)}, ${String(y)}`,
       );
+      if (!fog) decorateLearningCell(cell, frame, { x, y });
       const agent = agents.find(
         (candidate) => candidate.position.x === x && candidate.position.y === y,
       );
@@ -227,10 +234,40 @@ function renderMap(frame: WorldState, actor: AgentState | undefined): void {
       );
       if (ground.length > 0) {
         const token = node('span', 'item-token');
-        token.append(itemIllustration(ground[0]?.id ?? ''));
+        const material = frame.learning?.environment.resources.find(
+          (r) => r.id === ground[0]?.id,
+        );
+        const icon = material
+          ? (
+              {
+                fruit: 'berry',
+                'poison-fruit': 'berry',
+                branch: 'wood',
+                timber: 'wood',
+                stone: 'stone',
+                fish: 'water',
+                rod: 'wood',
+                axe: 'stone',
+              } as const
+            )[material.kind]
+          : (ground[0]?.id ?? '');
+        token.append(itemIllustration(icon));
+        if (material) {
+          token.append(node('b', 'item-count', String(material.quantity)));
+          if (material.toxicity > 0) token.classList.add('toxic-resource');
+        }
         if (ground.length > 1)
           token.append(node('b', 'item-count', String(ground.length)));
-        token.title = ground.map((item) => item.name).join(', ');
+        token.title = ground
+          .map((item) => {
+            const r = frame.learning?.environment.resources.find(
+              (r) => r.id === item.id,
+            );
+            return r
+              ? `${item.name}: ${String(r.quantity)} units, nutrition ${String(r.nutrition)}, toxicity ${String(r.toxicity)}`
+              : item.name;
+          })
+          .join(', ');
         token.setAttribute('aria-label', token.title);
         token.dataset.mapItem = ground.map((item) => item.id).join(',');
         cell.append(token);
@@ -246,7 +283,10 @@ function renderMap(frame: WorldState, actor: AgentState | undefined): void {
         token.title = `${agent.name} (${String(x)}, ${String(y)})`;
         token.setAttribute('aria-label', `Observe ${agent.name}`);
         token.dataset.mapAgent = agent.id;
-        if (frame.survival?.vitals[agent.id]?.health === 0)
+        if (
+          (frame.learning?.vitals[agent.id] ?? frame.survival?.vitals[agent.id])
+            ?.health === 0
+        )
           token.classList.add('dead-agent');
         token.addEventListener('click', () => {
           selectedId = agent.id;
@@ -418,9 +458,12 @@ function renderSurvival(
   frame: WorldState,
   actor: AgentState | undefined,
 ): void {
-  const vital = actor ? frame.survival?.vitals[actor.id] : undefined;
+  const vital = actor
+    ? (frame.learning?.vitals[actor.id] ?? frame.survival?.vitals[actor.id])
+    : undefined;
+  element('capability-panel').hidden = !frame.learning;
   element('survival-panel').hidden = vital === undefined;
-  if (!actor || !vital || !frame.survival) return;
+  if (!actor || !vital) return;
   element('life-status').textContent = vital.health > 0 ? 'Alive' : 'Dead';
   element('vital-signs').replaceChildren(
     ...(['health', 'satiety', 'cold', 'heat'] as const).map((key) => {
@@ -441,6 +484,13 @@ function renderSurvival(
       return row;
     }),
   );
+  if (frame.learning) {
+    renderLearningPanel(frame, actor, history, cursor);
+    return;
+  }
+  if (!frame.survival) return;
+  element('learning-policy').textContent =
+    'All requests are denied. No World Agent is present.';
   element('survival-environment').textContent =
     `${String(frame.survival.config.temperature)} °C · Health and satiety: higher is better. Cold and heat: lower is better.`;
   const programs =

@@ -76,6 +76,7 @@ function fixture(input = intent(), paths = ['source.ts']) {
         save();
       }
       await Promise.resolve();
+      return undefined;
     },
     analysisReady: (id) => state.analysis.has(id),
     analysisMaterials: (id) => ({ experiment: id }),
@@ -199,6 +200,50 @@ function fixture(input = intent(), paths = ['source.ts']) {
 }
 
 describe('programmatic task boundaries', () => {
+  it('pauses development before analysis or validation and resumes the same recorded experiment', async () => {
+    const f = fixture({
+      ...intent('pr-only'),
+      experiment: { mode: 'learning', allocation: 'new', basis },
+    });
+    let pending = true,
+      allocated = false;
+    f.effects.experiment = (c) => {
+      if (!allocated) {
+        allocated = true;
+        f.state.allocations++;
+        c.experiment = { before: [], phase: 'started', id: 'ex4' };
+      }
+      return Promise.resolve(
+        pending
+          ? { experiment: 'ex4', barrier: { tick: 0 }, schema: 'development' }
+          : undefined,
+      );
+    };
+    f.effects.submitDevelopment = (file) => {
+      expect(file).toBe('development.json');
+      pending = false;
+    };
+    await f.prepare();
+    expect(f.c.step).toBe('development');
+    expect(f.calls).not.toContain('full-check');
+    await f.flow().next();
+    expect(f.state.allocations).toBe(1);
+    await f.submit({
+      kind: 'review',
+      file: 'development.json',
+      files: ['source.ts'],
+      commitMessage: 'Wrong step',
+    });
+    expect(pending).toBe(true);
+    expect(f.state.runs).toBe(0);
+    await f.flow().next();
+    await f.submit({ kind: 'development', file: 'development.json' });
+    expect(f.c.step).toBe('analysis');
+    expect(f.state.allocations).toBe(1);
+    await f.submit({ kind: 'analysis', file: 'analysis.json' });
+    expect(f.state.runs).toBe(1);
+  });
+
   it.each([
     ['code', ['source.ts']],
     ['documentation', ['README.md']],

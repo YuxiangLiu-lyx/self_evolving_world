@@ -1,3 +1,4 @@
+import type { LearningData } from './learning-types.js';
 /** All base-world rules live here. No I/O, model calls or mutable skill registry. */
 export const CORE_RULES = Object.freeze({
   version: '1' as const,
@@ -120,6 +121,7 @@ export interface WorldState {
   /** Present only for the separately versioned simultaneous-round extension. */
   readonly events?: readonly WorldEvent[];
   readonly survival?: SurvivalData;
+  readonly learning?: LearningData;
 }
 
 const DIRECTIONS: Readonly<Record<Direction, Position>> = Object.freeze({
@@ -179,7 +181,7 @@ export function isVisible(
 ): boolean {
   return (origin.x - target.x) ** 2 + (origin.y - target.y) ** 2 <= radius ** 2;
 }
-function snapshot(
+export function snapshot(
   tick: number,
   settings: WorldSettings,
   agents: readonly AgentState[],

@@ -1,0 +1,1207 @@
+{
+  "format": "self-evolving-world/replay",
+  "version": 4,
+  "coreVersion": "1",
+  "schedule": "learning-v1",
+  "initial": {
+    "settings": {
+      "width": 24,
+      "height": 18,
+      "visionRadius": 5
+    },
+    "agents": [
+      {
+        "id": "lin",
+        "name": "Lin",
+        "position": {
+          "x": 2,
+          "y": 3
+        }
+      },
+      {
+        "id": "moss",
+        "name": "Moss",
+        "position": {
+          "x": 6,
+          "y": 11
+        }
+      },
+      {
+        "id": "sol",
+        "name": "Sol",
+        "position": {
+          "x": 17,
+          "y": 5
+        }
+      }
+    ],
+    "items": [
+      {
+        "id": "lin-fruit",
+        "name": "fruit",
+        "position": {
+          "x": 3,
+          "y": 3
+        }
+      },
+      {
+        "id": "lin-branches",
+        "name": "branch",
+        "position": {
+          "x": 2,
+          "y": 4
+        }
+      },
+      {
+        "id": "lin-stones",
+        "name": "stone",
+        "position": {
+          "x": 1,
+          "y": 4
+        }
+      },
+      {
+        "id": "lin-bitter-fruit",
+        "name": "poison-fruit",
+        "position": {
+          "x": 3,
+          "y": 5
+        }
+      },
+      {
+        "id": "moss-fruit",
+        "name": "fruit",
+        "position": {
+          "x": 7,
+          "y": 11
+        }
+      },
+      {
+        "id": "moss-branches",
+        "name": "branch",
+        "position": {
+          "x": 6,
+          "y": 12
+        }
+      },
+      {
+        "id": "moss-stones",
+        "name": "stone",
+        "position": {
+          "x": 5,
+          "y": 12
+        }
+      },
+      {
+        "id": "moss-bitter-fruit",
+        "name": "poison-fruit",
+        "position": {
+          "x": 7,
+          "y": 13
+        }
+      },
+      {
+        "id": "sol-fruit",
+        "name": "fruit",
+        "position": {
+          "x": 18,
+          "y": 5
+        }
+      },
+      {
+        "id": "sol-branches",
+        "name": "branch",
+        "position": {
+          "x": 17,
+          "y": 6
+        }
+      },
+      {
+        "id": "sol-stones",
+        "name": "stone",
+        "position": {
+          "x": 16,
+          "y": 6
+        }
+      },
+      {
+        "id": "sol-bitter-fruit",
+        "name": "poison-fruit",
+        "position": {
+          "x": 18,
+          "y": 7
+        }
+      },
+      {
+        "id": "far-east-fruit",
+        "name": "fruit",
+        "position": {
+          "x": 22,
+          "y": 15
+        }
+      },
+      {
+        "id": "far-west-fruit",
+        "name": "fruit",
+        "position": {
+          "x": 2,
+          "y": 16
+        }
+      }
+    ]
+  },
+  "environment": {
+    "era": "primitive",
+    "river": [
+      {
+        "x": 12,
+        "y": 0
+      },
+      {
+        "x": 12,
+        "y": 1
+      },
+      {
+        "x": 12,
+        "y": 2
+      },
+      {
+        "x": 12,
+        "y": 3
+      },
+      {
+        "x": 12,
+        "y": 4
+      },
+      {
+        "x": 12,
+        "y": 5
+      },
+      {
+        "x": 12,
+        "y": 6
+      },
+      {
+        "x": 12,
+        "y": 7
+      },
+      {
+        "x": 12,
+        "y": 8
+      },
+      {
+        "x": 12,
+        "y": 9
+      },
+      {
+        "x": 12,
+        "y": 10
+      },
+      {
+        "x": 12,
+        "y": 11
+      },
+      {
+        "x": 12,
+        "y": 12
+      },
+      {
+        "x": 12,
+        "y": 13
+      },
+      {
+        "x": 12,
+        "y": 14
+      },
+      {
+        "x": 12,
+        "y": 15
+      },
+      {
+        "x": 12,
+        "y": 16
+      },
+      {
+        "x": 12,
+        "y": 17
+      }
+    ],
+    "shallows": [
+      {
+        "x": 12,
+        "y": 3
+      },
+      {
+        "x": 12,
+        "y": 12
+      }
+    ],
+    "objects": [
+      {
+        "id": "lin-tree",
+        "kind": "tree",
+        "position": {
+          "x": 5,
+          "y": 3
+        },
+        "stock": {
+          "fruit": 4,
+          "branch": 3,
+          "timber": 2
+        }
+      },
+      {
+        "id": "lin-rock",
+        "kind": "rock",
+        "position": {
+          "x": 0,
+          "y": 6
+        },
+        "stock": {
+          "stone": 5
+        }
+      },
+      {
+        "id": "moss-tree",
+        "kind": "tree",
+        "position": {
+          "x": 9,
+          "y": 11
+        },
+        "stock": {
+          "fruit": 4,
+          "branch": 3,
+          "timber": 2
+        }
+      },
+      {
+        "id": "moss-rock",
+        "kind": "rock",
+        "position": {
+          "x": 4,
+          "y": 14
+        },
+        "stock": {
+          "stone": 5
+        }
+      },
+      {
+        "id": "sol-tree",
+        "kind": "tree",
+        "position": {
+          "x": 20,
+          "y": 5
+        },
+        "stock": {
+          "fruit": 4,
+          "branch": 3,
+          "timber": 2
+        }
+      },
+      {
+        "id": "sol-rock",
+        "kind": "rock",
+        "position": {
+          "x": 15,
+          "y": 8
+        },
+        "stock": {
+          "stone": 5
+        }
+      },
+      {
+        "id": "far-tree",
+        "kind": "tree",
+        "position": {
+          "x": 20,
+          "y": 14
+        },
+        "stock": {
+          "fruit": 6,
+          "branch": 6,
+          "timber": 3
+        }
+      },
+      {
+        "id": "north-fishery",
+        "kind": "fishery",
+        "position": {
+          "x": 12,
+          "y": 4
+        },
+        "stock": {
+          "fish": 6
+        }
+      },
+      {
+        "id": "south-fishery",
+        "kind": "fishery",
+        "position": {
+          "x": 12,
+          "y": 13
+        },
+        "stock": {
+          "fish": 6
+        }
+      }
+    ],
+    "resources": [
+      {
+        "id": "lin-fruit",
+        "kind": "fruit",
+        "quantity": 1,
+        "nutrition": 24,
+        "toxicity": 0,
+        "durability": 0
+      },
+      {
+        "id": "lin-branches",
+        "kind": "branch",
+        "quantity": 3,
+        "nutrition": 0,
+        "toxicity": 0,
+        "durability": 0
+      },
+      {
+        "id": "lin-stones",
+        "kind": "stone",
+        "quantity": 3,
+        "nutrition": 0,
+        "toxicity": 0,
+        "durability": 0
+      },
+      {
+        "id": "lin-bitter-fruit",
+        "kind": "poison-fruit",
+        "quantity": 2,
+        "nutrition": 12,
+        "toxicity": 35,
+        "durability": 0
+      },
+      {
+        "id": "moss-fruit",
+        "kind": "fruit",
+        "quantity": 1,
+        "nutrition": 24,
+        "toxicity": 0,
+        "durability": 0
+      },
+      {
+        "id": "moss-branches",
+        "kind": "branch",
+        "quantity": 3,
+        "nutrition": 0,
+        "toxicity": 0,
+        "durability": 0
+      },
+      {
+        "id": "moss-stones",
+        "kind": "stone",
+        "quantity": 3,
+        "nutrition": 0,
+        "toxicity": 0,
+        "durability": 0
+      },
+      {
+        "id": "moss-bitter-fruit",
+        "kind": "poison-fruit",
+        "quantity": 2,
+        "nutrition": 12,
+        "toxicity": 35,
+        "durability": 0
+      },
+      {
+        "id": "sol-fruit",
+        "kind": "fruit",
+        "quantity": 1,
+        "nutrition": 24,
+        "toxicity": 0,
+        "durability": 0
+      },
+      {
+        "id": "sol-branches",
+        "kind": "branch",
+        "quantity": 3,
+        "nutrition": 0,
+        "toxicity": 0,
+        "durability": 0
+      },
+      {
+        "id": "sol-stones",
+        "kind": "stone",
+        "quantity": 3,
+        "nutrition": 0,
+        "toxicity": 0,
+        "durability": 0
+      },
+      {
+        "id": "sol-bitter-fruit",
+        "kind": "poison-fruit",
+        "quantity": 2,
+        "nutrition": 12,
+        "toxicity": 35,
+        "durability": 0
+      },
+      {
+        "id": "far-east-fruit",
+        "kind": "fruit",
+        "quantity": 4,
+        "nutrition": 24,
+        "toxicity": 0,
+        "durability": 0
+      },
+      {
+        "id": "far-west-fruit",
+        "kind": "fruit",
+        "quantity": 4,
+        "nutrition": 24,
+        "toxicity": 0,
+        "durability": 0
+      }
+    ]
+  },
+  "programs": [
+    {
+      "agentId": "lin",
+      "tick": 0,
+      "call": 1,
+      "code": "learn({\"name\":\"Eat fruit\",\"purpose\":\"Restore satiety by consuming safe edible fruit.\",\"target\":\"Fruit resources owned in inventory, including lin-fruit.\",\"conditions\":\"Requires an owned fruit resource with positive quantity; consume one unit in one action.\",\"expectedEffect\":\"Apply the consumed unit's nutrition to satiety up to 100 and its actual toxicity to health; reduce resource quantity by one. Provide skill ID and exact use parameters.\"});",
+      "summary": "Learn to consume fruit so its nutrition can prevent starvation."
+    },
+    {
+      "agentId": "moss",
+      "tick": 0,
+      "call": 1,
+      "code": "move(\"east\", 1);\npickup(\"moss-fruit\");\nlearn({\"name\":\"Eat safe fruit\",\"purpose\":\"Restore satiety by eating an owned edible fruit.\",\"target\":\"A fruit resource in my inventory with positive nutrition and zero toxicity.\",\"conditions\":\"Requires an owned fruit unit; consume one unit in one use, without tools or preparation.\",\"expectedEffect\":\"Apply the consumed fruit's nutrition to my satiety up to the cap, applying its actual toxicity if any. Please provide the learned skill ID and exact argument names.\"});",
+      "summary": "Collect the nearby safe fruit and learn to eat it, prioritizing nutrition before starvation."
+    },
+    {
+      "agentId": "sol",
+      "tick": 0,
+      "call": 1,
+      "code": "move(\"east\", 1);\npickup(\"sol-fruit\");\nlearn({\"name\":\"Eat safe fruit\",\"purpose\":\"Restore satiety by consuming edible fruit from my inventory.\",\"target\":\"An owned fruit resource identified by itemId.\",\"conditions\":\"Learn in one round. Use only when the resource is in my inventory, has positive quantity and nutrition, and has zero toxicity. Consume one unit per use.\",\"expectedEffect\":\"Apply the consumed unit's nutrition to my satiety up to 100, apply its actual toxicity, and reduce its quantity by one. Expose the capability with parameter itemId.\"});",
+      "summary": "Collect the nearby safe fruit and learn to eat it, preparing to restore satiety before starvation."
+    },
+    {
+      "agentId": "lin",
+      "tick": 1,
+      "call": 2,
+      "code": "move(\"east\", 1);\npickup(\"lin-fruit\");\nuse(\"skill-1\", {\"food\":\"lin-fruit\"});",
+      "summary": "Collect and eat the safe fruit to restore satiety without toxicity."
+    },
+    {
+      "agentId": "moss",
+      "tick": 3,
+      "call": 2,
+      "code": "use(\"skill-1\", {\"food\":\"moss-fruit\"});\nmove(\"east\", 1);\nlearn({\"name\":\"Harvest tree fruit\",\"purpose\":\"Obtain safe food from a nearby fruit-bearing tree for later consumption.\",\"target\":\"The adjacent tree moss-tree, which has four fruit in its stock.\",\"conditions\":\"Requires being cardinally adjacent to the tree and at least one fruit remaining in its stock. Harvest one fruit by hand without tools, depleting the tree's fruit stock by one and transferring the fruit into my inventory.\",\"expectedEffect\":\"Gain one owned fruit resource with its actual nutrition and toxicity preserved, ready to consume with skill-1. Return the learned skill ID and exact parameter names.\"});",
+      "summary": "Eat the safe fruit to restore satiety, approach the fruit tree, and learn to harvest more food."
+    },
+    {
+      "agentId": "sol",
+      "tick": 3,
+      "call": 2,
+      "code": "use(\"skill-1\", {\"food\":\"sol-fruit\"});\nmove(\"east\", 1);\nlearn({\"name\":\"Harvest tree fruit\",\"purpose\":\"Obtain safe edible fruit from a nearby tree for ongoing nourishment.\",\"target\":\"An adjacent standing tree identified by objectId with positive fruit stock.\",\"conditions\":\"Learn in one round if possible. Require cardinal adjacency to the tree and at least one fruit in its stock. Harvest only fruit, without consuming it or damaging the tree.\",\"expectedEffect\":\"Reduce the target tree's fruit stock by one and transfer one fruit unit into my inventory with its actual nutrition and toxicity preserved. Return the owned resource ID for later consumption.\"});",
+      "summary": "Eat the safe fruit to restore satiety, approach the fruit-bearing tree, and learn to harvest more food."
+    },
+    {
+      "agentId": "lin",
+      "tick": 4,
+      "call": 3,
+      "code": "move(\"east\", 1);\nlearn({\"name\":\"Harvest tree fruit\",\"purpose\":\"Obtain edible fruit from a nearby fruit-bearing tree to sustain satiety.\",\"target\":\"Adjacent tree lin-tree with positive fruit stock.\",\"conditions\":\"Must stand one cardinal cell from the tree; require at least one fruit in its stock. Harvest one fruit without consuming it, reduce the tree's finite fruit stock by one, and transfer the harvested fruit into my inventory.\",\"expectedEffect\":\"Gain one owned edible fruit resource retaining its actual nutrition and toxicity, suitable for the learned Eat fruit skill. Report its resource ID and the harvesting skill's exact parameters.\"});",
+      "summary": "Approach the fruit tree and learn to harvest its finite fruit supply for safe nourishment."
+    },
+    {
+      "agentId": "lin",
+      "tick": 6,
+      "call": 4,
+      "code": "use(\"skill-2\", {\"tree\":\"lin-tree\"});",
+      "summary": "Harvest one fruit from the adjacent tree, then check its assigned inventory ID and food properties before eating."
+    },
+    {
+      "agentId": "moss",
+      "tick": 6,
+      "call": 3,
+      "code": "use(\"skill-2\", {\"tree\":\"moss-tree\"});",
+      "summary": "Harvest one fruit from the adjacent tree, then inspect its inventory ID and food properties before eating."
+    },
+    {
+      "agentId": "sol",
+      "tick": 6,
+      "call": 3,
+      "code": "use(\"skill-2\", {\"tree\":\"sol-tree\"});",
+      "summary": "Harvest one fruit from the adjacent tree, then inspect its inventory ID and food properties before eating."
+    },
+    {
+      "agentId": "lin",
+      "tick": 7,
+      "call": 5,
+      "code": "use(\"skill-1\", {\"food\":\"yield-7-lin-0\"});\nuse(\"skill-2\", {\"tree\":\"lin-tree\"});",
+      "summary": "Eat the owned, non-toxic fruit to restore satiety, then harvest another fruit from the adjacent tree for the next meal."
+    },
+    {
+      "agentId": "moss",
+      "tick": 7,
+      "call": 4,
+      "code": "use(\"skill-1\", {\"food\":\"yield-7-moss-0\"});\nuse(\"skill-2\", {\"tree\":\"moss-tree\"});",
+      "summary": "Eat the owned, nontoxic fruit to restore satiety, then harvest another fruit from the adjacent tree for the next meal."
+    },
+    {
+      "agentId": "sol",
+      "tick": 7,
+      "call": 4,
+      "code": "use(\"skill-1\", {\"food\":\"yield-7-sol-0\"});\nuse(\"skill-2\", {\"tree\":\"sol-tree\"});",
+      "summary": "Eat the owned non-toxic fruit to restore satiety, then harvest another fruit from the adjacent tree for later nourishment."
+    },
+    {
+      "agentId": "lin",
+      "tick": 9,
+      "call": 6,
+      "code": "use(\"skill-1\", {\"food\":\"yield-9-lin-0\"});\nuse(\"skill-2\", {\"tree\":\"lin-tree\"});",
+      "summary": "Eat the owned non-toxic fruit to restore satiety, then harvest another fruit from the adjacent tree for a future meal."
+    },
+    {
+      "agentId": "moss",
+      "tick": 9,
+      "call": 5,
+      "code": "use(\"skill-1\", {\"food\":\"yield-9-moss-0\"});\nuse(\"skill-2\", {\"tree\":\"moss-tree\"});\nuse(\"skill-2\", {\"tree\":\"moss-tree\"});",
+      "summary": "Eat the owned nontoxic fruit to restore satiety, then harvest the adjacent tree’s two remaining fruits as safe food reserves."
+    },
+    {
+      "agentId": "sol",
+      "tick": 9,
+      "call": 5,
+      "code": "use(\"skill-1\", {\"food\":\"yield-9-sol-0\"});\nuse(\"skill-2\", {\"tree\":\"sol-tree\"});\nuse(\"skill-2\", {\"tree\":\"sol-tree\"});",
+      "summary": "Eat the owned safe fruit to restore satiety, then harvest the tree’s two remaining fruits for a food reserve."
+    },
+    {
+      "agentId": "lin",
+      "tick": 11,
+      "call": 7,
+      "code": "use(\"skill-1\", {\"food\":\"yield-11-lin-0\"});\nuse(\"skill-2\", {\"tree\":\"lin-tree\"});",
+      "summary": "Eat the owned non-toxic fruit to restore satiety, then harvest the tree’s last fruit for a later meal."
+    },
+    {
+      "agentId": "moss",
+      "tick": 12,
+      "call": 6,
+      "code": "use(\"skill-1\", {\"food\":\"yield-11-moss-0\"});\nuse(\"skill-1\", {\"food\":\"yield-12-moss-0\"});",
+      "summary": "Consume both owned, nontoxic fruits to raise satiety from 51 to 93 while preserving full health."
+    },
+    {
+      "agentId": "sol",
+      "tick": 12,
+      "call": 6,
+      "code": "use(\"skill-1\", {\"food\":\"yield-11-sol-0\"});\nuse(\"skill-1\", {\"food\":\"yield-12-sol-0\"});\nwait(2);",
+      "summary": "Consume both safe fruits without exceeding the satiety cap, then remain safely in place. Avoid the poisonous fruit and depleted tree."
+    },
+    {
+      "agentId": "lin",
+      "tick": 13,
+      "call": 8,
+      "code": "use(\"skill-1\", {\"food\":\"yield-13-lin-0\"});\nwait(3);",
+      "summary": "Eat the owned non-toxic fruit, then stay in place for three rounds, preserving full health with ample satiety."
+    },
+    {
+      "agentId": "moss",
+      "tick": 14,
+      "call": 7,
+      "code": "wait(4);",
+      "summary": "Remain safely in place for the four remaining rounds, preserving full health. Satiety should decrease from 93 to 81 without starvation."
+    },
+    {
+      "agentId": "sol",
+      "tick": 16,
+      "call": 7,
+      "code": "wait(2);",
+      "summary": "Stay safely in place for the final two rounds, preserving full health while satiety decreases from 87 to 81. Avoid the poisonous fruit."
+    },
+    {
+      "agentId": "lin",
+      "tick": 17,
+      "call": 9,
+      "code": "wait(1);",
+      "summary": "Stay safely in place for the final round, preserving full health with 81 satiety remaining."
+    },
+    {
+      "agentId": "moss",
+      "tick": 17,
+      "call": 8,
+      "code": "wait(1);",
+      "summary": "Stay safely in place for the final round, preserving full health while satiety decreases to 81."
+    }
+  ],
+  "rounds": [
+    {
+      "actions": [
+        {
+          "type": "learn",
+          "agentId": "lin",
+          "request": {
+            "name": "Eat fruit",
+            "purpose": "Restore satiety by consuming safe edible fruit.",
+            "target": "Fruit resources owned in inventory, including lin-fruit.",
+            "conditions": "Requires an owned fruit resource with positive quantity; consume one unit in one action.",
+            "expectedEffect": "Apply the consumed unit's nutrition to satiety up to 100 and its actual toxicity to health; reduce resource quantity by one. Provide skill ID and exact use parameters."
+          }
+        },
+        {
+          "type": "move",
+          "agentId": "moss",
+          "direction": "east"
+        },
+        {
+          "type": "move",
+          "agentId": "sol",
+          "direction": "east"
+        }
+      ],
+      "reviews": [
+        {
+          "agentId": "lin",
+          "decision": "create",
+          "reason": "Consuming one edible fruit is a simple, feasible skill. Lin must first acquire fruit: lin-fruit is nearby but not currently owned. Consumption applies actual nutrition and toxicity; it does not make poisonous fruit safe. A skill ID will be assigned on registration.",
+          "prerequisites": [
+            "Complete one learning round before use.",
+            "Acquire at least one unit of edible fruit into inventory before use.",
+            "Bind food to the owned resource ID, for example food = lin-fruit after pickup. Choose non-toxic fruit for safe consumption."
+          ],
+          "learningRounds": 1,
+          "skillId": null,
+          "specification": {
+            "name": "Eat fruit",
+            "description": "Consume one owned edible unit, reducing its quantity by one and applying its immutable nutrition and toxicity under the fixed survival rules.",
+            "parameters": [
+              "food"
+            ],
+            "code": "consume(\"food\", 1);"
+          }
+        }
+      ]
+    },
+    {
+      "actions": [
+        {
+          "type": "move",
+          "agentId": "lin",
+          "direction": "east"
+        },
+        {
+          "type": "pickup",
+          "agentId": "moss",
+          "itemId": "moss-fruit"
+        },
+        {
+          "type": "pickup",
+          "agentId": "sol",
+          "itemId": "sol-fruit"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "pickup",
+          "agentId": "lin",
+          "itemId": "lin-fruit"
+        },
+        {
+          "type": "learn",
+          "agentId": "moss",
+          "request": {
+            "name": "Eat safe fruit",
+            "purpose": "Restore satiety by eating an owned edible fruit.",
+            "target": "A fruit resource in my inventory with positive nutrition and zero toxicity.",
+            "conditions": "Requires an owned fruit unit; consume one unit in one use, without tools or preparation.",
+            "expectedEffect": "Apply the consumed fruit's nutrition to my satiety up to the cap, applying its actual toxicity if any. Please provide the learned skill ID and exact argument names."
+          }
+        },
+        {
+          "type": "learn",
+          "agentId": "sol",
+          "request": {
+            "name": "Eat safe fruit",
+            "purpose": "Restore satiety by consuming edible fruit from my inventory.",
+            "target": "An owned fruit resource identified by itemId.",
+            "conditions": "Learn in one round. Use only when the resource is in my inventory, has positive quantity and nutrition, and has zero toxicity. Consume one unit per use.",
+            "expectedEffect": "Apply the consumed unit's nutrition to my satiety up to 100, apply its actual toxicity, and reduce its quantity by one. Expose the capability with parameter itemId."
+          }
+        }
+      ],
+      "reviews": [
+        {
+          "agentId": "moss",
+          "decision": "reuse",
+          "reason": "skill-1 implements the requested one-unit consumption. Its exact argument name is food; bind food to moss-fruit. This owned fruit provides 24 nutrition with zero toxicity. Learning takes one round; use becomes available the following round.",
+          "prerequisites": [
+            "At use, food must identify an owned edible resource with at least one unit.",
+            "Select positive-nutrition, zero-toxicity fruit for safe eating; the skill applies actual toxicity and does not filter unsafe targets."
+          ],
+          "learningRounds": 1,
+          "skillId": "skill-1",
+          "specification": null
+        },
+        {
+          "agentId": "sol",
+          "decision": "reuse",
+          "reason": "skill-1 implements the requested one-unit consumption. Reuse its registered argument name food, not itemId; bind food to sol-fruit. This owned fruit provides 24 nutrition with zero toxicity. Learning takes one round; use becomes available the following round.",
+          "prerequisites": [
+            "At use, food must identify an owned edible resource with at least one unit.",
+            "Select positive-nutrition, zero-toxicity fruit for safe eating; the skill applies actual toxicity and cannot enforce an additional zero-toxicity filter."
+          ],
+          "learningRounds": 1,
+          "skillId": "skill-1",
+          "specification": null
+        }
+      ]
+    },
+    {
+      "actions": [
+        {
+          "type": "use",
+          "agentId": "lin",
+          "skillId": "skill-1",
+          "args": {
+            "food": "lin-fruit"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "moss",
+          "skillId": "skill-1",
+          "args": {
+            "food": "moss-fruit"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "sol",
+          "skillId": "skill-1",
+          "args": {
+            "food": "sol-fruit"
+          }
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "move",
+          "agentId": "lin",
+          "direction": "east"
+        },
+        {
+          "type": "move",
+          "agentId": "moss",
+          "direction": "east"
+        },
+        {
+          "type": "move",
+          "agentId": "sol",
+          "direction": "east"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "learn",
+          "agentId": "lin",
+          "request": {
+            "name": "Harvest tree fruit",
+            "purpose": "Obtain edible fruit from a nearby fruit-bearing tree to sustain satiety.",
+            "target": "Adjacent tree lin-tree with positive fruit stock.",
+            "conditions": "Must stand one cardinal cell from the tree; require at least one fruit in its stock. Harvest one fruit without consuming it, reduce the tree's finite fruit stock by one, and transfer the harvested fruit into my inventory.",
+            "expectedEffect": "Gain one owned edible fruit resource retaining its actual nutrition and toxicity, suitable for the learned Eat fruit skill. Report its resource ID and the harvesting skill's exact parameters."
+          }
+        },
+        {
+          "type": "learn",
+          "agentId": "moss",
+          "request": {
+            "name": "Harvest tree fruit",
+            "purpose": "Obtain safe food from a nearby fruit-bearing tree for later consumption.",
+            "target": "The adjacent tree moss-tree, which has four fruit in its stock.",
+            "conditions": "Requires being cardinally adjacent to the tree and at least one fruit remaining in its stock. Harvest one fruit by hand without tools, depleting the tree's fruit stock by one and transferring the fruit into my inventory.",
+            "expectedEffect": "Gain one owned fruit resource with its actual nutrition and toxicity preserved, ready to consume with skill-1. Return the learned skill ID and exact parameter names."
+          }
+        },
+        {
+          "type": "learn",
+          "agentId": "sol",
+          "request": {
+            "name": "Harvest tree fruit",
+            "purpose": "Obtain safe edible fruit from a nearby tree for ongoing nourishment.",
+            "target": "An adjacent standing tree identified by objectId with positive fruit stock.",
+            "conditions": "Learn in one round if possible. Require cardinal adjacency to the tree and at least one fruit in its stock. Harvest only fruit, without consuming it or damaging the tree.",
+            "expectedEffect": "Reduce the target tree's fruit stock by one and transfer one fruit unit into my inventory with its actual nutrition and toxicity preserved. Return the owned resource ID for later consumption."
+          }
+        }
+      ],
+      "reviews": [
+        {
+          "agentId": "lin",
+          "decision": "create",
+          "reason": "Hand-picking one fruit is feasible in one learning round: Lin is cardinally adjacent to lin-tree, which has four fruit. skill-1 consumes food and cannot harvest it. Use parameter tree bound to lin-tree after learning completes; the harvested inventory resource ID is determined at execution, not registration.",
+          "prerequisites": [
+            "Complete one learning round before use.",
+            "Target tree must be cardinally adjacent and have at least one fruit remaining.",
+            "No tool is required."
+          ],
+          "learningRounds": 1,
+          "skillId": null,
+          "specification": {
+            "name": "Harvest tree fruit",
+            "description": "Gather one fruit from an adjacent tree into inventory, reducing its finite fruit stock by one. Preserve the fruit's actual nutrition and toxicity without consuming it or removing branches or timber.",
+            "parameters": [
+              "tree"
+            ],
+            "code": "harvest(\"tree\", \"fruit\", 1);"
+          }
+        },
+        {
+          "agentId": "moss",
+          "decision": "create",
+          "reason": "Hand-picking one fruit is feasible in one learning round: Moss is cardinally adjacent to moss-tree, which has four fruit. No registered skill implements harvesting. Use parameter tree bound to moss-tree after learning completes. This implementation is equivalent to the other fruit-harvesting proposals; registry deduplication does not replace individual learning.",
+          "prerequisites": [
+            "Complete one learning round before use.",
+            "Target tree must be cardinally adjacent and have at least one fruit remaining.",
+            "No tool is required."
+          ],
+          "learningRounds": 1,
+          "skillId": null,
+          "specification": {
+            "name": "Harvest tree fruit",
+            "description": "Gather one fruit from an adjacent tree into inventory, reducing its finite fruit stock by one. Preserve the fruit's actual nutrition and toxicity without consuming it or removing branches or timber.",
+            "parameters": [
+              "tree"
+            ],
+            "code": "harvest(\"tree\", \"fruit\", 1);"
+          }
+        },
+        {
+          "agentId": "sol",
+          "decision": "create",
+          "reason": "Hand-picking one fruit is feasible in one learning round: Sol is cardinally adjacent to sol-tree, which has four fruit. Use parameter tree bound to sol-tree after learning completes. Only fruit stock is depleted; the harvested inventory resource ID is determined at execution, not registration. Equivalent batch proposals can be deduplicated by the registry.",
+          "prerequisites": [
+            "Complete one learning round before use.",
+            "Target tree must be cardinally adjacent and have at least one fruit remaining.",
+            "No tool is required."
+          ],
+          "learningRounds": 1,
+          "skillId": null,
+          "specification": {
+            "name": "Harvest tree fruit",
+            "description": "Gather one fruit from an adjacent tree into inventory, reducing its finite fruit stock by one. Preserve the fruit's actual nutrition and toxicity without consuming it or removing branches or timber.",
+            "parameters": [
+              "tree"
+            ],
+            "code": "harvest(\"tree\", \"fruit\", 1);"
+          }
+        }
+      ]
+    },
+    {
+      "actions": [
+        {
+          "type": "use",
+          "agentId": "lin",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "lin-tree"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "moss",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "moss-tree"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "sol",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "sol-tree"
+          }
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "use",
+          "agentId": "lin",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-7-lin-0"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "moss",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-7-moss-0"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "sol",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-7-sol-0"
+          }
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "use",
+          "agentId": "lin",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "lin-tree"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "moss",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "moss-tree"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "sol",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "sol-tree"
+          }
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "use",
+          "agentId": "lin",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-9-lin-0"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "moss",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-9-moss-0"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "sol",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-9-sol-0"
+          }
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "use",
+          "agentId": "lin",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "lin-tree"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "moss",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "moss-tree"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "sol",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "sol-tree"
+          }
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "use",
+          "agentId": "lin",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-11-lin-0"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "moss",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "moss-tree"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "sol",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "sol-tree"
+          }
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "use",
+          "agentId": "lin",
+          "skillId": "skill-2",
+          "args": {
+            "tree": "lin-tree"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "moss",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-11-moss-0"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "sol",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-11-sol-0"
+          }
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "use",
+          "agentId": "lin",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-13-lin-0"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "moss",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-12-moss-0"
+          }
+        },
+        {
+          "type": "use",
+          "agentId": "sol",
+          "skillId": "skill-1",
+          "args": {
+            "food": "yield-12-sol-0"
+          }
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        }
+      ],
+      "reviews": []
+    }
+  ]
+}

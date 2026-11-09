@@ -79,7 +79,7 @@ export function legacyArguments(
       args.indexOf('--plan') !== args.length - 2)
   )
     throw new Error('Completion plan differs from recorded intent.');
-  if (entry === 'survival' && args.length)
+  if (['survival', 'learning'].includes(entry) && args.length)
     throw new Error('Survival uses the recorded fixed protocol.');
   if (entry === 'resume' && (args.length !== 1 || args[0] !== c.experiment?.id))
     throw new Error('Resume requires the recorded experiment ID.');
@@ -129,6 +129,7 @@ function main(): void {
         'finish',
         'random',
         'survival',
+        'learning',
         'resume',
       ].includes(entry)
     )
@@ -143,6 +144,7 @@ function main(): void {
         random: ['scripts/experiment-cli.ts', 'run'],
         resume: ['scripts/experiment-cli.ts', 'resume'],
         survival: ['scripts/survival-cli.ts'],
+        learning: ['scripts/learning-cli.ts'],
       };
       const worker = workers[entry];
       if (!worker)
@@ -153,7 +155,7 @@ function main(): void {
         'scripts/task.ts',
         ...legacyArguments(process.cwd(), entry, args),
       ];
-    if (entry === 'survival' && process.env.SEW_TASK_ID) {
+    if (['survival', 'learning'].includes(entry) && process.env.SEW_TASK_ID) {
       const build = spawnSync('pnpm', ['build'], { stdio: 'inherit' });
       if (build.error) throw build.error;
       if (build.status !== 0)

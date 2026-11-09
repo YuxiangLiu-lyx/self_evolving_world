@@ -33,3 +33,5 @@ Each ADR includes its date, decision status (Accepted / Superseded), context, de
 For a material change to an accepted decision, create a new ADR and mark the old one as superseded where appropriate. Preserve historical reasoning. Routine implementation details do not require separate ADRs.
 
 - [0014](0014-enforced-task-entry.md): coordinator-bound legacy commands and version-bound GitHub self-review provenance.
+
+- [0015](0015-survival-driven-skills.md): versioned survival pressure, generated constrained implementations, individual learning and durable round barriers.

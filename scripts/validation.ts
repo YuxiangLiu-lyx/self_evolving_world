@@ -20,6 +20,8 @@ export const REVIEW_SCENES = [
   'synchronous-mobile',
   'survival-browser',
   'survival-mobile',
+  'learning-browser',
+  'learning-mobile',
 ] as const;
 export type ReviewScene = (typeof REVIEW_SCENES)[number];
 

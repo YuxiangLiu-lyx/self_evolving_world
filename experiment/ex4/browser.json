@@ -1,0 +1,20 @@
+{
+  "id": "ex4",
+  "status": "passed",
+  "replayHash": "734aba3aeb1fde3bcfceb1608632b2fe0ca14459dc0573f35cf6a83cd4a8dc20",
+  "frameTicks": [
+    0,
+    9,
+    18
+  ],
+  "assertions": [
+    "replay-import",
+    "initial-midpoint-final-state",
+    "all-agent-positions-and-inventories",
+    "historical-controls-disabled",
+    "playback-and-export-invariance",
+    "layout-and-runtime-health",
+    "visuals-decode"
+  ],
+  "errors": []
+}
