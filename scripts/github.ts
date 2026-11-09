@@ -31,7 +31,8 @@ export function githubRequest(root: string): GithubRequest {
           Accept: 'application/vnd.github+json',
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-          'X-GitHub-Api-Version': '2026-03-10',
+          // This supported contract retains merge_commit_sha for independent confirmation.
+          'X-GitHub-Api-Version': '2022-11-28',
         },
         ...(data ? { body: JSON.stringify(data) } : {}),
         signal: AbortSignal.timeout(30_000),
