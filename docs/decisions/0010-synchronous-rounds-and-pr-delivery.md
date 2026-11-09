@@ -3,6 +3,8 @@
 - Date: 2026-11-08
 - Decision status: Accepted
 
+The PR-only delivery decision below is superseded by [ADR-0011](0011-default-merge-completion.md). The synchronous world and archive decisions remain accepted.
+
 ## Context
 
 The user requests ex2 to correct sequential movement, demonstrate successful pickups, improve character/item visuals and remove the learning-attempt control. ex1 recorded 41 pickup attempts but no successful collections. The user also requires a fresh number for each new experiment unless explicitly overridden, and automatic PR delivery for code and experiment work.

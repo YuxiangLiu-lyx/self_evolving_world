@@ -25,15 +25,17 @@ function write(path: string, value: unknown): void {
 }
 
 try {
-  if ((command !== 'run' && command !== 'finish') || task === '') {
+  if ((command !== 'run' && command !== 'review') || task === '') {
     throw new Error(
-      'Usage: pnpm validate -- "task name" / pnpm task:finish -- "same task name"',
+      'Usage: pnpm validate -- "task name" / pnpm task:review -- "same task name"',
     );
   }
   if (command === 'run') {
     mkdirSync(output, { recursive: true });
     // Invalidate old approvals before running anything that might fail/interrupted.
     rmSync(reviewPath, { force: true });
+    rmSync(resolve(output, 'completion.json'), { force: true });
+    rmSync(resolve(output, 'publication.json'), { force: true });
     rmSync(resolve(root, 'test-results/browser-validation.json'), {
       force: true,
     });
@@ -99,7 +101,7 @@ try {
         requirements: { verdict: 'pending', notes: '' },
       });
       console.log(
-        '\nAutomated validation passed; review is still required. Open playwright-report and every screenshot, complete validation-results/review.json, then run pnpm task:finish -- "same task name".',
+        '\nAutomated validation passed; review is still required. Open playwright-report and every screenshot, complete validation-results/review.json, then run pnpm task:review -- "same task name".',
       );
     } catch (error) {
       report.status = 'failed';
@@ -115,10 +117,10 @@ try {
     write(reportPath, {
       ...object(report),
       status: 'passed',
-      completedAt: new Date().toISOString(),
+      reviewedAt: new Date().toISOString(),
     });
     console.log(
-      `Task validation passed: ${task}. Automated checks, visual, behavior and requirement reviews are complete; source and screenshot fingerprints match. All task routes must now commit reviewed changes and run task:publish; local validation alone is not PR delivery.`,
+      `Local review passed: ${task}. Automated checks, visual, behavior and requirement reviews are complete; source and screenshot fingerprints match. Continue through task:publish and task:finish; local review alone never completes the task. Explicit local-only instructions use task:finish with the current plan.`,
     );
   }
 } catch (error) {

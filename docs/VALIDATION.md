@@ -9,9 +9,9 @@ Every development task, including documentation-only changes, must follow this w
 3. Open the current report with `pnpm exec playwright show-report` and inspect **every screenshot** listed in `validation-results/report.json`. Codex may use an image viewer to inspect the original artifacts. Checking file existence, reading the DOM, or repeating test names does not count as visual inspection.
 4. Apply the criteria below and complete `validation-results/review.json`. Record the reviewer, each image's `verdict` and specific `notes`, the `behavior` result, and a `requirements` review of the complete diff against the task plan. Requirement notes identify requirement IDs, implementation/evidence, scope coverage, and resolved mismatches; follow [PULL_REQUESTS](PULL_REQUESTS.md). Use `pass` only after actual review, `fail` for problems, and `pending` for unreviewed evidence. Keep the generated `runId`.
 5. If anything fails, fix it and restart at step 2. A new run invalidates the prior review. Source/documentation edits and missing or changed screenshots invalidate earlier evidence.
-6. Run `pnpm task:finish -- "same task name"`. The local gate requires exit code 0 and report status `passed`. It does not replace PR delivery.
+6. Run `pnpm task:review -- "same task name"`. The local gate requires exit code 0 and report status `passed`. It does not complete delivery.
 
-7. Automatically commit reviewed files, prepare the complete requirement-mapped PR body, and run `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"`. All task routes use this step. Report the PR URL and actual current remote-check result; no merging occurs. See the [publication contract](PULL_REQUESTS.md#automatic-pr-delivery-for-every-task).
+7. Automatically commit reviewed files, prepare the complete requirement-mapped PR body, and run `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"`. All task routes use this step. The publisher verifies current checks and conflicts, merges the reviewed head, then calls `task:finish` to independently verify the merged PR and integration into main. Only then is the default task complete. Explicit no-PR or no-merge instructions require the current plan exception. Report the PR URL and actual delivery result; failures remain incomplete. See the [publication contract](PULL_REQUESTS.md#automatic-pr-delivery-for-every-task).
 
 Automated success produces `awaiting-review` and never supplies visual judgments. `pnpm check`, `pnpm test:e2e`, or green CI alone cannot complete a task.
 
@@ -31,17 +31,19 @@ Every saved run adds four required scenes: `exN-initial`, `exN-midpoint`, `exN-f
 
 ## Visual review
 
-The World Observatory is currently the only product page. Inspect the following seven full-page screenshots every run. When adding pages or major interactions, extend the [scene list](../scripts/validation.ts) and browser tests instead of continuing to review only old pages.
+The World Observatory is currently the only product page. Inspect the following nine full-page screenshots every run. When adding pages or major interactions, extend the [scene list](../scripts/validation.ts) and browser tests instead of continuing to review only old pages.
 
-| Scene ID           | Required content                                        | Review focus                                                                                    |
-| ------------------ | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| desktop            | Demo world at a 1440×1100 viewport                      | Complete map, inspector, timeline, events, and controls; sensible spacing and hierarchy         |
-| mobile             | New world at a 390×844 viewport                         | Natural vertical scrolling; no cramped, clipped, or horizontally overflowing content            |
-| agent-vision       | Lin's initial agent view                                | Clear observed/unobserved regions; hidden out-of-range agents; matching map and inspector       |
-| after-actions      | Movement, pickup, and repeated tries                    | Correct position and ownership; clear unavailable results without implying execution            |
-| history            | Replay paused at frame 3                                | Clear historical state, disabled action controls, matching map/inspector/event                  |
-| experiment-browser | Archived ex1 selected and paused midway on desktop      | Visible selector, objective, frame count, chart link and read-only feedback; matching positions |
-| experiment-mobile  | Direct ex1 URL on a 390px screen, Moss's initial vision | Selector and archive details wrap naturally; map, controls and inspector remain readable        |
+| Scene ID            | Required content                                        | Review focus                                                                                            |
+| ------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| desktop             | Demo world at a 1440×1100 viewport                      | Complete map, inspector, timeline, events, and controls; sensible spacing and hierarchy                 |
+| mobile              | New world at a 390×844 viewport                         | Natural vertical scrolling; no cramped, clipped, or horizontally overflowing content                    |
+| agent-vision        | Lin's initial agent view                                | Clear observed/unobserved regions; hidden out-of-range agents; matching map and inspector               |
+| after-actions       | Movement and pickup                                     | Correct position, ownership and collection feedback                                                     |
+| history             | Replay paused at frame 3                                | Clear historical state, disabled action controls, matching map/inspector/event                          |
+| experiment-browser  | Archived ex1 selected and paused midway on desktop      | Visible selector, objective, frame count, chart link and read-only feedback; matching positions         |
+| experiment-mobile   | Direct ex1 URL on a 390px screen, Moss's initial vision | Selector and archive details wrap naturally; map, controls and inspector remain readable                |
+| synchronous-browser | ex2 at collection round 2 on desktop                    | Three recognizable actors, collected items, round label, all round events and disabled archive controls |
+| synchronous-mobile  | ex2 at collection round 2 at 390px                      | Readable illustrated map and event feedback with no horizontal overflow                                 |
 
 Inspect blank pages, missing styles, obstruction, odd spacing, unreadable text, distinguishable colors, overlapping controls, and state feedback. Automated layout checks cover objective issues such as horizontal overflow, clipping, panel overlap, and missing controls or grid cells. **Basic aesthetics still require looking at the actual page.** There is no pixel baseline, and producing a screenshot is not visual acceptance.
 
@@ -62,7 +64,8 @@ Add scenarios and expected outcomes for changed behavior. Import `test` from `ap
 ## Evidence and invalidation
 
 - `validation-results/report.json`: task name, run ID, source fingerprint, automated result, screenshot paths/hashes, and final state.
-- `validation-results/publication.json`: matching PR URL/head and current remote-check result, written by task:publish after local review and commit.
+- `validation-results/publication.json`: current delivery identity, policy, checks and merge result, written by task:publish after local review and commit.
+- `validation-results/completion.json`: independently verified final integration or explicit exception; failures record an error and return nonzero. New validation removes both prior delivery records.
 - `validation-results/review.json`: reviewer, per-image findings, behavior conclusions, and requirement/full-diff review, initially pending.
 - `playwright-report/index.html`: test details and attachments, opened with `pnpm exec playwright show-report`.
 - `test-results/`: screenshots, exported histories, and failure traces; browser summary in `browser-validation.json`.

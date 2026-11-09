@@ -8,7 +8,7 @@ export const ATTESTATIONS = [
   'No unrelated changes or unresolved requirement mismatches remain.',
   'The full test suite passed without skipped or focused tests.',
   'Current visual, behavior, and requirement reviews passed.',
-  'The task completion gate passed after the final edit.',
+  'The local review gate passed after the final edit.',
 ] as const;
 
 function sections(text: string): Map<string, Token[]> {

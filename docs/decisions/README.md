@@ -20,6 +20,8 @@ ADRs explain why a design was chosen rather than duplicating module descriptions
 
 - [0010](0010-synchronous-rounds-and-pr-delivery.md): simultaneous collection rounds, preserved legacy archives and mandatory PR delivery for every task route.
 
+- [0011](0011-default-merge-completion.md): default guarded PR merge, explicit task exceptions and independently verified completion.
+
 ## Writing requirements
 
 Each ADR includes its date, decision status (Accepted / Superseded), context, decision, alternatives, reasons, costs, and future consequences. Decision status describes the decision lifecycle, not PRODUCT feature status.

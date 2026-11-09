@@ -40,7 +40,7 @@ Placeholders, duplicate or mismatched requirements, missing paths, pending/faile
 
 Every PR, including documentation-only PRs, runs the complete unfiltered `pnpm validate -- "task name"`. It includes types, lint, formatting, architecture, all unit tests, builds, compiled CLI verification, all browser tests, and documentation checks. Do not use path filters, changed-tests-only selection, skips, todo tests, expected failures, `.only`, or failed-check waivers as acceptance evidence. Focused debugging commands do not replace the final full run. Test removal or weaker assertions need a requirement-based explanation and semantic review.
 
-Inspect every current screenshot and behavior result and record `requirements.verdict` and `requirements.notes` in the generated review after reading the actual diff. Notes identify the requirement IDs, changed behavior, evidence, and scope findings. `pnpm task:finish` requires this review in addition to visual and behavior approval. Complete only after it passes after the final edit.
+Inspect every current screenshot and behavior result and record `requirements.verdict` and `requirements.notes` in the generated review after reading the actual diff. Notes identify the requirement IDs, changed behavior, evidence, and scope findings. `pnpm task:review` requires this review in addition to visual and behavior approval. Run it after the final edit; final task completion additionally requires verified delivery.
 
 Commit the reviewed source, prepare the PR body outside tracked source (for example `validation-results/pr-body.md`), then run:
 
@@ -48,21 +48,35 @@ Commit the reviewed source, prepare the PR body outside tracked source (for exam
 pnpm pr:check -- validation-results/pr-body.md origin/main
 ```
 
-This requires a clean worktree, compares the PR body with the committed plan and changed paths, checks the head SHA, and verifies that its task/run ID matches the actual completed local evidence. Committing without changing source does not invalidate the source fingerprint. After another source edit, repeat validation, review, completion, commit, and PR preflight.
+This requires a clean worktree, compares the PR body with the committed plan and changed paths, checks the head SHA, and verifies that its task/run ID matches the actual accepted local evidence. Committing without changing source does not invalidate the source fingerprint. After another source edit, repeat validation, local review, commit, and PR preflight.
 
 ## Automatic PR delivery for every task
 
-Code, documentation-only, experiment-only and mixed tasks all proceed automatically to PR delivery. The task executor performs implementation, full validation and actual review, commits the reviewed files, and prepares the requirement-mapped body from the task plan and complete changed-file list. Do not wait for another publication confirmation once the task is authorized. A user instruction to keep work local takes precedence. Publication does not authorize merging.
-
-After the completed local gate and clean reviewed commit, run:
+Code, documentation-only, experiment-only and mixed tasks all proceed automatically through PR and merge under the user's standing instruction. Perform implementation, full validation and actual review, run `task:review`, commit reviewed files and prepare the requirement-mapped body. Do not ask again for already-authorized publication or merge. Completion requires integration into main, not merely an open green PR.
 
 ```bash
 pnpm task:publish -- validation-results/pr-body.md "Concrete problem and resulting behavior"
 ```
 
-This command verifies canonical origin and a focused branch, fetches main and requires it as an ancestor, runs `pr:check`, pushes without force, creates or updates that branch's open PR against main, and waits for successful current `quality` and `pr-policy` checks. A matching existing PR is reused, so retrying does not create duplicate PRs. It verifies the PR head/body before and after checks and reruns preflight. Checks must start at or after the observed PR update time, so an older green run cannot approve a new description on the same commit. This is conservative: a later comment or metadata update may require rerunning CI before verification. `validation-results/publication.json` records task, run ID, route, exact head, PR URL and remote-check result. Missing authentication, failed/stale checks, concurrent edits or timeout leave delivery incomplete. The script never merges or approves reviews.
+The publisher checks canonical origin, a focused branch and the clean reviewed commit/body, fetches main, computes conflicts with `git merge-tree` without changing the index/worktree, and requires main as an ancestor. It runs `pr:check`, pushes without force, creates or updates the matching PR, and waits for current `quality` and `pr-policy`. Checks must start at or after the observed PR update time; later comments or metadata edits may conservatively require rerunning CI. It rejects changed head/body/base, conflicting, unknown or blocked mergeability, stale/failed checks and concurrent source edits. After another preflight it requests a merge commit guarded by the reviewed head SHA, confirms the merged PR, fetches main and verifies both reviewed head and merge commit ancestry. GitHub protection remains authoritative; no override, automatic review approval or setting change is requested.
 
-Authentication uses `GITHUB_TOKEN` or an existing HTTPS Git credential helper without logging secrets. No gh installation is required. A connected GitHub tool may create/update the same reviewed PR; then append `--verify-only` to require the existing matching PR and verify delivery without publishing mutations. Source changes still require fresh validation, review, commit and an updated body.
+`validation-results/publication.json` binds task, run, source, plan, body, branch, base, head, checks and merge result. The publisher invokes `task:finish`, which independently checks current evidence, PR identity/checks, archive preservation and integration and writes `completion.json`. Failures return nonzero and record incomplete delivery. A retry with the same current receipt detects an already merged PR and verifies it without a second merge. Keep the receipt/body until completion; new validation invalidates them.
+
+Authentication uses `GITHUB_TOKEN` or an existing HTTPS Git credential helper without logging secrets; gh is not required. A connected GitHub tool may create/update the same reviewed PR. `--prepare-only` verifies readiness and saves the receipt without merging or completing; this supports a connector merge guarded by the same head. Then `--verify-only` confirms that merge and completes. Verify-only cannot complete a default task whose PR is still open, and never pushes, creates, edits or merges a PR.
+
+### Explicit delivery exceptions
+
+Only an explicit user instruction for this task permits an exception. Record it in the current changed plan, using the exact validation task name:
+
+```text
+## Delivery
+
+- Task: Exact validation task name
+- Mode: pr-only
+- Reason: The user explicitly requested a PR without merging for this task.
+```
+
+`pr-only` retains the reviewed PR and verifies current checks without merging. `local-only` means no PR and no merge; after full local review run `pnpm task:finish -- "Exact validation task name" --plan docs/exec-plans/active/pr-NN-task.md`. This path performs no network publication and requires the current reviewed exception plan and intact archives. Exceptions produce `completed-with-exception`, distinct from normal `completed`. Absent a section, the mode is `merge`; an explicit merge section needs Task and Mode only. Duplicate, malformed, wrong-task and unchanged historical exceptions fail. Semantic reviewers verify actual authorization; never manufacture an exception to work around missing credentials, conflicts or failed checks.
 
 New experiments always allocate the next unused exN by default. The harness and preflight compare every previously committed archive file with origin/main and block changed, removed or added files within existing exN directories. Only an explicit user reuse request may be recorded in the current changed plan as:
 
@@ -76,7 +90,7 @@ The reason must contain at least twenty characters. Reviewers verify the actual 
 
 [CI](../.github/workflows/ci.yml) runs `quality` for all PRs without path filters. The [PR workflow](../.github/workflows/pr-policy.yml) runs `pr-policy` on opening, reopening, new commits, description edits, and readiness changes. It fetches the current body and complete changed-file list, reads the plan at the exact head, and rejects concurrent changes. Both jobs use read-only permissions; untrusted PR text is data, never interpolated into shell commands. No privileged `pull_request_target` workflow executes PR code.
 
-The required repository protection is captured in [main-protection.json](../.github/main-protection.json): require PRs, successful `quality` and `pr-policy` checks with the branch up to date, resolved conversations, no force-push/deletion, and enforcement for administrators. The policy does not add a second-person approval requirement; the actual semantic review and requirement mapping remain mandatory, and humans choose whether to merge. A separate approval-count policy needs an explicit decision.
+The required repository protection is captured in [main-protection.json](../.github/main-protection.json): require PRs, successful `quality` and `pr-policy` checks with the branch up to date, resolved conversations, no force-push/deletion, and enforcement for administrators. The policy does not add a second-person approval requirement; the actual semantic review and requirement mapping remain mandatory, and humans retain product and architectural acceptance while the standing instruction authorizes guarded merge by default. A separate approval-count policy needs an explicit decision.
 
 A workflow file does not enable GitHub protection. Check the current remote state before applying settings, preserve stronger existing rules, and verify the returned state afterward. When `main` has no protection, an administrator may apply the reviewed configuration with:
 
