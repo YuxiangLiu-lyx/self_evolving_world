@@ -13,7 +13,13 @@ import { object } from './validation.js';
 /** Effects are existing gates/commands, not a second implementation of their policy. */
 export interface TaskEffects {
   snapshot(context: TaskContext): Snapshot;
-  experiment(context: TaskContext, save: () => void): Promise<void>;
+  experiment(
+    context: TaskContext,
+    save: () => void,
+  ): Promise<
+    undefined | { experiment: string; barrier: unknown; schema: string }
+  >;
+  submitDevelopment?(file: string, context: TaskContext): void;
   analysisReady(id: string, context: TaskContext): boolean;
   analysisMaterials(id: string, context: TaskContext): unknown;
   submitAnalysis(file: string, id: string, context: TaskContext): void;
@@ -116,7 +122,13 @@ export class TaskFlow {
           },
         );
       this.step('experiment');
-      await this.effects.experiment(c, this.save);
+      const development = await this.effects.experiment(c, this.save);
+      if (development)
+        return this.handoff(
+          'development',
+          'Inspect the saved World Agent request and constrained implementation. Submit a validated review batch or explicit rejection; no game round advances while development is pending.',
+          development,
+        );
       const snapshot = this.snapshot();
       const targets = [
         ...new Set([
@@ -321,6 +333,13 @@ export class TaskFlow {
           detail: text(response.notes, 'preparation notes'),
         });
         c.prepared = true;
+      } else if (request.step === 'development' && kind === 'development') {
+        if (!this.effects.submitDevelopment)
+          throw new Error('No development response handler is installed.');
+        this.effects.submitDevelopment(
+          text(response.file, 'development result'),
+          c,
+        );
       } else if (request.step === 'analysis' && kind === 'analysis') {
         const material = object(request.materials);
         this.effects.submitAnalysis(

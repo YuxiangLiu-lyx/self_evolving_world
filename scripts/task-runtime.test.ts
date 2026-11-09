@@ -1,4 +1,9 @@
 import {
+  continueLearningExecution,
+  newLearningExecution,
+} from '../apps/simulator/src/learning-run.js';
+import { learningCheckpoint, learningEngineHash } from './learning-files.js';
+import {
   cpSync,
   mkdirSync,
   mkdtempSync,
@@ -368,6 +373,113 @@ describe('existing gates behind the task runtime', () => {
     );
     expect(calls).toHaveLength(1);
   });
+});
+
+it('returns the saved development barrier without starting a worker and rejects stale source or forged responses', async () => {
+  for (const path of [
+    'apps/simulator/src',
+    'packages/world-core/src',
+    'experiment/ex4',
+  ])
+    mkdirSync(resolve(root, path), { recursive: true });
+  const state = await continueLearningExecution(
+    newLearningExecution('offline-fixture', 'simulated-test'),
+    (role) =>
+      Promise.resolve({
+        decision: {
+          text: JSON.stringify(
+            role === 'ordinary'
+              ? {
+                  code: 'learn({"name":"Nourishment","purpose":"Consume owned food for satiety","target":"Owned edible resource","conditions":"Inventory food is available","expectedEffect":"Finite consumption applies nutrition"});',
+                  summary: 'Offline fixture requests a capability.',
+                }
+              : { needsDevelopment: true, reviews: [] },
+          ),
+          responseId: 'fixture',
+          responseFormat: 'sse',
+        },
+        http: {
+          status: 200,
+          requestId: null,
+          contentType: 'text/event-stream',
+        },
+      }),
+    () => Promise.resolve(),
+  );
+  save('experiment/ex4/manifest.json', {
+    version: 4,
+    status: 'running',
+    provenance: { engineHash: learningEngineHash(root) },
+  });
+  save('experiment/ex4/execution.json', state);
+  const c = makeContext();
+  c.intent = {
+    ...c.intent,
+    experiment: {
+      mode: 'learning',
+      allocation: 'new',
+      basis: c.intent.delivery.basis,
+    },
+  };
+  c.experiment = { before: [], phase: 'started', id: 'ex4' };
+  const calls: string[][] = [];
+  const runtime = new LocalTaskEffects(
+    root,
+    () => {},
+    (args) => {
+      calls.push(args);
+      return { status: 0 };
+    },
+  );
+  expect(await runtime.experiment(c, () => {})).toMatchObject({
+    experiment: 'ex4',
+    barrier: { tick: 0 },
+  });
+  expect(await runtime.experiment(c, () => {})).toMatchObject({
+    experiment: 'ex4',
+  });
+  expect(calls).toEqual([]);
+  save('validation-results/development.json', {
+    barrierId: 'wrong',
+    tick: 0,
+    reviews: [],
+    notes: 'This deliberately invalid fixture must not advance anything.',
+  });
+  expect(() => {
+    runtime.submitDevelopment('validation-results/development.json', c);
+  }).toThrow('saved barrier');
+  expect(learningCheckpoint(root, 'ex4').rounds).toHaveLength(0);
+  const b = state.barrier;
+  if (!b) throw Error('Missing barrier.');
+  save('validation-results/development.json', {
+    barrierId: b.id,
+    tick: 0,
+    reviews: ['lin', 'moss', 'sol'].map((agentId) => ({
+      agentId,
+      decision: 'reject',
+      reason: 'Offline fixture rejects development without changing the world.',
+      prerequisites: [],
+      learningRounds: 0,
+      skillId: null,
+      specification: null,
+    })),
+    notes:
+      'Reviewed all three pending requests and explicitly rejected this fixture batch; no implementation was registered.',
+  });
+  runtime.submitDevelopment('validation-results/development.json', c);
+  expect(learningCheckpoint(root, 'ex4')).toMatchObject({
+    phase: 'running',
+    rounds: [],
+    barrier: null,
+  });
+  writeFileSync(
+    resolve(root, 'packages/world-core/src/change.ts'),
+    'export const changed = true;',
+  );
+  await expect(runtime.experiment(c, () => {})).rejects.toThrow(
+    'source changed',
+  );
+  expect(calls).toEqual([]);
 });
 
 describe('retained behavioral analysis', () => {

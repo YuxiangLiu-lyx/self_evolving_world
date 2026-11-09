@@ -32,7 +32,13 @@ export function readTask(root: string, id: string): TaskContext {
 }
 
 export type WorkerOperation =
-  'review' | 'publish' | 'finish' | 'random' | 'survival' | 'resume';
+  | 'review'
+  | 'publish'
+  | 'finish'
+  | 'random'
+  | 'survival'
+  | 'learning'
+  | 'resume';
 
 /** A coordinator lease is an accidental-bypass guard, not a sandbox against local file tampering. */
 export function requireTaskWorker(
@@ -174,6 +180,13 @@ export function requireTaskWorker(
     )
       throw new Error(
         'Survival execution does not match the recorded experiment.',
+      );
+    if (
+      operation === 'learning' &&
+      (e.mode !== 'learning' || e.allocation !== 'new' || args.length)
+    )
+      throw new Error(
+        'Learning execution does not match the recorded experiment.',
       );
     if (
       operation === 'resume' &&

@@ -1,3 +1,7 @@
+import {
+  learningCheckpoint,
+  submitLearningDevelopment,
+} from './learning-files.js';
 import { spawnSync } from 'node:child_process';
 import { closeSync, openSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, relative, isAbsolute } from 'node:path';
@@ -140,7 +144,12 @@ export class LocalTaskEffects implements TaskEffects {
       ).mode,
     };
   }
-  async experiment(c: TaskContext, save: () => void): Promise<void> {
+  async experiment(
+    c: TaskContext,
+    save: () => void,
+  ): Promise<
+    undefined | { experiment: string; barrier: unknown; schema: string }
+  > {
     const intent = c.intent.experiment;
     if (intent.mode === 'none') return;
     if (intent.allocation === 'reuse') {
@@ -180,7 +189,9 @@ export class LocalTaskEffects implements TaskEffects {
                 String(intent.seed ?? DEFAULT_SEED),
                 String(intent.rounds ?? DEFAULT_ROUNDS),
               ]
-            : ['experiment:survival'],
+            : intent.mode === 'learning'
+              ? ['experiment:learning']
+              : ['experiment:survival'],
         );
       } catch (error) {
         c.experiment.error =
@@ -208,13 +219,49 @@ export class LocalTaskEffects implements TaskEffects {
       save();
     }
     const id = text(journal.id, 'allocated experiment');
+    if (intent.mode === 'learning' && intent.allocation === 'new') {
+      if (journal.phase === 'recorded') {
+        readExperiment(this.root, id);
+        return;
+      }
+      const existing = object(
+        readJson(resolve(this.root, 'experiment', id, 'manifest.json')),
+      );
+      if (existing.status === 'completed') {
+        readExperiment(this.root, id);
+        journal.phase = 'recorded';
+        save();
+        return;
+      }
+      let checkpoint = learningCheckpoint(this.root, id);
+      if (checkpoint.phase === 'running') {
+        this.command(c, ['experiment:learning']);
+        checkpoint = learningCheckpoint(this.root, id);
+      }
+      if (checkpoint.phase === 'development')
+        return {
+          experiment: id,
+          barrier: checkpoint.barrier,
+          schema: 'apps/simulator/src/learning-run.ts#acceptDevelopment',
+        };
+      // A completed simulation may have stopped before derived artifacts were saved.
+      this.command(c, ['experiment:learning']);
+      const record = readExperiment(this.root, id, true);
+      if (record.manifest.status !== 'completed')
+        this.command(c, ['experiment:resume', '--', id]);
+      readExperiment(this.root, id);
+      journal.phase = 'recorded';
+      save();
+      return;
+    }
     const record = readExperiment(this.root, id, true);
     if (
       (intent.mode === 'random' &&
         (record.manifest.version !== 2 ||
           record.manifest.seed !== (intent.seed ?? DEFAULT_SEED) ||
           record.manifest.steps !== (intent.rounds ?? DEFAULT_ROUNDS))) ||
-      (intent.mode === 'survival' && record.manifest.version !== 3)
+      (intent.mode === 'survival' && record.manifest.version !== 3) ||
+      (intent.mode === 'learning' && record.manifest.version !== 4)
     )
       throw new Error(
         'Allocated experiment disagrees with the recorded protocol/parameters.',
@@ -230,6 +277,19 @@ export class LocalTaskEffects implements TaskEffects {
     journal.phase = 'recorded';
     save();
     await Promise.resolve();
+  }
+  submitDevelopment(file: string, c: TaskContext): void {
+    if (
+      c.intent.experiment.mode !== 'learning' ||
+      !c.experiment?.id ||
+      c.experiment.phase !== 'started'
+    )
+      throw new Error('No learning development is pending.');
+    submitLearningDevelopment(
+      this.root,
+      c.experiment.id,
+      readJson(this.inputFile(file)),
+    );
   }
   analysisReady(id: string, c: TaskContext): boolean {
     try {

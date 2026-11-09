@@ -28,6 +28,8 @@ Plans help humans and agents track tasks, scope, progress, and evidence. Every P
 
 - [PR-14](completed/pr-14-enforced-task-entry.md): mandatory task entries, auditable self-review and integration of PR #8.
 
+- [PR-15](completed/pr-15-survival-skill-learning.md): versioned survival-driven generation, learning, durable development barriers and real ex4.
+
 ## Format and lifecycle
 
 Use `pr-NN-short-title.md` and include `Requirement summary`, numbered `Requirements` (`- R1: ...`), `Scope and exclusions`, `Acceptance criteria`, steps, results, unexecuted checks, limitations, and follow-up suggestions. See the [PR contract](../PULL_REQUESTS.md). Historical completed plans preserve their original format; new PRs and newly submitted work follow this contract. Create plans in active, update them during implementation, then move completed plans to completed and repair references.

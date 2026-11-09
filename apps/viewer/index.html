@@ -248,10 +248,29 @@
             </div>
             <div class="inspector-block">
               <h3>Learning requests</h3>
-              <p class="muted">
+              <p id="learning-policy" class="muted">
                 All requests are denied. No World Agent is present.
               </p>
               <div id="learning-history" class="learning-history"></div>
+            </div>
+          </section>
+          <section id="capability-panel" class="panel capability-panel" hidden>
+            <div class="panel-heading">
+              <div>
+                <span class="eyebrow">LEARNED CAPABILITIES</span>
+                <h2>Knowledge and resources</h2>
+              </div>
+              <span id="world-skill-count" class="small-label"></span>
+            </div>
+            <p id="learning-progress" class="learning-progress"></p>
+            <div id="learned-skills"></div>
+            <div class="inspector-block">
+              <h3>Observable resources</h3>
+              <p class="muted">
+                River: blue is blocked; pale crossings are passable. Trees and
+                rocks require processing from an adjacent cell.
+              </p>
+              <div id="resource-details"></div>
             </div>
           </section>
           <section class="panel skills-panel">

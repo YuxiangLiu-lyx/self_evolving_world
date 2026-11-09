@@ -1,0 +1,35 @@
+{
+  "format": "self-evolving-world/experiment",
+  "version": 4,
+  "id": "ex4",
+  "objective": "Observe whether primitive-era actors request, learn and use generated resource-backed skills to improve health and survival under sustained hunger over 18 synchronous rounds; preserve real model evidence and a separate deterministic no-action control.",
+  "steps": 18,
+  "schedule": "learning-v1",
+  "policy": "survival-driven-skills-v1",
+  "controller": "chatgpt-plan",
+  "externalModelCalls": 27,
+  "createdAt": "2026-11-09T21:37:57.290Z",
+  "status": "completed",
+  "provenance": {
+    "revision": "ee1fd8afddc39fbb8fd91955e0d19b19976d7a13",
+    "dirty": true,
+    "node": "v24.22.2",
+    "platform": "darwin",
+    "engineHash": "5e1fd95bf0ebdab3b5613824c6e817f1c9414efd0118e206126641c7ca472f8d"
+  },
+  "captureFailures": [],
+  "artifacts": {
+    "replay.json": "734aba3aeb1fde3bcfceb1608632b2fe0ca14459dc0573f35cf6a83cd4a8dc20",
+    "results.json": "f9807548be2bedc8d9350c23d0da4abf69aa211ed89c83d61631d2f19b66604a",
+    "report.md": "f2809d41c115d5f3730b7aaa89232aaacb18885dd93e84fae7621f44a4f783ca",
+    "overview.svg": "c35072cf67ccdaf6b8f6e3b7bcbbf703e0fd9b410a4a74783d772c3e1bf992da",
+    "browser.json": "01781e7453b19990086f027ec2be2c25361df39def345a5211b0fe5e31ce5865",
+    "initial.png": "71976901e6fc627cb801c1d88defa071539e83c3ebf3009b9ccd4e05583435ff",
+    "midpoint.png": "0f4e3e0b8d16c7d45f4713eea4f29e3cfc1f7dc8862dfc41c588519034e6a8ff",
+    "final.png": "990a2ef0269c90c03c47d9b3018ce8417b6407b918fcc93bb550a7ded9734225",
+    "overview.png": "dd08ee9c5be0df131a26147f41ab350093565c2668e27aad97fab13922fec7bc",
+    "model-calls.json": "794a3a35dd32f1a413bfb9c3ae206b3f21b2667c226752d13df9a8d748f17ed9",
+    "execution.json": "2b7daeea5ce52fd2ad9d73942eda275652e0edfba13f67fa993671a4560c5c60",
+    "skills.json": "75b9c7deebabcbc1d4c8adadc996a6cfccc5ec59a3cbf8f008a8ab92ce560882"
+  }
+}

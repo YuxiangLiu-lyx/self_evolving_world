@@ -45,6 +45,8 @@ The World Observatory is currently the only product page. Inspect the following 
 | experiment-mobile   | Direct ex1 URL on a 390px screen, Moss's initial vision | Selector and archive details wrap naturally; map, controls and inspector remain readable                |
 | synchronous-browser | ex2 at collection round 2 on desktop                    | Three recognizable actors, collected items, round label, all round events and disabled archive controls |
 | survival-browser    | Survival replay at round 30 on desktop                  | Health/satiety/cold/heat, current code progress and denied learning are readable and agree with history |
+| learning-browser    | Version-4 generated skill fixture on desktop            | Terrain, resource quantities, learned specification/code and vitals agree with reconstructed state      |
+| learning-mobile     | Same fixture during unfinished learning at 390px        | Individual progress and resources fit without horizontal overflow                                       |
 | survival-mobile     | Same replay at 390px with Moss selected                 | Vital meters, code and request history fit without horizontal overflow                                  |
 | synchronous-mobile  | ex2 at collection round 2 at 390px                      | Readable illustrated map and event feedback with no horizontal overflow                                 |
 
@@ -89,3 +91,7 @@ Install the specified Node, pnpm, and Chromium using the [development workflow](
 Fix every automated, visual, or behavior failure and rerun the full workflow. Resolve browser installation, port, or environment problems before continuing. If a blocker cannot be resolved, report incomplete work instead of claiming success. Do not skip tests, weaken assertions, or use old screenshots to complete a task.
 
 CI runs the same automated validation on the [canonical repository](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions) and produces pending review. Each run uploads available reports, screenshots, and traces with 14-day retention, including failed runs. Download the complete artifact to preserve the report's relative evidence paths. There is no remote visual or semantic review service. GitHub protection is configured and verified separately under the [PR contract](PULL_REQUESTS.md#github-checks-and-merge-restrictions). The task executor performs actual visual and behavior review and references the plan and findings in the PR.
+
+## Learning protocol evidence
+
+Version-4 [learning experiments](SKILL_LEARNING_EXPERIMENT.md) require complete recorded call/input/output correspondence, bounded attempts, the exact round barrier, persisted executable registry and resource-backed survival reconstruction. Development is a task handoff before validation, not approval to bypass it. Tests include exact starvation timing, one-to-four-round learning, functional/same-batch reuse, generated execution, food/toxicity, tool costs/wear, reachable food, private observations, plan interruption and paused resumption. Every completed run receives the existing retained per-agent analysis and full screenshot/semantic review. The all-wait control is explicitly offline and is not a causal estimate.

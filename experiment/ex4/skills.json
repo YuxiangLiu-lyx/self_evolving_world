@@ -1,0 +1,59 @@
+[
+  {
+    "name": "Eat fruit",
+    "description": "Consume one owned edible unit, reducing its quantity by one and applying its immutable nutrition and toxicity under the fixed survival rules.",
+    "parameters": [
+      "food"
+    ],
+    "code": "consume(\"food\", 1);",
+    "id": "skill-1",
+    "version": 1,
+    "instructions": [
+      {
+        "op": "consume",
+        "parameter": "food",
+        "quantity": 1
+      }
+    ],
+    "signature": "[{\"op\":\"consume\",\"parameter\":0,\"quantity\":1}]",
+    "conditions": [
+      "Target must be an owned edible resource with sufficient quantity."
+    ],
+    "costs": [
+      "Consume 1 target units."
+    ],
+    "effects": [
+      "Apply resource-defined nutrition and toxicity, capped at 100; no revival."
+    ],
+    "learningRounds": 1
+  },
+  {
+    "name": "Harvest tree fruit",
+    "description": "Gather one fruit from an adjacent tree into inventory, reducing its finite fruit stock by one. Preserve the fruit's actual nutrition and toxicity without consuming it or removing branches or timber.",
+    "parameters": [
+      "tree"
+    ],
+    "code": "harvest(\"tree\", \"fruit\", 1);",
+    "id": "skill-2",
+    "version": 1,
+    "instructions": [
+      {
+        "op": "harvest",
+        "parameter": "tree",
+        "kind": "fruit",
+        "quantity": 1
+      }
+    ],
+    "signature": "[{\"op\":\"harvest\",\"parameter\":0,\"kind\":\"fruit\",\"quantity\":1}]",
+    "conditions": [
+      "Target must be an adjacent matching environment object with fruit stock; timber needs an axe and fish needs a rod and fishery."
+    ],
+    "costs": [
+      "Remove 1 fruit stock; timber/fish consume one tool durability per unit."
+    ],
+    "effects": [
+      "Transfer fruit from finite environment stock into inventory."
+    ],
+    "learningRounds": 1
+  }
+]

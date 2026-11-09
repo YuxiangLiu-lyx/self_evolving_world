@@ -7,7 +7,7 @@ export interface ExperimentEntry {
   readonly steps: number;
   readonly seed?: number;
   readonly createdAt: string;
-  readonly schedule?: 'simultaneous-v1' | 'survival-v1';
+  readonly schedule?: 'simultaneous-v1' | 'survival-v1' | 'learning-v1';
   readonly totalActions?: number;
 }
 
@@ -30,7 +30,8 @@ export function parseCatalogue(source: string): ExperimentEntry[] {
     if (
       (schedule !== undefined &&
         schedule !== 'simultaneous-v1' &&
-        schedule !== 'survival-v1') ||
+        schedule !== 'survival-v1' &&
+        schedule !== 'learning-v1') ||
       (schedule !== undefined &&
         (typeof totalActions !== 'number' ||
           !Number.isInteger(totalActions) ||
@@ -48,7 +49,7 @@ export function parseCatalogue(source: string): ExperimentEntry[] {
       !Number.isInteger(steps) ||
       steps < 3 ||
       steps > MAX_ACTIONS ||
-      (schedule === 'survival-v1'
+      (schedule === 'survival-v1' || schedule === 'learning-v1'
         ? seed !== undefined
         : typeof seed !== 'number' ||
           !Number.isInteger(seed) ||
@@ -65,7 +66,9 @@ export function parseCatalogue(source: string): ExperimentEntry[] {
       steps,
       ...(typeof seed === 'number' ? { seed } : {}),
       createdAt,
-      ...((schedule === 'simultaneous-v1' || schedule === 'survival-v1') &&
+      ...((schedule === 'simultaneous-v1' ||
+        schedule === 'survival-v1' ||
+        schedule === 'learning-v1') &&
       typeof totalActions === 'number'
         ? { schedule, totalActions }
         : {}),
@@ -136,7 +139,7 @@ export class ExperimentBrowser {
     this.chart.hidden = this.active === undefined;
     if (this.active !== undefined) {
       this.chart.href = `./experiments/${this.active.id}/overview.svg`;
-      this.feedback.textContent = `${this.active.id} · ${String(this.active.steps + 1)} frames${this.active.schedule ? ` · ${String(this.active.totalActions)} actions` : ''} · ${this.active.schedule === 'survival-v1' ? 'ChatGPT programs · 5 calls per actor maximum' : `Seed ${String(this.active.seed)}`} · Read-only archive`;
+      this.feedback.textContent = `${this.active.id} · ${String(this.active.steps + 1)} frames${this.active.schedule ? ` · ${String(this.active.totalActions)} actions` : ''} · ${this.active.schedule === 'learning-v1' ? 'Survival-driven skills · 12 calls per actor maximum' : this.active.schedule === 'survival-v1' ? 'ChatGPT programs · 5 calls per actor maximum' : `Seed ${String(this.active.seed)}`} · Read-only archive`;
     } else {
       this.chart.removeAttribute('href');
       this.feedback.textContent =
@@ -203,7 +206,10 @@ export class ExperimentBrowser {
             .reduce(
               (count, frame) =>
                 count +
-                (frame.survival?.events.length ?? frame.events?.length ?? 0),
+                (frame.learning?.events.length ??
+                  frame.survival?.events.length ??
+                  frame.events?.length ??
+                  0),
               0,
             ) !== entry.totalActions)
       )

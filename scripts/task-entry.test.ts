@@ -116,6 +116,44 @@ afterEach(() => {
 });
 
 describe('mandatory task entry', () => {
+  it('binds learning continuation to its mode, existing allocation and leased stage', () => {
+    c.step = 'experiment';
+    c.intent = {
+      ...c.intent,
+      experiment: {
+        mode: 'learning',
+        allocation: 'new',
+        basis: c.intent.delivery.basis,
+      },
+    };
+    c.experiment = { phase: 'started', before: [], id: 'ex4' };
+    save();
+    expect(legacyArguments(root, 'learning', [])).toEqual([
+      'next',
+      c.intent.id,
+    ]);
+    expect(requireTaskWorker(root, 'learning', [], env()).experiment?.id).toBe(
+      'ex4',
+    );
+    expect(() => requireTaskWorker(root, 'learning', ['ex5'], env())).toThrow(
+      'does not match',
+    );
+    expect(() =>
+      requireTaskWorker(root, 'random', ['42', '60'], env()),
+    ).toThrow('parameters');
+    c.step = 'development';
+    save();
+    expect(() => requireTaskWorker(root, 'learning', [], env())).toThrow(
+      'executing task step',
+    );
+    expect(() =>
+      parseIntent({
+        ...c.intent,
+        experiment: { ...c.intent.experiment, rounds: 99 },
+      }),
+    ).toThrow('fixed protocol');
+  });
+
   it('routes old harness/review/finish/publication to the same context without a merge switch', () => {
     expect(legacyArguments(root, 'harness', ['next', c.intent.id])).toEqual([
       'next',
@@ -267,6 +305,7 @@ describe('mandatory task entry', () => {
     ['validate.ts', 'review', 'Fixture entry'],
     ['experiment-cli.ts', 'run'],
     ['survival-cli.ts'],
+    ['learning-cli.ts'],
   ])(
     'rejects raw %s before credentials, allocation or accepting evidence',
     (...args) => {

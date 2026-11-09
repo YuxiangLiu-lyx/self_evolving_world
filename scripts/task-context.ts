@@ -15,7 +15,7 @@ export type MergeAuthority =
 export type ExperimentIntent =
   | { readonly mode: 'none' }
   | {
-      readonly mode: 'random' | 'survival';
+      readonly mode: 'random' | 'survival' | 'learning';
       readonly allocation: 'new' | 'reuse';
       readonly basis: Basis;
       readonly id?: string;
@@ -37,6 +37,7 @@ export interface TaskIntent {
 export type Step =
   | 'prepare'
   | 'experiment'
+  | 'development'
   | 'analysis'
   | 'validate'
   | 'review'
@@ -184,7 +185,7 @@ export function parseIntent(value: unknown): TaskIntent {
   )
     throw new Error('Invalid requirements version.');
   const e = object(v.experiment);
-  const mode = choice(e.mode, ['none', 'random', 'survival']);
+  const mode = choice(e.mode, ['none', 'random', 'survival', 'learning']);
   keys(
     e,
     mode === 'none'
@@ -196,8 +197,11 @@ export function parseIntent(value: unknown): TaskIntent {
     const allocation = choice(e.allocation, ['new', 'reuse']);
     if (allocation === 'new' && e.id !== undefined)
       throw new Error('New experiment IDs are allocated by the existing CLI.');
-    if (mode === 'survival' && (e.seed !== undefined || e.rounds !== undefined))
-      throw new Error('Survival uses the existing fixed protocol.');
+    if (
+      (mode === 'survival' || mode === 'learning') &&
+      (e.seed !== undefined || e.rounds !== undefined)
+    )
+      throw new Error('Model experiments use their recorded fixed protocol.');
     if (
       e.seed !== undefined &&
       (typeof e.seed !== 'number' ||
