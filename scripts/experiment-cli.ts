@@ -15,7 +15,7 @@ import {
   allocateExperiment,
   checkExperiments,
   digest,
-  EXPERIMENT_FILES,
+  experimentFiles,
   measureSynchronous,
   readExperiment,
   writeExperimentJson,
@@ -42,7 +42,7 @@ function captureRecord(id: string, manifest: Record<string, unknown>): void {
       ...manifest,
       status: 'completed',
       artifacts: Object.fromEntries(
-        EXPERIMENT_FILES.map((file) => [
+        experimentFiles(manifest).map((file) => [
           file,
           digest(resolve(directory, file)),
         ]),
@@ -79,7 +79,7 @@ try {
       status: 'running',
       captureFailures: [
         ...previousFailures,
-        manifest.error ?? 'Interrupted capture',
+        ...(typeof manifest.error === 'string' ? [manifest.error] : []),
       ],
     };
     delete resumed.error;

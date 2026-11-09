@@ -1,0 +1,190 @@
+{
+  "format": "self-evolving-world/replay",
+  "version": 3,
+  "coreVersion": "1",
+  "schedule": "survival-v1",
+  "initial": {
+    "settings": {
+      "width": 16,
+      "height": 12,
+      "visionRadius": 4
+    },
+    "agents": [
+      {
+        "id": "lin",
+        "name": "Lin",
+        "position": {
+          "x": 2,
+          "y": 3
+        }
+      },
+      {
+        "id": "moss",
+        "name": "Moss",
+        "position": {
+          "x": 8,
+          "y": 5
+        }
+      },
+      {
+        "id": "sol",
+        "name": "Sol",
+        "position": {
+          "x": 12,
+          "y": 8
+        }
+      }
+    ],
+    "items": [
+      {
+        "id": "wood",
+        "name": "Wood",
+        "position": {
+          "x": 3,
+          "y": 3
+        }
+      },
+      {
+        "id": "stone",
+        "name": "Stone",
+        "position": {
+          "x": 5,
+          "y": 2
+        }
+      },
+      {
+        "id": "berry",
+        "name": "Berry",
+        "position": {
+          "x": 8,
+          "y": 4
+        }
+      },
+      {
+        "id": "crystal",
+        "name": "Crystal",
+        "position": {
+          "x": 11,
+          "y": 8
+        }
+      },
+      {
+        "id": "seed",
+        "name": "Seed",
+        "position": {
+          "x": 13,
+          "y": 3
+        }
+      },
+      {
+        "id": "water",
+        "name": "Water",
+        "position": {
+          "x": 3,
+          "y": 8
+        }
+      }
+    ]
+  },
+  "survival": {
+    "version": "survival-v1",
+    "temperature": 22,
+    "satietyLoss": 0.5,
+    "exposureRate": 2,
+    "recoveryRate": 1,
+    "damage": 2,
+    "initial": {
+      "satiety": 100,
+      "cold": 0,
+      "heat": 0,
+      "health": 100
+    }
+  },
+  "programs": [
+    {
+      "agentId": "lin",
+      "tick": 0,
+      "call": 1,
+      "code": "learn(\"shelter\"); move(\"east\", 1); pickup(\"wood\"); move(\"east\", 2); move(\"north\", 1); pickup(\"stone\"); wait(8);",
+      "summary": "Exercise the required learning diagnostic, collect both visible items, and remain safely at 22°C for a 15-round program."
+    },
+    {
+      "agentId": "moss",
+      "tick": 0,
+      "call": 1,
+      "code": "learn(\"shelter\"); move(\"north\", 1); pickup(\"berry\"); wait(12);",
+      "summary": "Exercise the required learning diagnostic, collect the nearby berry, and remain safely idle in mild conditions for a 15-round program."
+    },
+    {
+      "agentId": "sol",
+      "tick": 0,
+      "call": 1,
+      "code": "learn(\"shelter\"); move(\"west\", 1); pickup(\"crystal\"); wait(12);",
+      "summary": "Exercise the required learning diagnostic, collect the nearby crystal, then wait in safe temperatures for a 15-round program."
+    },
+    {
+      "agentId": "lin",
+      "tick": 15,
+      "call": 2,
+      "code": "wait(15);",
+      "summary": "Remain safely in place for 15 rounds at 22°C, conserving full health while satiety remains well above the damage threshold."
+    },
+    {
+      "agentId": "moss",
+      "tick": 15,
+      "call": 2,
+      "code": "wait(15);",
+      "summary": "Remain safely idle for 15 rounds at 22°C. Satiety will stay well above the damage threshold, preserving full health."
+    },
+    {
+      "agentId": "sol",
+      "tick": 15,
+      "call": 2,
+      "code": "wait(15);",
+      "summary": "Remain in the safe 22°C conditions for 15 rounds, conserving full health while satiety stays comfortably above the damage threshold."
+    },
+    {
+      "agentId": "lin",
+      "tick": 30,
+      "call": 3,
+      "code": "wait(15);",
+      "summary": "Stay in place for 15 rounds at a safe 22°C. Satiety will decrease to 77.5, remaining safely above the damage threshold, with health preserved at 100."
+    },
+    {
+      "agentId": "moss",
+      "tick": 30,
+      "call": 3,
+      "code": "wait(15);",
+      "summary": "Wait safely for 15 rounds at 22°C, preserving full health while satiety decreases to 77.5."
+    },
+    {
+      "agentId": "sol",
+      "tick": 30,
+      "call": 3,
+      "code": "wait(15);",
+      "summary": "Stay in safe 22°C conditions for 15 rounds. Satiety will fall to 77.5, with health remaining at 100 and no cold or heat exposure."
+    },
+    {
+      "agentId": "lin",
+      "tick": 45,
+      "call": 4,
+      "code": "wait(15);",
+      "summary": "Remain at a safe 22°C for the final 15 rounds. Satiety will fall to 70, with no cold, heat, or starvation damage; health will remain at 100."
+    },
+    {
+      "agentId": "moss",
+      "tick": 45,
+      "call": 4,
+      "code": "wait(15);",
+      "summary": "Remain safely at 22°C for the final 15 rounds, finishing with full health, no exposure, and 70 satiety."
+    },
+    {
+      "agentId": "sol",
+      "tick": 45,
+      "call": 4,
+      "code": "wait(15);",
+      "summary": "Remain in safe 22°C conditions through the final 15 rounds. Satiety will reach 70, while health stays at 100 with no cold or heat exposure."
+    }
+  ],
+  "roundCount": 60
+}

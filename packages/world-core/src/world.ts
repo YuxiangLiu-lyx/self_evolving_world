@@ -75,6 +75,40 @@ export interface Observation {
   readonly agents: readonly AgentSeed[];
   readonly items: readonly GroundItem[];
 }
+/** Opt-in extension data; version-1 worlds never contain this field. */
+export interface VitalSigns {
+  readonly satiety: number;
+  readonly cold: number;
+  readonly heat: number;
+  readonly health: number;
+}
+export interface SurvivalConfig {
+  readonly version: 'survival-v1';
+  readonly temperature: number;
+  readonly satietyLoss: number;
+  readonly exposureRate: number;
+  readonly recoveryRate: number;
+  readonly damage: number;
+  readonly initial: VitalSigns;
+}
+export type SurvivalAction =
+  | WorldAction
+  | { readonly type: 'wait'; readonly agentId: string }
+  | {
+      readonly type: 'learn';
+      readonly agentId: string;
+      readonly skill: string;
+    };
+export interface SurvivalEvent {
+  readonly tick: number;
+  readonly action: SurvivalAction;
+  readonly outcome: Outcome | 'waited' | 'learning-denied' | 'dead';
+}
+export interface SurvivalData {
+  readonly config: SurvivalConfig;
+  readonly vitals: Readonly<Record<string, VitalSigns>>;
+  readonly events: readonly SurvivalEvent[];
+}
 export interface WorldState {
   readonly tick: number;
   readonly rules: typeof CORE_RULES;
@@ -85,6 +119,7 @@ export interface WorldState {
   readonly event: WorldEvent | null;
   /** Present only for the separately versioned simultaneous-round extension. */
   readonly events?: readonly WorldEvent[];
+  readonly survival?: SurvivalData;
 }
 
 const DIRECTIONS: Readonly<Record<Direction, Position>> = Object.freeze({
@@ -365,16 +400,27 @@ export function stepWorldRound(
     inputs.length !== state.agents.length
   )
     throw new RangeError('A round requires exactly one action per agent.');
+  return resolveRound(state, inputs);
+}
+
+/** Internal extension primitive: omitted actors stay still and retain occupancy. */
+export function resolveRound(
+  state: WorldState,
+  inputs: readonly WorldAction[],
+): WorldState {
+  integer(state.tick, 0, Number.MAX_SAFE_INTEGER - 1, 'tick');
   const actions = inputs.map((input: unknown) => parseWorldAction(input));
   const byActor = new Map(actions.map((action) => [action.agentId, action]));
   if (
-    byActor.size !== state.agents.length ||
-    state.agents.some((agent) => !byActor.has(agent.id))
+    byActor.size !== actions.length ||
+    actions.some(
+      (action) => !state.agents.some((agent) => agent.id === action.agentId),
+    )
   )
     throw new RangeError('A round requires each known agent exactly once.');
   const candidates = state.agents.map((actor) => {
     const action = byActor.get(actor.id);
-    if (action === undefined) throw new RangeError('Missing round action.');
+    if (action === undefined) return { actor, agent: actor, event: null };
     const candidate = stepWorld(state, action);
     const agent = candidate.agents.find((entry) => entry.id === actor.id);
     if (agent === undefined || candidate.event === null)
@@ -383,7 +429,7 @@ export function stepWorldRound(
   });
   const targets = new Map<string, number>();
   for (const { agent, event } of candidates) {
-    if (event.outcome === 'moved') {
+    if (event?.outcome === 'moved') {
       const key = `${String(agent.position.x)},${String(agent.position.y)}`;
       targets.set(key, (targets.get(key) ?? 0) + 1);
     }
@@ -391,6 +437,7 @@ export function stepWorldRound(
   const events: WorldEvent[] = [];
   const collected = new Set<string>();
   const agents = candidates.map(({ actor, agent, event }) => {
+    if (event === null) return actor;
     const key = `${String(agent.position.x)},${String(agent.position.y)}`;
     if (event.outcome === 'moved' && (targets.get(key) ?? 0) > 1) {
       events.push(Object.freeze({ ...event, outcome: 'occupied' }));

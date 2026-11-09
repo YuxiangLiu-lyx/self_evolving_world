@@ -30,6 +30,7 @@ import {
   synchronousReport,
   synchronousChart,
 } from './synchronous-analysis.js';
+import { measureSurvival, SURVIVAL_POLICY } from './survival-analysis.js';
 
 export const EXPERIMENT_SCENES = [
   'initial',
@@ -37,6 +38,13 @@ export const EXPERIMENT_SCENES = [
   'final',
   'overview',
 ] as const;
+export function experimentFiles(
+  manifest: Record<string, unknown>,
+): readonly string[] {
+  return manifest.version === 3
+    ? [...EXPERIMENT_FILES, 'model-calls.json']
+    : EXPERIMENT_FILES;
+}
 export const EXPERIMENT_FILES = [
   'replay.json',
   'results.json',
@@ -103,9 +111,9 @@ export function allocateExperiment(root: string): string {
 export interface ExperimentConfig {
   readonly id: string;
   readonly objective: string;
-  readonly seed: number;
+  readonly seed?: number;
   readonly steps: number;
-  readonly schedule?: typeof ROUND_SCHEDULE;
+  readonly schedule?: typeof ROUND_SCHEDULE | 'survival-v1';
   readonly totalActions?: number;
 }
 
@@ -145,6 +153,14 @@ export function readExperiment(root: string, id: string, pending = false) {
   const directory = resolve(root, 'experiment', id);
   if (!lstatSync(directory).isDirectory())
     throw new Error('Experiment directory cannot be a symlink.');
+  const manifestPath = resolve(directory, 'manifest.json');
+  if (
+    !lstatSync(manifestPath).isFile() ||
+    lstatSync(manifestPath).size > 2_000_000
+  )
+    throw new Error('Invalid experiment manifest file.');
+  const manifest = jsonObject(readExperimentJson(manifestPath));
+  const files = experimentFiles(manifest);
   const required = pending
     ? [
         'manifest.json',
@@ -152,16 +168,14 @@ export function readExperiment(root: string, id: string, pending = false) {
         'results.json',
         'report.md',
         'overview.svg',
+        ...(manifest.version === 3 ? ['model-calls.json'] : []),
       ]
-    : ['manifest.json', ...EXPERIMENT_FILES];
+    : ['manifest.json', ...files];
   for (const file of required) {
     const path = resolve(directory, file);
     if (!lstatSync(path).isFile() || lstatSync(path).size > 2_000_000)
       throw new Error(`Missing, oversized or non-file artifact: ${id}/${file}`);
   }
-  const manifest = jsonObject(
-    readExperimentJson(resolve(directory, 'manifest.json')),
-  );
   if (
     manifest.format !== 'self-evolving-world/experiment' ||
     !(
@@ -170,11 +184,19 @@ export function readExperiment(root: string, id: string, pending = false) {
         manifest.schedule === undefined) ||
       (manifest.version === 2 &&
         manifest.policy === SYNCHRONOUS_POLICY &&
-        manifest.schedule === ROUND_SCHEDULE)
+        manifest.schedule === ROUND_SCHEDULE) ||
+      (manifest.version === 3 &&
+        manifest.policy === SURVIVAL_POLICY &&
+        manifest.schedule === 'survival-v1')
     ) ||
     manifest.id !== id ||
-    manifest.controller !== 'seeded-random' ||
-    manifest.externalModelCalls !== 0
+    (manifest.version === 3
+      ? manifest.controller !== 'chatgpt-plan' ||
+        typeof manifest.externalModelCalls !== 'number' ||
+        manifest.externalModelCalls < 3 ||
+        manifest.externalModelCalls > 15
+      : manifest.controller !== 'seeded-random' ||
+        manifest.externalModelCalls !== 0)
   )
     throw new Error(`Invalid experiment identity or policy: ${id}`);
   if (
@@ -195,9 +217,14 @@ export function readExperiment(root: string, id: string, pending = false) {
     throw new Error(
       'Experiment objective must be a single paragraph of 20-1000 characters.',
     );
-  if (typeof seed !== 'number' || typeof steps !== 'number')
+  if (
+    typeof steps !== 'number' ||
+    (manifest.version === 3
+      ? seed !== undefined || steps !== 60
+      : typeof seed !== 'number')
+  )
     throw new Error('Missing numeric experiment parameters.');
-  validateParameters(seed, steps);
+  if (typeof seed === 'number') validateParameters(seed, steps);
   const provenance = jsonObject(manifest.provenance);
   if (
     typeof provenance.revision !== 'string' ||
@@ -210,10 +237,19 @@ export function readExperiment(root: string, id: string, pending = false) {
   )
     throw new Error('Missing experiment provenance.');
   const measurement =
-    manifest.version === 2
-      ? measureSynchronous(id, objective, seed, steps)
-      : measureLegacy(id, objective, seed, steps);
+    manifest.version === 3
+      ? measureSurvival(
+          id,
+          objective,
+          readExperimentJson(resolve(directory, 'replay.json')),
+          readExperimentJson(resolve(directory, 'model-calls.json')),
+        )
+      : manifest.version === 2
+        ? measureSynchronous(id, objective, Number(seed), steps)
+        : measureLegacy(id, objective, Number(seed), steps);
   const { run, results, report, chart } = measurement;
+  if (manifest.externalModelCalls !== results.externalModelCalls)
+    throw new Error('Model call count disagrees with evidence.');
   for (const [file, expected] of [
     ['replay.json', run.replay],
     ['results.json', results],
@@ -234,14 +270,9 @@ export function readExperiment(root: string, id: string, pending = false) {
     if (!isDeepStrictEqual(entries, [...required].sort()))
       throw new Error(`Unexpected experiment artifacts: ${id}`);
     const hashes = jsonObject(manifest.artifacts);
-    if (
-      !isDeepStrictEqual(
-        Object.keys(hashes).sort(),
-        [...EXPERIMENT_FILES].sort(),
-      )
-    )
+    if (!isDeepStrictEqual(Object.keys(hashes).sort(), [...files].sort()))
       throw new Error(`Incomplete artifact manifest: ${id}`);
-    for (const file of EXPERIMENT_FILES) {
+    for (const file of files) {
       if (hashes[file] !== digest(resolve(directory, file)))
         throw new Error(`Artifact hash mismatch: ${id}/${file}`);
     }
@@ -278,11 +309,14 @@ export function readExperiment(root: string, id: string, pending = false) {
     config: {
       id,
       objective,
-      seed,
+      ...(typeof seed === 'number' ? { seed } : {}),
       steps,
-      ...(manifest.version === 2
+      ...(manifest.version === 2 || manifest.version === 3
         ? {
-            schedule: ROUND_SCHEDULE,
+            schedule:
+              manifest.version === 3
+                ? ('survival-v1' as const)
+                : ROUND_SCHEDULE,
             totalActions: steps * (run.frames[0]?.agents.length ?? 0),
           }
         : {}),

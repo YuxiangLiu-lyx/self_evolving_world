@@ -22,6 +22,8 @@ ADRs explain why a design was chosen rather than duplicating module descriptions
 
 - [0011](0011-default-merge-completion.md): default guarded PR merge, explicit task exceptions and independently verified completion.
 
+- [0012](0012-survival-programs.md): bounded ChatGPT plan-funded behavior code, survival-v1, denied learning and version-3 archives.
+
 ## Writing requirements
 
 Each ADR includes its date, decision status (Accepted / Superseded), context, decision, alternatives, reasons, costs, and future consequences. Decision status describes the decision lifecycle, not PRODUCT feature status.

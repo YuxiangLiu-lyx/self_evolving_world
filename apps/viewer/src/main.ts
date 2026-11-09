@@ -1,10 +1,15 @@
-import { isVisible, parseWorldAction } from '@self-evolving-world/world-core';
+import {
+  isVisible,
+  parseWorldAction,
+  parseBehaviorCode,
+} from '@self-evolving-world/world-core';
 import type {
   AgentState,
   Outcome,
   WorldAction,
   WorldState,
   WorldEvent,
+  SurvivalEvent,
 } from '@self-evolving-world/world-core';
 import { createDemoTimeline, DEMO_SETUP } from './scenario.js';
 import { ExperimentBrowser } from './experiments.js';
@@ -55,7 +60,7 @@ let noticeTimer: number | undefined;
 let archivedExperiment: string | undefined;
 let experimentLoading = false;
 
-const outcomes: Record<Outcome, string> = {
+const outcomes: Record<Outcome | SurvivalEvent['outcome'], string> = {
   moved: 'Move succeeded',
   'picked-up': 'Added to inventory',
   'out-of-bounds': 'World boundary reached',
@@ -64,6 +69,9 @@ const outcomes: Record<Outcome, string> = {
   'item-out-of-reach': 'Move onto the item to pick it up',
   'skill-unavailable': 'Skill unavailable; request recorded only',
   'skill-already-exists': 'Skill already exists; use its action control',
+  waited: 'Waited one round',
+  'learning-denied': 'Learning denied; no World Agent',
+  dead: 'Dead; no action executed',
 };
 const directionNames = {
   north: 'north',
@@ -77,12 +85,18 @@ function countLabel(count: number, singular: string): string {
 }
 
 function eventText(frame: WorldState): string {
-  const events = frame.events ?? (frame.event === null ? [] : [frame.event]);
+  const events =
+    frame.survival?.events ??
+    frame.events ??
+    (frame.event === null ? [] : [frame.event]);
   return events.length === 0
     ? 'World created. Every agent has an initial observation.'
     : events.map((event) => actionText(frame, event)).join('\n');
 }
-function actionText(frame: WorldState, event: WorldEvent): string {
+function actionText(
+  frame: WorldState,
+  event: WorldEvent | SurvivalEvent,
+): string {
   const action = event.action;
   const name =
     frame.agents.find((agent) => agent.id === action.agentId)?.name ??
@@ -97,6 +111,12 @@ function actionText(frame: WorldState, event: WorldEvent): string {
       break;
     case 'try':
       verb = `tries "${action.skill}"`;
+      break;
+    case 'wait':
+      verb = 'waits';
+      break;
+    case 'learn':
+      verb = `requests learning "${action.skill}"`;
       break;
   }
   return `${name} ${verb} · ${outcomes[event.outcome]}`;
@@ -226,6 +246,8 @@ function renderMap(frame: WorldState, actor: AgentState | undefined): void {
         token.title = `${agent.name} (${String(x)}, ${String(y)})`;
         token.setAttribute('aria-label', `Observe ${agent.name}`);
         token.dataset.mapAgent = agent.id;
+        if (frame.survival?.vitals[agent.id]?.health === 0)
+          token.classList.add('dead-agent');
         token.addEventListener('click', () => {
           selectedId = agent.id;
           render();
@@ -392,6 +414,65 @@ function renderEvents(): void {
         ]),
   );
 }
+function renderSurvival(
+  frame: WorldState,
+  actor: AgentState | undefined,
+): void {
+  const vital = actor ? frame.survival?.vitals[actor.id] : undefined;
+  element('survival-panel').hidden = vital === undefined;
+  if (!actor || !vital || !frame.survival) return;
+  element('life-status').textContent = vital.health > 0 ? 'Alive' : 'Dead';
+  element('vital-signs').replaceChildren(
+    ...(['health', 'satiety', 'cold', 'heat'] as const).map((key) => {
+      const row = node('div', `vital vital-${key}`);
+      const label = node(
+        'span',
+        'vital-label',
+        key.charAt(0).toUpperCase() + key.slice(1),
+      );
+      const value = node('strong', 'mono', `${String(vital[key])} / 100`);
+      value.dataset.vital = key;
+      const meter = node('meter', 'vital-meter');
+      meter.min = 0;
+      meter.max = 100;
+      meter.value = vital[key];
+      meter.setAttribute('aria-label', key);
+      row.append(label, value, meter);
+      return row;
+    }),
+  );
+  element('survival-environment').textContent =
+    `${String(frame.survival.config.temperature)} °C · Health and satiety: higher is better. Cold and heat: lower is better.`;
+  const programs =
+    history.programs?.filter(
+      (p) => p.agentId === actor.id && p.tick <= frame.tick,
+    ) ?? [];
+  const active = programs.at(-1);
+  const duration = active?.code
+    ? parseBehaviorCode(active.code, actor.id, 60 - active.tick).length
+    : 0;
+  const elapsed = active ? Math.max(0, frame.tick - active.tick) : 0;
+  element('program-status').textContent =
+    `${String(programs.length)} / 5 calls · ${active?.code ? `${String(Math.min(elapsed, duration))} / ${String(duration)} rounds executed${elapsed > duration ? ' · Budget fallback: wait' : ''}` : 'No accepted program · Fallback: wait'}`;
+  element('program-code').textContent = active?.code ?? 'wait(1);';
+  element('program-summary').textContent =
+    active?.summary ?? 'No model program recorded at this frame.';
+  const learning = history.frames
+    .slice(1, cursor + 1)
+    .flatMap((f) => f.survival?.events ?? [])
+    .filter((e) => e.action.agentId === actor.id && e.action.type === 'learn');
+  element('learning-history').replaceChildren(
+    ...(learning.length
+      ? learning.map((event) =>
+          node(
+            'p',
+            'learning-record',
+            `Round ${String(event.tick)} · ${event.action.type === 'learn' ? event.action.skill : ''} · ${outcomes[event.outcome]}`,
+          ),
+        )
+      : [node('p', 'muted', 'No requests yet.')]),
+  );
+}
 function render(): void {
   const frame = frameAt(history, cursor);
   const actor =
@@ -442,6 +523,7 @@ function render(): void {
   element('agent-view').setAttribute('aria-pressed', String(view === 'agent'));
   renderMap(frame, actor);
   renderInspector(frame, actor);
+  renderSurvival(frame, actor);
   renderEvents();
 }
 

@@ -18,6 +18,8 @@ export const REVIEW_SCENES = [
   'experiment-mobile',
   'synchronous-browser',
   'synchronous-mobile',
+  'survival-browser',
+  'survival-mobile',
 ] as const;
 export type ReviewScene = (typeof REVIEW_SCENES)[number];
 

@@ -33,6 +33,7 @@
     "pr:check": "tsx scripts/check-pr.ts",
     "experiment:login": "tsx apps/simulator/src/login.ts",
     "experiment:once": "tsx apps/simulator/src/experiment-cli.ts",
+    "experiment:survival": "pnpm build && tsx scripts/survival-cli.ts",
     "experiment:run": "tsx scripts/experiment-cli.ts run",
     "experiment:check": "tsx scripts/experiment-cli.ts check",
     "harness": "tsx scripts/validate.ts run",
@@ -41,8 +42,9 @@
     "task:review": "tsx scripts/validate.ts review"
   },
   "devDependencies": {
-    "@playwright/test": "1.65.0",
     "@eslint/js": "10.0.1",
+    "@playwright/test": "1.65.0",
+    "@self-evolving-world/world-core": "workspace:*",
     "@types/markdown-it": "14.2.0",
     "@types/node": "24.19.2",
     "dependency-cruiser": "17.4.3",

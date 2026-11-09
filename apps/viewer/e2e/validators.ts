@@ -53,7 +53,7 @@ export async function checkLayout(page: Page): Promise<void> {
     if (document.documentElement.scrollWidth > innerWidth + 1)
       problems.push('Page overflows horizontally');
     for (const node of document.querySelectorAll(
-      'h1, .panel, .topbar, .playback-controls, #current-event, .experiment-browser',
+      'h1, .panel:not([hidden]), .topbar, .playback-controls, #current-event, .experiment-browser',
     )) {
       const rect = node.getBoundingClientRect();
       if (
@@ -66,8 +66,8 @@ export async function checkLayout(page: Page): Promise<void> {
       if (node.scrollWidth > node.clientWidth + 2)
         problems.push(`Clipped content: ${node.className || node.id}`);
     }
-    const panels = [...document.querySelectorAll('.panel')].map((node) =>
-      node.getBoundingClientRect(),
+    const panels = [...document.querySelectorAll('.panel:not([hidden])')].map(
+      (node) => node.getBoundingClientRect(),
     );
     for (const [index, a] of panels.entries()) {
       for (const b of panels.slice(index + 1)) {

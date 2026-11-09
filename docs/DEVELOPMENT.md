@@ -28,7 +28,7 @@ Follow the [numbered experiment workflow](../experiment/README.md) for `pnpm exp
 
 ## Optional model experiment
 
-Follow [One-Round Experiment](ONE_ROUND_EXPERIMENT.md) for `pnpm experiment:login` and `pnpm experiment:once`. These commands are explicit local operations and are excluded from `pnpm check`, demo determinism checks, and CI. Unit tests substitute network transports; they cannot prove live account entitlement or model decision quality. Record real request counts and failed rounds separately, and do not repeat inference automatically to obtain a passing result.
+Follow [One-Round Experiment](ONE_ROUND_EXPERIMENT.md) for `pnpm experiment:login` and `pnpm experiment:once`. These commands are explicit local operations and are excluded from `pnpm check`, demo determinism checks, and CI. Unit tests substitute network transports; they cannot prove live account entitlement or model decision quality. The separately authorized [survival experiment](SURVIVAL_EXPERIMENT.md) uses `pnpm experiment:survival` for a fresh exN with 60 rounds and five attempted calls per actor maximum. It persists attempts before inference and validates saved programs without replaying network calls. Record real request counts and failed rounds separately, and do not repeat inference automatically to obtain a passing result.
 
 ## Debugging failures
 
