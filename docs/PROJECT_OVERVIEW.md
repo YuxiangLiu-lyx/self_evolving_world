@@ -10,7 +10,7 @@ The current focus is a stable, understandable foundation: base rules stay fixed 
 
 The world is a bounded two-dimensional grid, 16×12 by default, with origin `(0, 0)` at the top left. Agents have names, positions, and inventories. Items start on the ground. World dimensions and vision radius are configured at creation and remain fixed.
 
-In the original single-action API, each well-formed action from a known agent advances the logical tick by one. Successful actions, boundary collisions, and unsupported skill attempts all leave records. A tick counts actions, not elapsed seconds. An optional CLI experiment requests one model decision per founding agent and then stops; the browser never starts model requests.
+In the original single-action API, each well-formed action from a known agent advances the logical tick by one. Successful actions, boundary collisions, and unsupported skill attempts all leave records. A tick counts actions, not elapsed seconds. Optional CLI experiments request one model decision per founding agent, or run bounded survival programs for 60 synchronous rounds; the browser never starts model requests.
 
 New offline experiments use the [simultaneous-round extension](SYNCHRONOUS_ROUNDS.md): all agents choose from their own round-start observations and commit together. One tick is one complete round; results distinguish rounds from total actions. Existing single-action demos and ex1 retain their original semantics.
 
@@ -58,9 +58,13 @@ Use **Experiment archive** to select a retained run such as **ex2** or **ex1**. 
 
 Export stores initial conditions and actions. Import reconstructs history under the same rules version. Local session memory is not automatically persisted across refreshes, so export before leaving. Invalid imports or experiment loads preserve the current world. **Demo / local session**, **New world** and valid file imports leave archive mode.
 
+## Bounded survival programs
+
+The [survival-v1 extension](SURVIVAL_EXPERIMENT.md) adds satiety, cold, heat and health. Dangerous values cause continuing damage and death. The model receives only its actor's observation and public rules, writes finite action/duration code, and replans only when that code finishes, at most five requests per actor. Waiting is explicit; every learning request is denied without a World Agent. The mild ex3 run preserves all three actors through 60 rounds. The viewer shows vital values, active code/progress and learning history at each selected frame. Calls and code are retained for offline validation and replay.
+
 ## NPC Agent (Planned)
 
-Existing entities have positions, inventories, and vision. The optional model experiment adds a single decision opportunity per agent to scripts and manual input. Future NPCs would have persistent goals, memory, and a continuous decision loop; those capabilities are outside this experiment.
+Existing entities have positions, inventories, and vision. The optional model experiments add a single decision opportunity or a bounded 60-round program controller to scripts and manual input. Future NPCs would have persistent goals, memory, and a continuous decision loop; those capabilities are outside this experiment.
 
 ## World Agent (Planned)
 
@@ -68,10 +72,10 @@ A future World Agent would assess capability requests for suitability, compatibi
 
 ## Skill Evolution (Planned)
 
-Future requests may become capabilities through specification, review, isolated testing, and versioning. Current `try` actions only record unavailable names. There is no code generation, sandbox, dynamic registration, activation, or rollback. Attempts do not change the base core.
+Future requests may become capabilities through specification, review, isolated testing, and versioning. Current `try` actions only record unavailable names. The survival controller generates only bounded behavior commands, not new skills. There is no skill-code generation, host-code sandbox, dynamic skill registration, activation, or rollback. Attempts do not change the base core.
 
 ## Limitations and next steps
 
 There is no terrain collision, occlusion, diagonal movement, continuous physics, trade, or coordinated autonomous decision-making. The browser stores at most 500 single actions or simultaneous rounds in memory and accepts replay files up to 1 MB. There is no database, autosave, long-running service, or cross-version migration.
 
-Any expansion beyond one round needs a separate decision on goals, scheduling, memory, and account usage. The scripted demo must not be presented as model behavior, and attempts must not execute new code without a separate validation and governance design.
+Any expansion beyond the bounded 60-round protocol needs a separate decision on goals, scheduling, memory and account usage. The scripted demo must not be presented as model behavior, and skill attempts must not execute new capability code without a separate validation and governance design.

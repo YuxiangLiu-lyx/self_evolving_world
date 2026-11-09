@@ -1043,3 +1043,50 @@ fieldset {
   font-size: 10px;
   line-height: 1.8;
 }
+/* Survival history is observational; programs are displayed as text only. */
+.survival-panel {
+  padding: 24px;
+}
+.vital-signs {
+  display: grid;
+  gap: 12px;
+}
+.vital {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  font-size: 12px;
+}
+.vital-meter {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 10px;
+  accent-color: #3d7654;
+}
+.vital-cold .vital-meter {
+  accent-color: #468ba1;
+}
+.vital-heat .vital-meter {
+  accent-color: #c37944;
+}
+.program-code {
+  padding: 12px;
+  border-radius: 6px;
+  background: #183d32;
+  color: #e8eddd;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.7;
+}
+.learning-record {
+  font-size: 12px;
+  line-height: 1.6;
+  border-left: 2px solid #b18c52;
+  padding-left: 10px;
+  overflow-wrap: anywhere;
+}
+.dead-agent {
+  filter: grayscale(1);
+  opacity: 0.55;
+}

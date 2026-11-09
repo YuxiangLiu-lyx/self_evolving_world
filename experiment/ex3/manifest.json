@@ -1,0 +1,32 @@
+{
+  "format": "self-evolving-world/experiment",
+  "version": 3,
+  "id": "ex3",
+  "objective": "Verify ChatGPT plan-funded behavior programs for three agents over 60 synchronous survival rounds, with at most five calls per agent, mild conditions and every learning request denied without a World Agent.",
+  "steps": 60,
+  "schedule": "survival-v1",
+  "policy": "bounded-survival-programs-v1",
+  "controller": "chatgpt-plan",
+  "externalModelCalls": 12,
+  "createdAt": "2026-11-09T05:21:19.324Z",
+  "provenance": {
+    "revision": "159994132e0924adc24f394f6335e6c42e28ba1b",
+    "dirty": true,
+    "node": "v24.22.2",
+    "platform": "darwin"
+  },
+  "status": "completed",
+  "captureFailures": [],
+  "artifacts": {
+    "replay.json": "ecc78443f9b1f6c591d5452c059b7d947649121d60b291f6e98ac5dd352100ae",
+    "results.json": "4d66ad3da622a689525fb1f5da017a40388a1f14d774942af210e8880cc65dbb",
+    "report.md": "14fdd1e48ca9f8f50ead10b1aeb6d6880dbcb651d710be4800df525b073b8941",
+    "overview.svg": "4fe2c7fdd9c5f7b26f6bea6078ac70c63d31216db37988a53a2d484105569072",
+    "browser.json": "5098ad4e108bffc3ee6b904c4d3c6a3a87af561cdd77642d27ace8928f8e5f37",
+    "initial.png": "1d92124d872e34280e6235f4b25cacba08c0bad0973647168601dbdeafbce412",
+    "midpoint.png": "8a33b4ca838d6b55bd4d7f60fe5bb5ee407e7b527c1dc608f3abd8a68a9d099a",
+    "final.png": "775e80d621014a401e26cdcd51fe3f6382fb8e7c01555dd873f092fe2a4ec178",
+    "overview.png": "f84789a7cc60f328ac64540d7921088287c9d8da1830120c7869410c56bbde78",
+    "model-calls.json": "d6c0449ba342a4fd369200ab0b8b43d597be3d57dfa42ca353500a5a0841254a"
+  }
+}

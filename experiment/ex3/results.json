@@ -1,0 +1,1797 @@
+{
+  "status": "completed",
+  "rounds": 60,
+  "totalActions": 180,
+  "framesChecked": 61,
+  "invariantFailures": 0,
+  "externalModelCalls": 12,
+  "calls": {
+    "model": "gpt-6.1-sol",
+    "attempted": 12,
+    "completed": 12,
+    "accepted": 12,
+    "failed": 0,
+    "rejected": 0
+  },
+  "survivors": 3,
+  "deaths": 0,
+  "learningRequests": 3,
+  "unlockedSkills": 0,
+  "worldModelCalls": 0,
+  "collectedItems": 4,
+  "outcomes": {
+    "learning-denied": 3,
+    "moved": 6,
+    "picked-up": 4,
+    "waited": 167
+  },
+  "agents": [
+    {
+      "id": "lin",
+      "name": "Lin",
+      "rounds": 60,
+      "calls": 4,
+      "acceptedPrograms": 4,
+      "modelRounds": 60,
+      "fallbackRounds": 0,
+      "alive": true,
+      "vitals": {
+        "satiety": 70,
+        "cold": 0,
+        "heat": 0,
+        "health": 100
+      },
+      "finalPosition": {
+        "x": 5,
+        "y": 2
+      },
+      "inventory": [
+        {
+          "id": "wood",
+          "name": "Wood"
+        },
+        {
+          "id": "stone",
+          "name": "Stone"
+        }
+      ]
+    },
+    {
+      "id": "moss",
+      "name": "Moss",
+      "rounds": 60,
+      "calls": 4,
+      "acceptedPrograms": 4,
+      "modelRounds": 60,
+      "fallbackRounds": 0,
+      "alive": true,
+      "vitals": {
+        "satiety": 70,
+        "cold": 0,
+        "heat": 0,
+        "health": 100
+      },
+      "finalPosition": {
+        "x": 8,
+        "y": 4
+      },
+      "inventory": [
+        {
+          "id": "berry",
+          "name": "Berry"
+        }
+      ]
+    },
+    {
+      "id": "sol",
+      "name": "Sol",
+      "rounds": 60,
+      "calls": 4,
+      "acceptedPrograms": 4,
+      "modelRounds": 60,
+      "fallbackRounds": 0,
+      "alive": true,
+      "vitals": {
+        "satiety": 70,
+        "cold": 0,
+        "heat": 0,
+        "health": 100
+      },
+      "finalPosition": {
+        "x": 11,
+        "y": 8
+      },
+      "inventory": [
+        {
+          "id": "crystal",
+          "name": "Crystal"
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "tick": 1,
+      "action": {
+        "type": "learn",
+        "agentId": "lin",
+        "skill": "shelter"
+      },
+      "outcome": "learning-denied"
+    },
+    {
+      "tick": 1,
+      "action": {
+        "type": "learn",
+        "agentId": "moss",
+        "skill": "shelter"
+      },
+      "outcome": "learning-denied"
+    },
+    {
+      "tick": 1,
+      "action": {
+        "type": "learn",
+        "agentId": "sol",
+        "skill": "shelter"
+      },
+      "outcome": "learning-denied"
+    },
+    {
+      "tick": 2,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 2,
+      "action": {
+        "type": "move",
+        "agentId": "moss",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 2,
+      "action": {
+        "type": "move",
+        "agentId": "sol",
+        "direction": "west"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 3,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "wood"
+      },
+      "outcome": "picked-up"
+    },
+    {
+      "tick": 3,
+      "action": {
+        "type": "pickup",
+        "agentId": "moss",
+        "itemId": "berry"
+      },
+      "outcome": "picked-up"
+    },
+    {
+      "tick": 3,
+      "action": {
+        "type": "pickup",
+        "agentId": "sol",
+        "itemId": "crystal"
+      },
+      "outcome": "picked-up"
+    },
+    {
+      "tick": 4,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 4,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 4,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 5,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "east"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 5,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 5,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 6,
+      "action": {
+        "type": "move",
+        "agentId": "lin",
+        "direction": "north"
+      },
+      "outcome": "moved"
+    },
+    {
+      "tick": 6,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 6,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 7,
+      "action": {
+        "type": "pickup",
+        "agentId": "lin",
+        "itemId": "stone"
+      },
+      "outcome": "picked-up"
+    },
+    {
+      "tick": 7,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 7,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 8,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 8,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 8,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 9,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 9,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 9,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 10,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 10,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 10,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 11,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 11,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 11,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 12,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 12,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 12,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 13,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 13,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 13,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 14,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 14,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 14,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 15,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 15,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 15,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 16,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 16,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 16,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 17,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 17,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 17,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 18,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 18,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 18,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 19,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 19,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 19,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 20,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 20,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 20,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 21,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 21,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 21,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 22,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 22,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 22,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 23,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 23,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 23,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 24,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 24,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 24,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 25,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 25,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 25,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 26,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 26,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 26,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 27,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 27,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 27,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 28,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 28,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 28,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 29,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 29,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 29,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 30,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 30,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 30,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 31,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 31,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 31,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 32,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 32,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 32,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 33,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 33,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 33,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 34,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 34,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 34,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 35,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 35,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 35,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 36,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 36,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 36,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 37,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 37,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 37,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 38,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 38,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 38,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 39,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 39,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 39,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 40,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 40,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 40,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 41,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 41,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 41,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 42,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 42,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 42,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 43,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 43,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 43,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 44,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 44,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 44,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 45,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 45,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 45,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 46,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 46,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 46,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 47,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 47,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 47,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 48,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 48,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 48,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 49,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 49,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 49,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 50,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 50,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 50,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 51,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 51,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 51,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 52,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 52,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 52,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 53,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 53,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 53,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 54,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 54,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 54,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 55,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 55,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 55,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 56,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 56,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 56,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 57,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 57,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 57,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 58,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 58,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 58,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 59,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 59,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 59,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 60,
+      "action": {
+        "type": "wait",
+        "agentId": "lin"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 60,
+      "action": {
+        "type": "wait",
+        "agentId": "moss"
+      },
+      "outcome": "waited"
+    },
+    {
+      "tick": 60,
+      "action": {
+        "type": "wait",
+        "agentId": "sol"
+      },
+      "outcome": "waited"
+    }
+  ],
+  "finalState": {
+    "tick": 60,
+    "rules": {
+      "version": "1",
+      "skills": [
+        "move",
+        "pickup",
+        "try"
+      ],
+      "movement": "one-cardinal-cell",
+      "pickup": "same-cell",
+      "vision": "euclidean-without-occlusion"
+    },
+    "settings": {
+      "width": 16,
+      "height": 12,
+      "visionRadius": 4
+    },
+    "agents": [
+      {
+        "id": "lin",
+        "name": "Lin",
+        "position": {
+          "x": 5,
+          "y": 2
+        },
+        "inventory": [
+          {
+            "id": "wood",
+            "name": "Wood"
+          },
+          {
+            "id": "stone",
+            "name": "Stone"
+          }
+        ]
+      },
+      {
+        "id": "moss",
+        "name": "Moss",
+        "position": {
+          "x": 8,
+          "y": 4
+        },
+        "inventory": [
+          {
+            "id": "berry",
+            "name": "Berry"
+          }
+        ]
+      },
+      {
+        "id": "sol",
+        "name": "Sol",
+        "position": {
+          "x": 11,
+          "y": 8
+        },
+        "inventory": [
+          {
+            "id": "crystal",
+            "name": "Crystal"
+          }
+        ]
+      }
+    ],
+    "items": [
+      {
+        "id": "seed",
+        "name": "Seed",
+        "position": {
+          "x": 13,
+          "y": 3
+        }
+      },
+      {
+        "id": "water",
+        "name": "Water",
+        "position": {
+          "x": 3,
+          "y": 8
+        }
+      }
+    ],
+    "observations": [
+      {
+        "tick": 60,
+        "self": {
+          "id": "lin",
+          "name": "Lin",
+          "position": {
+            "x": 5,
+            "y": 2
+          },
+          "inventory": [
+            {
+              "id": "wood",
+              "name": "Wood"
+            },
+            {
+              "id": "stone",
+              "name": "Stone"
+            }
+          ]
+        },
+        "agents": [
+          {
+            "id": "moss",
+            "name": "Moss",
+            "position": {
+              "x": 8,
+              "y": 4
+            }
+          }
+        ],
+        "items": []
+      },
+      {
+        "tick": 60,
+        "self": {
+          "id": "moss",
+          "name": "Moss",
+          "position": {
+            "x": 8,
+            "y": 4
+          },
+          "inventory": [
+            {
+              "id": "berry",
+              "name": "Berry"
+            }
+          ]
+        },
+        "agents": [
+          {
+            "id": "lin",
+            "name": "Lin",
+            "position": {
+              "x": 5,
+              "y": 2
+            }
+          }
+        ],
+        "items": []
+      },
+      {
+        "tick": 60,
+        "self": {
+          "id": "sol",
+          "name": "Sol",
+          "position": {
+            "x": 11,
+            "y": 8
+          },
+          "inventory": [
+            {
+              "id": "crystal",
+              "name": "Crystal"
+            }
+          ]
+        },
+        "agents": [],
+        "items": []
+      }
+    ],
+    "event": null,
+    "events": [],
+    "survival": {
+      "config": {
+        "version": "survival-v1",
+        "temperature": 22,
+        "satietyLoss": 0.5,
+        "exposureRate": 2,
+        "recoveryRate": 1,
+        "damage": 2,
+        "initial": {
+          "satiety": 100,
+          "cold": 0,
+          "heat": 0,
+          "health": 100
+        }
+      },
+      "vitals": {
+        "lin": {
+          "satiety": 70,
+          "cold": 0,
+          "heat": 0,
+          "health": 100
+        },
+        "moss": {
+          "satiety": 70,
+          "cold": 0,
+          "heat": 0,
+          "health": 100
+        },
+        "sol": {
+          "satiety": 70,
+          "cold": 0,
+          "heat": 0,
+          "health": 100
+        }
+      },
+      "events": [
+        {
+          "tick": 60,
+          "action": {
+            "type": "wait",
+            "agentId": "lin"
+          },
+          "outcome": "waited"
+        },
+        {
+          "tick": 60,
+          "action": {
+            "type": "wait",
+            "agentId": "moss"
+          },
+          "outcome": "waited"
+        },
+        {
+          "tick": 60,
+          "action": {
+            "type": "wait",
+            "agentId": "sol"
+          },
+          "outcome": "waited"
+        }
+      ]
+    }
+  }
+}
