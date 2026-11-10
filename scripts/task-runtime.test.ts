@@ -570,3 +570,118 @@ describe('retained behavioral analysis', () => {
     }).toThrow();
   });
 });
+
+it('routes evolution development through the same coordinator without allocating or repeating a worker', async () => {
+  const { continueEvolutionExecution, newEvolutionExecution } =
+    await import('../apps/simulator/src/evolution-run.js');
+  const { evolutionCheckpoint } = await import('./evolution-files.js');
+  for (const path of [
+    'apps/simulator/src',
+    'packages/world-core/src',
+    'experiment/ex5',
+  ])
+    mkdirSync(resolve(root, path), { recursive: true });
+  const state = await continueEvolutionExecution(
+    newEvolutionExecution('fixture', 'simulated-test'),
+    (role) =>
+      Promise.resolve({
+        decision: {
+          text: JSON.stringify(
+            role === 'ordinary'
+              ? {
+                  code: 'learn({"name":"Examine","purpose":"Understand material properties","target":"Nearby material","conditions":"Within reach","expectedEffect":"Learn properties without creation"});',
+                  summary: 'Offline fixture requests identification.',
+                }
+              : {
+                  needsDevelopment: true,
+                  proposal: {
+                    resources: [],
+                    ecology: [],
+                    mechanics: [],
+                    reviews: [],
+                  },
+                },
+          ),
+          responseId: 'fixture',
+          responseFormat: 'sse',
+        },
+        http: {
+          status: 200,
+          requestId: null,
+          contentType: 'text/event-stream',
+        },
+      }),
+    async () => {},
+  );
+  save('experiment/ex5/manifest.json', {
+    version: 5,
+    status: 'running',
+    provenance: { engineHash: learningEngineHash(root) },
+  });
+  save('experiment/ex5/execution.json', state);
+  const c = makeContext();
+  c.intent = {
+    ...c.intent,
+    experiment: {
+      mode: 'evolution',
+      allocation: 'new',
+      basis: c.intent.delivery.basis,
+    },
+  };
+  c.experiment = { before: [], phase: 'started', id: 'ex5' };
+  const calls: string[][] = [],
+    runtime = new LocalTaskEffects(
+      root,
+      () => {},
+      (args) => {
+        calls.push(args);
+        return { status: 0 };
+      },
+    );
+  expect(await runtime.experiment(c, () => {})).toMatchObject({
+    experiment: 'ex5',
+    barrier: { tick: 0 },
+    schema: 'apps/simulator/src/evolution-run.ts#acceptDevelopment',
+  });
+  expect(await runtime.experiment(c, () => {})).toMatchObject({
+    experiment: 'ex5',
+  });
+  expect(calls).toEqual([]);
+  const b = state.barrier;
+  if (!b) throw Error('Missing saved barrier.');
+  save('validation-results/evolution-development.json', {
+    barrierId: b.id,
+    tick: 0,
+    proposal: {
+      resources: [],
+      ecology: [],
+      mechanics: [],
+      reviews: b.input.requests.map((r) => ({
+        agentId: r.agentId,
+        decision: 'reject',
+        reason: 'Offline test rejects this pending capability.',
+        prerequisites: [],
+        learningRounds: 0,
+        mechanicId: null,
+      })),
+    },
+    notes:
+      'Inspected pending fixture; explicit rejection produces no new resource or skill.',
+  });
+  runtime.submitDevelopment('validation-results/evolution-development.json', c);
+  expect(evolutionCheckpoint(root, 'ex5').rounds).toHaveLength(0);
+  expect(() => {
+    runtime.submitDevelopment(
+      'validation-results/evolution-development.json',
+      c,
+    );
+  }).toThrow('saved barrier');
+  writeFileSync(
+    resolve(root, 'apps/simulator/src/changed.ts'),
+    'export const changed = true;',
+  );
+  await expect(runtime.experiment(c, () => {})).rejects.toThrow(
+    'source changed',
+  );
+  expect(calls).toEqual([]);
+});

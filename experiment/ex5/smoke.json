@@ -1,0 +1,498 @@
+{
+  "format": "self-evolving-world/evolution-smoke",
+  "version": 1,
+  "controller": "simulated-test",
+  "externalModelCalls": 0,
+  "rounds": 12,
+  "checks": [
+    "functional-deduplication",
+    "individual-learning",
+    "finite-pickup-and-consumption",
+    "action-first-metabolism",
+    "safe-batch-completion",
+    "deterministic-reconstruction"
+  ],
+  "programs": [
+    {
+      "agentId": "lin",
+      "tick": 0,
+      "call": 1,
+      "code": "learn({\"name\":\"Direct nourishment\",\"purpose\":\"Consume an owned resource\",\"target\":\"Owned food\",\"conditions\":\"Positive available quantity\",\"expectedEffect\":\"Consume finite food and apply its true properties\"});",
+      "summary": "Simulated smoke fixture: request direct consumption."
+    },
+    {
+      "agentId": "moss",
+      "tick": 0,
+      "call": 1,
+      "code": "learn({\"name\":\"Direct nourishment\",\"purpose\":\"Consume an owned resource\",\"target\":\"Owned food\",\"conditions\":\"Positive available quantity\",\"expectedEffect\":\"Consume finite food and apply its true properties\"});",
+      "summary": "Simulated smoke fixture: request direct consumption."
+    },
+    {
+      "agentId": "sol",
+      "tick": 0,
+      "call": 1,
+      "code": "learn({\"name\":\"Direct nourishment\",\"purpose\":\"Consume an owned resource\",\"target\":\"Owned food\",\"conditions\":\"Positive available quantity\",\"expectedEffect\":\"Consume finite food and apply its true properties\"});",
+      "summary": "Simulated smoke fixture: request direct consumption."
+    },
+    {
+      "agentId": "reed",
+      "tick": 0,
+      "call": 1,
+      "code": "learn({\"name\":\"Direct nourishment\",\"purpose\":\"Consume an owned resource\",\"target\":\"Owned food\",\"conditions\":\"Positive available quantity\",\"expectedEffect\":\"Consume finite food and apply its true properties\"});",
+      "summary": "Simulated smoke fixture: request direct consumption."
+    },
+    {
+      "agentId": "lin",
+      "tick": 1,
+      "call": 2,
+      "code": "move(\"east\",1); pickup(\"forest-fallen\"); use(\"ability-1\",{\"food\":\"forest-fallen\"}); wait(8);",
+      "summary": "Simulated smoke fixture: test consumption and safe batching."
+    },
+    {
+      "agentId": "moss",
+      "tick": 1,
+      "call": 2,
+      "code": "wait(11);",
+      "summary": "Simulated smoke fixture: test consumption and safe batching."
+    },
+    {
+      "agentId": "sol",
+      "tick": 1,
+      "call": 2,
+      "code": "wait(11);",
+      "summary": "Simulated smoke fixture: test consumption and safe batching."
+    },
+    {
+      "agentId": "reed",
+      "tick": 1,
+      "call": 2,
+      "code": "wait(11);",
+      "summary": "Simulated smoke fixture: test consumption and safe batching."
+    }
+  ],
+  "roundsEvidence": [
+    {
+      "actions": [
+        {
+          "type": "learn",
+          "agentId": "lin",
+          "request": {
+            "name": "Direct nourishment",
+            "purpose": "Consume an owned resource",
+            "target": "Owned food",
+            "conditions": "Positive available quantity",
+            "expectedEffect": "Consume finite food and apply its true properties"
+          }
+        },
+        {
+          "type": "learn",
+          "agentId": "moss",
+          "request": {
+            "name": "Direct nourishment",
+            "purpose": "Consume an owned resource",
+            "target": "Owned food",
+            "conditions": "Positive available quantity",
+            "expectedEffect": "Consume finite food and apply its true properties"
+          }
+        },
+        {
+          "type": "learn",
+          "agentId": "sol",
+          "request": {
+            "name": "Direct nourishment",
+            "purpose": "Consume an owned resource",
+            "target": "Owned food",
+            "conditions": "Positive available quantity",
+            "expectedEffect": "Consume finite food and apply its true properties"
+          }
+        },
+        {
+          "type": "learn",
+          "agentId": "reed",
+          "request": {
+            "name": "Direct nourishment",
+            "purpose": "Consume an owned resource",
+            "target": "Owned food",
+            "conditions": "Positive available quantity",
+            "expectedEffect": "Consume finite food and apply its true properties"
+          }
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [
+          {
+            "id": "direct-consumption",
+            "name": "Direct consumption",
+            "description": "Consume one owned food unit",
+            "parameters": [
+              "food"
+            ],
+            "code": "[{\"op\":\"consume\",\"target\":\"food\",\"resource\":null,\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]"
+          }
+        ],
+        "reviews": [
+          {
+            "agentId": "lin",
+            "decision": "create",
+            "reason": "One round of practice in direct consumption.",
+            "prerequisites": [
+              "Owned food"
+            ],
+            "learningRounds": 1,
+            "mechanicId": "direct-consumption"
+          },
+          {
+            "agentId": "moss",
+            "decision": "create",
+            "reason": "One round of practice in direct consumption.",
+            "prerequisites": [
+              "Owned food"
+            ],
+            "learningRounds": 1,
+            "mechanicId": "direct-consumption"
+          },
+          {
+            "agentId": "sol",
+            "decision": "create",
+            "reason": "One round of practice in direct consumption.",
+            "prerequisites": [
+              "Owned food"
+            ],
+            "learningRounds": 1,
+            "mechanicId": "direct-consumption"
+          },
+          {
+            "agentId": "reed",
+            "decision": "create",
+            "reason": "One round of practice in direct consumption.",
+            "prerequisites": [
+              "Owned food"
+            ],
+            "learningRounds": 1,
+            "mechanicId": "direct-consumption"
+          }
+        ]
+      }
+    },
+    {
+      "actions": [
+        {
+          "type": "move",
+          "agentId": "lin",
+          "direction": "east"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        },
+        {
+          "type": "wait",
+          "agentId": "reed"
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [],
+        "reviews": []
+      }
+    },
+    {
+      "actions": [
+        {
+          "type": "pickup",
+          "agentId": "lin",
+          "itemId": "forest-fallen"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        },
+        {
+          "type": "wait",
+          "agentId": "reed"
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [],
+        "reviews": []
+      }
+    },
+    {
+      "actions": [
+        {
+          "type": "use",
+          "agentId": "lin",
+          "skillId": "ability-1",
+          "args": {
+            "food": "forest-fallen"
+          }
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        },
+        {
+          "type": "wait",
+          "agentId": "reed"
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [],
+        "reviews": []
+      }
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        },
+        {
+          "type": "wait",
+          "agentId": "reed"
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [],
+        "reviews": []
+      }
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        },
+        {
+          "type": "wait",
+          "agentId": "reed"
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [],
+        "reviews": []
+      }
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        },
+        {
+          "type": "wait",
+          "agentId": "reed"
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [],
+        "reviews": []
+      }
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        },
+        {
+          "type": "wait",
+          "agentId": "reed"
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [],
+        "reviews": []
+      }
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        },
+        {
+          "type": "wait",
+          "agentId": "reed"
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [],
+        "reviews": []
+      }
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        },
+        {
+          "type": "wait",
+          "agentId": "reed"
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [],
+        "reviews": []
+      }
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        },
+        {
+          "type": "wait",
+          "agentId": "reed"
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [],
+        "reviews": []
+      }
+    },
+    {
+      "actions": [
+        {
+          "type": "wait",
+          "agentId": "lin"
+        },
+        {
+          "type": "wait",
+          "agentId": "moss"
+        },
+        {
+          "type": "wait",
+          "agentId": "sol"
+        },
+        {
+          "type": "wait",
+          "agentId": "reed"
+        }
+      ],
+      "proposal": {
+        "resources": [],
+        "ecology": [],
+        "mechanics": [],
+        "reviews": []
+      }
+    }
+  ],
+  "finalVitals": {
+    "lin": {
+      "health": 100,
+      "satiety": 52,
+      "cold": 0,
+      "heat": 0
+    },
+    "moss": {
+      "health": 100,
+      "satiety": 36,
+      "cold": 0,
+      "heat": 0
+    },
+    "sol": {
+      "health": 100,
+      "satiety": 36,
+      "cold": 0,
+      "heat": 0
+    },
+    "reed": {
+      "health": 100,
+      "satiety": 36,
+      "cold": 0,
+      "heat": 0
+    }
+  }
+}

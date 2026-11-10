@@ -1144,3 +1144,67 @@ fieldset {
 .toxic-detail {
   color: #92583c;
 }
+
+/* Version 5 ecology uses authored symbols and observable appearances only. */
+.map-scale-control {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 10px 16px;
+  font-size: 12px;
+}
+.map-scale-control span {
+  flex-basis: 100%;
+  color: var(--muted);
+}
+.map-scale-control[hidden] {
+  display: none;
+}
+.evolution-map {
+  overflow: auto;
+  max-width: 100%;
+}
+.evolution-map .map-row,
+.evolution-map .x-axis {
+  min-width: var(--map-width, 0px);
+}
+.cell.biome-forest {
+  background: #28513d;
+}
+.cell.biome-grassland {
+  background: #49623c;
+}
+.cell.biome-rocky {
+  background: #515a56;
+}
+.cell.biome-damp {
+  background: #4c455c;
+}
+.cell.biome-bank {
+  background: #7a7350;
+}
+.cell.biome-river {
+  background: #2d5d76;
+}
+.cell.biome-shallow {
+  background: #5f9fa2;
+}
+.evolution-map .cell.visible {
+  box-shadow: inset 0 0 0 1px #d4d29244;
+}
+.evolution-map .agent-token {
+  min-width: 12px;
+  min-height: 12px;
+  z-index: 3;
+}
+.evolution-map .item-count {
+  font-size: 8px;
+}
+.capability-panel .panel-heading {
+  flex-wrap: wrap;
+}
+#world-skill-count {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

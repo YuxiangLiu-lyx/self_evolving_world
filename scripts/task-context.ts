@@ -15,7 +15,7 @@ export type MergeAuthority =
 export type ExperimentIntent =
   | { readonly mode: 'none' }
   | {
-      readonly mode: 'random' | 'survival' | 'learning';
+      readonly mode: 'random' | 'survival' | 'learning' | 'evolution';
       readonly allocation: 'new' | 'reuse';
       readonly basis: Basis;
       readonly id?: string;
@@ -185,7 +185,13 @@ export function parseIntent(value: unknown): TaskIntent {
   )
     throw new Error('Invalid requirements version.');
   const e = object(v.experiment);
-  const mode = choice(e.mode, ['none', 'random', 'survival', 'learning']);
+  const mode = choice(e.mode, [
+    'none',
+    'random',
+    'survival',
+    'learning',
+    'evolution',
+  ]);
   keys(
     e,
     mode === 'none'
@@ -198,7 +204,7 @@ export function parseIntent(value: unknown): TaskIntent {
     if (allocation === 'new' && e.id !== undefined)
       throw new Error('New experiment IDs are allocated by the existing CLI.');
     if (
-      (mode === 'survival' || mode === 'learning') &&
+      (mode === 'survival' || mode === 'learning' || mode === 'evolution') &&
       (e.seed !== undefined || e.rounds !== undefined)
     )
       throw new Error('Model experiments use their recorded fixed protocol.');

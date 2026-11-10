@@ -95,3 +95,7 @@ CI runs the same automated validation on the [canonical repository](https://gith
 ## Learning protocol evidence
 
 Version-4 [learning experiments](SKILL_LEARNING_EXPERIMENT.md) require complete recorded call/input/output correspondence, bounded attempts, the exact round barrier, persisted executable registry and resource-backed survival reconstruction. Development is a task handoff before validation, not approval to bypass it. Tests include exact starvation timing, one-to-four-round learning, functional/same-batch reuse, generated execution, food/toxicity, tool costs/wear, reachable food, private observations, plan interruption and paused resumption. Every completed run receives the existing retained per-agent analysis and full screenshot/semantic review. The all-wait control is explicitly offline and is not a causal estimate.
+
+## Heterogeneous evolution evidence
+
+Version5 adds `evolution-browser` and `evolution-mobile` to current screenshot review. Its archive reconstructs every retained ordinary/world input and proposal, persistent finite allocations, registry and body transitions. Tests cover zero-stock persistence, generic new resource execution, nutritional conservation, unknown-property isolation, map reachability, safe batching and development resume. The short smoke is explicitly offline and never substitutes for real-model evidence. Scientific failures remain recorded outcomes; archive validity does not assert survival success.

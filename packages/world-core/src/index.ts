@@ -104,3 +104,23 @@ export type {
   LearningCursor,
   LearningRun,
 } from './learning-program.js';
+
+export * from './evolution-types.js';
+export {
+  EVOLUTION_CONFIG,
+  EMPTY_PROPOSAL,
+  parseEvolutionProposal,
+  compileMechanic,
+  seededUnit,
+  BIOMES,
+} from './evolution-schema.js';
+export {
+  createEvolutionWorld,
+  evolutionData,
+  biomeAt,
+  eWalkable,
+  registerEvolution,
+} from './evolution-environment.js';
+export { stepEvolutionRound, parseEvolutionRound } from './evolution.js';
+
+export * from './evolution-program.js';

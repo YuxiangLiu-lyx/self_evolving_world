@@ -35,3 +35,5 @@ For a material change to an accepted decision, create a new ADR and mark the old
 - [0014](0014-enforced-task-entry.md): coordinator-bound legacy commands and version-bound GitHub self-review provenance.
 
 - [0015](0015-survival-driven-skills.md): versioned survival pressure, generated constrained implementations, individual learning and durable round barriers.
+
+- [0016](0016-demand-driven-ecology.md): demand-driven resource definitions, persistent ecology, generic executable mechanics and private experience in version5.

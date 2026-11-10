@@ -78,4 +78,8 @@ Future requests may become capabilities through specification, review, isolated 
 
 The foundation has no terrain collision; learning-v1 adds tree/rock/deep-water blocking. Neither version has occlusion, diagonal movement, continuous physics or trade. The browser stores at most 500 single actions or simultaneous rounds in memory and accepts replay files up to 1 MB. There is no database, autosave, long-running service, or cross-version migration.
 
-Any expansion beyond the bounded 60-round protocol needs a separate decision on goals, scheduling, memory and account usage. The scripted demo must not be presented as model behavior, and skill attempts must not execute new capability code without a separate validation and governance design.
+The bounded 60-round protocol remains unchanged. The separately designed learning-v1 and evolution-v1 extensions specify their own goals, scheduling, memory and account budgets. Further expansion requires another explicit design decision. The scripted demo must not be presented as model behavior, and founding skill attempts never execute extension code.
+
+## Heterogeneous demand-driven worlds
+
+The [evolution-v1 protocol](EVOLUTION_EXPERIMENT.md) separates unknown resource properties from personal discoveries. Four actors share one autonomous prompt in different regions. The World Agent can add resource types, persistent habitat distributions and costed executable compositions, while the kernel enforces finite stock and survival rules. Version5 histories use the same experiment selector and add map scaling, ecological counts and individual identification. Authored primitives bound this prototype; open-ended physics and social communication remain future scope.

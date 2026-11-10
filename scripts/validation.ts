@@ -22,6 +22,8 @@ export const REVIEW_SCENES = [
   'survival-mobile',
   'learning-browser',
   'learning-mobile',
+  'evolution-browser',
+  'evolution-mobile',
 ] as const;
 export type ReviewScene = (typeof REVIEW_SCENES)[number];
 

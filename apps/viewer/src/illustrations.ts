@@ -29,6 +29,8 @@ export function characterIllustration(index: number): SVGSVGElement {
 }
 
 const itemArtwork: Readonly<Record<string, string>> = {
+  mushroom:
+    '<path fill="#e9d6ab" d="M20 23h9l3 20H17z"/><path fill="#c4a07a" stroke="#f3dbac" stroke-width="2" d="M4 25Q6 2 24 4q18-2 20 21z"/><circle cx="16" cy="16" r="3" fill="#efdcba"/><circle cx="31" cy="14" r="3" fill="#efdcba"/>',
   wood: '<path d="M9 34 28 13l12 9-19 21z" fill="#a77745" stroke="#efcb8e" stroke-width="2"/><path d="m14 32 17-17m-9 23 15-16" stroke="#6c4b31" stroke-width="2"/><ellipse cx="15" cy="36" rx="8" ry="6" transform="rotate(40 15 36)" fill="#dfb776"/><ellipse cx="15" cy="36" rx="4" ry="3" transform="rotate(40 15 36)" fill="none" stroke="#9c713f" stroke-width="2"/>',
   stone:
     '<path d="m5 33 7-17 17-8 13 13-2 17-25 4z" fill="#a3b8bb" stroke="#dbe8df" stroke-width="2"/><path d="m12 16 11 12 19-7M23 28l-8 14" fill="none" stroke="#6d8b94" stroke-width="3"/><path d="m12 16 17-8-6 20" fill="#c6d5cf"/>',
