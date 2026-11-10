@@ -1,4 +1,8 @@
 import {
+  evolutionCheckpoint,
+  submitEvolutionDevelopment,
+} from './evolution-files.js';
+import {
   learningCheckpoint,
   submitLearningDevelopment,
 } from './learning-files.js';
@@ -189,9 +193,11 @@ export class LocalTaskEffects implements TaskEffects {
                 String(intent.seed ?? DEFAULT_SEED),
                 String(intent.rounds ?? DEFAULT_ROUNDS),
               ]
-            : intent.mode === 'learning'
-              ? ['experiment:learning']
-              : ['experiment:survival'],
+            : intent.mode === 'evolution'
+              ? ['experiment:evolution']
+              : intent.mode === 'learning'
+                ? ['experiment:learning']
+                : ['experiment:survival'],
         );
       } catch (error) {
         c.experiment.error =
@@ -219,7 +225,16 @@ export class LocalTaskEffects implements TaskEffects {
       save();
     }
     const id = text(journal.id, 'allocated experiment');
-    if (intent.mode === 'learning' && intent.allocation === 'new') {
+    if (
+      (intent.mode === 'learning' || intent.mode === 'evolution') &&
+      intent.allocation === 'new'
+    ) {
+      const checkpointReader =
+        intent.mode === 'evolution' ? evolutionCheckpoint : learningCheckpoint;
+      const command =
+        intent.mode === 'evolution'
+          ? 'experiment:evolution'
+          : 'experiment:learning';
       if (journal.phase === 'recorded') {
         readExperiment(this.root, id);
         return;
@@ -233,19 +248,19 @@ export class LocalTaskEffects implements TaskEffects {
         save();
         return;
       }
-      let checkpoint = learningCheckpoint(this.root, id);
+      let checkpoint = checkpointReader(this.root, id);
       if (checkpoint.phase === 'running') {
-        this.command(c, ['experiment:learning']);
-        checkpoint = learningCheckpoint(this.root, id);
+        this.command(c, [command]);
+        checkpoint = checkpointReader(this.root, id);
       }
       if (checkpoint.phase === 'development')
         return {
           experiment: id,
           barrier: checkpoint.barrier,
-          schema: 'apps/simulator/src/learning-run.ts#acceptDevelopment',
+          schema: `apps/simulator/src/${intent.mode}-run.ts#acceptDevelopment`,
         };
       // A completed simulation may have stopped before derived artifacts were saved.
-      this.command(c, ['experiment:learning']);
+      this.command(c, [command]);
       const record = readExperiment(this.root, id, true);
       if (record.manifest.status !== 'completed')
         this.command(c, ['experiment:resume', '--', id]);
@@ -261,7 +276,8 @@ export class LocalTaskEffects implements TaskEffects {
           record.manifest.seed !== (intent.seed ?? DEFAULT_SEED) ||
           record.manifest.steps !== (intent.rounds ?? DEFAULT_ROUNDS))) ||
       (intent.mode === 'survival' && record.manifest.version !== 3) ||
-      (intent.mode === 'learning' && record.manifest.version !== 4)
+      (intent.mode === 'learning' && record.manifest.version !== 4) ||
+      (intent.mode === 'evolution' && record.manifest.version !== 5)
     )
       throw new Error(
         'Allocated experiment disagrees with the recorded protocol/parameters.',
@@ -280,16 +296,16 @@ export class LocalTaskEffects implements TaskEffects {
   }
   submitDevelopment(file: string, c: TaskContext): void {
     if (
-      c.intent.experiment.mode !== 'learning' ||
+      !['learning', 'evolution'].includes(c.intent.experiment.mode) ||
       !c.experiment?.id ||
       c.experiment.phase !== 'started'
     )
       throw new Error('No learning development is pending.');
-    submitLearningDevelopment(
-      this.root,
-      c.experiment.id,
-      readJson(this.inputFile(file)),
-    );
+    const submit =
+      c.intent.experiment.mode === 'evolution'
+        ? submitEvolutionDevelopment
+        : submitLearningDevelopment;
+    submit(this.root, c.experiment.id, readJson(this.inputFile(file)));
   }
   analysisReady(id: string, c: TaskContext): boolean {
     try {

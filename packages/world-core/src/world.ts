@@ -1,3 +1,4 @@
+import type { EvolutionData } from './evolution-types.js';
 import type { LearningData } from './learning-types.js';
 /** All base-world rules live here. No I/O, model calls or mutable skill registry. */
 export const CORE_RULES = Object.freeze({
@@ -122,6 +123,7 @@ export interface WorldState {
   readonly events?: readonly WorldEvent[];
   readonly survival?: SurvivalData;
   readonly learning?: LearningData;
+  readonly evolution?: EvolutionData;
 }
 
 const DIRECTIONS: Readonly<Record<Direction, Position>> = Object.freeze({

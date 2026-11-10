@@ -33,6 +33,7 @@
     "pr:check": "tsx scripts/check-pr.ts",
     "experiment:login": "tsx apps/simulator/src/login.ts",
     "experiment:once": "tsx apps/simulator/src/experiment-cli.ts",
+    "experiment:evolution": "tsx scripts/task-entry.ts evolution",
     "experiment:learning": "tsx scripts/task-entry.ts learning",
     "experiment:survival": "tsx scripts/task-entry.ts survival",
     "experiment:run": "tsx scripts/task-entry.ts random",

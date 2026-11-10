@@ -59,3 +59,7 @@ Base world behavior stays in `world.ts`. Rule changes require explicit versionin
 ## Survival-driven learning experiments
 
 Record the explicitly authorized [learning protocol](SKILL_LEARNING_EXPERIMENT.md) as `experiment.mode: "learning"` in the unified task. The guarded `pnpm experiment:learning` entry continues the same state machine; development handoffs return to the current conversation. Offline test providers and deterministic controls never establish live model success. Old survival-v1 commands, budgets and archives are unchanged.
+
+## Heterogeneous evolution experiments
+
+Record the [version5 protocol](EVOLUTION_EXPERIMENT.md) as `experiment.mode: "evolution"`, allocation `new`, with its actual user authorization. `pnpm experiment:evolution` continues that same task. A short offline smoke precedes allocation and real inference; do not change core/simulator source during a saved live run. Existing full verification, analysis, PR and authorized merge gates apply.

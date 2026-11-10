@@ -1,4 +1,10 @@
 import {
+  decorateEvolutionCell,
+  renderEvolutionPanel,
+  evolutionEventText,
+  evolutionIcon,
+} from './evolution-view.js';
+import {
   isVisible,
   parseWorldAction,
   parseBehaviorCode,
@@ -90,6 +96,7 @@ function countLabel(count: number, singular: string): string {
 }
 
 function eventText(frame: WorldState): string {
+  if (frame.evolution) return evolutionEventText(frame);
   if (frame.learning) return learningEventText(frame);
   const events =
     frame.survival?.events ??
@@ -225,7 +232,10 @@ function renderMap(frame: WorldState, actor: AgentState | undefined): void {
         'aria-label',
         fog ? 'Unobserved area' : `Cell ${String(x)}, ${String(y)}`,
       );
-      if (!fog) decorateLearningCell(cell, frame, { x, y });
+      if (!fog) {
+        decorateLearningCell(cell, frame, { x, y });
+        decorateEvolutionCell(cell, frame, { x, y });
+      }
       const agent = agents.find(
         (candidate) => candidate.position.x === x && candidate.position.y === y,
       );
@@ -237,21 +247,31 @@ function renderMap(frame: WorldState, actor: AgentState | undefined): void {
         const material = frame.learning?.environment.resources.find(
           (r) => r.id === ground[0]?.id,
         );
-        const icon = material
-          ? (
-              {
-                fruit: 'berry',
-                'poison-fruit': 'berry',
-                branch: 'wood',
-                timber: 'wood',
-                stone: 'stone',
-                fish: 'water',
-                rod: 'wood',
-                axe: 'stone',
-              } as const
-            )[material.kind]
-          : (ground[0]?.id ?? '');
+        const evolved = frame.evolution?.stacks.find(
+          (s) => s.id === ground[0]?.id,
+        );
+        const evolvedType = frame.evolution?.types.find(
+          (t) => t.id === evolved?.type,
+        );
+        const icon = evolvedType
+          ? evolutionIcon(evolvedType.appearance)
+          : material
+            ? (
+                {
+                  fruit: 'berry',
+                  'poison-fruit': 'berry',
+                  branch: 'wood',
+                  timber: 'wood',
+                  stone: 'stone',
+                  fish: 'water',
+                  rod: 'wood',
+                  axe: 'stone',
+                } as const
+              )[material.kind]
+            : (ground[0]?.id ?? '');
         token.append(itemIllustration(icon));
+        if (evolved)
+          token.append(node('b', 'item-count', String(evolved.quantity)));
         if (material) {
           token.append(node('b', 'item-count', String(material.quantity)));
           if (material.toxicity > 0) token.classList.add('toxic-resource');
@@ -284,8 +304,11 @@ function renderMap(frame: WorldState, actor: AgentState | undefined): void {
         token.setAttribute('aria-label', `Observe ${agent.name}`);
         token.dataset.mapAgent = agent.id;
         if (
-          (frame.learning?.vitals[agent.id] ?? frame.survival?.vitals[agent.id])
-            ?.health === 0
+          (
+            frame.evolution?.vitals[agent.id] ??
+            frame.learning?.vitals[agent.id] ??
+            frame.survival?.vitals[agent.id]
+          )?.health === 0
         )
           token.classList.add('dead-agent');
         token.addEventListener('click', () => {
@@ -298,6 +321,9 @@ function renderMap(frame: WorldState, actor: AgentState | undefined): void {
     }
   }
   grid.replaceChildren(cells);
+  const surround = grid.closest('.map-surround');
+  surround?.classList.toggle('evolution-map', !!frame.evolution);
+  element('map-scale-control').hidden = !frame.evolution;
   const xAxis = element('x-axis');
   xAxis.style.gridTemplateColumns = `repeat(${String(width)}, 1fr)`;
   xAxis.replaceChildren(
@@ -459,9 +485,11 @@ function renderSurvival(
   actor: AgentState | undefined,
 ): void {
   const vital = actor
-    ? (frame.learning?.vitals[actor.id] ?? frame.survival?.vitals[actor.id])
+    ? (frame.evolution?.vitals[actor.id] ??
+      frame.learning?.vitals[actor.id] ??
+      frame.survival?.vitals[actor.id])
     : undefined;
-  element('capability-panel').hidden = !frame.learning;
+  element('capability-panel').hidden = !frame.learning && !frame.evolution;
   element('survival-panel').hidden = vital === undefined;
   if (!actor || !vital) return;
   element('life-status').textContent = vital.health > 0 ? 'Alive' : 'Dead';
@@ -484,6 +512,10 @@ function renderSurvival(
       return row;
     }),
   );
+  if (frame.evolution) {
+    renderEvolutionPanel(frame, actor, history, cursor);
+    return;
+  }
   if (frame.learning) {
     renderLearningPanel(frame, actor, history, cursor);
     return;
@@ -723,3 +755,10 @@ const experimentBrowser = new ExperimentBrowser(
 );
 render();
 void experimentBrowser.start();
+
+element('map-scale').addEventListener('change', () => {
+  const control = element('map-scale') as HTMLSelectElement;
+  document
+    .querySelector<HTMLElement>('.map-surround')
+    ?.style.setProperty('--map-width', `${control.value}px`);
+});

@@ -1,0 +1,357 @@
+{
+  "resources": [
+    {
+      "id": "fallen-berry",
+      "name": "Golden fallen berry",
+      "appearance": "Small golden skin, soft pulp",
+      "nutrition": 16,
+      "toxicity": 0,
+      "durability": 0
+    },
+    {
+      "id": "ochre-cap",
+      "name": "Ochre-capped mushroom",
+      "appearance": "Ochre cap with fine pale gills",
+      "nutrition": 18,
+      "toxicity": 0,
+      "durability": 0
+    },
+    {
+      "id": "ivory-cap",
+      "name": "Ivory-capped mushroom",
+      "appearance": "Ivory cap with a narrow dark ring",
+      "nutrition": 18,
+      "toxicity": 18,
+      "durability": 0
+    },
+    {
+      "id": "russet-cap",
+      "name": "Russet-capped mushroom",
+      "appearance": "Russet cap with coarse brown gills",
+      "nutrition": 22,
+      "toxicity": 8,
+      "durability": 0
+    },
+    {
+      "id": "branch",
+      "name": "Dry branch",
+      "appearance": "Short dry wooden branch",
+      "nutrition": 0,
+      "toxicity": 0,
+      "durability": 0
+    },
+    {
+      "id": "stone",
+      "name": "Loose stone",
+      "appearance": "Palm-sized rough stone",
+      "nutrition": 0,
+      "toxicity": 0,
+      "durability": 0
+    },
+    {
+      "id": "silver-river-fish",
+      "name": "Silver river fish",
+      "appearance": "Small fish with silvery scales, a dark back, and translucent fins",
+      "nutrition": 24,
+      "toxicity": 3,
+      "durability": 0
+    },
+    {
+      "id": "amber-tree-fruit",
+      "name": "Amber-skinned fruit",
+      "appearance": "Small rounded fruit with amber skin, firm pulp, and a central seed",
+      "nutrition": 14,
+      "toxicity": 0,
+      "durability": 0
+    },
+    {
+      "id": "oval-tree-leaves",
+      "name": "Soft oval leaves",
+      "appearance": "Thin green oval leaves with finely toothed edges and short flexible stems",
+      "nutrition": 5,
+      "toxicity": 0,
+      "durability": 0
+    }
+  ],
+  "ecology": [
+    {
+      "id": "ochre-fungi-damp-beds",
+      "resource": "ochre-cap",
+      "siteKind": "fungus",
+      "biomes": [
+        "damp"
+      ],
+      "distribution": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "reason": "Damp growth beds can support ochre-capped fungi, but unsuitable substrate and patchy fruiting leave some beds empty. Stock is allocated once, constrained by each site's capacity and energy limit, and does not replenish."
+    },
+    {
+      "id": "silver-fish-river-reaches",
+      "resource": "silver-river-fish",
+      "siteKind": "water",
+      "biomes": [
+        "river",
+        "shallow"
+      ],
+      "distribution": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "reason": "River reaches can support small fish, but patchy cover and variable aquatic habitat leave some reaches empty. Allocate stock once within site capacity and energy limits, only where no prior ecological allocation exists; stock does not replenish."
+    },
+    {
+      "id": "amber-fruit-forest-trees",
+      "resource": "amber-tree-fruit",
+      "siteKind": "tree",
+      "biomes": [
+        "forest"
+      ],
+      "distribution": [
+        0,
+        0,
+        1,
+        1,
+        2
+      ],
+      "reason": "Some forest trees bear fruit on reachable low branches; others lack fruit because of species differences or seasonal fruiting. Allocate once only to previously unallocated sites, within capacity and energy limits. Existing branch stock is not converted into fruit. Empty allocations and harvested stock never replenish."
+    },
+    {
+      "id": "oval-leaves-tree-foliage",
+      "resource": "oval-tree-leaves",
+      "siteKind": "tree",
+      "biomes": [
+        "forest",
+        "grassland",
+        "damp"
+      ],
+      "distribution": [
+        0,
+        0,
+        1,
+        1,
+        2
+      ],
+      "reason": "Some trees bear reachable tender foliage of this type; differences in species, leaf maturity, and browsing leave others without a harvestable portion. Allocate once only to previously unallocated sites, within capacity and energy limits. Existing branch stock is unchanged. Previously allocated sites, including empty ones, receive no additional allocation, and harvested foliage does not replenish."
+    }
+  ],
+  "mechanics": [
+    {
+      "id": "foodassessment",
+      "name": "Examine food",
+      "description": "Examine an owned or adjacent stack to learn its true type properties without consuming it. An adjacent natural site can instead be examined to reveal remaining stock. Examination does not prepare food, remove hazards, or establish a preparation recipe.",
+      "parameters": [
+        "target"
+      ],
+      "code": "[{\"op\":\"identify\",\"target\":\"target\",\"resource\":null,\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "identify",
+          "target": "target",
+          "resource": null,
+          "quantity": 1,
+          "costs": [],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"identify\",\"target\":0,\"resource\":null,\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]"
+    },
+    {
+      "id": "eat-food",
+      "name": "Eat food",
+      "description": "Consume one unit from an owned nutritious food stack, applying its actual nutrition and toxicity. Satiety is capped at 100; eating does not heal or remove toxins. This ability does not check safety: examine unfamiliar food before choosing to eat it.",
+      "parameters": [
+        "target"
+      ],
+      "code": "[{\"op\":\"consume\",\"target\":\"target\",\"resource\":null,\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "consume",
+          "target": "target",
+          "resource": null,
+          "quantity": 1,
+          "costs": [],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"consume\",\"target\":0,\"resource\":null,\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]"
+    },
+    {
+      "id": "harvest-ochre-fungi",
+      "name": "Harvest ochre-capped fungi",
+      "description": "Hand-gather one ochre-capped mushroom from the finite remaining stock of an adjacent natural site into owned inventory. Requires matching stock; empty or exhausted sites yield nothing. No tools or additional materials are needed. Harvesting neither consumes the mushroom nor identifies its properties, and does not create or replenish stock.",
+      "parameters": [
+        "target"
+      ],
+      "code": "[{\"op\":\"extract\",\"target\":\"target\",\"resource\":\"ochre-cap\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "extract",
+          "target": "target",
+          "resource": "ochre-cap",
+          "quantity": 1,
+          "costs": [],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"extract\",\"target\":0,\"resource\":\"ochre-cap\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]"
+    },
+    {
+      "id": "hand-catch-river-fish",
+      "name": "Bank hand fishing",
+      "description": "Attempt to catch one small silver river fish within arm's reach at an adjacent water site's margin. This can be attempted from an adjacent bank without entering the river, but bare-handed capture is unreliable: each attempt has a 25% success chance. Requires finite matching stock; empty or exhausted sites yield nothing. Success transfers one fish into owned inventory without consuming it or identifying its properties. Failure spends the round without removing stock.",
+      "parameters": [
+        "target"
+      ],
+      "code": "[{\"op\":\"extract\",\"target\":\"target\",\"resource\":\"silver-river-fish\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":25}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "extract",
+          "target": "target",
+          "resource": "silver-river-fish",
+          "quantity": 1,
+          "costs": [],
+          "tool": null,
+          "chance": 25
+        }
+      ],
+      "signature": "[{\"op\":\"extract\",\"target\":0,\"resource\":\"silver-river-fish\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":25}]"
+    },
+    {
+      "id": "gather-amber-tree-fruit",
+      "name": "Gather reachable tree fruit",
+      "description": "Hand-pick one amber-skinned fruit from the finite matching stock of an adjacent natural site into owned inventory. Requires reachable fruit stock; empty or exhausted sites yield nothing. No tool is required. Gathering does not consume the fruit, identify its properties, or replenish stock.",
+      "parameters": [
+        "target"
+      ],
+      "code": "[{\"op\":\"extract\",\"target\":\"target\",\"resource\":\"amber-tree-fruit\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "extract",
+          "target": "target",
+          "resource": "amber-tree-fruit",
+          "quantity": 1,
+          "costs": [],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"extract\",\"target\":0,\"resource\":\"amber-tree-fruit\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]"
+    },
+    {
+      "id": "gather-fallen-berries",
+      "name": "Gather fallen berries",
+      "description": "Hand-gather one golden fallen berry from an adjacent natural site's finite matching stock into owned inventory. Requires an actual site with accessible berry stock; bare terrain coordinates are not resource sites. Empty or exhausted sites yield nothing. This ability does not create sites, reveal hidden food automatically, replenish resources, identify properties, or consume the gathered berry. No tools or materials are required.",
+      "parameters": [
+        "target"
+      ],
+      "code": "[{\"op\":\"extract\",\"target\":\"target\",\"resource\":\"fallen-berry\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "extract",
+          "target": "target",
+          "resource": "fallen-berry",
+          "quantity": 1,
+          "costs": [],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"extract\",\"target\":0,\"resource\":\"fallen-berry\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]"
+    },
+    {
+      "id": "gather-oval-tree-leaves",
+      "name": "Gather reachable oval leaves",
+      "description": "Hand-gather one portion of soft oval leaves from an adjacent natural site's finite matching stock into owned inventory. Requires actual reachable leaf stock; a leafy appearance alone does not establish availability or food properties. No tools or materials are required. Gathering does not identify or consume the leaves, convert branches into food, or replenish stock.",
+      "parameters": [
+        "target"
+      ],
+      "code": "[{\"op\":\"extract\",\"target\":\"target\",\"resource\":\"oval-tree-leaves\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "extract",
+          "target": "target",
+          "resource": "oval-tree-leaves",
+          "quantity": 1,
+          "costs": [],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"extract\",\"target\":0,\"resource\":\"oval-tree-leaves\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]"
+    }
+  ],
+  "skills": [
+    {
+      "id": "ability-1",
+      "mechanicId": "foodassessment",
+      "name": "Examine food",
+      "description": "Examine an owned or adjacent stack to learn its true type properties without consuming it. An adjacent natural site can instead be examined to reveal remaining stock. Examination does not prepare food, remove hazards, or establish a preparation recipe.",
+      "learningRounds": 2,
+      "version": 1
+    },
+    {
+      "id": "ability-2",
+      "mechanicId": "eat-food",
+      "name": "Eat food",
+      "description": "Consume one unit from an owned nutritious food stack, applying its actual nutrition and toxicity. Satiety is capped at 100; eating does not heal or remove toxins. This ability does not check safety: examine unfamiliar food before choosing to eat it.",
+      "learningRounds": 1,
+      "version": 1
+    },
+    {
+      "id": "ability-3",
+      "mechanicId": "harvest-ochre-fungi",
+      "name": "Harvest ochre-capped fungi",
+      "description": "Hand-gather one ochre-capped mushroom from the finite remaining stock of an adjacent natural site into owned inventory. Requires matching stock; empty or exhausted sites yield nothing. No tools or additional materials are needed. Harvesting neither consumes the mushroom nor identifies its properties, and does not create or replenish stock.",
+      "learningRounds": 2,
+      "version": 1
+    },
+    {
+      "id": "ability-4",
+      "mechanicId": "hand-catch-river-fish",
+      "name": "Bank hand fishing",
+      "description": "Attempt to catch one small silver river fish within arm's reach at an adjacent water site's margin. This can be attempted from an adjacent bank without entering the river, but bare-handed capture is unreliable: each attempt has a 25% success chance. Requires finite matching stock; empty or exhausted sites yield nothing. Success transfers one fish into owned inventory without consuming it or identifying its properties. Failure spends the round without removing stock.",
+      "learningRounds": 4,
+      "version": 1
+    },
+    {
+      "id": "ability-5",
+      "mechanicId": "gather-amber-tree-fruit",
+      "name": "Gather reachable tree fruit",
+      "description": "Hand-pick one amber-skinned fruit from the finite matching stock of an adjacent natural site into owned inventory. Requires reachable fruit stock; empty or exhausted sites yield nothing. No tool is required. Gathering does not consume the fruit, identify its properties, or replenish stock.",
+      "learningRounds": 2,
+      "version": 1
+    },
+    {
+      "id": "ability-6",
+      "mechanicId": "gather-fallen-berries",
+      "name": "Gather fallen berries",
+      "description": "Hand-gather one golden fallen berry from an adjacent natural site's finite matching stock into owned inventory. Requires an actual site with accessible berry stock; bare terrain coordinates are not resource sites. Empty or exhausted sites yield nothing. This ability does not create sites, reveal hidden food automatically, replenish resources, identify properties, or consume the gathered berry. No tools or materials are required.",
+      "learningRounds": 1,
+      "version": 1
+    },
+    {
+      "id": "ability-7",
+      "mechanicId": "gather-oval-tree-leaves",
+      "name": "Gather reachable oval leaves",
+      "description": "Hand-gather one portion of soft oval leaves from an adjacent natural site's finite matching stock into owned inventory. Requires actual reachable leaf stock; a leafy appearance alone does not establish availability or food properties. No tools or materials are required. Gathering does not identify or consume the leaves, convert branches into food, or replenish stock.",
+      "learningRounds": 2,
+      "version": 1
+    }
+  ]
+}

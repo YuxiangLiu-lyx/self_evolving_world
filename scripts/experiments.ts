@@ -1,3 +1,5 @@
+import { evolutionSmoke } from './evolution-smoke.js';
+import { measureEvolution, EVOLUTION_POLICY } from './evolution-analysis.js';
 import { createHash } from 'node:crypto';
 import {
   existsSync,
@@ -42,11 +44,24 @@ export const EXPERIMENT_SCENES = [
 export function experimentFiles(
   manifest: Record<string, unknown>,
 ): readonly string[] {
-  return manifest.version === 4
-    ? [...EXPERIMENT_FILES, 'model-calls.json', 'execution.json', 'skills.json']
-    : manifest.version === 3
-      ? [...EXPERIMENT_FILES, 'model-calls.json']
-      : EXPERIMENT_FILES;
+  return manifest.version === 5
+    ? [
+        ...EXPERIMENT_FILES,
+        'model-calls.json',
+        'execution.json',
+        'skills.json',
+        'smoke.json',
+      ]
+    : manifest.version === 4
+      ? [
+          ...EXPERIMENT_FILES,
+          'model-calls.json',
+          'execution.json',
+          'skills.json',
+        ]
+      : manifest.version === 3
+        ? [...EXPERIMENT_FILES, 'model-calls.json']
+        : EXPERIMENT_FILES;
 }
 export const EXPERIMENT_FILES = [
   'replay.json',
@@ -118,7 +133,8 @@ export interface ExperimentConfig {
   readonly objective: string;
   readonly seed?: number;
   readonly steps: number;
-  readonly schedule?: typeof ROUND_SCHEDULE | 'survival-v1' | 'learning-v1';
+  readonly schedule?:
+    typeof ROUND_SCHEDULE | 'survival-v1' | 'learning-v1' | 'evolution-v1';
   readonly totalActions?: number;
 }
 
@@ -173,16 +189,25 @@ export function readExperiment(root: string, id: string, pending = false) {
         'results.json',
         'report.md',
         'overview.svg',
-        ...(manifest.version === 4
-          ? ['model-calls.json', 'execution.json', 'skills.json']
-          : manifest.version === 3
-            ? ['model-calls.json']
-            : []),
+        ...(manifest.version === 5
+          ? ['model-calls.json', 'execution.json', 'skills.json', 'smoke.json']
+          : manifest.version === 4
+            ? ['model-calls.json', 'execution.json', 'skills.json']
+            : manifest.version === 3
+              ? ['model-calls.json']
+              : []),
       ]
     : ['manifest.json', ...files];
   for (const file of required) {
     const path = resolve(directory, file);
-    if (!lstatSync(path).isFile() || lstatSync(path).size > 2_000_000)
+    if (
+      !lstatSync(path).isFile() ||
+      lstatSync(path).size >
+        (manifest.version === 5 &&
+        ['execution.json', 'model-calls.json'].includes(file)
+          ? 20_000_000
+          : 2_000_000)
+    )
       throw new Error(`Missing, oversized or non-file artifact: ${id}/${file}`);
   }
   if (
@@ -199,21 +224,29 @@ export function readExperiment(root: string, id: string, pending = false) {
         manifest.schedule === 'survival-v1') ||
       (manifest.version === 4 &&
         manifest.policy === LEARNING_POLICY &&
-        manifest.schedule === 'learning-v1')
+        manifest.schedule === 'learning-v1') ||
+      (manifest.version === 5 &&
+        manifest.policy === EVOLUTION_POLICY &&
+        manifest.schedule === 'evolution-v1')
     ) ||
     manifest.id !== id ||
-    (manifest.version === 4
+    (manifest.version === 5
       ? manifest.controller !== 'chatgpt-plan' ||
         typeof manifest.externalModelCalls !== 'number' ||
-        manifest.externalModelCalls < 3 ||
-        manifest.externalModelCalls > 48
-      : manifest.version === 3
+        manifest.externalModelCalls < 4 ||
+        manifest.externalModelCalls > 288
+      : manifest.version === 4
         ? manifest.controller !== 'chatgpt-plan' ||
           typeof manifest.externalModelCalls !== 'number' ||
           manifest.externalModelCalls < 3 ||
-          manifest.externalModelCalls > 15
-        : manifest.controller !== 'seeded-random' ||
-          manifest.externalModelCalls !== 0)
+          manifest.externalModelCalls > 48
+        : manifest.version === 3
+          ? manifest.controller !== 'chatgpt-plan' ||
+            typeof manifest.externalModelCalls !== 'number' ||
+            manifest.externalModelCalls < 3 ||
+            manifest.externalModelCalls > 15
+          : manifest.controller !== 'seeded-random' ||
+            manifest.externalModelCalls !== 0)
   )
     throw new Error(`Invalid experiment identity or policy: ${id}`);
   if (
@@ -236,11 +269,13 @@ export function readExperiment(root: string, id: string, pending = false) {
     );
   if (
     typeof steps !== 'number' ||
-    (manifest.version === 4
-      ? seed !== undefined || steps !== 18
-      : manifest.version === 3
-        ? seed !== undefined || steps !== 60
-        : typeof seed !== 'number')
+    (manifest.version === 5
+      ? seed !== undefined || steps !== 120
+      : manifest.version === 4
+        ? seed !== undefined || steps !== 18
+        : manifest.version === 3
+          ? seed !== undefined || steps !== 60
+          : typeof seed !== 'number')
   )
     throw new Error('Missing numeric experiment parameters.');
   if (typeof seed === 'number') validateParameters(seed, steps);
@@ -256,23 +291,30 @@ export function readExperiment(root: string, id: string, pending = false) {
   )
     throw new Error('Missing experiment provenance.');
   const measurement =
-    manifest.version === 4
-      ? measureLearning(
+    manifest.version === 5
+      ? measureEvolution(
           id,
           objective,
           readExperimentJson(resolve(directory, 'execution.json')),
           readExperimentJson(resolve(directory, 'model-calls.json')),
         )
-      : manifest.version === 3
-        ? measureSurvival(
+      : manifest.version === 4
+        ? measureLearning(
             id,
             objective,
-            readExperimentJson(resolve(directory, 'replay.json')),
+            readExperimentJson(resolve(directory, 'execution.json')),
             readExperimentJson(resolve(directory, 'model-calls.json')),
           )
-        : manifest.version === 2
-          ? measureSynchronous(id, objective, Number(seed), steps)
-          : measureLegacy(id, objective, Number(seed), steps);
+        : manifest.version === 3
+          ? measureSurvival(
+              id,
+              objective,
+              readExperimentJson(resolve(directory, 'replay.json')),
+              readExperimentJson(resolve(directory, 'model-calls.json')),
+            )
+          : manifest.version === 2
+            ? measureSynchronous(id, objective, Number(seed), steps)
+            : measureLegacy(id, objective, Number(seed), steps);
   const { run, results, report, chart } = measurement;
   if (
     manifest.version === 4 &&
@@ -282,6 +324,28 @@ export function readExperiment(root: string, id: string, pending = false) {
     )
   )
     throw new Error('Executable skill registry differs from reconstruction.');
+  if (manifest.version === 5) {
+    if (
+      !isDeepStrictEqual(
+        readExperimentJson(resolve(directory, 'smoke.json')),
+        evolutionSmoke(),
+      )
+    )
+      throw new Error('Offline smoke differs from reconstruction.');
+    const data = run.frames.at(-1)?.evolution;
+    if (
+      !isDeepStrictEqual(
+        readExperimentJson(resolve(directory, 'skills.json')),
+        {
+          resources: data?.types,
+          ecology: data?.ecology,
+          mechanics: data?.mechanics,
+          skills: data?.skills,
+        },
+      )
+    )
+      throw new Error('World registry differs from reconstruction.');
+  }
   if (manifest.externalModelCalls !== results.externalModelCalls)
     throw new Error('Model call count disagrees with evidence.');
   for (const [file, expected] of [
@@ -347,14 +411,17 @@ export function readExperiment(root: string, id: string, pending = false) {
       steps,
       ...(manifest.version === 2 ||
       manifest.version === 3 ||
-      manifest.version === 4
+      manifest.version === 4 ||
+      manifest.version === 5
         ? {
             schedule:
-              manifest.version === 4
-                ? ('learning-v1' as const)
-                : manifest.version === 3
-                  ? ('survival-v1' as const)
-                  : ROUND_SCHEDULE,
+              manifest.version === 5
+                ? ('evolution-v1' as const)
+                : manifest.version === 4
+                  ? ('learning-v1' as const)
+                  : manifest.version === 3
+                    ? ('survival-v1' as const)
+                    : ROUND_SCHEDULE,
             totalActions: steps * (run.frames[0]?.agents.length ?? 0),
           }
         : {}),

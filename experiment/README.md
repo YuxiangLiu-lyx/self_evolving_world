@@ -61,3 +61,7 @@ Store companion records in `experiment/analyses/exN/<task-id>.json` and `.md`, o
 ## Run a skill-learning experiment
 
 Use an explicitly authorized `learning` intent with `allocation: "new"`, then continue the unified task. `pnpm experiment:learning` is its guarded alias. The [version-4 protocol](../docs/SKILL_LEARNING_EXPERIMENT.md) uses three actors, 18 rounds and finite ordinary/world call budgets; it adds `execution.json`, `skills.json` and both prompts in `model-calls.json` to the existing artifacts. A saved development barrier returns to the current conversation and consumes no game time. Resumption never reallocates the ID or repeats accepted decisions. Uncertain calls or changed execution code block continuation. Full checks, actual visual review and the following behavioral analysis remain mandatory.
+
+## Run a heterogeneous evolution experiment
+
+The [version-5 protocol](../docs/EVOLUTION_EXPERIMENT.md) uses an authorized `evolution` intent and the guarded `pnpm experiment:evolution` alias. Four comparable actors share 120 rounds in distinct regions; world proposals can add persistent resource types, one-time ecology and generic executable mechanics. `smoke.json` retains the explicitly simulated preflight; `skills.json` includes resources/ecology/mechanics/skills. The complete private/world ledger, deterministic replay, visuals and twelve-question behavioral analysis retain unsuccessful outcomes. Existing archive preservation, bounded development recovery and delivery gates are unchanged.

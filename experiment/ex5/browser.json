@@ -1,0 +1,20 @@
+{
+  "id": "ex5",
+  "status": "passed",
+  "replayHash": "04a91b3c11801dc38364fc5b0cedd43aa15164e19bd19a2a1edd0ad90f730059",
+  "frameTicks": [
+    0,
+    60,
+    120
+  ],
+  "assertions": [
+    "replay-import",
+    "initial-midpoint-final-state",
+    "all-agent-positions-and-inventories",
+    "historical-controls-disabled",
+    "playback-and-export-invariance",
+    "layout-and-runtime-health",
+    "visuals-decode"
+  ],
+  "errors": []
+}

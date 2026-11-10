@@ -45,11 +45,11 @@ async function inspectState(page: Page, state: WorldState): Promise<void> {
     );
     for (const item of agent.inventory)
       await expect(page.locator('#inventory')).toContainText(item.name);
-    if (state.survival || state.learning) {
+    if (state.survival || state.learning || state.evolution) {
       await expect(page.locator('#survival-panel')).toBeVisible();
       for (const key of ['health', 'satiety', 'cold', 'heat'] as const)
         await expect(page.locator(`[data-vital="${key}"]`)).toHaveText(
-          `${String((state.learning ?? state.survival)?.vitals[agent.id]?.[key])} / 100`,
+          `${String((state.evolution ?? state.learning ?? state.survival)?.vitals[agent.id]?.[key])} / 100`,
         );
       await expect(page.locator('#program-code')).not.toBeEmpty();
     } else await expect(page.locator('#survival-panel')).toBeHidden();
@@ -107,7 +107,8 @@ for (const id of ids) {
         ).toBeDisabled();
       if (config.schedule !== undefined) {
         await expect(page.locator('#tick-unit')).toHaveText('ROUND');
-        for (const event of state.learning?.events ??
+        for (const event of state.evolution?.events ??
+          state.learning?.events ??
           state.survival?.events ??
           state.events ??
           []) {
