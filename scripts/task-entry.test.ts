@@ -307,6 +307,7 @@ describe('mandatory task entry', () => {
     ['survival-cli.ts'],
     ['learning-cli.ts'],
     ['evolution-cli.ts'],
+    ['coevolution-cli.ts'],
   ])(
     'rejects raw %s before credentials, allocation or accepting evidence',
     (...args) => {

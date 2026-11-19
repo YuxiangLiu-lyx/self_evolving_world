@@ -1,0 +1,54 @@
+{
+  "format": "self-evolving-world/experiment",
+  "version": 6,
+  "id": "ex6",
+  "objective": "Observe whether three autonomous actors identify daily problems, request functional capabilities, and obtain sustained or shared benefits through costed world changes over a target of 180 synchronous rounds, retaining unsuccessful outcomes.",
+  "steps": 180,
+  "schedule": "coevolution-v1",
+  "policy": "development-coevolution-v1",
+  "controller": "chatgpt-plan",
+  "externalModelCalls": 71,
+  "createdAt": "2026-11-19T20:23:00.632Z",
+  "status": "completed",
+  "provenance": {
+    "revision": "a47365884b640f293ec316e61a95329b2fd45e24",
+    "dirty": true,
+    "node": "v24.22.2",
+    "platform": "darwin",
+    "engineHash": "d60c44f95a3ab25330de9b78e371b114e04cff0a5c4917d884615c21301cd6ab"
+  },
+  "captureFailures": [
+    "pnpm exec playwright test experiments.spec.ts failed.",
+    "pnpm exec playwright test experiments.spec.ts failed.",
+    "Unexpected experiment artifacts: ex6"
+  ],
+  "sourceArtifacts": [
+    "development-baselines.json",
+    "extension-validation-2-failed-1.txt",
+    "extension-validation-2.txt",
+    "extension-validation-3.txt"
+  ],
+  "artifacts": {
+    "replay.json": "245b165705442611092932fab4a628603d540ff120ea03eeed76cde26c4b34d6",
+    "results.json": "fc7cee5c99107b628a07be3f23d1f7955d68b46178c4168880284378d11be105",
+    "report.md": "ff8d147a542870a296cdd0b813cfd2e1468947246c31378d313a8212c30e16be",
+    "overview.svg": "dcab9f8917994d7c92952f8154b36163c022a8ad967c33015b0aeddc27250a9d",
+    "browser.json": "494e2c813cc316a4fe971ca8d05f2cbe8ba5f8ef62574e81618f45479c7a1f22",
+    "initial.png": "2744e89dd264227c7b13baea3e4f957fd505394158f4da9288e9b6765b3f7597",
+    "midpoint.png": "2f458652009ce61ce0f1a0321a47000918289d3eb73644596d78126f954f312b",
+    "final.png": "2174fc6c87391cbd6680f33510fd74c2b01d1696937ac0fb67f9565bfeed949b",
+    "overview.png": "eb0106d93662fd45fc4b33ac361b46b5a41aa3f9c8f448f5f4ee0412129ac346",
+    "model-calls.json": "e86f481001b2bdcf27a6d0357730feff98848a8257f2030dff99173bfaf42bea",
+    "execution.json": "f6907ed069b94a5816f3ebb2db0f71c0be75a8710d16ec0c7a5d8a9ef39bbad1",
+    "skills.json": "7eb0c27de21b6f65930ebae6d1e375ba559eca885a21a03fde622c3b3df3b419",
+    "preflight.json": "fdc65ab20e9fa66f377bc6ff371594f944e0635654261a672af0ecc9e38dc4f0",
+    "configuration.json": "93581805428bac2cb2e1b697b446a739ef85e3ed1de1e1ca206845498552974c",
+    "checkpoints.json": "0648777a7c9f725f001dc05dfec3605f421e0e2ada626a4800854f98caeaa300",
+    "stages.json": "e6972ca18b6258f360cecacb052916ae4de5275dd6cc8a7a9817d6581e932d03",
+    "source-history.json": "8bf8836b1e061a0cc7bd36cf659403b7b6e06ab816de9c7249699573eb1a8230",
+    "development-baselines.json": "db2e743bdaa6bb3e387df39150e08ef00f61f0d35dcdb61c6f279a3d5cf3b2d8",
+    "extension-validation-2-failed-1.txt": "fdd3530af081e3b28d2c66ab0b2d5ffd2ad91451dbcfa32b88e39a02c0b2a0cf",
+    "extension-validation-2.txt": "77f2b5862fa3c4e2af81244524abc83ca2ab590397cfbdff2af0a553cd5da2b7",
+    "extension-validation-3.txt": "e5b3ae5ceb61a261ea95f20d1b2f3e3455ebd7f87ca00a2bcb3b56bab783ad9e"
+  }
+}

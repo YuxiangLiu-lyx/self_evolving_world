@@ -1,0 +1,30 @@
+
+> self-evolving-world@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world
+> tsc --noEmit && pnpm --filter @self-evolving-world/world-core typecheck && pnpm --filter @self-evolving-world/viewer exec tsc --noEmit
+
+
+> @self-evolving-world/world-core@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world/packages/world-core
+> tsc -p tsconfig.json --noEmit
+
+
+> self-evolving-world@0.0.0 lint /Users/liuyuxiang/developer/self_evolving_world
+> eslint . --max-warnings 0
+
+
+> self-evolving-world@0.0.0 architecture:check /Users/liuyuxiang/developer/self_evolving_world
+> depcruise --config dependency-cruiser.config.cjs apps packages
+
+
+  error no-circular-dependencies: scripts/coevolution-source.ts → 
+      scripts/validation.ts →
+      scripts/experiments.ts →
+      scripts/coevolution-source.ts
+  error no-circular-dependencies: scripts/coevolution-source.ts → 
+      scripts/learning-files.ts →
+      scripts/validation.ts →
+      scripts/experiments.ts →
+      scripts/coevolution-source.ts
+
+x 2 dependency violations (2 errors, 0 warnings). 106 modules, 413 dependencies cruised.
+
+ ELIFECYCLE  Command failed with exit code 2.

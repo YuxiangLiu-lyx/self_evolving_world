@@ -1,0 +1,126 @@
+[
+  {
+    "tick": 30,
+    "survivors": 3,
+    "minimumSatiety": 56,
+    "objects": 11,
+    "benefitEvents": 7,
+    "sustainedProjectProgress": true,
+    "projects": {
+      "lin": {
+        "problem": "Food still requires collection, and existing berry plantings have not yet produced their first harvest.",
+        "reason": "A fourth planting beside the proven resting platform should improve nearby future supply with no ongoing tending, within its finite production budget.",
+        "progress": "Platform built at (8,7), with three rests confirming eight energy recovery each. Three berry plantings established. Collect berries at (8,5) and plant at (8,6).",
+        "missing": "First harvests remain unverified: existing plantings are scheduled for ticks 33, 35, and 40. The proposed fourth planting is not yet established.",
+        "observedEffects": "Platform rests recovered eight energy, including four bonus energy. Eating one berry added 18 nutrition before the round's two-satiety cost; health remains 100."
+      },
+      "moss": {
+        "problem": "Food supply relies on finite wild berries; the first planting has not yet produced.",
+        "reason": "Additional unattended plantings could stagger bounded harvests and reduce repeated searching.",
+        "progress": "Successfully extracted a branch and established a planting at (14,5). Planning two more nearby while retaining food for eating.",
+        "missing": "No cultivated yield observed yet; first planting is scheduled for tick 39. Branch stock and each planting's lifetime yield are finite.",
+        "observedEffects": "First planting consumed one berry and one branch. It requires no tending; declared output is capped at six units, with at most two on the ground. Ordinary rest restored four energy per round."
+      },
+      "sol": {
+        "problem": "Root production works, but finite planting lifetimes require replacement inputs; resting still restores only 4 energy per round.",
+        "reason": "Harvesting verifies usable food, while branch gathering can support replacement plantings and an existing improved-rest design.",
+        "progress": "Four root plantings exist; three have each produced one visible ripe root. Collecting those roots and learning branch gathering next.",
+        "missing": "Verify harvest and consumption; locate actual branch stock, gather inputs, and build and test a sleeping platform.",
+        "observedEffects": "Three plantings produced one root each without tending. Fourth has not yielded yet. Root nutrition is 18; ordinary rest has restored 4 energy per round."
+      }
+    }
+  },
+  {
+    "tick": 60,
+    "survivors": 3,
+    "minimumSatiety": 50,
+    "objects": 17,
+    "benefitEvents": 40,
+    "sustainedProjectProgress": true,
+    "projects": {
+      "lin": {
+        "problem": "Ripe berries need collection, while carrying food increases movement effort and cultivation has finite lifetime yields.",
+        "reason": "Eating carried food supports health and reduces load; timely harvesting prevents ground-stock ceilings from delaying production.",
+        "progress": "Three first harvests were successfully collected. Four plantings and the shared resting platform remain established; collect the three second harvests next.",
+        "missing": "Fourth planting's first yield is due at tick 57. Long-term replacement needs actual branches and new planting cells; each planting produces at most six berries.",
+        "observedEffects": "Exact-cell pickups transferred three cultivated berries. Eating supplied 18 nutrition per berry. Platform-assisted rest recovered eight energy. Health is 100; satiety is 48."
+      },
+      "moss": {
+        "problem": "Resting consumes many rounds, and the depleted nearby tree cannot supply replacement plantings or a sleeping platform.",
+        "reason": "A platform could improve energy recovery; new branch stock must first be located and gathered.",
+        "progress": "Five berry plantings exist. Use the final branch for a sixth, then scout west after eating and resting.",
+        "missing": "Find stocked trees; gather four branches and learn platform construction. Confirm the sixth planting and newer plantings' yields.",
+        "observedEffects": "Three established plantings have produced four berries total. Two newer plantings await first yields at ticks 73 and 75. Health is 100; ordinary rest restores four energy."
+      },
+      "sol": {
+        "problem": "Root plantings have finite production budgets and stop producing when two ripe units remain uncollected.",
+        "reason": "Eating harvested roots maintains health indirectly through satiety; clearing stock enables remaining growth, and another planting extends supply.",
+        "progress": "Five root plantings established. Sleeping platform built and tested. One owned branch remains; site-7 has no branches left.",
+        "missing": "Establish the sixth planting and harvest accumulated roots. Longer-term supply still depends on finite planting budgets and finding actual materials.",
+        "observedEffects": "Platform-adjacent rest recovered 8 energy, including a 4-point bonus; recovery caps at 40. Existing plantings produced roots without tending. Roots provide 18 nutrition; health remains 100."
+      }
+    }
+  },
+  {
+    "tick": 120,
+    "survivors": 3,
+    "minimumSatiety": 56,
+    "objects": 28,
+    "benefitEvents": 117,
+    "sustainedProjectProgress": true,
+    "projects": {
+      "lin": {
+        "problem": "Food plantings and natural branch stocks have finite lifetimes or quantities.",
+        "reason": "A woody nursery could extend construction supply while reducing repeated extraction; its own output is also finite.",
+        "progress": "Four replacement berry plantings confirmed. Two have each produced their first berry; the other two are due at ticks 138 and 140. Begin nursery and cutting study.",
+        "missing": "Nursery and cutting abilities are not yet learned. Cutting collection, nursery construction, and branch yields remain unobserved.",
+        "observedEffects": "Health 100, satiety 62, energy 11. Plantings at (7,8) and (8,6) reached six berries. Platform rest recovers eight energy. Nearby tree retains two branches and two cuttings."
+      },
+      "moss": {
+        "problem": "Berry plantings require branches, but observed natural branch stocks are finite and no replacement source is established.",
+        "reason": "A planted branch source could support future replacement food plantings with less exploration and repeated gathering travel.",
+        "progress": "Ninth personal berry planting confirmed at (7,7), first yield due tick 126. Approach the western tree for material and investigate branch cultivation.",
+        "missing": "Branch nursery is only proposed, not learned or implemented. Verify its actual costs, growth schedule and output before relying on it.",
+        "observedEffects": "Health 100, satiety 56, energy 28. Shared platform restores 8 energy per rest. Western tree reports three branches; nearby berry plantings have real ripe stock."
+      },
+      "sol": {
+        "problem": "Plantings have finite lifetime production, and two ripe roots on the ground block further output.",
+        "reason": "Harvesting capped active plantings preserves near-term supply without spending more finite branches.",
+        "progress": "Health 100; carrying three roots. Replacement plantings at (9,11) and (9,10) have each produced food; (10,10) is established. Site-6 retains three branches.",
+        "missing": "Collect ripe roots at (10,13), (10,11), and (9,11); recover energy. Long-term supply still depends on finite planting inputs.",
+        "observedEffects": "Roots give 18 nutrition without toxicity. Nearby platform rest recovers 8 energy. Root plantings produce without tending, with a two-root ground ceiling and six-root lifetime limit."
+      }
+    }
+  },
+  {
+    "tick": 180,
+    "survivors": 3,
+    "minimumSatiety": 62,
+    "objects": 38,
+    "benefitEvents": 196,
+    "sustainedProjectProgress": true,
+    "projects": {
+      "lin": {
+        "problem": "Food plantings and woody nurseries have finite production budgets.",
+        "reason": "Use observed nursery output to establish replacement food production before older plantings expire.",
+        "progress": "A branch is available at the first nursery. Collect it and move to (9,4), an open grassland cell suitable for berry cultivation.",
+        "missing": "Replacement planting still needs establishment using the collected branch and one owned berry. Second nursery output has not yet been observed.",
+        "observedEffects": "Health 100, satiety 66, energy 24. First nursery has produced two branches; its second branch is on the current cell. Three berries are owned."
+      },
+      "moss": {
+        "problem": "Food plantings and woody nurseries have finite yields and need staggered replacement.",
+        "reason": "Existing untended production reduces gathering work, but finite lifetimes prevent permanent supply.",
+        "progress": "Confirmed berry planting at (6,7), established tick 176; first yield due 200. Planting at (6,8) is due at 180.",
+        "missing": "Observe new plantings' first yields; collect available food and nursery branches as needed. Further nursery expansion requires finite viable cuttings.",
+        "observedEffects": "Health 100, satiety 48, energy 8. Nurseries at (5,8) and (5,7) have produced 3 and 2 branches. Adjacent platform provides total rest recovery 8."
+      },
+      "sol": {
+        "problem": "Food and branch production have finite lifetime budgets.",
+        "reason": "Maintain nutrition and energy while harvesting existing unattended production before expanding further.",
+        "progress": "Health 100, satiety 52, energy 27. Root planting established at (9,6); two roots owned and another ripe at the current cell.",
+        "missing": "Eat the valid owned root, collect the current yield, and recover. The (9,6) planting has not yet produced.",
+        "observedEffects": "The (9,8) planting has produced two roots. The (9,6) planting was created at tick 171. Platform-assisted rests recovered 8 energy each."
+      }
+    }
+  }
+]

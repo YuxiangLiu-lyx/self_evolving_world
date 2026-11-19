@@ -39,6 +39,7 @@ export type WorkerOperation =
   | 'survival'
   | 'learning'
   | 'evolution'
+  | 'coevolution'
   | 'resume';
 
 /** A coordinator lease is an accidental-bypass guard, not a sandbox against local file tampering. */
@@ -183,7 +184,9 @@ export function requireTaskWorker(
         'Survival execution does not match the recorded experiment.',
       );
     if (
-      (operation === 'learning' || operation === 'evolution') &&
+      (operation === 'learning' ||
+        operation === 'evolution' ||
+        operation === 'coevolution') &&
       (e.mode !== operation || e.allocation !== 'new' || args.length)
     )
       throw new Error(

@@ -24,6 +24,8 @@ export const REVIEW_SCENES = [
   'learning-mobile',
   'evolution-browser',
   'evolution-mobile',
+  'coevolution-browser',
+  'coevolution-mobile',
 ] as const;
 export type ReviewScene = (typeof REVIEW_SCENES)[number];
 

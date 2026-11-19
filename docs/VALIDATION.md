@@ -99,3 +99,7 @@ Version-4 [learning experiments](SKILL_LEARNING_EXPERIMENT.md) require complete 
 ## Heterogeneous evolution evidence
 
 Version5 adds `evolution-browser` and `evolution-mobile` to current screenshot review. Its archive reconstructs every retained ordinary/world input and proposal, persistent finite allocations, registry and body transitions. Tests cover zero-stock persistence, generic new resource execution, nutritional conservation, unknown-property isolation, map reachability, safe batching and development resume. The short smoke is explicitly offline and never substitutes for real-model evidence. Scientific failures remain recorded outcomes; archive validity does not assert survival success.
+
+## Coevolution evidence
+
+Version6 adds `coevolution-browser` and `coevolution-mobile`: inspect energy/load, project text, persistent object markers, shared effects, and historical read-only behavior. [Protocol evidence](COEVOLUTION_EXPERIMENT.md#harness-evidence-and-review) includes deterministic feasibility, generated effects, finite resource coexistence, input-before-output processing, individual mastery, actual shared recovery, attempt budgets and replay/checkpoint correspondence. Archive validity may accept an explicitly budget-paused observation; never describe that as180 completed rounds. No fixture is real-model evidence, and no stage report becomes actor guidance.

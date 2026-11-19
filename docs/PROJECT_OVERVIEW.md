@@ -83,3 +83,7 @@ The bounded 60-round protocol remains unchanged. The separately designed learnin
 ## Heterogeneous demand-driven worlds
 
 The [evolution-v1 protocol](EVOLUTION_EXPERIMENT.md) separates unknown resource properties from personal discoveries. Four actors share one autonomous prompt in different regions. The World Agent can add resource types, persistent habitat distributions and costed executable compositions, while the kernel enforces finite stock and survival rules. Version5 histories use the same experiment selector and add map scaling, ecological counts and individual identification. Authored primitives bound this prototype; open-ended physics and social communication remain future scope.
+
+## Development beyond survival
+
+The [coevolution-v1 protocol](COEVOLUTION_EXPERIMENT.md) adds a separate three-actor observation of reliable supply, reduced repetitive work and living conditions. Costed carrying/rest, persistent shared objects, delayed resource processing and personal projects give goals observable consequences. Basic eating is authored initial knowledge; later capabilities still require reviewed implementation and individual learning. The existing task harness and viewer retain the real observation and stop the entire world when attempted-call budgets are exhausted.

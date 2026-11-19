@@ -35,3 +35,5 @@ Plans help humans and agents track tasks, scope, progress, and evidence. Every P
 Use `pr-NN-short-title.md` and include `Requirement summary`, numbered `Requirements` (`- R1: ...`), `Scope and exclusions`, `Acceptance criteria`, steps, results, unexecuted checks, limitations, and follow-up suggestions. See the [PR contract](../PULL_REQUESTS.md). Historical completed plans preserve their original format; new PRs and newly submitted work follow this contract. Create plans in active, update them during implementation, then move completed plans to completed and repair references.
 
 Plans must distinguish intended validation from actual passing results. Explain any unavailable checks. Record commands, environment versions, outcomes, and key counts instead of copying full dependency logs. Historical records retain their original results even when translated.
+
+- [PR-17](completed/pr-17-development-coevolution.md): development motivation, costed persistent coevolution and real experimental evidence.

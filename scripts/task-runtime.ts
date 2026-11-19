@@ -1,4 +1,8 @@
 import {
+  coevolutionCheckpoint,
+  submitCoevolutionDevelopment,
+} from './coevolution-files.js';
+import {
   evolutionCheckpoint,
   submitEvolutionDevelopment,
 } from './evolution-files.js';
@@ -193,11 +197,13 @@ export class LocalTaskEffects implements TaskEffects {
                 String(intent.seed ?? DEFAULT_SEED),
                 String(intent.rounds ?? DEFAULT_ROUNDS),
               ]
-            : intent.mode === 'evolution'
-              ? ['experiment:evolution']
-              : intent.mode === 'learning'
-                ? ['experiment:learning']
-                : ['experiment:survival'],
+            : intent.mode === 'coevolution'
+              ? ['experiment:coevolution']
+              : intent.mode === 'evolution'
+                ? ['experiment:evolution']
+                : intent.mode === 'learning'
+                  ? ['experiment:learning']
+                  : ['experiment:survival'],
         );
       } catch (error) {
         c.experiment.error =
@@ -226,15 +232,23 @@ export class LocalTaskEffects implements TaskEffects {
     }
     const id = text(journal.id, 'allocated experiment');
     if (
-      (intent.mode === 'learning' || intent.mode === 'evolution') &&
+      (intent.mode === 'learning' ||
+        intent.mode === 'evolution' ||
+        intent.mode === 'coevolution') &&
       intent.allocation === 'new'
     ) {
       const checkpointReader =
-        intent.mode === 'evolution' ? evolutionCheckpoint : learningCheckpoint;
+        intent.mode === 'coevolution'
+          ? coevolutionCheckpoint
+          : intent.mode === 'evolution'
+            ? evolutionCheckpoint
+            : learningCheckpoint;
       const command =
-        intent.mode === 'evolution'
-          ? 'experiment:evolution'
-          : 'experiment:learning';
+        intent.mode === 'coevolution'
+          ? 'experiment:coevolution'
+          : intent.mode === 'evolution'
+            ? 'experiment:evolution'
+            : 'experiment:learning';
       if (journal.phase === 'recorded') {
         readExperiment(this.root, id);
         return;
@@ -257,7 +271,7 @@ export class LocalTaskEffects implements TaskEffects {
         return {
           experiment: id,
           barrier: checkpoint.barrier,
-          schema: `apps/simulator/src/${intent.mode}-run.ts#acceptDevelopment`,
+          schema: `apps/simulator/src/${intent.mode}-run.ts#${intent.mode === 'coevolution' ? 'acceptCDevelopment' : 'acceptDevelopment'}`,
         };
       // A completed simulation may have stopped before derived artifacts were saved.
       this.command(c, [command]);
@@ -296,15 +310,19 @@ export class LocalTaskEffects implements TaskEffects {
   }
   submitDevelopment(file: string, c: TaskContext): void {
     if (
-      !['learning', 'evolution'].includes(c.intent.experiment.mode) ||
+      !['learning', 'evolution', 'coevolution'].includes(
+        c.intent.experiment.mode,
+      ) ||
       !c.experiment?.id ||
       c.experiment.phase !== 'started'
     )
       throw new Error('No learning development is pending.');
     const submit =
-      c.intent.experiment.mode === 'evolution'
-        ? submitEvolutionDevelopment
-        : submitLearningDevelopment;
+      c.intent.experiment.mode === 'coevolution'
+        ? submitCoevolutionDevelopment
+        : c.intent.experiment.mode === 'evolution'
+          ? submitEvolutionDevelopment
+          : submitLearningDevelopment;
     submit(this.root, c.experiment.id, readJson(this.inputFile(file)));
   }
   analysisReady(id: string, c: TaskContext): boolean {
