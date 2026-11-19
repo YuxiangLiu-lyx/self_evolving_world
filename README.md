@@ -114,3 +114,5 @@ Decisions and acceptance records live in [ADRs](docs/decisions/README.md) and [e
 ## Development task entry
 
 Use the [programmatic harness](docs/TASK_HARNESS.md) for new code, documentation and experiment tasks: `pnpm task -- start validation-results/intent.json`. It returns structured requests to the current conversation and resumes with `submit` or `next`; `status` shows current evidence and blockers. Legacy task commands are guarded compatibility entries; standalone diagnostic checks remain available. Every experiment also retains a [behavioral analysis](experiment/README.md#behavioral-analysis) with recommendations only.
+
+The [development and coevolution protocol](docs/COEVOLUTION_EXPERIMENT.md) adds a separately versioned three-actor,180-round target through the same programmatic task harness. It retains costed shared world changes, project memory, staged evidence and honest budget pauses.

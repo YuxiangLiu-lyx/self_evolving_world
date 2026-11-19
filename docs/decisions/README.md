@@ -37,3 +37,5 @@ For a material change to an accepted decision, create a new ADR and mark the old
 - [0015](0015-survival-driven-skills.md): versioned survival pressure, generated constrained implementations, individual learning and durable round barriers.
 
 - [0016](0016-demand-driven-ecology.md): demand-driven resource definitions, persistent ecology, generic executable mechanics and private experience in version5.
+
+- [0017](0017-development-coevolution.md): costed persistent objects, development goals, finite coexisting processes and budget-paused version-6 observations.

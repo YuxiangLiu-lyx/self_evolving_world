@@ -19,6 +19,40 @@ const capture = process.env.WORLD_EXPERIMENT_CAPTURE;
 if (capture !== undefined) experimentId(capture);
 const ids = capture === undefined ? experimentIds(root) : [capture];
 
+async function inspectMapItems(
+  page: Page,
+  items: WorldState['items'],
+): Promise<void> {
+  const groups = await page.locator('[data-map-item]').evaluateAll((nodes) =>
+    nodes.map((node) => ({
+      cell: node.closest('[role="gridcell"]')?.getAttribute('aria-label'),
+      ids: JSON.parse(
+        (node as HTMLElement).dataset.mapItemIds ?? '[]',
+      ) as string[],
+    })),
+  );
+  const expectedGroups = [
+    ...new Set(
+      items.map((i) => `Cell ${String(i.position.x)}, ${String(i.position.y)}`),
+    ),
+  ]
+    .sort()
+    .map((cell) => ({
+      cell,
+      ids: items
+        .filter(
+          (i) =>
+            `Cell ${String(i.position.x)}, ${String(i.position.y)}` === cell,
+        )
+        .map((i) => i.id)
+        .sort(),
+    }));
+  expect(
+    groups
+      .map((g) => ({ ...g, ids: [...g.ids].sort() }))
+      .sort((a, b) => (a.cell ?? '').localeCompare(b.cell ?? '')),
+  ).toEqual(expectedGroups.sort((a, b) => a.cell.localeCompare(b.cell)));
+}
 async function inspectState(page: Page, state: WorldState): Promise<void> {
   await expect(page.locator('#tick-value')).toHaveText(
     String(state.tick).padStart(3, '0'),
@@ -26,7 +60,19 @@ async function inspectState(page: Page, state: WorldState): Promise<void> {
   await expect(page.locator('[data-map-agent]')).toHaveCount(
     state.agents.length,
   );
-  await expect(page.locator('[data-map-item]')).toHaveCount(state.items.length);
+  await inspectMapItems(page, state.items);
+  expect(
+    await page
+      .locator('[data-persistent-object]')
+      .evaluateAll((nodes) =>
+        nodes.map((n) => (n as HTMLElement).dataset.persistentObject).sort(),
+      ),
+  ).toEqual(
+    (
+      state.coevolution?.objects.filter((o) => o.position).map((o) => o.id) ??
+      []
+    ).sort(),
+  );
   for (const agent of state.agents) {
     await expect(
       page
@@ -45,11 +91,16 @@ async function inspectState(page: Page, state: WorldState): Promise<void> {
     );
     for (const item of agent.inventory)
       await expect(page.locator('#inventory')).toContainText(item.name);
-    if (state.survival || state.learning || state.evolution) {
+    if (
+      state.survival ||
+      state.learning ||
+      state.evolution ||
+      state.coevolution
+    ) {
       await expect(page.locator('#survival-panel')).toBeVisible();
       for (const key of ['health', 'satiety', 'cold', 'heat'] as const)
         await expect(page.locator(`[data-vital="${key}"]`)).toHaveText(
-          `${String((state.evolution ?? state.learning ?? state.survival)?.vitals[agent.id]?.[key])} / 100`,
+          `${String((state.coevolution ?? state.evolution ?? state.learning ?? state.survival)?.vitals[agent.id]?.[key])} / 100`,
         );
       await expect(page.locator('#program-code')).not.toBeEmpty();
     } else await expect(page.locator('#survival-panel')).toBeHidden();
@@ -61,9 +112,7 @@ async function inspectState(page: Page, state: WorldState): Promise<void> {
     await expect(page.locator('[data-map-agent]')).toHaveCount(
       observation.agents.length + 1,
     );
-    await expect(page.locator('[data-map-item]')).toHaveCount(
-      observation.items.length,
-    );
+    await inspectMapItems(page, observation.items);
     await page.locator('#global-view').click();
   }
   await page.locator('#agent-select').selectOption('lin');
@@ -107,7 +156,8 @@ for (const id of ids) {
         ).toBeDisabled();
       if (config.schedule !== undefined) {
         await expect(page.locator('#tick-unit')).toHaveText('ROUND');
-        for (const event of state.evolution?.events ??
+        for (const event of state.coevolution?.events ??
+          state.evolution?.events ??
           state.learning?.events ??
           state.survival?.events ??
           state.events ??

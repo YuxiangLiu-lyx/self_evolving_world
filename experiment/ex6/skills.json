@@ -1,0 +1,1009 @@
+{
+  "resources": [
+    {
+      "id": "berry",
+      "name": "Berry",
+      "appearance": "Small ripe berries",
+      "nutrition": 18,
+      "toxicity": 0,
+      "durability": 0
+    },
+    {
+      "id": "root",
+      "name": "Edible root",
+      "appearance": "Firm pale roots",
+      "nutrition": 18,
+      "toxicity": 0,
+      "durability": 0
+    },
+    {
+      "id": "branch",
+      "name": "Fallen branch",
+      "appearance": "Dry woody lengths",
+      "nutrition": 0,
+      "toxicity": 0,
+      "durability": 0
+    },
+    {
+      "id": "stone",
+      "name": "Loose stone",
+      "appearance": "Rough hard fragments",
+      "nutrition": 0,
+      "toxicity": 0,
+      "durability": 0
+    },
+    {
+      "id": "woody-cutting",
+      "name": "Viable woody cutting",
+      "appearance": "Fresh living woody shoot with viable buds",
+      "nutrition": 0,
+      "toxicity": 0,
+      "durability": 0
+    }
+  ],
+  "ecology": [
+    {
+      "id": "forest-woody-cuttings-v1",
+      "resource": "woody-cutting",
+      "siteKind": "tree",
+      "biomes": [
+        "forest"
+      ],
+      "distribution": [
+        0,
+        1,
+        2
+      ],
+      "reason": "Suitable existing forest trees may hold zero, one or two viable shoots. One permanent seeded canopy allocation per tree; no refills, rerolls or food production. This source supplies actual propagation material for the requested woody nursery.",
+      "niche": "canopy",
+      "renewEvery": 0,
+      "lifetime": 0
+    }
+  ],
+  "allocations": [
+    {
+      "site": "site-1",
+      "niche": "canopy",
+      "rule": "forest-woody-cuttings-v1",
+      "resource": "woody-cutting",
+      "draw": 2,
+      "ceiling": 2,
+      "remaining": 0,
+      "renewEvery": 0,
+      "next": 117
+    },
+    {
+      "site": "site-3",
+      "niche": "canopy",
+      "rule": "forest-woody-cuttings-v1",
+      "resource": "woody-cutting",
+      "draw": 2,
+      "ceiling": 2,
+      "remaining": 0,
+      "renewEvery": 0,
+      "next": 117
+    },
+    {
+      "site": "site-6",
+      "niche": "canopy",
+      "rule": "forest-woody-cuttings-v1",
+      "resource": "woody-cutting",
+      "draw": 0,
+      "ceiling": 0,
+      "remaining": 0,
+      "renewEvery": 0,
+      "next": 117
+    }
+  ],
+  "mechanics": [
+    {
+      "id": "basic-eating",
+      "name": "Basic eating",
+      "description": "Consume one owned food unit, applying its real nutrition and toxicity.",
+      "parameters": [
+        "item"
+      ],
+      "code": "[{\"op\":\"consume\",\"target\":\"item\",\"resource\":null,\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "consume",
+          "target": "item",
+          "resource": null,
+          "quantity": 1,
+          "costs": [],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"consume\",\"target\":0,\"resource\":null,\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]"
+    },
+    {
+      "id": "plant-berry",
+      "name": "Berry cultivation",
+      "description": "Consume one owned berry and one branch at your current forest or grassland cell to establish a persistent berry planting. First ripe unit after 24 rounds, then at most one every 12 rounds, ground stock ceiling 2 and lifetime production 6. Photosynthetic environmental energy is recorded. No additional tending. Harvest actual ripe ground stacks with the existing pickup interface on the planting cell; anyone may collect them. The occupied cell and production budget cannot be reset.",
+      "parameters": [],
+      "code": "[{\"op\":\"place\",\"target\":null,\"resource\":\"berry-planting\",\"quantity\":1,\"costs\":[{\"resource\":\"berry\",\"quantity\":1},{\"resource\":\"branch\",\"quantity\":1}],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "place",
+          "target": null,
+          "resource": "berry-planting",
+          "quantity": 1,
+          "costs": [
+            {
+              "resource": "berry",
+              "quantity": 1
+            },
+            {
+              "resource": "branch",
+              "quantity": 1
+            }
+          ],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"place\",\"target\":null,\"resource\":\"berry-planting\",\"quantity\":1,\"costs\":[{\"resource\":\"berry\",\"quantity\":1},{\"resource\":\"branch\",\"quantity\":1}],\"tool\":null,\"chance\":100}]"
+    },
+    {
+      "id": "plant-root",
+      "name": "Root cultivation",
+      "description": "Consume one owned root and one branch at your current grassland cell to establish a persistent root planting. First ripe unit after 12 rounds, then at most one every 12 rounds, ground stock ceiling 2 and lifetime production 6. Photosynthetic environmental energy is recorded. No additional tending. Harvest actual ripe ground stacks with the existing pickup interface on the planting cell; anyone may collect them. The occupied cell and production budget cannot be reset.",
+      "parameters": [],
+      "code": "[{\"op\":\"place\",\"target\":null,\"resource\":\"root-planting\",\"quantity\":1,\"costs\":[{\"resource\":\"root\",\"quantity\":1},{\"resource\":\"branch\",\"quantity\":1}],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "place",
+          "target": null,
+          "resource": "root-planting",
+          "quantity": 1,
+          "costs": [
+            {
+              "resource": "root",
+              "quantity": 1
+            },
+            {
+              "resource": "branch",
+              "quantity": 1
+            }
+          ],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"place\",\"target\":null,\"resource\":\"root-planting\",\"quantity\":1,\"costs\":[{\"resource\":\"branch\",\"quantity\":1},{\"resource\":\"root\",\"quantity\":1}],\"tool\":null,\"chance\":100}]"
+    },
+    {
+      "id": "gather-branch",
+      "name": "Gather branches",
+      "description": "Requires an adjacent natural site with at least one available branch and inventory capacity. With ordinary action effort, transfer one branch from its finite stock into owned inventory. No tool or material cost. The branch remains available for later use; gathering depletes the site and does not establish regeneration.",
+      "parameters": [
+        "site"
+      ],
+      "code": "[{\"op\":\"extract\",\"target\":\"site\",\"resource\":\"branch\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "extract",
+          "target": "site",
+          "resource": "branch",
+          "quantity": 1,
+          "costs": [],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"extract\",\"target\":0,\"resource\":\"branch\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]"
+    },
+    {
+      "id": "build-branch-sleeping-platform",
+      "name": "Build branch sleeping platform",
+      "description": "Spend four owned branches at your current unoccupied walkable cell to build a persistent stationary shared resting platform. Existing coevolution rules allow any walkable terrain and give rest +4 on the platform cell or an adjacent cell, using only the strongest available bonus and capped at energy 40. This is the executable shared-rest scope, broader than the requested forest/grassland and same-cell-only restrictions. Construction gives no immediate recovery, food, healing or regeneration.",
+      "parameters": [],
+      "code": "[{\"op\":\"place\",\"target\":null,\"resource\":\"branch-sleeping-platform\",\"quantity\":1,\"costs\":[{\"resource\":\"branch\",\"quantity\":4}],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "place",
+          "target": null,
+          "resource": "branch-sleeping-platform",
+          "quantity": 1,
+          "costs": [
+            {
+              "resource": "branch",
+              "quantity": 4
+            }
+          ],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"place\",\"target\":null,\"resource\":\"branch-sleeping-platform\",\"quantity\":1,\"costs\":[{\"resource\":\"branch\",\"quantity\":4}],\"tool\":null,\"chance\":100}]"
+    },
+    {
+      "id": "establish-woody-nursery",
+      "name": "Establish woody nursery",
+      "description": "Consume one owned branch as support and one owned viable woody-cutting as propagation material on an unoccupied forest cell. Create a persistent shared woody nursery. First branch after 24 rounds, then at most one branch every 12 rounds, ground-stock ceiling 2 and lifetime production 6. Anyone can collect mature ground branches with pickup. Production records environmental biomass units; branch nutritional energy is zero. No tending, immediate output, natural-site refill or occupied-cell/lifetime reset. The registered collect-woody-cutting mechanic extracts one cutting from adjacent finite matching tree stock, but personal learning is required separately.",
+      "parameters": [],
+      "code": "[{\"op\":\"place\",\"target\":null,\"resource\":\"woody-nursery\",\"quantity\":1,\"costs\":[{\"resource\":\"branch\",\"quantity\":1},{\"resource\":\"woody-cutting\",\"quantity\":1}],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "place",
+          "target": null,
+          "resource": "woody-nursery",
+          "quantity": 1,
+          "costs": [
+            {
+              "resource": "branch",
+              "quantity": 1
+            },
+            {
+              "resource": "woody-cutting",
+              "quantity": 1
+            }
+          ],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"place\",\"target\":null,\"resource\":\"woody-nursery\",\"quantity\":1,\"costs\":[{\"resource\":\"branch\",\"quantity\":1},{\"resource\":\"woody-cutting\",\"quantity\":1}],\"tool\":null,\"chance\":100}]"
+    },
+    {
+      "id": "collect-woody-cutting",
+      "name": "Collect viable woody cutting",
+      "description": "From an adjacent natural tree with actual woody-cutting stock, extract one cutting into owned inventory for normal use effort. Stock is finite, may be zero, and does not regenerate. No tool or additional material cost; personal learning is required.",
+      "parameters": [
+        "site"
+      ],
+      "code": "[{\"op\":\"extract\",\"target\":\"site\",\"resource\":\"woody-cutting\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]",
+      "version": 1,
+      "operations": [
+        {
+          "op": "extract",
+          "target": "site",
+          "resource": "woody-cutting",
+          "quantity": 1,
+          "costs": [],
+          "tool": null,
+          "chance": 100
+        }
+      ],
+      "signature": "[{\"op\":\"extract\",\"target\":0,\"resource\":\"woody-cutting\",\"quantity\":1,\"costs\":[],\"tool\":null,\"chance\":100}]"
+    }
+  ],
+  "skills": [
+    {
+      "id": "ability-1",
+      "mechanicId": "basic-eating",
+      "name": "Basic eating",
+      "description": "Consume one owned food unit.",
+      "learningRounds": 1,
+      "version": 1
+    },
+    {
+      "id": "ability-2",
+      "mechanicId": "plant-berry",
+      "name": "Berry cultivation",
+      "description": "Consume one owned berry and one branch at your current forest or grassland cell to establish a persistent berry planting. First ripe unit after 24 rounds, then at most one every 12 rounds, ground stock ceiling 2 and lifetime production 6. Photosynthetic environmental energy is recorded. No additional tending. Harvest actual ripe ground stacks with the existing pickup interface on the planting cell; anyone may collect them. The occupied cell and production budget cannot be reset.",
+      "learningRounds": 4,
+      "version": 1
+    },
+    {
+      "id": "ability-3",
+      "mechanicId": "plant-root",
+      "name": "Root cultivation",
+      "description": "Consume one owned root and one branch at your current grassland cell to establish a persistent root planting. First ripe unit after 12 rounds, then at most one every 12 rounds, ground stock ceiling 2 and lifetime production 6. Photosynthetic environmental energy is recorded. No additional tending. Harvest actual ripe ground stacks with the existing pickup interface on the planting cell; anyone may collect them. The occupied cell and production budget cannot be reset.",
+      "learningRounds": 3,
+      "version": 1
+    },
+    {
+      "id": "ability-4",
+      "mechanicId": "gather-branch",
+      "name": "Gather branches",
+      "description": "Requires an adjacent natural site with at least one available branch and inventory capacity. With ordinary action effort, transfer one branch from its finite stock into owned inventory. No tool or material cost. The branch remains available for later use; gathering depletes the site and does not establish regeneration.",
+      "learningRounds": 2,
+      "version": 1
+    },
+    {
+      "id": "ability-5",
+      "mechanicId": "build-branch-sleeping-platform",
+      "name": "Build branch sleeping platform",
+      "description": "Spend four owned branches at your current unoccupied walkable cell to build a persistent stationary shared resting platform. Existing coevolution rules allow any walkable terrain and give rest +4 on the platform cell or an adjacent cell, using only the strongest available bonus and capped at energy 40. This is the executable shared-rest scope, broader than the requested forest/grassland and same-cell-only restrictions. Construction gives no immediate recovery, food, healing or regeneration.",
+      "learningRounds": 2,
+      "version": 1
+    },
+    {
+      "id": "ability-6",
+      "mechanicId": "establish-woody-nursery",
+      "name": "Establish woody nursery",
+      "description": "Consume one owned branch as support and one owned viable woody-cutting as propagation material on an unoccupied forest cell. Create a persistent shared woody nursery. First branch after 24 rounds, then at most one branch every 12 rounds, ground-stock ceiling 2 and lifetime production 6. Anyone can collect mature ground branches with pickup. Production records environmental biomass units; branch nutritional energy is zero. No tending, immediate output, natural-site refill or occupied-cell/lifetime reset. The registered collect-woody-cutting mechanic extracts one cutting from adjacent finite matching tree stock, but personal learning is required separately.",
+      "learningRounds": 4,
+      "version": 1
+    },
+    {
+      "id": "ability-7",
+      "mechanicId": "collect-woody-cutting",
+      "name": "Collect viable woody cutting",
+      "description": "From an adjacent natural tree with actual woody-cutting stock, extract one cutting into owned inventory for normal use effort. Stock is finite, may be zero, and does not regenerate. No tool or additional material cost; personal learning is required.",
+      "learningRounds": 2,
+      "version": 1
+    }
+  ],
+  "blueprints": [
+    {
+      "id": "berry-planting",
+      "name": "Berry planting",
+      "description": "Consume one owned berry and one branch at your current forest or grassland cell to establish a persistent berry planting. First ripe unit after 24 rounds, then at most one every 12 rounds, ground stock ceiling 2 and lifetime production 6. Photosynthetic environmental energy is recorded. No additional tending. Harvest actual ripe ground stacks with the existing pickup interface on the planting cell; anyone may collect them. The occupied cell and production budget cannot be reset.",
+      "portable": false,
+      "restBonus": 0,
+      "carryBonus": 0,
+      "recipe": null,
+      "growth": {
+        "version": "photosynthesis-v1",
+        "output": "berry",
+        "biomes": [
+          "forest",
+          "grassland"
+        ],
+        "establishment": 24,
+        "interval": 12,
+        "ceiling": 2,
+        "lifetime": 6
+      }
+    },
+    {
+      "id": "root-planting",
+      "name": "Root planting",
+      "description": "Consume one owned root and one branch at your current grassland cell to establish a persistent root planting. First ripe unit after 12 rounds, then at most one every 12 rounds, ground stock ceiling 2 and lifetime production 6. Photosynthetic environmental energy is recorded. No additional tending. Harvest actual ripe ground stacks with the existing pickup interface on the planting cell; anyone may collect them. The occupied cell and production budget cannot be reset.",
+      "portable": false,
+      "restBonus": 0,
+      "carryBonus": 0,
+      "recipe": null,
+      "growth": {
+        "version": "photosynthesis-v1",
+        "output": "root",
+        "biomes": [
+          "grassland"
+        ],
+        "establishment": 12,
+        "interval": 12,
+        "ceiling": 2,
+        "lifetime": 6
+      }
+    },
+    {
+      "id": "branch-sleeping-platform",
+      "name": "Branch sleeping platform",
+      "description": "Spend four owned branches at your current unoccupied walkable cell to build a persistent stationary shared resting platform. Existing coevolution rules allow any walkable terrain and give rest +4 on the platform cell or an adjacent cell, using only the strongest available bonus and capped at energy 40. This is the executable shared-rest scope, broader than the requested forest/grassland and same-cell-only restrictions. Construction gives no immediate recovery, food, healing or regeneration.",
+      "portable": false,
+      "restBonus": 4,
+      "carryBonus": 0,
+      "recipe": null
+    },
+    {
+      "id": "woody-nursery",
+      "name": "Woody nursery",
+      "description": "Consume one owned branch as support and one owned viable woody-cutting as propagation material on an unoccupied forest cell. Create a persistent shared woody nursery. First branch after 24 rounds, then at most one branch every 12 rounds, ground-stock ceiling 2 and lifetime production 6. Anyone can collect mature ground branches with pickup. Production records environmental biomass units; branch nutritional energy is zero. No tending, immediate output, natural-site refill or occupied-cell/lifetime reset. The registered collect-woody-cutting mechanic extracts one cutting from adjacent finite matching tree stock, but personal learning is required separately.",
+      "portable": false,
+      "restBonus": 0,
+      "carryBonus": 0,
+      "recipe": null,
+      "growth": {
+        "version": "photosynthesis-v1",
+        "output": "branch",
+        "biomes": [
+          "forest"
+        ],
+        "establishment": 24,
+        "interval": 12,
+        "ceiling": 2,
+        "lifetime": 6
+      }
+    }
+  ],
+  "objects": [
+    {
+      "id": "object-8-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 8,
+      "owner": null,
+      "position": {
+        "x": 9,
+        "y": 13
+      },
+      "growth": {
+        "next": 116,
+        "produced": 6,
+        "environmentalEnergy": 108
+      }
+    },
+    {
+      "id": "object-9-lin-0",
+      "blueprint": "berry-planting",
+      "creator": "lin",
+      "created": 9,
+      "owner": null,
+      "position": {
+        "x": 5,
+        "y": 9
+      },
+      "growth": {
+        "next": 153,
+        "produced": 6,
+        "environmentalEnergy": 108
+      }
+    },
+    {
+      "id": "object-10-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 10,
+      "owner": null,
+      "position": {
+        "x": 9,
+        "y": 12
+      },
+      "growth": {
+        "next": 190,
+        "produced": 5,
+        "environmentalEnergy": 90
+      }
+    },
+    {
+      "id": "object-11-lin-0",
+      "blueprint": "berry-planting",
+      "creator": "lin",
+      "created": 11,
+      "owner": null,
+      "position": {
+        "x": 6,
+        "y": 9
+      },
+      "growth": {
+        "next": 191,
+        "produced": 4,
+        "environmentalEnergy": 72
+      }
+    },
+    {
+      "id": "object-12-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 12,
+      "owner": null,
+      "position": {
+        "x": 10,
+        "y": 12
+      },
+      "growth": {
+        "next": 96,
+        "produced": 6,
+        "environmentalEnergy": 108
+      }
+    },
+    {
+      "id": "object-15-moss-0",
+      "blueprint": "berry-planting",
+      "creator": "moss",
+      "created": 15,
+      "owner": null,
+      "position": {
+        "x": 14,
+        "y": 5
+      },
+      "growth": {
+        "next": 183,
+        "produced": 3,
+        "environmentalEnergy": 54
+      }
+    },
+    {
+      "id": "object-16-lin-0",
+      "blueprint": "berry-planting",
+      "creator": "lin",
+      "created": 16,
+      "owner": null,
+      "position": {
+        "x": 7,
+        "y": 8
+      },
+      "growth": {
+        "next": 124,
+        "produced": 6,
+        "environmentalEnergy": 108
+      }
+    },
+    {
+      "id": "object-18-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 18,
+      "owner": null,
+      "position": {
+        "x": 11,
+        "y": 12
+      },
+      "growth": {
+        "next": 102,
+        "produced": 6,
+        "environmentalEnergy": 108
+      }
+    },
+    {
+      "id": "object-24-lin-0",
+      "blueprint": "branch-sleeping-platform",
+      "creator": "lin",
+      "created": 24,
+      "owner": null,
+      "position": {
+        "x": 8,
+        "y": 7
+      }
+    },
+    {
+      "id": "object-25-moss-0",
+      "blueprint": "berry-planting",
+      "creator": "moss",
+      "created": 25,
+      "owner": null,
+      "position": {
+        "x": 13,
+        "y": 5
+      },
+      "growth": {
+        "next": 181,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-27-moss-0",
+      "blueprint": "berry-planting",
+      "creator": "moss",
+      "created": 27,
+      "owner": null,
+      "position": {
+        "x": 13,
+        "y": 6
+      },
+      "growth": {
+        "next": 183,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-33-lin-0",
+      "blueprint": "berry-planting",
+      "creator": "lin",
+      "created": 33,
+      "owner": null,
+      "position": {
+        "x": 8,
+        "y": 6
+      },
+      "growth": {
+        "next": 129,
+        "produced": 6,
+        "environmentalEnergy": 108
+      }
+    },
+    {
+      "id": "object-45-sol-0",
+      "blueprint": "branch-sleeping-platform",
+      "creator": "sol",
+      "created": 45,
+      "owner": null,
+      "position": {
+        "x": 11,
+        "y": 13
+      }
+    },
+    {
+      "id": "object-49-moss-0",
+      "blueprint": "berry-planting",
+      "creator": "moss",
+      "created": 49,
+      "owner": null,
+      "position": {
+        "x": 14,
+        "y": 6
+      },
+      "growth": {
+        "next": 181,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-51-moss-0",
+      "blueprint": "berry-planting",
+      "creator": "moss",
+      "created": 51,
+      "owner": null,
+      "position": {
+        "x": 15,
+        "y": 6
+      },
+      "growth": {
+        "next": 183,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-54-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 54,
+      "owner": null,
+      "position": {
+        "x": 10,
+        "y": 13
+      },
+      "growth": {
+        "next": 150,
+        "produced": 6,
+        "environmentalEnergy": 108
+      }
+    },
+    {
+      "id": "object-57-moss-0",
+      "blueprint": "berry-planting",
+      "creator": "moss",
+      "created": 57,
+      "owner": null,
+      "position": {
+        "x": 15,
+        "y": 8
+      },
+      "growth": {
+        "next": 189,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-63-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 63,
+      "owner": null,
+      "position": {
+        "x": 10,
+        "y": 11
+      },
+      "growth": {
+        "next": 183,
+        "produced": 5,
+        "environmentalEnergy": 90
+      }
+    },
+    {
+      "id": "object-85-moss-0",
+      "blueprint": "berry-planting",
+      "creator": "moss",
+      "created": 85,
+      "owner": null,
+      "position": {
+        "x": 4,
+        "y": 7
+      },
+      "growth": {
+        "next": 181,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-90-lin-0",
+      "blueprint": "berry-planting",
+      "creator": "lin",
+      "created": 90,
+      "owner": null,
+      "position": {
+        "x": 7,
+        "y": 4
+      },
+      "growth": {
+        "next": 186,
+        "produced": 4,
+        "environmentalEnergy": 72
+      }
+    },
+    {
+      "id": "object-93-lin-0",
+      "blueprint": "berry-planting",
+      "creator": "lin",
+      "created": 93,
+      "owner": null,
+      "position": {
+        "x": 7,
+        "y": 3
+      },
+      "growth": {
+        "next": 189,
+        "produced": 4,
+        "environmentalEnergy": 72
+      }
+    },
+    {
+      "id": "object-96-moss-0",
+      "blueprint": "berry-planting",
+      "creator": "moss",
+      "created": 96,
+      "owner": null,
+      "position": {
+        "x": 6,
+        "y": 6
+      },
+      "growth": {
+        "next": 192,
+        "produced": 3,
+        "environmentalEnergy": 54
+      }
+    },
+    {
+      "id": "object-99-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 99,
+      "owner": null,
+      "position": {
+        "x": 9,
+        "y": 11
+      },
+      "growth": {
+        "next": 183,
+        "produced": 4,
+        "environmentalEnergy": 72
+      }
+    },
+    {
+      "id": "object-101-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 101,
+      "owner": null,
+      "position": {
+        "x": 9,
+        "y": 10
+      },
+      "growth": {
+        "next": 185,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-102-moss-0",
+      "blueprint": "berry-planting",
+      "creator": "moss",
+      "created": 102,
+      "owner": null,
+      "position": {
+        "x": 7,
+        "y": 7
+      },
+      "growth": {
+        "next": 186,
+        "produced": 5,
+        "environmentalEnergy": 90
+      }
+    },
+    {
+      "id": "object-105-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 105,
+      "owner": null,
+      "position": {
+        "x": 10,
+        "y": 10
+      },
+      "growth": {
+        "next": 189,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-114-lin-0",
+      "blueprint": "berry-planting",
+      "creator": "lin",
+      "created": 114,
+      "owner": null,
+      "position": {
+        "x": 7,
+        "y": 5
+      },
+      "growth": {
+        "next": 186,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-116-lin-0",
+      "blueprint": "berry-planting",
+      "creator": "lin",
+      "created": 116,
+      "owner": null,
+      "position": {
+        "x": 8,
+        "y": 5
+      },
+      "growth": {
+        "next": 188,
+        "produced": 4,
+        "environmentalEnergy": 72
+      }
+    },
+    {
+      "id": "object-124-moss-0",
+      "blueprint": "woody-nursery",
+      "creator": "moss",
+      "created": 124,
+      "owner": null,
+      "position": {
+        "x": 5,
+        "y": 8
+      },
+      "growth": {
+        "next": 184,
+        "produced": 3,
+        "environmentalEnergy": 0
+      }
+    },
+    {
+      "id": "object-139-lin-0",
+      "blueprint": "woody-nursery",
+      "creator": "lin",
+      "created": 139,
+      "owner": null,
+      "position": {
+        "x": 8,
+        "y": 4
+      },
+      "growth": {
+        "next": 187,
+        "produced": 2,
+        "environmentalEnergy": 0
+      }
+    },
+    {
+      "id": "object-139-moss-0",
+      "blueprint": "woody-nursery",
+      "creator": "moss",
+      "created": 139,
+      "owner": null,
+      "position": {
+        "x": 5,
+        "y": 7
+      },
+      "growth": {
+        "next": 187,
+        "produced": 2,
+        "environmentalEnergy": 0
+      }
+    },
+    {
+      "id": "object-149-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 149,
+      "owner": null,
+      "position": {
+        "x": 9,
+        "y": 9
+      },
+      "growth": {
+        "next": 185,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-152-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 152,
+      "owner": null,
+      "position": {
+        "x": 9,
+        "y": 8
+      },
+      "growth": {
+        "next": 188,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-156-lin-0",
+      "blueprint": "woody-nursery",
+      "creator": "lin",
+      "created": 156,
+      "owner": null,
+      "position": {
+        "x": 8,
+        "y": 3
+      },
+      "growth": {
+        "next": 192,
+        "produced": 1,
+        "environmentalEnergy": 0
+      }
+    },
+    {
+      "id": "object-156-moss-0",
+      "blueprint": "berry-planting",
+      "creator": "moss",
+      "created": 156,
+      "owner": null,
+      "position": {
+        "x": 6,
+        "y": 8
+      },
+      "growth": {
+        "next": 192,
+        "produced": 1,
+        "environmentalEnergy": 18
+      }
+    },
+    {
+      "id": "object-156-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 156,
+      "owner": null,
+      "position": {
+        "x": 9,
+        "y": 7
+      },
+      "growth": {
+        "next": 192,
+        "produced": 2,
+        "environmentalEnergy": 36
+      }
+    },
+    {
+      "id": "object-171-sol-0",
+      "blueprint": "root-planting",
+      "creator": "sol",
+      "created": 171,
+      "owner": null,
+      "position": {
+        "x": 9,
+        "y": 6
+      },
+      "growth": {
+        "next": 183,
+        "produced": 0,
+        "environmentalEnergy": 0
+      }
+    },
+    {
+      "id": "object-176-moss-0",
+      "blueprint": "berry-planting",
+      "creator": "moss",
+      "created": 176,
+      "owner": null,
+      "position": {
+        "x": 6,
+        "y": 7
+      },
+      "growth": {
+        "next": 200,
+        "produced": 0,
+        "environmentalEnergy": 0
+      }
+    }
+  ],
+  "jobs": []
+}

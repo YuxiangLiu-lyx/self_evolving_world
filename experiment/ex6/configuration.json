@@ -1,0 +1,27 @@
+{
+  "version": "coevolution-v1",
+  "seed": 20261119,
+  "width": 24,
+  "height": 24,
+  "visionRadius": 5,
+  "rounds": 180,
+  "initialHealth": 100,
+  "initialSatiety": 80,
+  "satietyLoss": 2,
+  "starvationDamage": 10,
+  "initialEnergy": 40,
+  "energyCap": 40,
+  "restRecovery": 4,
+  "ordinaryAttempts": 120,
+  "worldAttempts": 20,
+  "developmentInterventions": 10,
+  "attemptsPerBatch": 2,
+  "planRounds": 12,
+  "stages": [
+    30,
+    60,
+    120,
+    180
+  ],
+  "earlyStop": "At round 60 only: no measured benefit and no noninitial successful use, construction, processing or learning progress during rounds 31-60."
+}

@@ -1,8 +1,14 @@
-import { biomeAt, isVisible } from '@self-evolving-world/world-core';
+import {
+  biomeAt,
+  isVisible,
+  carryingLoad,
+} from '@self-evolving-world/world-core';
 import type {
   AgentState,
   Cell,
   WorldState,
+  LearningEvent,
+  CoevolutionEvent,
 } from '@self-evolving-world/world-core';
 import type { Timeline } from './timeline.js';
 import { itemIllustration } from './illustrations.js';
@@ -35,7 +41,7 @@ export function decorateEvolutionCell(
   frame: WorldState,
   p: Cell,
 ): void {
-  const data = frame.evolution;
+  const data = frame.coevolution ?? frame.evolution;
   if (!data) return;
   const biome = biomeAt(data, p);
   cell.classList.add(`biome-${biome}`);
@@ -44,6 +50,15 @@ export function decorateEvolutionCell(
   const site = data.sites.find(
     (s) => s.position.x === p.x && s.position.y === p.y,
   );
+  for (const object of frame.coevolution?.objects.filter(
+    (o) => o.position?.x === p.x && o.position.y === p.y,
+  ) ?? []) {
+    const token = text('span', '◇', 'environment-token persistent-object');
+    token.dataset.persistentObject = object.id;
+    token.title = `${object.id} · ${frame.coevolution?.blueprints.find((b) => b.id === object.blueprint)?.name ?? object.blueprint}`;
+    token.setAttribute('aria-label', token.title);
+    cell.append(token);
+  }
   if (site) {
     const token = text('span', '', `environment-token site-${site.kind}`);
     token.dataset.mapObject = site.id;
@@ -67,13 +82,15 @@ export function decorateEvolutionCell(
 }
 export function evolutionEventText(frame: WorldState): string {
   return (
-    frame.evolution?.events
+    (frame.coevolution ?? frame.evolution)?.events
       .map(
         (e) =>
           `${frame.agents.find((a) => a.id === e.action.agentId)?.name ?? e.action.agentId} · ${e.action.type} · ${e.outcome}: ${e.detail}`,
       )
       .join('\n') ||
-    'Heterogeneous world created. Resource safety is unknown until personally learned.'
+    (frame.coevolution
+      ? 'Development world created. Basic eating and initial safe foods are authored knowledge.'
+      : 'Heterogeneous world created. Resource safety is unknown until personally learned.')
   );
 }
 export function renderEvolutionPanel(
@@ -82,26 +99,30 @@ export function renderEvolutionPanel(
   timeline: Timeline,
   cursor: number,
 ): void {
-  const data = frame.evolution;
+  const data = frame.coevolution ?? frame.evolution;
   if (!data) return;
-  el('survival-environment').textContent =
-    'Primitive era · At zero satiety: −10 health, then −2 satiety. Initial satiety 60. Deep river blocks movement; shallows connect regions.';
-  el('learning-policy').textContent =
-    'World review and development complete at the round barrier. Shared implementations require individual learning; no resource replenishment.';
+  el('survival-environment').textContent = frame.coevolution
+    ? 'Primitive era · Health100 / satiety80 initially · Prelearned eating · Carrying uses energy; rest restores4 plus actual object effects.'
+    : 'Primitive era · At zero satiety: −10 health, then −2 satiety. Initial satiety 60. Deep river blocks movement; shallows connect regions.';
+  el('learning-policy').textContent = frame.coevolution
+    ? 'Versioned, costed world changes · Individual learning · Finite ecology and delayed shared outputs.'
+    : 'World review and development complete at the round barrier. Shared implementations require individual learning; no resource replenishment.';
   const programs =
-      timeline.evolutionPrograms?.filter(
+      (timeline.coevolutionPrograms ?? timeline.evolutionPrograms)?.filter(
         (p) => p.agentId === actor.id && p.tick <= frame.tick,
       ) ?? [],
     active = programs.at(-1);
   el('program-status').textContent =
-    `${String(programs.length)} / 60 calls · Up to 12 rounds per plan · Failure, danger or encounters can interrupt`;
+    `${String(programs.length)} actor calls${frame.coevolution ? ' · 120 shared ordinary attempts maximum' : ' / 60 maximum'} · Up to 12 rounds per plan · ${frame.coevolution ? 'Failure, danger or invalid targets can interrupt' : 'Failure, danger or encounters can interrupt'}`;
   el('program-code').textContent =
     active?.code ?? 'No accepted program; wait fallback.';
   el('program-summary').textContent =
     active?.summary ?? 'No decision recorded at this frame.';
   const feedback = timeline.frames
     .slice(1, cursor + 1)
-    .flatMap((f) => f.evolution?.events ?? [])
+    .flatMap<LearningEvent | CoevolutionEvent>(
+      (f) => (f.coevolution ?? f.evolution)?.events ?? [],
+    )
     .filter(
       (e) =>
         e.action.agentId === actor.id &&
@@ -194,5 +215,53 @@ export function renderEvolutionPanel(
       'resource-detail',
     ),
   );
+  if (frame.coevolution) {
+    const c = frame.coevolution,
+      project = timeline.coevolutionPrograms
+        ?.filter(
+          (p) => p.agentId === actor.id && p.tick <= frame.tick && p.project,
+        )
+        .at(-1)?.project;
+    rows.unshift(
+      text(
+        'p',
+        `Energy: ${String(c.energy[actor.id])} / 40 · Carried load: ${String(carryingLoad(c, actor.id))} units`,
+        'resource-detail',
+      ),
+    );
+    if (project)
+      rows.unshift(
+        text(
+          'p',
+          `Project: ${project.problem} · Why: ${project.reason} · Progress: ${project.progress} · Missing: ${project.missing} · Observed: ${project.observedEffects}`,
+          'resource-detail',
+        ),
+      );
+    for (const o of c.objects.filter(
+      (o) =>
+        o.owner === actor.id ||
+        (o.position &&
+          isVisible(actor.position, o.position, frame.settings.visionRadius)),
+    )) {
+      const b = c.blueprints.find((b) => b.id === o.blueprint);
+      rows.push(
+        text(
+          'p',
+          `${o.id} · ${b?.name ?? o.blueprint} · Creator ${o.creator} · ${o.owner ? `Carried by ${o.owner}` : 'Shared stationary object'} · Rest +${String(b?.restBonus)} · Carry aid ${String(b?.carryBonus)}${o.growth && b?.growth ? ` · Produced ${String(o.growth.produced)}/${String(b.growth.lifetime)} ${b.growth.output} · ${o.growth.produced >= b.growth.lifetime ? 'Lifetime production exhausted' : `Next maturity check ${String(o.growth.next)}`} · Environmental nutrition ${String(o.growth.environmentalEnergy)}` : ''}`,
+          'resource-detail',
+        ),
+      );
+    }
+    for (const m of c.messages
+      .filter((m) => m.recipient === actor.id)
+      .slice(-4))
+      rows.push(
+        text(
+          'p',
+          `Message from ${m.sender} at round ${String(m.tick)}: ${m.text}`,
+          'resource-detail',
+        ),
+      );
+  }
   el('resource-details').replaceChildren(...rows);
 }

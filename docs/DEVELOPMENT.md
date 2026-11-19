@@ -63,3 +63,7 @@ Record the explicitly authorized [learning protocol](SKILL_LEARNING_EXPERIMENT.m
 ## Heterogeneous evolution experiments
 
 Record the [version5 protocol](EVOLUTION_EXPERIMENT.md) as `experiment.mode: "evolution"`, allocation `new`, with its actual user authorization. `pnpm experiment:evolution` continues that same task. A short offline smoke precedes allocation and real inference; do not change core/simulator source during a saved live run. Existing full verification, analysis, PR and authorized merge gates apply.
+
+## Development and coevolution experiments
+
+Use the [version-6 protocol](COEVOLUTION_EXPERIMENT.md) with an explicitly authorized `coevolution` intent and new allocation. The guarded `pnpm experiment:coevolution` adapter uses the existing task sequence. Offline feasibility and mechanism/browser tests precede inference. Source-bound live checkpoints may accept reviewed declarations but cannot silently change the kernel. Budget-paused observations retain their actual horizon and all full validation/delivery requirements.

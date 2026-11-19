@@ -1,3 +1,15 @@
+import { COEVOLUTION_CONFIG } from '@self-evolving-world/world-core';
+import { coevolutionPreflight } from './coevolution-preflight.js';
+import {
+  readSourceHistory,
+  sourceArtifactFiles,
+} from './coevolution-source.js';
+import {
+  measureCoevolution,
+  COEVOLUTION_POLICY,
+  readCoevolutionExecution,
+  coevolutionRegistry,
+} from './coevolution-analysis.js';
 import { evolutionSmoke } from './evolution-smoke.js';
 import { measureEvolution, EVOLUTION_POLICY } from './evolution-analysis.js';
 import { createHash } from 'node:crypto';
@@ -44,24 +56,37 @@ export const EXPERIMENT_SCENES = [
 export function experimentFiles(
   manifest: Record<string, unknown>,
 ): readonly string[] {
-  return manifest.version === 5
+  return manifest.version === 6
     ? [
         ...EXPERIMENT_FILES,
         'model-calls.json',
         'execution.json',
         'skills.json',
-        'smoke.json',
+        'preflight.json',
+        'configuration.json',
+        'checkpoints.json',
+        'stages.json',
+        'source-history.json',
+        ...sourceArtifactFiles(manifest.sourceArtifacts),
       ]
-    : manifest.version === 4
+    : manifest.version === 5
       ? [
           ...EXPERIMENT_FILES,
           'model-calls.json',
           'execution.json',
           'skills.json',
+          'smoke.json',
         ]
-      : manifest.version === 3
-        ? [...EXPERIMENT_FILES, 'model-calls.json']
-        : EXPERIMENT_FILES;
+      : manifest.version === 4
+        ? [
+            ...EXPERIMENT_FILES,
+            'model-calls.json',
+            'execution.json',
+            'skills.json',
+          ]
+        : manifest.version === 3
+          ? [...EXPERIMENT_FILES, 'model-calls.json']
+          : EXPERIMENT_FILES;
 }
 export const EXPERIMENT_FILES = [
   'replay.json',
@@ -134,7 +159,11 @@ export interface ExperimentConfig {
   readonly seed?: number;
   readonly steps: number;
   readonly schedule?:
-    typeof ROUND_SCHEDULE | 'survival-v1' | 'learning-v1' | 'evolution-v1';
+    | typeof ROUND_SCHEDULE
+    | 'survival-v1'
+    | 'learning-v1'
+    | 'evolution-v1'
+    | 'coevolution-v1';
   readonly totalActions?: number;
 }
 
@@ -189,13 +218,30 @@ export function readExperiment(root: string, id: string, pending = false) {
         'results.json',
         'report.md',
         'overview.svg',
-        ...(manifest.version === 5
-          ? ['model-calls.json', 'execution.json', 'skills.json', 'smoke.json']
-          : manifest.version === 4
-            ? ['model-calls.json', 'execution.json', 'skills.json']
-            : manifest.version === 3
-              ? ['model-calls.json']
-              : []),
+        ...(manifest.version === 6
+          ? [
+              'model-calls.json',
+              'execution.json',
+              'skills.json',
+              'preflight.json',
+              'configuration.json',
+              'checkpoints.json',
+              'stages.json',
+              'source-history.json',
+              ...sourceArtifactFiles(manifest.sourceArtifacts),
+            ]
+          : manifest.version === 5
+            ? [
+                'model-calls.json',
+                'execution.json',
+                'skills.json',
+                'smoke.json',
+              ]
+            : manifest.version === 4
+              ? ['model-calls.json', 'execution.json', 'skills.json']
+              : manifest.version === 3
+                ? ['model-calls.json']
+                : []),
       ]
     : ['manifest.json', ...files];
   for (const file of required) {
@@ -203,8 +249,13 @@ export function readExperiment(root: string, id: string, pending = false) {
     if (
       !lstatSync(path).isFile() ||
       lstatSync(path).size >
-        (manifest.version === 5 &&
-        ['execution.json', 'model-calls.json'].includes(file)
+        ((manifest.version === 5 || manifest.version === 6) &&
+        [
+          'execution.json',
+          'model-calls.json',
+          'checkpoints.json',
+          'source-history.json',
+        ].includes(file)
           ? 20_000_000
           : 2_000_000)
     )
@@ -227,26 +278,34 @@ export function readExperiment(root: string, id: string, pending = false) {
         manifest.schedule === 'learning-v1') ||
       (manifest.version === 5 &&
         manifest.policy === EVOLUTION_POLICY &&
-        manifest.schedule === 'evolution-v1')
+        manifest.schedule === 'evolution-v1') ||
+      (manifest.version === 6 &&
+        manifest.policy === COEVOLUTION_POLICY &&
+        manifest.schedule === 'coevolution-v1')
     ) ||
     manifest.id !== id ||
-    (manifest.version === 5
+    (manifest.version === 6
       ? manifest.controller !== 'chatgpt-plan' ||
         typeof manifest.externalModelCalls !== 'number' ||
-        manifest.externalModelCalls < 4 ||
-        manifest.externalModelCalls > 288
-      : manifest.version === 4
+        manifest.externalModelCalls < 3 ||
+        manifest.externalModelCalls > 140
+      : manifest.version === 5
         ? manifest.controller !== 'chatgpt-plan' ||
           typeof manifest.externalModelCalls !== 'number' ||
-          manifest.externalModelCalls < 3 ||
-          manifest.externalModelCalls > 48
-        : manifest.version === 3
+          manifest.externalModelCalls < 4 ||
+          manifest.externalModelCalls > 288
+        : manifest.version === 4
           ? manifest.controller !== 'chatgpt-plan' ||
             typeof manifest.externalModelCalls !== 'number' ||
             manifest.externalModelCalls < 3 ||
-            manifest.externalModelCalls > 15
-          : manifest.controller !== 'seeded-random' ||
-            manifest.externalModelCalls !== 0)
+            manifest.externalModelCalls > 48
+          : manifest.version === 3
+            ? manifest.controller !== 'chatgpt-plan' ||
+              typeof manifest.externalModelCalls !== 'number' ||
+              manifest.externalModelCalls < 3 ||
+              manifest.externalModelCalls > 15
+            : manifest.controller !== 'seeded-random' ||
+              manifest.externalModelCalls !== 0)
   )
     throw new Error(`Invalid experiment identity or policy: ${id}`);
   if (
@@ -269,13 +328,18 @@ export function readExperiment(root: string, id: string, pending = false) {
     );
   if (
     typeof steps !== 'number' ||
-    (manifest.version === 5
-      ? seed !== undefined || steps !== 120
-      : manifest.version === 4
-        ? seed !== undefined || steps !== 18
-        : manifest.version === 3
-          ? seed !== undefined || steps !== 60
-          : typeof seed !== 'number')
+    (manifest.version === 6
+      ? seed !== undefined ||
+        !Number.isInteger(steps) ||
+        steps < 0 ||
+        steps > 180
+      : manifest.version === 5
+        ? seed !== undefined || steps !== 120
+        : manifest.version === 4
+          ? seed !== undefined || steps !== 18
+          : manifest.version === 3
+            ? seed !== undefined || steps !== 60
+            : typeof seed !== 'number')
   )
     throw new Error('Missing numeric experiment parameters.');
   if (typeof seed === 'number') validateParameters(seed, steps);
@@ -291,30 +355,37 @@ export function readExperiment(root: string, id: string, pending = false) {
   )
     throw new Error('Missing experiment provenance.');
   const measurement =
-    manifest.version === 5
-      ? measureEvolution(
+    manifest.version === 6
+      ? measureCoevolution(
           id,
           objective,
           readExperimentJson(resolve(directory, 'execution.json')),
           readExperimentJson(resolve(directory, 'model-calls.json')),
         )
-      : manifest.version === 4
-        ? measureLearning(
+      : manifest.version === 5
+        ? measureEvolution(
             id,
             objective,
             readExperimentJson(resolve(directory, 'execution.json')),
             readExperimentJson(resolve(directory, 'model-calls.json')),
           )
-        : manifest.version === 3
-          ? measureSurvival(
+        : manifest.version === 4
+          ? measureLearning(
               id,
               objective,
-              readExperimentJson(resolve(directory, 'replay.json')),
+              readExperimentJson(resolve(directory, 'execution.json')),
               readExperimentJson(resolve(directory, 'model-calls.json')),
             )
-          : manifest.version === 2
-            ? measureSynchronous(id, objective, Number(seed), steps)
-            : measureLegacy(id, objective, Number(seed), steps);
+          : manifest.version === 3
+            ? measureSurvival(
+                id,
+                objective,
+                readExperimentJson(resolve(directory, 'replay.json')),
+                readExperimentJson(resolve(directory, 'model-calls.json')),
+              )
+            : manifest.version === 2
+              ? measureSynchronous(id, objective, Number(seed), steps)
+              : measureLegacy(id, objective, Number(seed), steps);
   const { run, results, report, chart } = measurement;
   if (
     manifest.version === 4 &&
@@ -345,6 +416,35 @@ export function readExperiment(root: string, id: string, pending = false) {
       )
     )
       throw new Error('World registry differs from reconstruction.');
+  }
+  if (manifest.version === 6) {
+    const state = readCoevolutionExecution(
+      readExperimentJson(resolve(directory, 'execution.json')),
+    );
+    readSourceHistory(root, id, state);
+    for (const [file, expected] of [
+      ['preflight.json', coevolutionPreflight()],
+      ['configuration.json', COEVOLUTION_CONFIG],
+      ['skills.json', coevolutionRegistry(state)],
+      ['checkpoints.json', state.checkpoints],
+      [
+        'stages.json',
+        state.checkpoints.map((c) => ({
+          tick: c.tick,
+          ...c.report,
+          projects: c.projects,
+        })),
+      ],
+    ] as const)
+      if (
+        !isDeepStrictEqual(
+          readExperimentJson(resolve(directory, file)),
+          expected,
+        )
+      )
+        throw new Error(`Coevolution artifact mismatch: ${file}`);
+    if (steps !== state.rounds.length)
+      throw new Error('Observation horizon differs from actual rounds.');
   }
   if (manifest.externalModelCalls !== results.externalModelCalls)
     throw new Error('Model call count disagrees with evidence.');
@@ -412,16 +512,19 @@ export function readExperiment(root: string, id: string, pending = false) {
       ...(manifest.version === 2 ||
       manifest.version === 3 ||
       manifest.version === 4 ||
-      manifest.version === 5
+      manifest.version === 5 ||
+      manifest.version === 6
         ? {
             schedule:
-              manifest.version === 5
-                ? ('evolution-v1' as const)
-                : manifest.version === 4
-                  ? ('learning-v1' as const)
-                  : manifest.version === 3
-                    ? ('survival-v1' as const)
-                    : ROUND_SCHEDULE,
+              manifest.version === 6
+                ? ('coevolution-v1' as const)
+                : manifest.version === 5
+                  ? ('evolution-v1' as const)
+                  : manifest.version === 4
+                    ? ('learning-v1' as const)
+                    : manifest.version === 3
+                      ? ('survival-v1' as const)
+                      : ROUND_SCHEDULE,
             totalActions: steps * (run.frames[0]?.agents.length ?? 0),
           }
         : {}),

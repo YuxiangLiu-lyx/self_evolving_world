@@ -124,3 +124,42 @@ export {
 export { stepEvolutionRound, parseEvolutionRound } from './evolution.js';
 
 export * from './evolution-program.js';
+
+export type {
+  CoevolutionData,
+  CoevolutionEnvironment,
+  CoevolutionProposal,
+  CoevolutionRound,
+  CoevolutionAction,
+  CoevolutionEvent,
+  CMechanic,
+  CMechanicDraft,
+  CReview,
+  CSkill,
+  CSite,
+  CEcologyRule,
+  ObjectBlueprint,
+  PersistentObject,
+  ResourceJob,
+  ResourceAllocation,
+  PersonalProject,
+  BenefitEvent,
+} from './coevolution-types.js';
+export {
+  COEVOLUTION_CONFIG,
+  EMPTY_COEVOLUTION_PROPOSAL,
+  parseCoevolutionProposal,
+  compileCMechanic,
+  parseCoevolutionAction,
+  parseProject,
+} from './coevolution-schema.js';
+export {
+  createCoevolutionWorld,
+  coevolutionData,
+  cBiomeAt,
+  cWalkable,
+  registerCoevolution,
+} from './coevolution-environment.js';
+export { actionEffort, carryingLoad, recovery } from './coevolution-effects.js';
+export { stepCoevolutionRound, parseCoevolutionRound } from './coevolution.js';
+export * from './coevolution-program.js';

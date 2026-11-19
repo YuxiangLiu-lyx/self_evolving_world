@@ -65,3 +65,7 @@ Use an explicitly authorized `learning` intent with `allocation: "new"`, then co
 ## Run a heterogeneous evolution experiment
 
 The [version-5 protocol](../docs/EVOLUTION_EXPERIMENT.md) uses an authorized `evolution` intent and the guarded `pnpm experiment:evolution` alias. Four comparable actors share 120 rounds in distinct regions; world proposals can add persistent resource types, one-time ecology and generic executable mechanics. `smoke.json` retains the explicitly simulated preflight; `skills.json` includes resources/ecology/mechanics/skills. The complete private/world ledger, deterministic replay, visuals and twelve-question behavioral analysis retain unsuccessful outcomes. Existing archive preservation, bounded development recovery and delivery gates are unchanged.
+
+## Run a development and coevolution experiment
+
+The [version-6 protocol](../docs/COEVOLUTION_EXPERIMENT.md) uses `coevolution` intent and the existing guarded task sequence. Three actors pursue health, stable supply, reduced repetitive work and living conditions over a180-round target. Initial eating is authored; later resource/object/process changes are reviewed, costed and versioned. New archives retain configuration, offline feasibility, staged snapshots/reports, complete call/event evidence and shared-viewer replay. Budget exhaustion freezes all actors and records the actual observation window; it is not a180-round success. Full review, PR and separately authorized guarded merge remain required.

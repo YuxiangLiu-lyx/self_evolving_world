@@ -43,7 +43,8 @@
     "task:publish": "tsx scripts/task-entry.ts publish",
     "task:review": "tsx scripts/task-entry.ts review",
     "task": "tsx scripts/task.ts",
-    "analysis:check": "tsx scripts/task.ts analyses"
+    "analysis:check": "tsx scripts/task.ts analyses",
+    "experiment:coevolution": "tsx scripts/task-entry.ts coevolution"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
