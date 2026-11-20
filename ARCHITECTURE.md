@@ -1,8 +1,30 @@
 # System Architecture
 
-This document owns current modules, interfaces, and dependency boundaries. Feature status belongs to [PRODUCT](docs/PRODUCT.md); context is in the [project overview](docs/PROJECT_OVERVIEW.md). Base world rules are implemented in one file and consumed by the CLI and browser through a public entry point.
+This document owns current modules, interfaces, and dependency boundaries. Feature status belongs to [PRODUCT](docs/PRODUCT.md); context is in the [project overview](docs/PROJECT_OVERVIEW.md). The pure core exposes independently versioned protocols through one public package entry point. The fixed founding rules remain in world.ts; their grid and skill limits do not constrain the separate continuous protocol.
 
-## Current modules and data flow
+| Area                     | Scope                                                                                                     | Entry                                                              |
+| ------------------------ | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Current Continuous World | Continuous-v1 / ex7: deterministic physics, reviewed mechanisms, persistent memory and recorded wellbeing | [Current protocol and game observatory](#current-continuous-world) |
+| Legacy Foundation        | Fixed grid and three base skills; retained histories and separately versioned grid extensions             | [Founding contracts](#legacy-foundation)                           |
+| Development Harness      | Repository-only task routing, conversation handoffs, evidence, PR and merge gates                         | [Coordinator boundary](#development-harness)                       |
+
+The main viewer opens the current game observatory; `/classic.html` retains the grid inspector. Both replay saved experiments without model calls. A historical run keeps its original protocol even when shown in the newer presentation.
+
+## Current Continuous World
+
+### Continuous world and game observatory
+
+The independent [continuous-v1 protocol](docs/CONTINUOUS_WORLD.md) adds pure continuous-types/data/policy/geometry/observation/registry/base/kernel/tasks/wellbeing modules behind world-core's public entry point. WorldState and founding world.ts retain their historical semantics. Floating-point state, same-start transactions, swept collision, private navigation, persistent processes and event-grounded wellbeing share a deterministic time step. Reviewed code packages register typed interfaces and optional state schemas, migrations and personal observation adapters; individual mastery remains separate.
+
+Simulator continuous-scenario/input/provider/run modules own the independent initial world, minimal ordinary goal, dynamic JSON interface schema, exact-attempt journals and persistent conditional tasks. Repository continuous-cli/files/source/store/analysis/preflight modules adapt the existing coordinator and gates, retain versioned source and segmented deterministic evidence, and pause globally on budget exhaustion. Source review may inspect pure viewer visual registrations; core never imports the viewer or Node services.
+
+The separate observatory entry renders continuous-scene/visuals/history modules with a bounded segment cache, camera, event and state inspection. Its historical adapter preserves old grid positions and explicitly labels the different simulation. Camera time and animations never affect world time. See [ADR-0018](docs/decisions/0018-continuous-world-and-wellbeing.md).
+
+## Legacy Foundation
+
+The diagram and module table below describe the original fixed-grid path. Later grid protocols have their own sections; continuous-v1 uses the separate kernel described above. Restrictions such as three fixed skills and no host-code skill execution apply to the foundation.
+
+### Foundation modules and data flow
 
 ```mermaid
 flowchart LR
@@ -135,11 +157,15 @@ Local session history lives in page memory and does not survive refreshes automa
 
 The [PR contract](docs/PULL_REQUESTS.md) adds Markdown requirement/changed-file traceability, a current-head CI check, and local preflight against completed evidence. The unit reporter rejects skipped or incomplete suites; the task completion gate also requires an explicit requirement/full-diff review. These checks remain development tooling outside the core. GitHub protection is separately configured and verified. None of these mechanisms proves arbitrary program purity, semantic correctness, or honest review; see [ADR-0006](docs/decisions/0006-requirement-traceability.md).
 
-## Future modules (Planned)
+## Development and coevolution boundary
 
-Continuous NPC control, persistent goals and memory, generalized model adapters, World Agent review, skill evolution, databases, and migrations remain unimplemented. Future skills require a separately designed extension layer, explicit authorization, rule versioning, and an ADR. They must not rewrite this base core during a run. Current `try` actions only record requests.
+The separate [coevolution-v1 protocol](docs/COEVOLUTION_EXPERIMENT.md) uses pure `coevolution-*` modules and a distinct optional WorldState extension. Version6 reuses foundation movement and schema utilities without changing older transitions. It adds material-backed object effects, finite niche allocations, delayed recipes, personal projects and total-attempt scheduling. Node-only provider/execution and repository-only audit/CLI adapters reuse existing OAuth, coordinator and delivery gates. The existing viewer reads the new state and reconstructs version6 without models. [ADR-0017](docs/decisions/0017-development-coevolution.md) explains the version-specific modules and finite physical envelope.
 
-## Task orchestration boundary
+Requested growth effects use optional versioned object definitions, with material/habitat prerequisites, maturity intervals, stock ceilings and lifetime output bounds. The repository-side source bridge records full engine revisions and current-barrier prefix hashes before permitting narrowly scoped interpreter development. Base configuration, metabolism, carrying/rest, scenario, prompts and scheduler remain frozen. Development source validation and ordinary declaration validation are distinct from final full-task acceptance; no Node I/O or model service enters the pure core.
+
+## Development Harness
+
+### Task orchestration boundary
 
 The repository-only [task entry](docs/TASK_HARNESS.md) uses `scripts/task-context.ts` for original intent, derived facts and evidence; `task-flow.ts` controls transitions; `task-runtime.ts` calls the existing validation, experiment and delivery commands. `task.ts` persists ignored journals and returns structured work to the current conversation. `task-entry.ts` adapts legacy task commands to the same coordinator; `task-worker.ts` checks the live execution lease and current context at internal mutation/acceptance boundaries. Standalone automated validation stays available to CI. The publisher has no default HTTP merge branch. `task-review.ts` builds and verifies the current-head GitHub COMMENT from actual accepted local findings; its provenance explicitly denotes current-conversation self-review, not independent approval. No core, viewer or model adapter depends on this layer. Original acceptance gates, source fingerprints, PR contract, conflict checks and independent remote verification remain authoritative.
 
@@ -147,16 +173,8 @@ The repository-only [task entry](docs/TASK_HARNESS.md) uses `scripts/task-contex
 
 The strengthened command and review boundaries are recorded in [ADR-0014](docs/decisions/0014-enforced-task-entry.md). They do not sandbox direct Git/GitHub access or prove honest judgment.
 
-## Development and coevolution boundary
+## Future modules (Planned)
 
-The separate [coevolution-v1 protocol](docs/COEVOLUTION_EXPERIMENT.md) uses pure `coevolution-*` modules and a distinct optional WorldState extension. Version6 reuses foundation movement and schema utilities without changing older transitions. It adds material-backed object effects, finite niche allocations, delayed recipes, personal projects and total-attempt scheduling. Node-only provider/execution and repository-only audit/CLI adapters reuse existing OAuth, coordinator and delivery gates. The existing viewer reads the new state and reconstructs version6 without models. [ADR-0017](docs/decisions/0017-development-coevolution.md) explains the version-specific modules and finite physical envelope.
+[PRODUCT](docs/PRODUCT.md) reserves future scope for an unattended production NPC service (F-102), richer cooperation/trade systems (F-103), general technology governance beyond reviewed experiments (F-104), unrestricted evolution with general rollback (F-105), and shared durable storage with general cross-protocol migration (F-106).
 
-Requested growth effects use optional versioned object definitions, with material/habitat prerequisites, maturity intervals, stock ceilings and lifetime output bounds. The repository-side source bridge records full engine revisions and current-barrier prefix hashes before permitting narrowly scoped interpreter development. Base configuration, metabolism, carrying/rest, scenario, prompts and scheduler remain frozen. Development source validation and ordinary declaration validation are distinct from final full-task acceptance; no Node I/O or model service enters the pure core.
-
-## Continuous world and game observatory
-
-The independent [continuous-v1 protocol](docs/CONTINUOUS_WORLD.md) adds pure continuous-types/data/policy/geometry/observation/registry/base/kernel/tasks/wellbeing modules behind world-core's public entry point. WorldState and founding world.ts retain their historical semantics. Floating-point state, same-start transactions, swept collision, private navigation, persistent processes and event-grounded wellbeing share a deterministic time step. Reviewed code packages register typed interfaces and optional state schemas, migrations and personal observation adapters; individual mastery remains separate.
-
-Simulator continuous-scenario/input/provider/run modules own the independent initial world, minimal ordinary goal, dynamic JSON interface schema, exact-attempt journals and persistent conditional tasks. Repository continuous-cli/files/source/store/analysis/preflight modules adapt the existing coordinator and gates, retain versioned source and segmented deterministic evidence, and pause globally on budget exhaustion. Source review may inspect pure viewer visual registrations; core never imports the viewer or Node services.
-
-The separate observatory entry renders continuous-scene/visuals/history modules with a bounded segment cache, camera, event and state inspection. Its historical adapter preserves old grid positions and explicitly labels the different simulation. Camera time and animations never affect world time. See [ADR-0018](docs/decisions/0018-continuous-world-and-wellbeing.md).
+Bounded World Agent review, versioned skill/mechanism extensions, persistent tasks and individual memory already exist in the experimental protocols described above. Continuous packages can define explicit state migrations; this does not provide general migration between protocols. The founding `try` action still only records requests and never installs capabilities or rewrites its rules.
