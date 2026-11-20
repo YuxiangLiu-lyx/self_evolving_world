@@ -452,12 +452,26 @@ export class LocalTaskEffects implements TaskEffects {
   reviewMaterials(c: TaskContext): unknown {
     const snapshot = this.snapshot(c);
     const diff = `validation-results/tasks/${c.intent.id}-diff.patch`;
-    writeFileSync(
-      resolve(this.root, diff),
-      git(this.root, 'diff', `${snapshot.base}...HEAD`) +
-        '\n' +
-        git(this.root, 'diff', 'HEAD'),
-    );
+    const fd = openSync(resolve(this.root, diff), 'w');
+    try {
+      // Archive patches can exceed child_process's captured-output limit.
+      // Stream both complete diffs to the review artifact without truncation.
+      for (const revision of [`${snapshot.base}...HEAD`, 'HEAD']) {
+        const result = spawnSync('git', ['diff', revision], {
+          cwd: this.root,
+          encoding: 'utf8',
+          stdio: ['ignore', fd, 'pipe'],
+        });
+        if (result.error) throw result.error;
+        if (result.status !== 0)
+          throw new Error(
+            `Review diff failed (${String(result.status)}): ${result.stderr}`,
+          );
+        writeFileSync(fd, '\n');
+      }
+    } finally {
+      closeSync(fd);
+    }
     return {
       plan: c.intent.plan,
       diff,

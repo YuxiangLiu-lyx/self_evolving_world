@@ -3,7 +3,11 @@ import { defineConfig } from 'vite';
 import { experimentAssets } from '../../scripts/experiment-assets.js';
 
 export default defineConfig(() => {
-  const assets = experimentAssets(resolve(import.meta.dirname, '../..'));
+  // Preview serves the already validated build; reconstruct archives only when
+  // producing assets or serving source in development.
+  let assets: ReturnType<typeof experimentAssets> | undefined;
+  const archiveAssets = (): ReturnType<typeof experimentAssets> =>
+    (assets ??= experimentAssets(resolve(import.meta.dirname, '../..')));
   return {
     build: {
       rolldownOptions: {
@@ -18,9 +22,11 @@ export default defineConfig(() => {
       {
         name: 'validated-experiment-archive',
         configureServer(server) {
+          const servedAssets = archiveAssets();
           server.middlewares.use((request, response, next) => {
             const path = request.url?.split('?')[0]?.replace(/^\//, '');
-            const source = path === undefined ? undefined : assets.get(path);
+            const source =
+              path === undefined ? undefined : servedAssets.get(path);
             if (source === undefined) {
               next();
               return;
@@ -36,7 +42,7 @@ export default defineConfig(() => {
           });
         },
         generateBundle() {
-          for (const [fileName, source] of assets)
+          for (const [fileName, source] of archiveAssets())
             this.emitFile({ type: 'asset', fileName, source });
         },
       },

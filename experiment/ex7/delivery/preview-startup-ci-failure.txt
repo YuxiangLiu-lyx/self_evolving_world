@@ -1,0 +1,198 @@
+2026-11-20T01:49:09.1172117Z 
+2026-11-20T01:49:09.1173340Z > self-evolving-world@0.0.0 format:check /home/runner/work/self_evolving_world/self_evolving_world
+2026-11-20T01:49:09.1176326Z > prettier --check .
+2026-11-20T01:49:09.1176599Z 
+2026-11-20T01:49:09.2088619Z Checking formatting...
+2026-11-20T01:49:14.2417291Z All matched files use Prettier code style!
+2026-11-20T01:49:14.6482569Z 
+2026-11-20T01:49:14.6484383Z > self-evolving-world@0.0.0 architecture:check /home/runner/work/self_evolving_world/self_evolving_world
+2026-11-20T01:49:14.6486000Z > depcruise --config dependency-cruiser.config.cjs apps packages
+2026-11-20T01:49:14.6486449Z 
+2026-11-20T01:49:15.6738367Z 
+2026-11-20T01:49:15.6740041Z ✔ no dependency violations found (134 modules, 534 dependencies cruised)
+2026-11-20T01:49:15.6740442Z 
+2026-11-20T01:49:16.0732824Z 
+2026-11-20T01:49:16.0734444Z > self-evolving-world@0.0.0 test /home/runner/work/self_evolving_world/self_evolving_world
+2026-11-20T01:49:16.0735905Z > vitest run
+2026-11-20T01:49:16.0736211Z 
+2026-11-20T01:49:16.4053141Z 
+2026-11-20T01:49:16.4058472Z  RUN  v4.1.12 /home/runner/work/self_evolving_world/self_evolving_world
+2026-11-20T01:49:16.4059397Z 
+2026-11-20T01:49:16.9746634Z  ✓ packages/world-core/test/evolution.test.ts (10 tests) 40ms
+2026-11-20T01:49:17.0030344Z  ✓ packages/world-core/test/coevolution.test.ts (11 tests) 79ms
+2026-11-20T01:49:17.4231177Z  ✓ apps/simulator/test/experiment.test.ts (21 tests) 114ms
+2026-11-20T01:49:17.4379715Z  ✓ scripts/task-flow.test.ts (16 tests) 26ms
+2026-11-20T01:49:17.7451801Z  ✓ packages/world-core/test/learning.test.ts (22 tests) 48ms
+2026-11-20T01:49:17.9600323Z  ✓ packages/world-core/test/continuous.test.ts (12 tests) 280ms
+2026-11-20T01:49:18.2672769Z  ✓ packages/world-core/test/world.test.ts (38 tests) 24ms
+2026-11-20T01:49:18.6795954Z  ✓ scripts/task-runtime.test.ts (11 tests) 1200ms
+2026-11-20T01:49:19.0257660Z  ✓ apps/simulator/test/continuous.test.ts (6 tests) 991ms
+2026-11-20T01:49:19.0276042Z      ✓ journals each attempt before inference and runs long tasks without per-round calls  771ms
+2026-11-20T01:49:19.0740321Z  ✓ apps/simulator/test/learning-run.test.ts (5 tests) 117ms
+2026-11-20T01:49:21.4228659Z  ✓ apps/simulator/test/coevolution.test.ts (5 tests) 2087ms
+2026-11-20T01:49:21.4268156Z      ✓ proves three connected sustainable starts offline without adding fixtures to model context  562ms
+2026-11-20T01:49:21.4273064Z      ✓ counts every failed attempt and freezes the whole world on the 120th ordinary call  871ms
+2026-11-20T01:49:21.9858730Z  ✓ scripts/experiments.test.ts (18 tests) 214ms
+2026-11-20T01:49:22.3334926Z  ✓ scripts/delivery.test.ts (7 tests) 15ms
+2026-11-20T01:49:22.4186229Z  ✓ apps/simulator/test/evolution-run.test.ts (5 tests) 3133ms
+2026-11-20T01:49:22.4195475Z      ✓ pauses development at the same tick, resumes once, and audits every retained private input  2926ms
+2026-11-20T01:49:22.6908403Z  ✓ scripts/pr-policy.test.ts (13 tests) 84ms
+2026-11-20T01:49:23.1373264Z  ✓ scripts/validation.test.ts (15 tests) 112ms
+2026-11-20T01:49:23.4051772Z  ✓ packages/world-core/test/survival.test.ts (7 tests) 18ms
+2026-11-20T01:49:23.6894850Z  ✓ packages/world-core/test/round.test.ts (5 tests) 18ms
+2026-11-20T01:49:24.1750067Z  ✓ scripts/learning-analysis.test.ts (1 test) 204ms
+2026-11-20T01:49:24.2864285Z  ✓ scripts/task-entry.test.ts (14 tests) 5590ms
+2026-11-20T01:49:24.5447702Z  ✓ apps/simulator/test/survival-run.test.ts (5 tests) 95ms
+2026-11-20T01:49:24.6922138Z  ✓ scripts/publication.test.ts (5 tests) 11ms
+2026-11-20T01:49:24.9076907Z  ✓ apps/viewer/test/timeline.test.ts (7 tests) 73ms
+2026-11-20T01:49:25.1612976Z  ✓ scripts/harness.test.ts (3 tests) 267ms
+2026-11-20T01:49:25.2855750Z  ✓ packages/world-core/test/continuous-mosaic.test.ts (2 tests) 121ms
+2026-11-20T01:49:25.5275612Z  ✓ scripts/coevolution-source.test.ts (4 tests) 113ms
+2026-11-20T01:49:25.6485820Z  ✓ scripts/finish-task.test.ts (4 tests) 2823ms
+2026-11-20T01:49:25.6545492Z      ✓ requires publication when no local exception plan was supplied and replaces old success with failure  554ms
+2026-11-20T01:49:25.6575420Z      ✓ rejects evidence that has not passed local review and source changes after review  1077ms
+2026-11-20T01:49:25.6585846Z      ✓ does not use the local-only entry point to waive default merge completion  548ms
+2026-11-20T01:49:25.8016275Z  ✓ apps/simulator/test/synchronous-run.test.ts (4 tests) 222ms
+2026-11-20T01:49:25.9491007Z  ✓ scripts/documentation.test.ts (15 tests) 120ms
+2026-11-20T01:49:26.1505877Z  ✓ packages/world-core/test/continuous-nature.test.ts (2 tests) 84ms
+2026-11-20T01:49:26.4948900Z  ✓ scripts/task-review.test.ts (8 tests) 13ms
+2026-11-20T01:49:26.7698084Z  ✓ scripts/continuous-store.test.ts (1 test) 836ms
+2026-11-20T01:49:26.7706315Z      ✓ recovers the committed world after interruption, reconstructs fractional navigation and preserves a shorter window when continued  833ms
+2026-11-20T01:49:26.7869857Z  ✓ scripts/delivery-git.test.ts (4 tests) 492ms
+2026-11-20T01:49:26.8345999Z  ✓ scripts/survival-analysis.test.ts (2 tests) 86ms
+2026-11-20T01:49:27.0866957Z  ✓ packages/world-core/test/program.test.ts (16 tests) 24ms
+2026-11-20T01:49:27.1932971Z  ✓ apps/simulator/test/chatgpt-auth.test.ts (9 tests) 29ms
+2026-11-20T01:49:27.3482805Z  ✓ apps/simulator/test/random-run.test.ts (12 tests) 331ms
+2026-11-20T01:49:27.5448660Z  ✓ scripts/github.test.ts (2 tests) 44ms
+2026-11-20T01:49:27.6687222Z  ✓ apps/viewer/test/experiments.test.ts (10 tests) 16ms
+2026-11-20T01:49:27.8062951Z  ✓ apps/simulator/test/demo.test.ts (3 tests) 7ms
+2026-11-20T01:49:30.5853928Z  ✓ scripts/unit-reporter.test.ts (6 tests) 3271ms
+2026-11-20T01:49:30.5855103Z      ✓ handles ordinary passing test  653ms
+2026-11-20T01:49:30.5855983Z      ✓ handles skipped test  531ms
+2026-11-20T01:49:30.5856738Z      ✓ handles todo test  520ms
+2026-11-20T01:49:30.5857755Z      ✓ handles expected failure  518ms
+2026-11-20T01:49:30.5858543Z      ✓ handles focused test  517ms
+2026-11-20T01:49:30.5859286Z      ✓ handles dynamic skip  530ms
+2026-11-20T01:49:30.5880576Z 
+2026-11-20T01:49:30.5890982Z  Test Files  41 passed (41)
+2026-11-20T01:49:30.5892005Z       Tests  366 passed (366)
+2026-11-20T01:49:30.5892794Z    Start at  01:49:16
+2026-11-20T01:49:30.5894400Z    Duration  14.17s (transform 1.74s, setup 0ms, import 5.61s, tests 23.47s, environment 6ms)
+2026-11-20T01:49:30.5895224Z 
+2026-11-20T01:49:30.9966129Z 
+2026-11-20T01:49:30.9969110Z > self-evolving-world@0.0.0 build /home/runner/work/self_evolving_world/self_evolving_world
+2026-11-20T01:49:30.9969981Z > pnpm -r build
+2026-11-20T01:49:30.9970198Z 
+2026-11-20T01:49:31.3494912Z Scope: 3 of 4 workspace projects
+2026-11-20T01:49:31.3545158Z packages/world-core build$ tsc -p tsconfig.json
+2026-11-20T01:49:33.1354847Z packages/world-core build: Done
+2026-11-20T01:49:33.1365725Z apps/simulator build$ tsc -p tsconfig.json
+2026-11-20T01:49:33.1369374Z apps/viewer build$ tsc --noEmit && vite build
+2026-11-20T01:49:36.3290140Z apps/simulator build: Done
+2026-11-20T01:50:07.0455275Z apps/viewer build: vite v8.3.6 building client environment for production...
+2026-11-20T01:50:07.0587699Z apps/viewer build: transforming...
+2026-11-20T01:50:07.1070101Z apps/viewer build: ✓ 52 modules transformed.
+2026-11-20T01:50:07.1240996Z apps/viewer build: rendering chunks...
+2026-11-20T01:50:07.1585128Z apps/viewer build: computing gzip size...
+2026-11-20T01:50:07.1701875Z apps/viewer build: dist/index.html                                        0.57 kB │ gzip:  0.32 kB
+2026-11-20T01:50:07.1704021Z apps/viewer build: dist/observatory.html                                  0.57 kB │ gzip:  0.32 kB
+2026-11-20T01:50:07.1706336Z apps/viewer build: dist/experiments/ex7/replay.json                       1.54 kB │ gzip:  0.69 kB
+2026-11-20T01:50:07.1708441Z apps/viewer build: dist/experiments/ex4/overview.svg                      1.72 kB │ gzip:  0.65 kB
+2026-11-20T01:50:07.1710542Z apps/viewer build: dist/experiments/index.json                            2.41 kB │ gzip:  1.04 kB
+2026-11-20T01:50:07.1712206Z apps/viewer build: dist/experiments/ex3/overview.svg                      4.14 kB │ gzip:  1.48 kB
+2026-11-20T01:50:07.1714194Z apps/viewer build: dist/experiments/ex3/replay.json                       4.91 kB │ gzip:  1.09 kB
+2026-11-20T01:50:07.1715928Z apps/viewer build: dist/experiments/ex5/overview.svg                      5.80 kB │ gzip:  1.22 kB
+2026-11-20T01:50:07.1717811Z apps/viewer build: dist/experiments/ex2/overview.svg                      6.87 kB │ gzip:  1.76 kB
+2026-11-20T01:50:07.1719734Z apps/viewer build: dist/classic.html                                     14.04 kB │ gzip:  3.48 kB
+2026-11-20T01:50:07.1720885Z apps/viewer build: dist/experiments/ex1/overview.svg                     14.69 kB │ gzip:  1.89 kB
+2026-11-20T01:50:07.1722607Z apps/viewer build: dist/experiments/ex6/overview.svg                     24.14 kB │ gzip:  3.34 kB
+2026-11-20T01:50:07.1724493Z apps/viewer build: dist/experiments/ex4/replay.json                      36.08 kB │ gzip:  4.31 kB
+2026-11-20T01:50:07.1725972Z apps/viewer build: dist/experiments/ex1/replay.json                      42.25 kB │ gzip:  1.40 kB
+2026-11-20T01:50:07.1727480Z apps/viewer build: dist/experiments/ex7/overview.svg                     44.25 kB │ gzip: 13.94 kB
+2026-11-20T01:50:07.1728981Z apps/viewer build: dist/experiments/ex2/replay.json                      49.36 kB │ gzip:  1.21 kB
+2026-11-20T01:50:07.1730423Z apps/viewer build: dist/experiments/ex5/replay.json                     191.65 kB │ gzip: 22.73 kB
+2026-11-20T01:50:07.1731980Z apps/viewer build: dist/experiments/ex6/replay.json                     213.78 kB │ gzip: 24.13 kB
+2026-11-20T01:50:07.1733989Z apps/viewer build: dist/experiments/ex7/replay/part-000900-001000.json  695.34 kB │ gzip: 38.84 kB
+2026-11-20T01:50:07.1735593Z apps/viewer build: dist/experiments/ex7/replay/part-000600-000700.json  730.99 kB │ gzip: 40.93 kB
+2026-11-20T01:50:07.1737246Z apps/viewer build: dist/experiments/ex7/replay/part-000800-000900.json  731.41 kB │ gzip: 42.68 kB
+2026-11-20T01:50:07.1738851Z apps/viewer build: dist/experiments/ex7/replay/part-000100-000200.json  740.54 kB │ gzip: 42.15 kB
+2026-11-20T01:50:07.1740337Z apps/viewer build: dist/experiments/ex7/replay/part-000700-000800.json  748.80 kB │ gzip: 43.46 kB
+2026-11-20T01:50:07.1741854Z apps/viewer build: dist/experiments/ex7/replay/part-000200-000300.json  751.98 kB │ gzip: 43.64 kB
+2026-11-20T01:50:07.1743346Z apps/viewer build: dist/experiments/ex7/replay/part-000500-000600.json  773.42 kB │ gzip: 44.74 kB
+2026-11-20T01:50:07.1754957Z apps/viewer build: dist/experiments/ex7/replay/part-000000-000100.json  773.77 kB │ gzip: 49.94 kB
+2026-11-20T01:50:07.1755958Z apps/viewer build: dist/experiments/ex7/replay/part-000400-000500.json  786.06 kB │ gzip: 46.49 kB
+2026-11-20T01:50:07.1756900Z apps/viewer build: dist/experiments/ex7/replay/part-000300-000400.json  898.19 kB │ gzip: 52.83 kB
+2026-11-20T01:50:07.1757825Z apps/viewer build: dist/assets/observatory-D8eqzeqa.css                   6.99 kB │ gzip:  2.34 kB
+2026-11-20T01:50:07.1758738Z apps/viewer build: dist/assets/classic-CkITEJCO.css                      16.01 kB │ gzip:  4.83 kB
+2026-11-20T01:50:07.1759650Z apps/viewer build: dist/assets/observatory-CgpHx8vD.js                   25.05 kB │ gzip:  9.26 kB
+2026-11-20T01:50:07.1760560Z apps/viewer build: dist/assets/classic-XHjyNxQ5.js                       35.67 kB │ gzip: 11.83 kB
+2026-11-20T01:50:07.1761461Z apps/viewer build: dist/assets/timeline-DXweNzxR.js                     138.86 kB │ gzip: 38.82 kB
+2026-11-20T01:50:07.1762132Z apps/viewer build: ✓ built in 127ms
+2026-11-20T01:50:07.2280442Z apps/viewer build: Done
+2026-11-20T01:50:07.5928794Z 
+2026-11-20T01:50:07.5929993Z > self-evolving-world@0.0.0 demo:check /home/runner/work/self_evolving_world/self_evolving_world
+2026-11-20T01:50:07.5930840Z > tsx scripts/check-demo.ts
+2026-11-20T01:50:07.5931085Z 
+2026-11-20T01:50:07.9331911Z Compiled CLI checks passed: exact JSON matches in two independent processes.
+2026-11-20T01:50:08.3191518Z 
+2026-11-20T01:50:08.3192882Z > self-evolving-world@0.0.0 experiment:check /home/runner/work/self_evolving_world/self_evolving_world
+2026-11-20T01:50:08.3194509Z > tsx scripts/experiment-cli.ts check
+2026-11-20T01:50:08.3194853Z 
+2026-11-20T01:50:38.8671997Z Experiment artifacts passed: ex1, ex2, ex3, ex4, ex5, ex6, ex7.
+2026-11-20T01:50:39.2998865Z 
+2026-11-20T01:50:39.3000026Z > self-evolving-world@0.0.0 analysis:check /home/runner/work/self_evolving_world/self_evolving_world
+2026-11-20T01:50:39.3001761Z > tsx scripts/task.ts analyses
+2026-11-20T01:50:39.3002159Z 
+2026-11-20T01:51:39.2324836Z Experiment companion analyses passed.
+2026-11-20T01:51:39.6805322Z 
+2026-11-20T01:51:39.6806298Z > self-evolving-world@0.0.0 test:e2e /home/runner/work/self_evolving_world/self_evolving_world
+2026-11-20T01:51:39.6807352Z > playwright test
+2026-11-20T01:51:39.6807618Z 
+2026-11-20T01:52:10.6295226Z Error: Timed out waiting 30000ms from config.webServer.
+2026-11-20T01:52:10.6295773Z 
+2026-11-20T01:52:10.6820912Z  ELIFECYCLE  Command failed with exit code 1.
+2026-11-20T01:52:10.7195790Z  ELIFECYCLE  Command failed with exit code 1.
+2026-11-20T01:52:10.7412343Z pnpm check did not pass. Fix the failure and rerun validation.
+2026-11-20T01:52:10.8507746Z  ELIFECYCLE  Command failed with exit code 1.
+2026-11-20T01:52:10.8798371Z ##[error]Process completed with exit code 1.
+2026-11-20T01:52:10.8910042Z ##[group]Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+2026-11-20T01:52:10.8910553Z with:
+2026-11-20T01:52:10.8910852Z   name: validation-88a0aa4e510992b4172ce830624922d7672e3a62-1
+2026-11-20T01:52:10.8911299Z   path: playwright-report/
+2026-11-20T01:52:10.8911672Z   retention-days: 14
+2026-11-20T01:52:10.8911911Z   if-no-files-found: warn
+2026-11-20T01:52:10.8912156Z   compression-level: 6
+2026-11-20T01:52:10.8912375Z   overwrite: false
+2026-11-20T01:52:10.8912593Z   include-hidden-files: false
+2026-11-20T01:52:10.8912832Z   archive: true
+2026-11-20T01:52:10.8913030Z env:
+2026-11-20T01:52:10.8913277Z   PNPM_HOME: /home/runner/setup-pnpm/node_modules/.bin
+2026-11-20T01:52:10.8913964Z ##[endgroup]
+2026-11-20T01:52:11.0461755Z Multiple search paths detected. Calculating the least common ancestor of all paths
+2026-11-20T01:52:11.0464999Z The least common ancestor is /home/runner/work/self_evolving_world/self_evolving_world. This will be the root directory of the artifact
+2026-11-20T01:52:11.0466457Z With the provided path, there will be 3 files uploaded
+2026-11-20T01:52:11.0467649Z Artifact name is valid!
+2026-11-20T01:52:11.0468600Z Root directory input is valid!
+2026-11-20T01:52:11.3037829Z Uploading artifact: validation-88a0aa4e510992b4172ce830624922d7672e3a62-1.zip
+2026-11-20T01:52:11.3078358Z Beginning upload of artifact content to blob storage
+2026-11-20T01:52:11.5527882Z Uploaded bytes 222589
+2026-11-20T01:52:11.5847241Z Finished uploading artifact content to blob storage!
+2026-11-20T01:52:11.5848610Z SHA256 digest of uploaded artifact is 00cecdebdbc55a3f729a846f48965728751318af726160098fdc73e8851db131
+2026-11-20T01:52:11.5849699Z Finalizing artifact upload
+2026-11-20T01:52:11.9837998Z Artifact validation-88a0aa4e510992b4172ce830624922d7672e3a62-1 successfully finalized. Artifact ID 14593526811
+2026-11-20T01:52:11.9840468Z Artifact validation-88a0aa4e510992b4172ce830624922d7672e3a62-1 has been successfully uploaded! Final size is 222589 bytes. Artifact ID is 14593526811
+2026-11-20T01:52:11.9842715Z Artifact download URL: https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/runs/44656154696/artifacts/14593526811
+2026-11-20T01:52:12.0041291Z Post job cleanup.
+2026-11-20T01:52:12.1606766Z Pruning is unnecessary.
+2026-11-20T01:52:12.1792997Z Post job cleanup.
+2026-11-20T01:52:12.2780892Z [command]/usr/bin/git version
+2026-11-20T01:52:12.2829191Z git version 2.56.1
+2026-11-20T01:52:12.2906981Z Temporarily overriding HOME='/home/runner/work/_temp/2a7001a9-0c0b-48be-8c4b-69bd1435986f' before making global git config changes
+2026-11-20T01:52:12.2909215Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-20T01:52:12.2913855Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/self_evolving_world/self_evolving_world
+2026-11-20T01:52:12.2956258Z Removing SSH command configuration
+2026-11-20T01:52:12.2965891Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-20T01:52:12.3011589Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-20T01:52:12.3276477Z Removing HTTP extra header
+2026-11-20T01:52:12.3900321Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-20T01:52:12.4315030Z Cleaning up orphan processes
