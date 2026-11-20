@@ -35,10 +35,19 @@ function captureRecord(id: string, manifest: Record<string, unknown>): void {
   const path = resolve(directory, 'manifest.json');
   try {
     // Additional capture only; never a substitute for final full validation.
-    run('pnpm', ['exec', 'playwright', 'test', 'experiments.spec.ts'], {
-      ...process.env,
-      WORLD_EXPERIMENT_CAPTURE: id,
-    });
+    run(
+      'pnpm',
+      [
+        'exec',
+        'playwright',
+        'test',
+        manifest.version === 7 ? 'continuous.spec.ts' : 'experiments.spec.ts',
+      ],
+      {
+        ...process.env,
+        WORLD_EXPERIMENT_CAPTURE: id,
+      },
+    );
     writeExperimentJson(path, {
       ...manifest,
       status: 'completed',

@@ -163,3 +163,14 @@ export {
 export { actionEffort, carryingLoad, recovery } from './coevolution-effects.js';
 export { stepCoevolutionRound, parseCoevolutionRound } from './coevolution.js';
 export * from './coevolution-program.js';
+export * from './continuous-types.js';
+export * from './continuous-policy.js';
+export * from './continuous-data.js';
+export * from './continuous-geometry.js';
+export * from './continuous-observation.js';
+export * from './continuous-base.js';
+export * from './continuous-registry.js';
+export * from './continuous-wellbeing.js';
+export * from './continuous-kernel.js';
+export * from './continuous-tasks.js';
+export * from './continuous.js';

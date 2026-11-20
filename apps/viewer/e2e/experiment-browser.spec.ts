@@ -15,7 +15,7 @@ const replay: unknown = JSON.parse(
 test('switches between ex1 and ex2 and displays simultaneous moves and successful pickups on desktop and mobile', async ({
   page,
 }, info) => {
-  await page.goto('/?experiment=ex2');
+  await page.goto('/classic.html?experiment=ex2');
   await expect(page.locator('#experiment-select')).toHaveValue('ex2');
   await expect(page.locator('#tick-unit')).toHaveText('ROUND');
   await expect(page.locator('#history-count')).toHaveText('160 / 160');
@@ -57,7 +57,7 @@ test('selects an archived experiment, navigates URLs and replays without changin
   page,
 }, info) => {
   await page.clock.install();
-  await page.goto('/');
+  await page.goto('/classic.html');
   const select = page.getByLabel('EXPERIMENT ARCHIVE', { exact: true });
   await expect(select).toBeEnabled();
   await select.selectOption('ex1');
@@ -107,7 +107,7 @@ test('opens a direct experiment link on mobile with agent inspection and vision'
   page,
 }, info) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/?experiment=ex1');
+  await page.goto('/classic.html?experiment=ex1');
   await expect(page.locator('#experiment-select')).toHaveValue('ex1');
   await page.getByRole('button', { name: 'First frame' }).click();
   await page.locator('#agent-select').selectOption('moss');
@@ -123,7 +123,7 @@ test('opens a direct experiment link on mobile with agent inspection and vision'
 test('handles an unknown experiment, empty archive and invalid catalogue without losing the demo', async ({
   page,
 }) => {
-  await page.goto('/?experiment=ex999');
+  await page.goto('/classic.html?experiment=ex999');
   await expect(page.locator('#experiment-feedback')).toContainText(
     'Could not load ex999',
   );
@@ -167,7 +167,7 @@ test('keeps the archive intact after invalid imports or replay loads and cancels
       },
     }),
   );
-  await page.goto('/?experiment=ex1');
+  await page.goto('/classic.html?experiment=ex1');
   await expect(page.locator('#experiment-select')).toHaveValue('ex1');
   await page.locator('#import-file').setInputFiles({
     name: 'invalid.json',

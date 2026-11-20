@@ -26,6 +26,12 @@ export const REVIEW_SCENES = [
   'evolution-mobile',
   'coevolution-browser',
   'coevolution-mobile',
+  'historical-game-ex6',
+  'historical-personal-ex6',
+  'historical-game-mobile',
+  'historical-unmeasured-vitals',
+  'isolated-continuous-extension',
+  'continuous-initial-world-fixture',
 ] as const;
 export type ReviewScene = (typeof REVIEW_SCENES)[number];
 

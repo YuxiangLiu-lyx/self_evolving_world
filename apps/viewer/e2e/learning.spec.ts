@@ -53,7 +53,7 @@ const source = serializeReplay({
 test('shows versioned terrain, individual learning and generated implementations on desktop and mobile', async ({
   page,
 }, info) => {
-  await page.goto('/');
+  await page.goto('/classic.html');
   await page.locator('#import-file').setInputFiles({
     name: 'learning-offline-fixture.json',
     mimeType: 'application/json',
@@ -97,7 +97,7 @@ for (const id of experimentIds(process.cwd()).filter(
   test(`${id} opens learning history through the shared selector and survives reload`, async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/classic.html');
     await page.locator('#experiment-select').selectOption(id);
     await expect(page.locator('#capability-panel')).toBeVisible();
     await expect(page.locator('#history-count')).toHaveText('018 / 018');

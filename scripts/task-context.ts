@@ -16,7 +16,12 @@ export type ExperimentIntent =
   | { readonly mode: 'none' }
   | {
       readonly mode:
-        'random' | 'survival' | 'learning' | 'evolution' | 'coevolution';
+        | 'random'
+        | 'survival'
+        | 'learning'
+        | 'evolution'
+        | 'coevolution'
+        | 'continuous';
       readonly allocation: 'new' | 'reuse';
       readonly basis: Basis;
       readonly id?: string;
@@ -193,6 +198,7 @@ export function parseIntent(value: unknown): TaskIntent {
     'learning',
     'evolution',
     'coevolution',
+    'continuous',
   ]);
   keys(
     e,
@@ -209,10 +215,13 @@ export function parseIntent(value: unknown): TaskIntent {
       (mode === 'survival' ||
         mode === 'learning' ||
         mode === 'evolution' ||
-        mode === 'coevolution') &&
+        mode === 'coevolution' ||
+        (mode === 'continuous' && allocation === 'new')) &&
       (e.seed !== undefined || e.rounds !== undefined)
     )
       throw new Error('Model experiments use their recorded fixed protocol.');
+    if (mode === 'continuous' && e.seed !== undefined)
+      throw new Error('Continuous continuation preserves the original seed.');
     if (
       e.seed !== undefined &&
       (typeof e.seed !== 'number' ||
@@ -224,9 +233,9 @@ export function parseIntent(value: unknown): TaskIntent {
     if (
       e.rounds !== undefined &&
       (typeof e.rounds !== 'number' ||
-        !Number.isInteger(e.rounds) ||
-        e.rounds < 3 ||
-        e.rounds > 500)
+        !Number.isSafeInteger(e.rounds) ||
+        e.rounds < (mode === 'continuous' ? 1001 : 3) ||
+        (mode !== 'continuous' && e.rounds > 500))
     )
       throw new Error('Invalid random round count.');
     experiment = {

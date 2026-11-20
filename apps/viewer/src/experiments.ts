@@ -12,7 +12,8 @@ export interface ExperimentEntry {
     | 'survival-v1'
     | 'learning-v1'
     | 'evolution-v1'
-    | 'coevolution-v1';
+    | 'coevolution-v1'
+    | 'continuous-v1';
   readonly totalActions?: number;
 }
 
@@ -38,7 +39,8 @@ export function parseCatalogue(source: string): ExperimentEntry[] {
         schedule !== 'survival-v1' &&
         schedule !== 'learning-v1' &&
         schedule !== 'evolution-v1' &&
-        schedule !== 'coevolution-v1') ||
+        schedule !== 'coevolution-v1' &&
+        schedule !== 'continuous-v1') ||
       (schedule !== undefined &&
         (typeof totalActions !== 'number' ||
           !Number.isInteger(totalActions) ||
@@ -54,12 +56,16 @@ export function parseCatalogue(source: string): ExperimentEntry[] {
       objective.length > 1000 ||
       typeof steps !== 'number' ||
       !Number.isInteger(steps) ||
-      steps < (schedule === 'coevolution-v1' ? 0 : 3) ||
-      steps > MAX_ACTIONS ||
+      steps <
+        (schedule === 'coevolution-v1' || schedule === 'continuous-v1'
+          ? 0
+          : 3) ||
+      (schedule !== 'continuous-v1' && steps > MAX_ACTIONS) ||
       (schedule === 'survival-v1' ||
       schedule === 'learning-v1' ||
       schedule === 'evolution-v1' ||
-      schedule === 'coevolution-v1'
+      schedule === 'coevolution-v1' ||
+      schedule === 'continuous-v1'
         ? seed !== undefined
         : typeof seed !== 'number' ||
           !Number.isInteger(seed) ||
@@ -80,7 +86,8 @@ export function parseCatalogue(source: string): ExperimentEntry[] {
         schedule === 'survival-v1' ||
         schedule === 'learning-v1' ||
         schedule === 'evolution-v1' ||
-        schedule === 'coevolution-v1') &&
+        schedule === 'coevolution-v1' ||
+        schedule === 'continuous-v1') &&
       typeof totalActions === 'number'
         ? { schedule, totalActions }
         : {}),
@@ -208,6 +215,12 @@ export class ExperimentBrowser {
       const entry = this.entries.find((candidate) => candidate.id === id);
       if (entry === undefined)
         throw new Error('This experiment is not in the completed archive.');
+      if (entry.schedule === 'continuous-v1') {
+        window.location.assign(
+          `./observatory.html?experiment=${encodeURIComponent(entry.id)}`,
+        );
+        return;
+      }
       const timeline = parseReplay(await readAsset(`${entry.id}/replay.json`));
       if (
         timeline.frames.length !== entry.steps + 1 ||

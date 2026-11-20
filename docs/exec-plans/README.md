@@ -37,3 +37,5 @@ Use `pr-NN-short-title.md` and include `Requirement summary`, numbered `Requirem
 Plans must distinguish intended validation from actual passing results. Explain any unavailable checks. Record commands, environment versions, outcomes, and key counts instead of copying full dependency logs. Historical records retain their original results even when translated.
 
 - [PR-17](completed/pr-17-development-coevolution.md): development motivation, costed persistent coevolution and real experimental evidence.
+
+- [PR-18](completed/pr-18-continuous-world.md): continuous physics, open versioned mechanisms and visuals, persistent wellbeing and the real 1,000-round ex7 observation.

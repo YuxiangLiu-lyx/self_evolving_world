@@ -1,0 +1,181 @@
+import type {
+  V7Action,
+  V7Condition,
+  V7Cursor,
+  V7Plan,
+  V7TaskStep,
+  V7World,
+  V7RoundResult,
+} from './continuous-types.js';
+import {
+  V7ComputePause,
+  v7Clone,
+  v7Json,
+  v7Number,
+  v7Record,
+  v7String,
+} from './continuous-data.js';
+import { v7Condition, v7ConditionContext } from './continuous-observation.js';
+
+function condition(value: unknown): V7Condition | null {
+  if (value === null) return null;
+  const c = v7Record(value),
+    path = v7String(c.path, 'condition path');
+  if (
+    !/^(self\.(health|satiety|energy|temperature|happiness|inventory\.[a-z0-9-]+)|tick)$/.test(
+      path,
+    )
+  )
+    throw new Error('Conditions must use registered personal state paths.');
+  if (
+    !['lt', 'lte', 'gt', 'gte', 'eq', 'neq'].includes(String(c.comparison)) ||
+    !['number', 'boolean', 'string'].includes(typeof c.value)
+  )
+    throw new Error('Invalid condition.');
+  return {
+    path,
+    comparison: c.comparison as V7Condition['comparison'],
+    value: c.value as V7Condition['value'],
+  };
+}
+function repeat(value: unknown): number {
+  const result = v7Number(value, 'task repeat count', 1);
+  if (!Number.isSafeInteger(result))
+    throw new Error('Task repeats must be safe integers.');
+  return result;
+}
+export function v7ParsePlan(value: unknown): V7Plan {
+  const p = v7Record(value);
+  if (
+    Object.keys(p).sort().join(',') !==
+    'intention,interrupts,notes,preferences,repeat,steps,until'
+  )
+    throw new Error('Expected the registered task plan shape.');
+  if (!Array.isArray(p.steps) || !p.steps.length)
+    throw new Error('A decision needs at least one explicit action.');
+  const strings = (v: unknown): string[] => {
+    if (!Array.isArray(v) || v.some((x: unknown) => typeof x !== 'string'))
+      throw new Error('Expected text records.');
+    return v as string[];
+  };
+  const steps: V7TaskStep[] = p.steps.map((raw: unknown) => {
+    const s = v7Record(raw),
+      a = v7Record(s.action),
+      args = v7Json(a.args);
+    if (!args || typeof args !== 'object' || Array.isArray(args))
+      throw new Error('Action arguments must be an object.');
+    return {
+      action: { interface: v7String(a.interface, 'interface'), args },
+      repeat: repeat(s.repeat),
+      until: condition(s.until),
+      guard: condition(s.guard),
+    };
+  });
+  return {
+    intention: typeof p.intention === 'string' ? p.intention : '',
+    steps,
+    repeat: repeat(p.repeat),
+    until: condition(p.until),
+    interrupts: strings(p.interrupts),
+    notes: strings(p.notes),
+    preferences: strings(p.preferences),
+  };
+}
+export function v7Cursor(plan: V7Plan, tick: number): V7Cursor {
+  return {
+    plan: v7Clone(plan),
+    step: 0,
+    repetition: 0,
+    cycle: 0,
+    startedAt: tick,
+    navigation: null,
+    reason: null,
+  };
+}
+function advance(cursor: V7Cursor): void {
+  cursor.repetition += 1;
+  if (cursor.repetition >= (cursor.plan.steps[cursor.step]?.repeat ?? 1)) {
+    cursor.step += 1;
+    cursor.repetition = 0;
+  }
+  if (cursor.step >= cursor.plan.steps.length) {
+    cursor.step = 0;
+    cursor.cycle += 1;
+  }
+  cursor.navigation = null;
+}
+export function v7TaskAction(
+  world: V7World,
+  actorId: string,
+  cursor: V7Cursor,
+): V7Action | null {
+  const actor = world.actors.find((a) => a.id === actorId);
+  if (!actor || actor.vitals.health <= 0) return null;
+  if (actor.learning) return { interface: 'wait', args: {} };
+  if (cursor.reason) return null;
+  const context = v7ConditionContext(world, actor);
+  let examined = 0;
+  while (cursor.cycle < cursor.plan.repeat) {
+    if (++examined > world.config.computation.workPerRound)
+      throw new V7ComputePause(
+        'Conditional task evaluation exhausted the computation budget.',
+      );
+    if (v7Condition(cursor.plan.until, context)) {
+      cursor.reason = 'The actor-defined plan condition is satisfied.';
+      return null;
+    }
+    const step = cursor.plan.steps[cursor.step];
+    if (!step) throw new Error('Missing task step.');
+    if (step.guard && !v7Condition(step.guard, context)) {
+      cursor.reason = 'The actor-defined guard no longer holds.';
+      return null;
+    }
+    if (v7Condition(step.until, context)) {
+      cursor.repetition = step.repeat - 1;
+      advance(cursor);
+      continue;
+    }
+    return step.action;
+  }
+  cursor.reason = 'The actor-defined task is complete.';
+  return null;
+}
+export function v7FinishTasks(
+  before: V7World,
+  result: V7RoundResult,
+  cursors: Record<string, V7Cursor>,
+): void {
+  if (result.paused) return;
+  for (const actor of result.world.actors) {
+    const cursor = cursors[actor.id],
+      old = before.actors.find((a) => a.id === actor.id),
+      outcome = result.outcomes[actor.id];
+    if (!cursor || !old || !outcome) continue;
+    if (!outcome.success) cursor.reason = outcome.reason;
+    else if (
+      result.world.events.some(
+        (e) => e.actor === actor.id && e.type === 'mastered',
+      )
+    )
+      cursor.reason =
+        'A studied interface is now mastered; the available action catalogue changed.';
+    else if (!old.learning && outcome.complete) advance(cursor);
+    if (
+      (old.vitals.satiety > 8 && actor.vitals.satiety <= 8) ||
+      (old.vitals.health > 60 && actor.vitals.health <= 60) ||
+      (old.vitals.health > 20 && actor.vitals.health <= 20) ||
+      (old.vitals.energy > 1 && actor.vitals.energy <= 1) ||
+      (Math.abs(old.vitals.temperature - 22) < 10 &&
+        Math.abs(actor.vitals.temperature - 22) >= 10)
+    )
+      cursor.reason = 'New urgent physiological risk requires a decision.';
+    if (
+      result.world.events.some(
+        (e) =>
+          cursor.plan.interrupts.includes(e.type) &&
+          (e.actor === actor.id || e.target === actor.id),
+      )
+    )
+      cursor.reason = 'An actor-selected interrupt event occurred.';
+  }
+}

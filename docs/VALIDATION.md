@@ -26,29 +26,39 @@ Creating a survival model experiment is explicit: `pnpm experiment:survival` run
 
 Creating a random experiment is explicit: `pnpm experiment:run` generates the next `exN` with an objective, random configuration, results, report and real visual evidence. Its additional browser capture does not replace full validation. `pnpm experiment:check` verifies all records without creating another run. The capture environment variable is forbidden in full validation so it cannot restrict the suite. See the [archive contract](../experiment/README.md) and [ADR-0008](decisions/0008-numbered-experiments-and-task-routing.md).
 
-Every saved run adds four required scenes: `exN-initial`, `exN-midpoint`, `exN-final`, and `exN-overview`. Inspect all of them alongside the eleven standard scenes below. Review positions, ownership, event feedback, trajectories, counts and chart readability. The completion gate revalidates artifacts and requires fresh per-scene approval; expected action rejections do not imply execution failure.
+Every saved run adds four required scenes: `exN-initial`, `exN-midpoint`, `exN-final`, and `exN-overview`. Inspect all of them alongside the standard scenes below. Review positions, ownership, event feedback, trajectories, counts and chart readability. The completion gate revalidates artifacts and requires fresh per-scene approval; expected action rejections do not imply execution failure.
 
 Every new/changed experiment also returns a [behavioral analysis request](../experiment/README.md#behavioral-analysis) before final validation. Explicit retrospective targets use existing archives without another run. The separately requested analysis gate checks completeness and artifact freshness, while the current conversation judges causes and recommendations. It does not change execution-success metrics.
 
 ## Visual review
 
-The World Observatory is currently the only product page. Inspect the following eleven full-page screenshots every run. When adding pages or major interactions, extend the [scene list](../scripts/validation.ts) and browser tests instead of continuing to review only old pages.
+The game observatory is the primary page; `classic.html` preserves the original controls and protocol views. Inspect all twenty-three standard screenshots every run, including the isolated continuous fixtures, historical adapters and mobile views. The four ex7 archive scenes additionally cover the real continuous experiment. When adding pages or major interactions, extend the [scene list](../scripts/validation.ts) and browser tests instead of continuing to review only old pages.
 
-| Scene ID            | Required content                                        | Review focus                                                                                            |
-| ------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| desktop             | Demo world at a 1440×1100 viewport                      | Complete map, inspector, timeline, events, and controls; sensible spacing and hierarchy                 |
-| mobile              | New world at a 390×844 viewport                         | Natural vertical scrolling; no cramped, clipped, or horizontally overflowing content                    |
-| agent-vision        | Lin's initial agent view                                | Clear observed/unobserved regions; hidden out-of-range agents; matching map and inspector               |
-| after-actions       | Movement and pickup                                     | Correct position, ownership and collection feedback                                                     |
-| history             | Replay paused at frame 3                                | Clear historical state, disabled action controls, matching map/inspector/event                          |
-| experiment-browser  | Archived ex1 selected and paused midway on desktop      | Visible selector, objective, frame count, chart link and read-only feedback; matching positions         |
-| experiment-mobile   | Direct ex1 URL on a 390px screen, Moss's initial vision | Selector and archive details wrap naturally; map, controls and inspector remain readable                |
-| synchronous-browser | ex2 at collection round 2 on desktop                    | Three recognizable actors, collected items, round label, all round events and disabled archive controls |
-| survival-browser    | Survival replay at round 30 on desktop                  | Health/satiety/cold/heat, current code progress and denied learning are readable and agree with history |
-| learning-browser    | Version-4 generated skill fixture on desktop            | Terrain, resource quantities, learned specification/code and vitals agree with reconstructed state      |
-| learning-mobile     | Same fixture during unfinished learning at 390px        | Individual progress and resources fit without horizontal overflow                                       |
-| survival-mobile     | Same replay at 390px with Moss selected                 | Vital meters, code and request history fit without horizontal overflow                                  |
-| synchronous-mobile  | ex2 at collection round 2 at 390px                      | Readable illustrated map and event feedback with no horizontal overflow                                 |
+| Scene ID                         | Required content                                        | Review focus                                                                                            |
+| -------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| desktop                          | Demo world at a 1440×1100 viewport                      | Complete map, inspector, timeline, events, and controls; sensible spacing and hierarchy                 |
+| mobile                           | New world at a 390×844 viewport                         | Natural vertical scrolling; no cramped, clipped, or horizontally overflowing content                    |
+| agent-vision                     | Lin's initial agent view                                | Clear observed/unobserved regions; hidden out-of-range agents; matching map and inspector               |
+| after-actions                    | Movement and pickup                                     | Correct position, ownership and collection feedback                                                     |
+| history                          | Replay paused at frame 3                                | Clear historical state, disabled action controls, matching map/inspector/event                          |
+| experiment-browser               | Archived ex1 selected and paused midway on desktop      | Visible selector, objective, frame count, chart link and read-only feedback; matching positions         |
+| experiment-mobile                | Direct ex1 URL on a 390px screen, Moss's initial vision | Selector and archive details wrap naturally; map, controls and inspector remain readable                |
+| synchronous-browser              | ex2 at collection round 2 on desktop                    | Three recognizable actors, collected items, round label, all round events and disabled archive controls |
+| survival-browser                 | Survival replay at round 30 on desktop                  | Health/satiety/cold/heat, current code progress and denied learning are readable and agree with history |
+| learning-browser                 | Version-4 generated skill fixture on desktop            | Terrain, resource quantities, learned specification/code and vitals agree with reconstructed state      |
+| learning-mobile                  | Same fixture during unfinished learning at 390px        | Individual progress and resources fit without horizontal overflow                                       |
+| survival-mobile                  | Same replay at 390px with Moss selected                 | Vital meters, code and request history fit without horizontal overflow                                  |
+| synchronous-mobile               | ex2 at collection round 2 at 390px                      | Readable illustrated map and event feedback with no horizontal overflow                                 |
+| evolution-browser                | Version-5 resource discovery on desktop                 | Persistent allocation, learned capabilities and actual resources match history                          |
+| evolution-mobile                 | Version-5 discovery at 390px                            | Allocation and resource feedback remain readable                                                        |
+| coevolution-browser              | Version-6 facility fixture on desktop                   | Persistent facility, energy, burden and effects agree with state                                        |
+| coevolution-mobile               | Version-6 fixture at 390px                              | Facility details and plans fit the narrow view                                                          |
+| historical-game-ex6              | Saved ex6 in the game observatory                       | Historical coordinates, resources and actor state remain unchanged                                      |
+| historical-personal-ex6          | Personal historical view                                | Hidden actors and objects stay hidden; selection and inspector agree                                    |
+| historical-game-mobile           | Historical game view at 390px                           | Map and controls fit; inspector and event feed scroll naturally                                         |
+| historical-unmeasured-vitals     | Saved ex1 in the game observatory                       | Unmeasured vital fields show an empty meter and em dash, never invented values                          |
+| isolated-continuous-extension    | Paid shared object fixture                              | Real geometry, footprint and distinct rendering; fixture is not an experiment discovery                 |
+| continuous-initial-world-fixture | Continuous scene fixture                                | Fractional positions, private vision, selected object and before/after reconstruction                   |
 
 Inspect blank pages, missing styles, obstruction, odd spacing, unreadable text, distinguishable colors, overlapping controls, and state feedback. Automated layout checks cover objective issues such as horizontal overflow, clipping, panel overlap, and missing controls or grid cells. **Basic aesthetics still require looking at the actual page.** There is no pixel baseline, and producing a screenshot is not visual acceptance.
 
@@ -56,8 +66,8 @@ Inspect blank pages, missing styles, obstruction, odd spacing, unreadable text, 
 
 Review the browser assertions and key frames, compare states before and after actions, and use core and timeline tests to verify:
 
-- A move travels exactly one cell. Boundary or occupancy rejection preserves position while recording a failed-action tick.
-- Pickup transfers a same-cell item to exactly one inventory. The ground item, pickup button, and observations update together; other agents do not receive duplicates.
+- In historical grid protocols a move travels exactly one cell; their boundary and occupancy rejection semantics remain unchanged. In version7 a step uses continuous distance, swept collision and mass-dependent costs; the renderer never advances simulation time.
+- Historical pickup transfers a same-cell item to exactly one inventory. Continuous pickup uses the shared reach geometry and actual quantity/cost rules. Ground state, controls and observations update together; other agents do not receive duplicates.
 - Legacy imported skill attempts do not execute or unlock capabilities. Repeated tries remain unavailable; trying `move` does not implicitly move.
 - Agent view excludes out-of-range entities and updates as agents move or items are collected.
 - Playback, pause, and stepping do not create actions or rewrite history. Exports before and after replay must be identical. Local session actions require the latest state; archived experiment actions stay disabled at every frame.

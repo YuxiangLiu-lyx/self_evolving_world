@@ -1,0 +1,11 @@
+{
+  "runId": "7cb2e30e-733a-4525-9eea-07463a14f6e7",
+  "sourceHash": "19a4bf472646ca5b82946a1f7d697092723a110230d0dafde564ab5e00558434",
+  "evidence": {
+    "id": "isolated-continuous-extension",
+    "path": "test-results/continuous-an-isolated-abs-915fa-o-its-paid-persistent-state/attachments/review-isolated-continuous-extension-034185b3fa96f84fa479c95dea39ac4b6345d63f.png",
+    "sha256": "f81d31dc3257a45e860de3af90b6faf5b3273679738fc7a1581061a37519ffa9"
+  },
+  "verdict": "fail",
+  "finding": "The isolated extension fixture omitted actual scene CSS, so default SVG text sizing and filled hitboxes obscured its paid object. Automated checks alone did not establish visual acceptance. Correct fixture styling, retain this failed image, and perform fresh complete validation and image review. No real simulation or model call is affected."
+}

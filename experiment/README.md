@@ -2,6 +2,9 @@
 
 Each numbered experiment is a retained, numbered record: `ex1`, `ex2`, `ex3`, and so on. Numbering is independent of the older optional model rounds in ignored `experiment-results/`. This directory is tracked and included in task fingerprints.
 
+- [ex7 report](ex7/report.md): one real 1,000-round continuous world; three healthy survivors, two implemented activities and no mental satisfaction source.
+- [ex6 report](ex6/report.md): real 180-round coevolution with persistent shared facilities and resource processes.
+- [ex5 report](ex5/report.md): real 120-round heterogeneous evolution with four starvation deaths retained.
 - [ex4 report](ex4/report.md): real survival-driven skill generation, reuse and learning; three survivors over18 rounds.
 - [ex3 report](ex3/report.md): ChatGPT-authored survival programs, 60 rounds per actor and denied learning.
 - [ex2 report](ex2/report.md): simultaneous rounds with successful collection and no learning attempts.
@@ -9,9 +12,11 @@ Each numbered experiment is a retained, numbered record: `ex1`, `ex2`, `ex3`, an
 
 ## Browse saved history
 
-Run `pnpm dev` and open the printed local URL (normally `http://127.0.0.1:5173`). Choose **ex3**, **ex2**, **ex1**, or another completed run in **Experiment archive**. A direct link such as `http://127.0.0.1:5173/?experiment=ex1` reopens the selected history after refresh and supports back/forward navigation. Use the timeline to seek/play, select agents, switch vision, export the replay, or open the overview chart. Archived histories remain read-only, including the final frame.
+Run `pnpm dev` and open the printed local URL (normally `http://127.0.0.1:5173`). The main page is the game observatory; choose a completed archive or open `http://127.0.0.1:5173/?experiment=ex7`. Seek/play its saved timeline, select actors, switch between global and personal views, zoom/pan/follow, locate events and compare adjacent states. Vitals, tasks, memory and happiness panels show recorded data; unmeasured historical values remain unmeasured. Camera and playback never advance simulation or call models.
 
-Every completed record supplies the data for this shared interactive page; there is no separate HTML file inside each experiment directory. `pnpm dev` discovers completed runs at startup, and `pnpm build` bundles them into the static viewer. Restart or rebuild after a new experiment completes. Viewing a run never creates the next experiment number or rewrites its artifacts. A missing or invalid replay leaves the current world intact. Local demos/imports remain available through **Demo / local session**, **New world** and **Import history**.
+The original grid inspector remains at `/classic.html`, with its archive overview links, legacy import/export, URL back/forward behavior and manual demo controls. It redirects continuous archives to the game observatory. Local demos/imports remain available there through **Demo / local session**, **New world** and **Import history**.
+
+Every completed record supplies the data for these shared pages; there is no separate HTML file inside each experiment directory. `pnpm dev` discovers completed runs at startup, and `pnpm build` bundles their public replay/chart data into the static viewer. Restart or rebuild after a new experiment completes. Viewing a run never creates an experiment number or rewrites its artifacts. Calls, credentials and source snapshots are not served as public viewer assets.
 
 ## Run an experiment
 
@@ -69,3 +74,11 @@ The [version-5 protocol](../docs/EVOLUTION_EXPERIMENT.md) uses an authorized `ev
 ## Run a development and coevolution experiment
 
 The [version-6 protocol](../docs/COEVOLUTION_EXPERIMENT.md) uses `coevolution` intent and the existing guarded task sequence. Three actors pursue health, stable supply, reduced repetitive work and living conditions over a180-round target. Initial eating is authored; later resource/object/process changes are reviewed, costed and versioned. New archives retain configuration, offline feasibility, staged snapshots/reports, complete call/event evidence and shared-viewer replay. Budget exhaustion freezes all actors and records the actual observation window; it is not a180-round success. Full review, PR and separately authorized guarded merge remain required.
+
+## Run or continue a continuous world
+
+Use the [continuous protocol](../docs/CONTINUOUS_WORLD.md) with `experiment.mode: "continuous"` and `allocation: "new"` in the authorized task intent. The existing coordinator owns allocation, the initial feasibility check, real plan-funded inference, development handoffs, stage reports, capture, analysis and delivery. `pnpm experiment:continuous` is its guarded compatibility entry. The initial observation targets 1,000 rounds with three actors and shared budgets of 400 ordinary attempts, 60 world attempts and 20 live conversation handoffs. Internal developer usage is unknown. No fixture activity enters real actor context.
+
+Version 7 retains configuration, initial/execution state, immutable per-call records, 100-round replay segments and index, 200-round checkpoints/reports, source/visual snapshots, validation logs and browser evidence. `pnpm experiment:check` reconstructs the record without inference; the legacy 500-round and 1 MB importer limits do not apply to this separate segmented protocol. Stage reports never become actor hints. A budget or engineering pause is reported separately from a completed observation.
+
+Continue a pending live barrier with `pnpm task -- next TASK_ID` and its exact development response. A later authorized larger observation uses a new explicit reuse task and larger target, preserving the captured prior window, identities, tasks and call counts through the existing [continuation contract](../docs/CONTINUOUS_WORLD.md#calls-journals-and-windows). Source integrity must match the retained revision; opening playback does not continue inference. ex7's post-window delivery corrections are separately versioned, retain all live sources and do not rewrite events or count as autonomous discoveries.

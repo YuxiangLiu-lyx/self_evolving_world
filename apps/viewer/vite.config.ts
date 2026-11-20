@@ -5,6 +5,15 @@ import { experimentAssets } from '../../scripts/experiment-assets.js';
 export default defineConfig(() => {
   const assets = experimentAssets(resolve(import.meta.dirname, '../..'));
   return {
+    build: {
+      rolldownOptions: {
+        input: {
+          main: resolve(import.meta.dirname, 'index.html'),
+          classic: resolve(import.meta.dirname, 'classic.html'),
+          observatory: resolve(import.meta.dirname, 'observatory.html'),
+        },
+      },
+    },
     plugins: [
       {
         name: 'validated-experiment-archive',

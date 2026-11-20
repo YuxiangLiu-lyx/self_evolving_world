@@ -26,7 +26,7 @@ const source = serializeReplay({
 test('replays survival programs, vital signs and denied learning on desktop and mobile', async ({
   page,
 }, info) => {
-  await page.goto('/');
+  await page.goto('/classic.html');
   await page.locator('#import-file').setInputFiles({
     name: 'survival-fixture.json',
     mimeType: 'application/json',
@@ -71,7 +71,7 @@ for (const id of experimentIds(process.cwd()).filter(
   test(`${id} opens its real survival history from the archive selector and restores the URL`, async ({
     page,
   }) => {
-    await page.goto('/');
+    await page.goto('/classic.html');
     await page.locator('#experiment-select').selectOption(id);
     await expect(page).toHaveURL(new RegExp(`\\?experiment=${id}$`));
     await expect(page.locator('#survival-panel')).toBeVisible();

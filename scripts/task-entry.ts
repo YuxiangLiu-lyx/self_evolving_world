@@ -80,7 +80,9 @@ export function legacyArguments(
   )
     throw new Error('Completion plan differs from recorded intent.');
   if (
-    ['survival', 'learning', 'evolution', 'coevolution'].includes(entry) &&
+    ['survival', 'learning', 'evolution', 'coevolution', 'continuous'].includes(
+      entry,
+    ) &&
     args.length
   )
     throw new Error('Survival uses the recorded fixed protocol.');
@@ -135,6 +137,7 @@ function main(): void {
         'learning',
         'evolution',
         'coevolution',
+        'continuous',
         'resume',
       ].includes(entry)
     )
@@ -152,6 +155,7 @@ function main(): void {
         learning: ['scripts/learning-cli.ts'],
         evolution: ['scripts/evolution-cli.ts'],
         coevolution: ['scripts/coevolution-cli.ts'],
+        continuous: ['scripts/continuous-cli.ts'],
       };
       const worker = workers[entry];
       if (!worker)
@@ -163,7 +167,13 @@ function main(): void {
         ...legacyArguments(process.cwd(), entry, args),
       ];
     if (
-      ['survival', 'learning', 'evolution', 'coevolution'].includes(entry) &&
+      [
+        'survival',
+        'learning',
+        'evolution',
+        'coevolution',
+        'continuous',
+      ].includes(entry) &&
       process.env.SEW_TASK_ID
     ) {
       const build = spawnSync('pnpm', ['build'], { stdio: 'inherit' });

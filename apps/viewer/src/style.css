@@ -1208,3 +1208,12 @@ fieldset {
   white-space: normal;
   overflow-wrap: anywhere;
 }
+
+.observatory-link {
+  display: block;
+  padding: 8px 24px;
+  background: #214f40;
+  color: #f6f2dd;
+  text-align: right;
+  font-size: 12px;
+}

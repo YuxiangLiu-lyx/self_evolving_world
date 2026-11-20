@@ -17,7 +17,14 @@ import { captureReview, expect, test } from './validators.js';
 const root = process.cwd();
 const capture = process.env.WORLD_EXPERIMENT_CAPTURE;
 if (capture !== undefined) experimentId(capture);
-const ids = capture === undefined ? experimentIds(root) : [capture];
+const ids = (capture === undefined ? experimentIds(root) : [capture]).filter(
+  (id) =>
+    (
+      JSON.parse(
+        readFileSync(resolve(root, 'experiment', id, 'manifest.json'), 'utf8'),
+      ) as { version: number }
+    ).version !== 7,
+);
 
 async function inspectMapItems(
   page: Page,
@@ -131,12 +138,13 @@ for (const id of ids) {
     page,
   }, info) => {
     test.setTimeout(60_000);
-    const { directory, config, run } = readExperiment(
-      root,
-      id,
-      capture !== undefined,
-    );
-    await page.goto('/');
+    const record = readExperiment(root, id, capture !== undefined);
+    if ('continuous' in record)
+      throw new Error(
+        'Continuous archives use their dedicated segmented browser contract.',
+      );
+    const { directory, config, run } = record;
+    await page.goto('/classic.html');
     await page
       .locator('#import-file')
       .setInputFiles(resolve(directory, 'replay.json'));

@@ -1,0 +1,19 @@
+{
+  "id": "ex7",
+  "status": "passed",
+  "replayHash": "1f6ed8ee211c5c9d027a574dde392bb44bff28e55e9d2b609d72456ecdf477c5",
+  "frameTicks": [
+    0,
+    500,
+    1000
+  ],
+  "assertions": [
+    "segment-integrity-and-deterministic-reconstruction",
+    "initial-midpoint-final-state",
+    "private-observation-and-global-view",
+    "camera-and-playback-do-not-change-state",
+    "continuous-geometry-and-object-inspection",
+    "runtime-and-layout-health"
+  ],
+  "errors": []
+}

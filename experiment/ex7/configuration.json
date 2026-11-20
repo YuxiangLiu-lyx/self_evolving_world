@@ -1,0 +1,1 @@
+{"protocol":"continuous-v1","seed":20261120,"width":24,"height":24,"dt":1,"speed":0.8,"vision":5,"interaction":0.65,"hunger":2,"starvation":10,"energyCap":40,"restRecovery":4,"physicalCap":10,"mentalCap":90,"budgets":{"ordinary":400,"world":60,"development":20},"computation":{"workPerRound":2000000,"inputBytes":120000,"stateBytes":32000000}}
