@@ -18,7 +18,7 @@ const source = serializeReplay({
 test('renders the heterogeneous map, private discoveries, generated code and usable zoom without losing history', async ({
   page,
 }, info) => {
-  await page.goto('/');
+  await page.goto('/classic.html');
   await page.locator('#import-file').setInputFiles({
     name: 'evolution-offline-smoke.json',
     mimeType: 'application/json',

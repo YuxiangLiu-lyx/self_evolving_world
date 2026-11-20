@@ -1,0 +1,465 @@
+import type { V7World, V7Cursor } from '@self-evolving-world/world-core';
+import {
+  continuousScene,
+  historicalScene,
+  sceneSvg,
+} from './continuous-scene.js';
+import type { SceneFrame } from './continuous-scene.js';
+import { svgText } from './continuous-visuals.js';
+import { replaySceneSegment, browserDigest } from './continuous-history.js';
+import type { SceneIndex, SceneSegment } from './continuous-history.js';
+import { parseReplay } from './timeline.js';
+import type { Timeline } from './timeline.js';
+import './observatory.css';
+
+const root = document.getElementById('observatory');
+if (!root) throw new Error('Missing observatory root.');
+root.innerHTML = `<header class="obs-header"><div class="brand"><div class="brand-mark" aria-hidden="true">♧</div><div><div class="eyebrow">Self-evolving world</div><h1>World Observatory</h1><p>A living record of choices and consequences</p></div></div><div class="header-controls"><a id="classic-link" href="./classic.html">Classic inspector ↗</a><select id="archive" aria-label="Saved experiment"></select></div></header><main class="obs-layout"><section class="world-column"><div class="world-toolbar"><div><div class="eyebrow" id="world-label">Loading archive</div><h2 id="world-title">Life, at its own pace</h2></div><div class="mode-controls"><button id="global" aria-pressed="true">Whole world</button><button id="private" aria-pressed="false">Personal view</button></div></div><div class="world-stage"><svg class="world-canvas" id="scene" role="img" aria-label="Recorded world scene" viewBox="0 0 24 24"></svg><div class="stage-tag" id="stage-tag">READ-ONLY OBSERVATION</div><div class="camera-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="fit">Fit</button><button id="follow" aria-pressed="false">Follow</button><button id="geometry" aria-pressed="false">Geometry</button></div><svg id="minimap" class="minimap" role="img" aria-label="World minimap"></svg><div class="stage-caption" id="spatial-caption">Drag to pan · Scroll to zoom · Select a character</div></div><div class="timeline-card"><div class="playback"><button id="previous" aria-label="Previous round">‹</button><button id="play">Play</button><button id="next" aria-label="Next round">›</button><input id="time" type="range" min="0" max="0" value="0" aria-label="Observation round"/><span class="round-value" id="round">0 / 0</span><button id="compare" aria-pressed="false">Before</button></div><p class="timeline-note" id="timeline-note">Playback reads saved state; it never advances the experiment.</p></div><div class="events-head"><h3>What happened here</h3><span class="badge" id="event-count">0 events</span></div><div class="event-list" id="events"></div></section><aside class="obs-aside"><section class="observer-card"><div class="eyebrow">Individual perspective</div><div class="actor-heading"><h3 id="actor-name">—</h3><select id="actor" aria-label="Observed actor"></select></div><div class="coordinates" id="coordinates"></div><div class="vitals" id="vitals"></div><div class="eyebrow inventory-heading">Carried items</div><div id="carried" class="carried-items"></div></section><section class="observer-card"><div class="eyebrow">Experienced wellbeing</div><h3>How life feels</h3><div class="wellbeing-number" id="happiness">—</div><div class="wellbeing-split"><div id="body-bar" class="wellbeing-body"></div><div id="mind-bar" class="wellbeing-mind"></div></div><div class="small-label" id="happiness-split">Physical comfort + other satisfaction</div><div id="sources"></div></section><section class="observer-card"><div class="eyebrow">Personal continuity</div><h3>Intent & memory</h3><p id="task">No saved task.</p><ul class="memory-list" id="memory"></ul><p id="learning"></p><details><summary>Recent experience</summary><ul class="memory-list" id="experiences"></ul></details></section><section class="observer-card"><div class="eyebrow">World state</div><h3 id="object-title">A closer look</h3><p id="object-description">Select a visible object to inspect its actual geometry, state and provenance.</p><pre class="object-state" id="object-state"></pre></section></aside></main><div id="status" class="obs-status" role="status">Loading recorded evidence…</div>`;
+function el(id: string): HTMLElement {
+  const e = document.getElementById(id);
+  if (!e) throw new Error(`Missing observatory element: ${id}`);
+  return e;
+}
+function select(id: string): HTMLSelectElement {
+  return el(id) as HTMLSelectElement;
+}
+const scene = document.getElementById('scene') as unknown as SVGSVGElement;
+const mini = document.getElementById('minimap') as unknown as SVGSVGElement;
+const slider = el('time') as HTMLInputElement;
+let id = '',
+  index: SceneIndex | null = null,
+  legacy: Timeline | null = null,
+  tick = 0,
+  maximum = 0,
+  actor = 'lin',
+  privateView = false,
+  frame: SceneFrame | null = null,
+  tasks: Record<string, V7Cursor> = {},
+  sequence = 0,
+  timer: number | undefined,
+  follow = false,
+  geometry = false,
+  compare = false;
+let camera = { x: 0, y: 0, size: 24 };
+const cache = new Map<string, { segment: SceneSegment; frames: V7World[] }>();
+function status(text: string, error = false): void {
+  el('status').textContent = text;
+  el('status').classList.toggle('error', error);
+}
+async function asset(path: string): Promise<string> {
+  const response = await fetch(`./experiments/${id}/${path}`, {
+    cache: 'no-store',
+  });
+  if (!response.ok)
+    throw new Error(`Archive unavailable (${String(response.status)}).`);
+  return response.text();
+}
+function updateCamera(): void {
+  scene.setAttribute(
+    'viewBox',
+    `${String(camera.x)} ${String(camera.y)} ${String(camera.size)} ${String(camera.size)}`,
+  );
+  mini.querySelector('[data-camera]')?.setAttribute('x', String(camera.x));
+  mini.querySelector('[data-camera]')?.setAttribute('y', String(camera.y));
+  mini
+    .querySelector('[data-camera]')
+    ?.setAttribute('width', String(camera.size));
+  mini
+    .querySelector('[data-camera]')
+    ?.setAttribute('height', String(camera.size));
+}
+function focus(x: number, y: number): void {
+  camera.x = x - camera.size / 2;
+  camera.y = y - camera.size / 2;
+  updateCamera();
+}
+function render(): void {
+  if (!frame) return;
+  const current = frame,
+    self = frame.actors.find((a) => a.id === actor);
+  scene.innerHTML = sceneSvg(current, actor, geometry);
+  mini.innerHTML =
+    sceneSvg(current, '', false) +
+    `<rect data-camera x="${String(camera.x)}" y="${String(camera.y)}" width="${String(camera.size)}" height="${String(camera.size)}" fill="none" stroke="#fff5cc" stroke-width=".3"/>`;
+  mini.setAttribute(
+    'viewBox',
+    `0 0 ${String(frame.width)} ${String(frame.height)}`,
+  );
+  if (follow && self) focus(self.position.x, self.position.y);
+  else updateCamera();
+  el('round').textContent = `${String(frame.tick)} / ${String(maximum)}`;
+  slider.value = String(tick);
+  el('stage-tag').textContent =
+    `${id.toUpperCase()} · ROUND ${frame.tick.toString().padStart(4, '0')} · ${privateView ? 'PERSONAL OBSERVATION' : 'GLOBAL VIEW'}`;
+  el('spatial-caption').textContent = frame.legacy
+    ? 'Historical grid simulation · Exact recorded positions · New presentation only'
+    : 'Continuous coordinates · Fixed simulation time · Drag to pan';
+  el('world-label').textContent =
+    `${id} / ${frame.legacy ? 'Historical archive' : 'Continuous world'}`;
+  const allActors =
+    current.continuous?.actors ??
+    legacy?.frames[frame.tick]?.agents ??
+    current.actors;
+  select('actor').innerHTML = allActors
+    .map((a) => `<option value="${svgText(a.id)}">${svgText(a.name)}</option>`)
+    .join('');
+  select('actor').value = actor;
+  if (self) {
+    el('actor-name').textContent = self.name;
+    el('coordinates').textContent =
+      `Position ${self.position.x.toFixed(3)} · ${self.position.y.toFixed(3)}${self.vitals.health <= 0 ? ' · Deceased' : ''}`;
+    el('vitals').innerHTML = [
+      ['Health', self.vitals.health, 100],
+      ['Satiety', self.vitals.satiety, 100],
+      ['Energy', self.vitals.energy, 40],
+      ['Temperature', self.vitals.temperature, 40],
+    ]
+      .map(([label, value, cap]) => {
+        const historical = legacy?.frames[current.tick];
+        const measured =
+          !current.legacy ||
+          (label !== 'Temperature' &&
+            (label === 'Energy'
+              ? !!historical?.coevolution
+              : !!(
+                  historical?.coevolution ??
+                  historical?.evolution ??
+                  historical?.learning ??
+                  historical?.survival
+                )));
+        return `<div><div class="vital-label"><span>${String(label)}</span><strong>${measured ? Number(value).toFixed(1) + (label === 'Temperature' ? '°' : '') : '—'}</strong></div><div class="vital-track"><div class="vital-fill" style="width:${String(measured ? Math.max(0, Math.min(100, (Number(value) / Number(cap)) * 100)) : 0)}%"></div></div></div>`;
+      })
+      .join('');
+    const inventory = current.continuous
+      ? current.continuous.stacks
+          .filter((s) => s.owner === actor)
+          .map(
+            (s) =>
+              `${String(s.quantity)} ${current.continuous?.resources.find((r) => r.id === s.resource)?.name ?? s.resource}`,
+          )
+      : (legacy?.frames[frame.tick]?.agents
+          .find((a) => a.id === actor)
+          ?.inventory.map((i) => i.name) ?? []);
+    el('carried').textContent = inventory.length
+      ? inventory.join(' · ')
+      : 'Nothing carried';
+    el('experiences').innerHTML = self.memory.experiences
+      .slice(-5)
+      .map((e) => `<li>Round ${String(e.tick)} · ${svgText(e.summary)}</li>`)
+      .join('');
+    el('happiness').innerHTML = frame.legacy
+      ? '— <small>not measured</small>'
+      : `${self.wellbeing.total.toFixed(1)} <small>/ 100</small>`;
+    el('body-bar').style.width = `${String(self.wellbeing.physical)}%`;
+    el('mind-bar').style.width = `${String(self.wellbeing.mental)}%`;
+    el('happiness-split').textContent = frame.legacy
+      ? 'This historical protocol did not measure happiness.'
+      : `${self.wellbeing.physical.toFixed(1)} physical / 10 · ${self.wellbeing.mental.toFixed(1)} other / 90`;
+    el('sources').innerHTML =
+      self.wellbeing.sources
+        .filter((s) => s.value > 0)
+        .map(
+          (s) =>
+            `<div class="source-row"><span>${svgText(current.continuous?.satisfaction.find((r) => r.id === s.source)?.name ?? s.source)}</span><strong>${s.value.toFixed(1)}</strong></div>`,
+        )
+        .join('') ||
+      (frame.legacy ? '' : '<p>No active nonphysical satisfaction source.</p>');
+    const task = tasks[actor];
+    el('task').textContent = task
+      ? `${task.plan.intention || 'Self-selected sequence'} · Step ${String(task.step + 1)}, cycle ${String(task.cycle + 1)}${task.reason ? ` · ${task.reason}` : ''}`
+      : frame.legacy
+        ? 'Historical decisions remain available in the classic inspector.'
+        : 'No active saved task at this boundary.';
+    el('memory').innerHTML = [...self.memory.notes, ...self.memory.preferences]
+      .map((s) => `<li>${svgText(s)}</li>`)
+      .join('');
+    el('learning').textContent = self.learning
+      ? `Studying ${self.learning.ability} · ${String(self.learning.remaining)} rounds remain.`
+      : frame.legacy
+        ? 'No continuous-world state has been inferred for this archive.'
+        : `${String(self.mastered.length)} mastered interfaces · ${String(self.memory.objects.length)} dated object memories`;
+  }
+  const events = frame.events.filter(
+    (e) => e.type !== 'satisfaction' || e.actor === actor,
+  );
+  el('event-count').textContent = `${String(events.length)} events`;
+  el('events').innerHTML =
+    events
+      .slice(0, 18)
+      .map(
+        (e, i) =>
+          `<button class="event-entry ${e.success ? '' : 'failed'}" data-event="${String(i)}"><small>${svgText(e.actor ?? 'WORLD')} · ${svgText(e.type)}</small>${svgText(e.description)}</button>`,
+      )
+      .join('') ||
+    '<p class="timeline-note">The saved world has no events at this boundary.</p>';
+  el('events')
+    .querySelectorAll<HTMLButtonElement>('[data-event]')
+    .forEach((button) => {
+      button.addEventListener('click', () => {
+        const event = events[Number(button.dataset.event)];
+        if (event?.position) {
+          camera.size = Math.min(camera.size, 10);
+          focus(event.position.x, event.position.y);
+        }
+        if (event?.target) inspect(event.target);
+      });
+    });
+  scene.querySelectorAll<SVGGElement>('[data-scene-actor]').forEach((g) => {
+    g.addEventListener('click', () => {
+      if (privateView) return;
+      actor = g.dataset.sceneActor ?? actor;
+      void seek(tick);
+    });
+  });
+  scene.querySelectorAll<SVGGElement>('[data-scene-object]').forEach((g) => {
+    const run = () => {
+      inspect(g.dataset.sceneObject ?? '');
+    };
+    g.addEventListener('click', run);
+    g.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') run();
+    });
+  });
+}
+function inspect(objectId: string): void {
+  const object = frame?.objects.find((o) => o.id === objectId);
+  if (!object) return;
+  el('object-title').textContent = object.name;
+  el('object-description').textContent =
+    `${object.id} · ${object.visual.state} · ${object.createdBy ? `Created by ${object.createdBy} at round ${String(object.createdAt)}` : 'Initial world object'}`;
+  el('object-state').textContent = JSON.stringify(
+    { geometry: object.spatial, state: object.data, revision: object.revision },
+    null,
+    2,
+  );
+}
+async function seek(requested: number): Promise<void> {
+  const token = ++sequence;
+  tick = Math.max(0, Math.min(maximum, requested));
+  const at = compare ? Math.max(0, tick - 1) : tick;
+  try {
+    if (legacy) {
+      const world = legacy.frames[at];
+      if (!world) throw new Error('Missing historical frame.');
+      frame = historicalScene(world, privateView ? actor : null);
+      tasks = {};
+    } else if (index) {
+      const part = index.segments.find((p) => p.start <= at && p.end >= at);
+      if (!part) throw new Error('Missing indexed segment.');
+      let value = cache.get(part.path);
+      if (!value) {
+        status(
+          `Verifying saved rounds ${String(part.start)}–${String(part.end)}…`,
+        );
+        const source = await asset(part.path);
+        if ((await browserDigest(source)) !== part.sha256)
+          throw new Error('Segment integrity check failed.');
+        const segment = JSON.parse(source) as SceneSegment;
+        value = { segment, frames: await replaySceneSegment(segment) };
+        if (token !== sequence) return;
+        cache.set(part.path, value);
+        if (cache.size > 3) cache.delete(cache.keys().next().value ?? '');
+      }
+      const world = value.frames[at - part.start];
+      if (!world) throw new Error('Missing reconstructed frame.');
+      frame = continuousScene(world, privateView ? actor : null);
+      tasks = value.segment.rounds.find((r) => r.tick === at)?.tasks ?? {};
+    }
+    if (token !== sequence) return;
+    render();
+    status(
+      `${id} · Verified recorded state · ${index ? `${String(index.observed)} observed / ${String(index.target)} target rounds · ${index.phase}` : 'Historical simulation rules preserved'}`,
+    );
+  } catch (error) {
+    if (token !== sequence) return;
+    stop();
+    status(error instanceof Error ? error.message : 'Replay failed.', true);
+  }
+}
+function stop(): void {
+  window.clearInterval(timer);
+  timer = undefined;
+  el('play').textContent = 'Play';
+}
+async function open(experiment: string): Promise<void> {
+  stop();
+  const token = ++sequence;
+  id = experiment;
+  cache.clear();
+  legacy = null;
+  index = null;
+  actor = 'lin';
+  compare = false;
+  el('compare').setAttribute('aria-pressed', 'false');
+  el('compare').textContent = 'Before';
+  try {
+    const source = await asset('replay.json'),
+      data = JSON.parse(source) as { version: number };
+    if (token !== sequence) return;
+    if (data.version === 7) {
+      index = data as SceneIndex;
+      maximum = index.observed;
+      camera = { x: 0, y: 0, size: 24 };
+    } else {
+      legacy = parseReplay(source);
+      maximum = legacy.frames.length - 1;
+      camera = {
+        x: 0,
+        y: 0,
+        size: Math.max(
+          legacy.frames[0]?.settings.width ?? 24,
+          legacy.frames[0]?.settings.height ?? 24,
+        ),
+      };
+    }
+    slider.max = String(maximum);
+    select('archive').value = id;
+    (el('classic-link') as HTMLAnchorElement).href = legacy
+      ? `./classic.html?experiment=${encodeURIComponent(id)}`
+      : './classic.html';
+    const url = new URL(location.href);
+    url.searchParams.set('experiment', id);
+    history.replaceState(null, '', url);
+    await seek(0);
+  } catch (error) {
+    if (token !== sequence) return;
+    status(error instanceof Error ? error.message : 'Archive failed.', true);
+  }
+}
+select('archive').addEventListener('change', () => {
+  void open(select('archive').value);
+});
+select('actor').addEventListener('change', () => {
+  actor = select('actor').value;
+  void seek(tick);
+});
+slider.addEventListener('input', () => {
+  stop();
+  void seek(Number(slider.value));
+});
+el('previous').addEventListener('click', () => {
+  stop();
+  void seek(tick - 1);
+});
+el('next').addEventListener('click', () => {
+  stop();
+  void seek(tick + 1);
+});
+el('play').addEventListener('click', () => {
+  if (timer) stop();
+  else {
+    el('play').textContent = 'Pause';
+    timer = window.setInterval(() => {
+      if (tick >= maximum) stop();
+      else void seek(tick + 1);
+    }, 900);
+  }
+});
+for (const [key, value] of [
+  ['global', false],
+  ['private', true],
+] as const)
+  el(key).addEventListener('click', () => {
+    privateView = value;
+    el('private').setAttribute('aria-pressed', String(value));
+    el('global').setAttribute('aria-pressed', String(!value));
+    void seek(tick);
+  });
+el('follow').addEventListener('click', () => {
+  follow = !follow;
+  el('follow').setAttribute('aria-pressed', String(follow));
+  render();
+});
+el('geometry').addEventListener('click', () => {
+  geometry = !geometry;
+  el('geometry').setAttribute('aria-pressed', String(geometry));
+  render();
+});
+el('compare').addEventListener('click', () => {
+  compare = !compare;
+  el('compare').setAttribute('aria-pressed', String(compare));
+  el('compare').textContent = compare ? 'After' : 'Before';
+  void seek(tick);
+});
+function zoom(scale: number): void {
+  const center = {
+    x: camera.x + camera.size / 2,
+    y: camera.y + camera.size / 2,
+  };
+  camera.size = Math.max(3, Math.min(48, camera.size * scale));
+  focus(center.x, center.y);
+}
+el('zoom-in').addEventListener('click', () => {
+  zoom(0.75);
+});
+el('zoom-out').addEventListener('click', () => {
+  zoom(1.33);
+});
+el('fit').addEventListener('click', () => {
+  camera = {
+    x: 0,
+    y: 0,
+    size: Math.max(frame?.width ?? 24, frame?.height ?? 24),
+  };
+  follow = false;
+  el('follow').setAttribute('aria-pressed', 'false');
+  updateCamera();
+});
+scene.addEventListener(
+  'wheel',
+  (event) => {
+    event.preventDefault();
+    zoom(event.deltaY > 0 ? 1.1 : 0.9);
+  },
+  { passive: false },
+);
+let drag: { x: number; y: number; cameraX: number; cameraY: number } | null =
+  null;
+scene.addEventListener('pointerdown', (e) => {
+  if ((e.target as Element).closest('[data-scene-actor],[data-scene-object]'))
+    return;
+  drag = { x: e.clientX, y: e.clientY, cameraX: camera.x, cameraY: camera.y };
+  scene.setPointerCapture(e.pointerId);
+});
+scene.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  const size = Math.min(scene.clientWidth, scene.clientHeight);
+  camera.x = drag.cameraX - ((e.clientX - drag.x) / size) * camera.size;
+  camera.y = drag.cameraY - ((e.clientY - drag.y) / size) * camera.size;
+  follow = false;
+  updateCamera();
+});
+scene.addEventListener('pointerup', () => {
+  drag = null;
+});
+mini.addEventListener('click', (e) => {
+  const rect = mini.getBoundingClientRect();
+  camera.size = Math.min(camera.size, 12);
+  focus(
+    ((e.clientX - rect.left) / rect.width) * (frame?.width ?? 24),
+    ((e.clientY - rect.top) / rect.height) * (frame?.height ?? 24),
+  );
+});
+try {
+  const response = await fetch('./experiments/index.json', {
+    cache: 'no-store',
+  });
+  if (!response.ok) throw new Error('Experiment catalogue unavailable.');
+  const catalogue = (await response.json()) as {
+    experiments: { id: string; steps: number }[];
+  };
+  select('archive').innerHTML = [...catalogue.experiments]
+    .reverse()
+    .map(
+      (e) =>
+        `<option value="${svgText(e.id)}">${svgText(e.id.toUpperCase())} · ${String(e.steps)} rounds</option>`,
+    )
+    .join('');
+  const requested =
+    new URL(location.href).searchParams.get('experiment') ??
+    catalogue.experiments.at(-1)?.id;
+  if (requested) await open(requested);
+  else status('No saved experiment is available.');
+} catch (error) {
+  status(error instanceof Error ? error.message : 'Catalogue failed.', true);
+}

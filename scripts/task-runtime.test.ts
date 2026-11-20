@@ -129,6 +129,37 @@ afterEach(() => {
 });
 
 describe('existing gates behind the task runtime', () => {
+  it('retains complete committed and working review diffs larger than the capture buffer', () => {
+    const c = makeContext(),
+      runtime = new LocalTaskEffects(root, () => {}),
+      committed = Array.from(
+        { length: 60_000 },
+        (_, i) => `Committed archive record ${String(i)}\n`,
+      ).join(''),
+      working = Array.from(
+        { length: 60_000 },
+        (_, i) => `Working archive record ${String(i)}\n`,
+      ).join('');
+    writeFileSync(resolve(root, 'large.txt'), committed);
+    git(root, 'add', 'large.txt');
+    git(root, 'commit', '-m', 'Large archive fixture');
+    writeFileSync(resolve(root, 'large.txt'), committed + working);
+    save('validation-results/report.json', { fixture: true });
+
+    runtime.reviewMaterials(c);
+
+    const patch = readFileSync(
+      resolve(root, 'validation-results/tasks/fixture-task-diff.patch'),
+      'utf8',
+    );
+    for (const content of [committed, working]) {
+      expect(Buffer.byteLength(content)).toBeGreaterThan(1024 * 1024);
+      expect(patch).toContain(content.replace(/^./gm, '+$&'));
+    }
+    expect(
+      patch.match(/^diff --git a\/large.txt b\/large.txt$/gm),
+    ).toHaveLength(2);
+  });
   it('rejects incomplete reviews and stale source, screenshot and run evidence using the real gate', () => {
     const c = makeContext(),
       runtime = new LocalTaskEffects(root, () => {});

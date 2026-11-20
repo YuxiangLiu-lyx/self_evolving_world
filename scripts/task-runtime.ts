@@ -1,4 +1,8 @@
 import {
+  continuousCheckpoint,
+  submitContinuousDevelopment,
+} from './continuous-files.js';
+import {
   coevolutionCheckpoint,
   submitCoevolutionDevelopment,
 } from './coevolution-files.js';
@@ -197,13 +201,15 @@ export class LocalTaskEffects implements TaskEffects {
                 String(intent.seed ?? DEFAULT_SEED),
                 String(intent.rounds ?? DEFAULT_ROUNDS),
               ]
-            : intent.mode === 'coevolution'
-              ? ['experiment:coevolution']
-              : intent.mode === 'evolution'
-                ? ['experiment:evolution']
-                : intent.mode === 'learning'
-                  ? ['experiment:learning']
-                  : ['experiment:survival'],
+            : intent.mode === 'continuous'
+              ? ['experiment:continuous']
+              : intent.mode === 'coevolution'
+                ? ['experiment:coevolution']
+                : intent.mode === 'evolution'
+                  ? ['experiment:evolution']
+                  : intent.mode === 'learning'
+                    ? ['experiment:learning']
+                    : ['experiment:survival'],
         );
       } catch (error) {
         c.experiment.error =
@@ -234,36 +240,66 @@ export class LocalTaskEffects implements TaskEffects {
     if (
       (intent.mode === 'learning' ||
         intent.mode === 'evolution' ||
-        intent.mode === 'coevolution') &&
-      intent.allocation === 'new'
+        intent.mode === 'coevolution' ||
+        intent.mode === 'continuous') &&
+      (intent.allocation === 'new' ||
+        (intent.mode === 'continuous' && intent.rounds !== undefined))
     ) {
       const checkpointReader =
-        intent.mode === 'coevolution'
-          ? coevolutionCheckpoint
-          : intent.mode === 'evolution'
-            ? evolutionCheckpoint
-            : learningCheckpoint;
+        intent.mode === 'continuous'
+          ? continuousCheckpoint
+          : intent.mode === 'coevolution'
+            ? coevolutionCheckpoint
+            : intent.mode === 'evolution'
+              ? evolutionCheckpoint
+              : learningCheckpoint;
       const command =
-        intent.mode === 'coevolution'
-          ? 'experiment:coevolution'
-          : intent.mode === 'evolution'
-            ? 'experiment:evolution'
-            : 'experiment:learning';
+        intent.mode === 'continuous'
+          ? 'experiment:continuous'
+          : intent.mode === 'coevolution'
+            ? 'experiment:coevolution'
+            : intent.mode === 'evolution'
+              ? 'experiment:evolution'
+              : 'experiment:learning';
       if (journal.phase === 'recorded') {
         readExperiment(this.root, id);
         return;
       }
-      const existing = object(
+      let existing = object(
         readJson(resolve(this.root, 'experiment', id, 'manifest.json')),
       );
-      if (existing.status === 'completed') {
+      if (
+        existing.status === 'completed' &&
+        intent.mode === 'continuous' &&
+        intent.rounds !== undefined &&
+        continuousCheckpoint(this.root, id).windowTarget < intent.rounds
+      ) {
+        this.command(c, [command]);
+        existing = object(
+          readJson(resolve(this.root, 'experiment', id, 'manifest.json')),
+        );
+      }
+      if (
+        existing.status === 'completed' &&
+        !(
+          intent.mode === 'continuous' &&
+          intent.rounds !== undefined &&
+          continuousCheckpoint(this.root, id).phase !== 'window-complete'
+        )
+      ) {
         readExperiment(this.root, id);
         journal.phase = 'recorded';
         save();
         return;
       }
       let checkpoint = checkpointReader(this.root, id);
-      if (checkpoint.phase === 'running') {
+      if (
+        checkpoint.phase === 'running' ||
+        (intent.mode === 'continuous' &&
+          checkpoint.phase === 'development' &&
+          'windowTarget' in checkpoint &&
+          checkpoint.developments.at(-1)?.status === 'failed')
+      ) {
         this.command(c, [command]);
         checkpoint = checkpointReader(this.root, id);
       }
@@ -310,7 +346,7 @@ export class LocalTaskEffects implements TaskEffects {
   }
   submitDevelopment(file: string, c: TaskContext): void {
     if (
-      !['learning', 'evolution', 'coevolution'].includes(
+      !['learning', 'evolution', 'coevolution', 'continuous'].includes(
         c.intent.experiment.mode,
       ) ||
       !c.experiment?.id ||
@@ -318,11 +354,13 @@ export class LocalTaskEffects implements TaskEffects {
     )
       throw new Error('No learning development is pending.');
     const submit =
-      c.intent.experiment.mode === 'coevolution'
-        ? submitCoevolutionDevelopment
-        : c.intent.experiment.mode === 'evolution'
-          ? submitEvolutionDevelopment
-          : submitLearningDevelopment;
+      c.intent.experiment.mode === 'continuous'
+        ? submitContinuousDevelopment
+        : c.intent.experiment.mode === 'coevolution'
+          ? submitCoevolutionDevelopment
+          : c.intent.experiment.mode === 'evolution'
+            ? submitEvolutionDevelopment
+            : submitLearningDevelopment;
     submit(this.root, c.experiment.id, readJson(this.inputFile(file)));
   }
   analysisReady(id: string, c: TaskContext): boolean {
@@ -414,12 +452,26 @@ export class LocalTaskEffects implements TaskEffects {
   reviewMaterials(c: TaskContext): unknown {
     const snapshot = this.snapshot(c);
     const diff = `validation-results/tasks/${c.intent.id}-diff.patch`;
-    writeFileSync(
-      resolve(this.root, diff),
-      git(this.root, 'diff', `${snapshot.base}...HEAD`) +
-        '\n' +
-        git(this.root, 'diff', 'HEAD'),
-    );
+    const fd = openSync(resolve(this.root, diff), 'w');
+    try {
+      // Archive patches can exceed child_process's captured-output limit.
+      // Stream both complete diffs to the review artifact without truncation.
+      for (const revision of [`${snapshot.base}...HEAD`, 'HEAD']) {
+        const result = spawnSync('git', ['diff', revision], {
+          cwd: this.root,
+          encoding: 'utf8',
+          stdio: ['ignore', fd, 'pipe'],
+        });
+        if (result.error) throw result.error;
+        if (result.status !== 0)
+          throw new Error(
+            `Review diff failed (${String(result.status)}): ${result.stderr}`,
+          );
+        writeFileSync(fd, '\n');
+      }
+    } finally {
+      closeSync(fd);
+    }
     return {
       plan: c.intent.plan,
       diff,

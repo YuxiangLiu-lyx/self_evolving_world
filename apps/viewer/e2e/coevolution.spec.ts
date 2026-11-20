@@ -11,7 +11,7 @@ const run = coevolutionSmoke(),
 test('shows persistent shared facilities, personal projects and actual energy in version-six replay', async ({
   page,
 }, info) => {
-  await page.goto('/');
+  await page.goto('/classic.html');
   await page.locator('#import-file').setInputFiles({
     name: 'coevolution-offline.json',
     mimeType: 'application/json',

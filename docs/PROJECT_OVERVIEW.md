@@ -6,7 +6,9 @@ Self-Evolving World explores how autonomous agents might interact in a shared wo
 
 The current focus is a stable, understandable foundation: base rules stay fixed during a run, and every state transition can be observed and replayed.
 
-## How the world runs
+The main page now opens the [continuous-world game observatory](CONTINUOUS_WORLD.md). It renders saved continuous or historical worlds without advancing simulation. The founding-grid descriptions below apply to the original protocol and the manual inspector at `/classic.html`; they do not restrict the independently versioned continuous world.
+
+## How the founding world runs
 
 The world is a bounded two-dimensional grid, 16×12 by default, with origin `(0, 0)` at the top left. Agents have names, positions, and inventories. Items start on the ground. World dimensions and vision radius are configured at creation and remain fixed.
 
@@ -44,7 +46,7 @@ flowchart LR
 
 - The **core** owns rules and transitions, with no UI, networking, or AI service dependency.
 - The **CLI** runs a fixed demo, a [seeded random experiment](../experiment/README.md) without external agents, or the separately invoked [one-round model experiment](ONE_ROUND_EXPERIMENT.md). The model experiment submits each agent's own observation to ChatGPT and validates its returned action before applying it.
-- The **observatory** displays the map, inventory, vision, and results, and supports interaction and replay. It loads a 12-action demo with three agents, then allows manual continuation.
+- The **classic inspector** displays the map, inventory, vision, and results, and supports interaction and replay. It loads a 12-action demo with three agents, then allows manual continuation.
 
 Module contracts are in [ARCHITECTURE](../ARCHITECTURE.md). Current feature status and evidence are maintained only in [PRODUCT](PRODUCT.md#current-scope).
 
@@ -52,7 +54,7 @@ Module contracts are in [ARCHITECTURE](../ARCHITECTURE.md). Current feature stat
 
 Start the viewer using the [quick start](../README.md#five-minute-quick-start). Select an agent on the map or from the dropdown. Global view shows the whole world; agent vision hides entities outside the selected observation. The inspector always shows that agent's inventory and observation at the current frame.
 
-Use direction buttons or WASD to move, then collect items from the same cell. The current interface exposes move and pickup; legacy try records remain readable without a learning-attempt control. The timeline supports play, pause, speed changes, stepping, and seeking. Actions are disabled in historical frames; select **Latest frame** to continue.
+On `/classic.html`, use direction buttons or WASD to move, then collect items from the same cell. The current interface exposes move and pickup; legacy try records remain readable without a learning-attempt control. The timeline supports play, pause, speed changes, stepping, and seeking. Actions are disabled in historical frames; select **Latest frame** to continue.
 
 Use **Experiment archive** to select a retained run such as **ex2** or **ex1**. The page opens its full interactive timeline, objective, seed and overview chart without file import. Its `?experiment=ex1` URL restores the archive after refresh and supports browser navigation. Archived histories remain read-only at every frame. New runs appear after restarting development or rebuilding the static viewer.
 
@@ -62,21 +64,21 @@ Export stores initial conditions and actions. Import reconstructs history under 
 
 The [survival-v1 extension](SURVIVAL_EXPERIMENT.md) adds satiety, cold, heat and health. Dangerous values cause continuing damage and death. The model receives only its actor's observation and public rules, writes finite action/duration code, and replans only when that code finishes, at most five requests per actor. Waiting is explicit; every learning request is denied without a World Agent. The mild ex3 run preserves all three actors through 60 rounds. The viewer shows vital values, active code/progress and learning history at each selected frame. Calls and code are retained for offline validation and replay.
 
-## NPC Agent (Planned)
+## Unattended NPC service (Planned)
 
-Existing entities have positions, inventories, and vision. The optional model experiments add a single decision opportunity or a bounded 60-round program controller to scripts and manual input. Future NPCs would have persistent goals, memory, and a continuous decision loop; those capabilities are outside this experiment.
+Existing entities have positions, inventories, and vision. The optional model experiments add a single decision opportunity or a bounded 60-round program controller to scripts and manual input. The continuous protocol separately provides persistent individual memory, goals and conditional tasks. An unattended production service remains outside the bounded experimental controllers.
 
 ## Bounded World Agent and learning
 
 The [learning-v1 experiment](SKILL_LEARNING_EXPERIMENT.md) uses a separate World Agent to assess functional requests, reuse or generate resource-checked code, and assign individual learning time. A 24 by 18 map adds finite food, terrain, materials and river crossings. Ordinary agents receive survival goals and private recent feedback; plans interrupt on failures, learning feedback and worsening vitals. World development pauses game time and returns to the current coding conversation when needed.
 
-## Skill Evolution (Planned)
+## Founding skill boundary and later extensions
 
-Future requests may become capabilities through specification, review, isolated testing, and versioning. Current `try` actions only record unavailable names. The survival controller generates only bounded behavior commands, not new skills. Learning-v1 separately generates bounded resource-operation compositions and tracks individual proficiency. Arbitrary host code, unrestricted new physics and rollback remain outside scope; base try never changes the core.
+Later protocols turn functional requests into capabilities through specification, review, testing and versioning. Current `try` actions only record unavailable names. The survival controller generates only bounded behavior commands, not new skills. Learning-v1 separately generates bounded resource-operation compositions and tracks individual proficiency. The continuous protocol accepts reviewed versioned host-code packages; unrestricted unreviewed code and general rollback remain outside scope. Base try never changes the founding core.
 
 ## Limitations and next steps
 
-The foundation has no terrain collision; learning-v1 adds tree/rock/deep-water blocking. Neither version has occlusion, diagonal movement, continuous physics or trade. The browser stores at most 500 single actions or simultaneous rounds in memory and accepts replay files up to 1 MB. There is no database, autosave, long-running service, or cross-version migration.
+The foundation has no terrain collision; learning-v1 adds tree/rock/deep-water blocking. Neither version has occlusion, diagonal movement, continuous physics or trade. The classic importer stores at most 500 single actions or simultaneous rounds in memory and accepts replay files up to 1 MB; the continuous viewer uses separately indexed segments. The founding demo has no database, autosave or migration. Continuous experiments separately retain durable checkpoints, calls, source versions and explicit package migrations; they are not a long-running service.
 
 The bounded 60-round protocol remains unchanged. The separately designed learning-v1 and evolution-v1 extensions specify their own goals, scheduling, memory and account budgets. Further expansion requires another explicit design decision. The scripted demo must not be presented as model behavior, and founding skill attempts never execute extension code.
 
@@ -87,3 +89,9 @@ The [evolution-v1 protocol](EVOLUTION_EXPERIMENT.md) separates unknown resource 
 ## Development beyond survival
 
 The [coevolution-v1 protocol](COEVOLUTION_EXPERIMENT.md) adds a separate three-actor observation of reliable supply, reduced repetitive work and living conditions. Costed carrying/rest, persistent shared objects, delayed resource processing and personal projects give goals observable consequences. Basic eating is authored initial knowledge; later capabilities still require reviewed implementation and individual learning. The existing task harness and viewer retain the real observation and stop the entire world when attempted-call budgets are exhausted.
+
+## Continuous world and persistent wellbeing
+
+The independent [continuous protocol](CONTINUOUS_WORLD.md) uses fractional positions, swept collision, private-knowledge navigation and distance-based energy costs. Ordinary goals are health, survival and happiness; personal tasks and preferences are optional. Happiness combines actual physical comfort with reviewed event-grounded sources. New executable, spatial, lifecycle, presentation or private-memory mechanisms return to the current conversation for versioned development. Installation does not grant objects, materials or mastery.
+
+The main game observatory provides zoom, pan, follow, minimap, timeline comparison, event location and recorded actor/task/source panels. It reconstructs checksummed segments and keeps historical grid semantics explicit. Three initial actors share attempted-call budgets of 400 ordinary, 60 world and 20 current-conversation development handoffs across a first 1,000-round target window; developer-internal usage is unknown. Checkpoints preserve identities and budgets for later authorized continuation. Current acceptance and experiment evidence remain in [PRODUCT](PRODUCT.md).

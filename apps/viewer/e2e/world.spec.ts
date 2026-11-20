@@ -4,7 +4,7 @@ import { captureReview, expect, test } from './validators.js';
 test('renders the real world, isolates the selected view and works on mobile', async ({
   page,
 }, testInfo) => {
-  await page.goto('/');
+  await page.goto('/classic.html');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await expect(
     page.getByRole('heading', { name: 'World Observatory.' }),
@@ -36,7 +36,7 @@ test('renders the real world, isolates the selected view and works on mobile', a
 test('moves and picks up with illustrated entities and no learning control', async ({
   page,
 }, testInfo) => {
-  await page.goto('/');
+  await page.goto('/classic.html');
   await page.getByRole('button', { name: /New world/ }).click();
   await expect(page.locator('#inventory')).toContainText('Inventory is empty');
   await page.getByRole('button', { name: 'Move east' }).click();
@@ -57,7 +57,7 @@ test('plays recorded snapshots, disables historical commands and resumes only at
   page,
 }, testInfo) => {
   await page.clock.install();
-  await page.goto('/');
+  await page.goto('/classic.html');
   const exportHistory = async (filename: string): Promise<string> => {
     const pending = page.waitForEvent('download');
     await page.getByRole('button', { name: /Export history/ }).click();
@@ -91,7 +91,7 @@ test('plays recorded snapshots, disables historical commands and resumes only at
 test('exports/imports history and keeps the current world on invalid input', async ({
   page,
 }, testInfo) => {
-  await page.goto('/');
+  await page.goto('/classic.html');
   const originalPosition = await page.locator('#agent-position').textContent();
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: /Export history/ }).click();
@@ -120,7 +120,7 @@ test('exports/imports history and keeps the current world on invalid input', asy
 test('renders an imported empty world and treats names as text', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/classic.html');
   const replay = {
     format: 'self-evolving-world/replay',
     version: 1,

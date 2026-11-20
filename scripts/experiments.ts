@@ -1,3 +1,7 @@
+import {
+  continuousArtifactFiles,
+  readContinuousExperiment,
+} from './continuous-analysis.js';
 import { COEVOLUTION_CONFIG } from '@self-evolving-world/world-core';
 import { coevolutionPreflight } from './coevolution-preflight.js';
 import {
@@ -56,37 +60,39 @@ export const EXPERIMENT_SCENES = [
 export function experimentFiles(
   manifest: Record<string, unknown>,
 ): readonly string[] {
-  return manifest.version === 6
-    ? [
-        ...EXPERIMENT_FILES,
-        'model-calls.json',
-        'execution.json',
-        'skills.json',
-        'preflight.json',
-        'configuration.json',
-        'checkpoints.json',
-        'stages.json',
-        'source-history.json',
-        ...sourceArtifactFiles(manifest.sourceArtifacts),
-      ]
-    : manifest.version === 5
+  return manifest.version === 7
+    ? continuousArtifactFiles(manifest)
+    : manifest.version === 6
       ? [
           ...EXPERIMENT_FILES,
           'model-calls.json',
           'execution.json',
           'skills.json',
-          'smoke.json',
+          'preflight.json',
+          'configuration.json',
+          'checkpoints.json',
+          'stages.json',
+          'source-history.json',
+          ...sourceArtifactFiles(manifest.sourceArtifacts),
         ]
-      : manifest.version === 4
+      : manifest.version === 5
         ? [
             ...EXPERIMENT_FILES,
             'model-calls.json',
             'execution.json',
             'skills.json',
+            'smoke.json',
           ]
-        : manifest.version === 3
-          ? [...EXPERIMENT_FILES, 'model-calls.json']
-          : EXPERIMENT_FILES;
+        : manifest.version === 4
+          ? [
+              ...EXPERIMENT_FILES,
+              'model-calls.json',
+              'execution.json',
+              'skills.json',
+            ]
+          : manifest.version === 3
+            ? [...EXPERIMENT_FILES, 'model-calls.json']
+            : EXPERIMENT_FILES;
 }
 export const EXPERIMENT_FILES = [
   'replay.json',
@@ -163,7 +169,8 @@ export interface ExperimentConfig {
     | 'survival-v1'
     | 'learning-v1'
     | 'evolution-v1'
-    | 'coevolution-v1';
+    | 'coevolution-v1'
+    | 'continuous-v1';
   readonly totalActions?: number;
 }
 
@@ -210,6 +217,8 @@ export function readExperiment(root: string, id: string, pending = false) {
   )
     throw new Error('Invalid experiment manifest file.');
   const manifest = jsonObject(readExperimentJson(manifestPath));
+  if (manifest.version === 7)
+    return readContinuousExperiment(root, id, manifest, pending);
   const files = experimentFiles(manifest);
   const required = pending
     ? [

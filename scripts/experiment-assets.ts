@@ -19,7 +19,19 @@ export function experimentAssets(root: string): Map<string, string> {
     if (manifest.status === 'running' || manifest.status === 'failed') continue;
     const record = readExperiment(root, id);
     entries.push({ ...record.config, createdAt: record.manifest.createdAt });
-    for (const file of ['replay.json', 'overview.svg']) {
+    const exposed =
+      manifest.version === 7
+        ? [
+            'replay.json',
+            'overview.svg',
+            ...(
+              readExperimentJson(resolve(record.directory, 'replay.json')) as {
+                segments: { path: string }[];
+              }
+            ).segments.map((p) => p.path),
+          ]
+        : ['replay.json', 'overview.svg'];
+    for (const file of exposed) {
       assets.set(
         `experiments/${id}/${file}`,
         readFileSync(resolve(record.directory, file), 'utf8'),

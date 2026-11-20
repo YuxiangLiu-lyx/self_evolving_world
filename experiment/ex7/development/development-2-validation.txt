@@ -1,0 +1,127 @@
+$ pnpm typecheck
+
+> self-evolving-world@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world
+> tsc --noEmit && pnpm --filter @self-evolving-world/world-core typecheck && pnpm --filter @self-evolving-world/viewer exec tsc --noEmit
+
+
+> @self-evolving-world/world-core@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world/packages/world-core
+> tsc -p tsconfig.json --noEmit
+
+
+$ pnpm architecture:check
+
+> self-evolving-world@0.0.0 architecture:check /Users/liuyuxiang/developer/self_evolving_world
+> depcruise --config dependency-cruiser.config.cjs apps packages
+
+
+✔ no dependency violations found (134 modules, 534 dependencies cruised)
+
+
+$ pnpm test
+
+> self-evolving-world@0.0.0 test /Users/liuyuxiang/developer/self_evolving_world
+> vitest run
+
+
+ RUN  v4.1.12 /Users/liuyuxiang/developer/self_evolving_world
+
+ ✓ scripts/coevolution-source.test.ts (4 tests) 147ms
+ ✓ scripts/validation.test.ts (15 tests) 120ms
+ ✓ scripts/experiments.test.ts (18 tests) 138ms
+ ✓ scripts/harness.test.ts (3 tests) 440ms
+ ✓ apps/simulator/test/continuous.test.ts (6 tests) 281ms
+ ✓ scripts/continuous-store.test.ts (1 test) 277ms
+ ✓ apps/simulator/test/random-run.test.ts (12 tests) 85ms
+ ✓ scripts/documentation.test.ts (15 tests) 114ms
+ ✓ packages/world-core/test/continuous.test.ts (12 tests) 94ms
+ ✓ apps/simulator/test/experiment.test.ts (21 tests) 37ms
+ ✓ apps/simulator/test/synchronous-run.test.ts (4 tests) 53ms
+ ✓ scripts/learning-analysis.test.ts (1 test) 71ms
+ ✓ apps/simulator/test/learning-run.test.ts (5 tests) 37ms
+ ✓ packages/world-core/test/coevolution.test.ts (11 tests) 26ms
+ ✓ scripts/survival-analysis.test.ts (2 tests) 28ms
+ ✓ packages/world-core/test/continuous-nature.test.ts (2 tests) 35ms
+ ✓ packages/world-core/test/continuous-mosaic.test.ts (2 tests) 42ms
+ ✓ apps/simulator/test/survival-run.test.ts (5 tests) 24ms
+ ✓ scripts/pr-policy.test.ts (13 tests) 17ms
+ ✓ apps/viewer/test/timeline.test.ts (7 tests) 18ms
+ ✓ apps/simulator/test/coevolution.test.ts (5 tests) 776ms
+     ✓ counts every failed attempt and freezes the whole world on the 120th ordinary call  336ms
+ ✓ packages/world-core/test/evolution.test.ts (10 tests) 11ms
+ ✓ scripts/github.test.ts (2 tests) 16ms
+ ✓ apps/simulator/test/chatgpt-auth.test.ts (9 tests) 9ms
+ ✓ packages/world-core/test/learning.test.ts (22 tests) 13ms
+ ✓ packages/world-core/test/world.test.ts (38 tests) 7ms
+ ✓ packages/world-core/test/program.test.ts (16 tests) 6ms
+ ✓ packages/world-core/test/survival.test.ts (7 tests) 4ms
+ ✓ scripts/task-flow.test.ts (16 tests) 9ms
+ ✓ packages/world-core/test/round.test.ts (5 tests) 4ms
+ ✓ scripts/delivery.test.ts (7 tests) 5ms
+ ✓ scripts/task-review.test.ts (8 tests) 4ms
+ ✓ apps/viewer/test/experiments.test.ts (10 tests) 3ms
+ ✓ apps/simulator/test/evolution-run.test.ts (5 tests) 1039ms
+     ✓ pauses development at the same tick, resumes once, and audits every retained private input  982ms
+ ✓ scripts/publication.test.ts (5 tests) 4ms
+ ✓ apps/simulator/test/demo.test.ts (3 tests) 3ms
+ ✓ scripts/delivery-git.test.ts (4 tests) 1036ms
+ ✓ scripts/task-runtime.test.ts (11 tests) 1406ms
+     ✓ commits the exact reviewed files once and keeps generated journals outside fingerprints  371ms
+ ✓ scripts/unit-reporter.test.ts (6 tests) 1860ms
+     ✓ handles ordinary passing test  305ms
+     ✓ handles skipped test  391ms
+     ✓ handles todo test  359ms
+ ✓ scripts/finish-task.test.ts (4 tests) 1652ms
+     ✓ completes an explicit local-only task without credentials, publication or a network remote  523ms
+     ✓ requires publication when no local exception plan was supplied and replaces old success with failure  413ms
+     ✓ rejects evidence that has not passed local review and source changes after review  460ms
+ ✓ scripts/task-entry.test.ts (14 tests) 2763ms
+     ✓ binds learning continuation to its mode, existing allocation and leased stage  329ms
+     ✓ binds evolution continuation to its mode, existing allocation and leased stage  318ms
+
+ Test Files  41 passed (41)
+      Tests  366 passed (366)
+   Start at  19:45:42
+   Duration  3.23s (transform 2.46s, setup 0ms, import 5.09s, tests 12.71s, environment 2ms)
+
+
+$ pnpm build
+
+> self-evolving-world@0.0.0 build /Users/liuyuxiang/developer/self_evolving_world
+> pnpm -r build
+
+Scope: 3 of 4 workspace projects
+packages/world-core build$ tsc -p tsconfig.json
+packages/world-core build: Done
+apps/viewer build$ tsc --noEmit && vite build
+apps/simulator build$ tsc -p tsconfig.json
+apps/simulator build: Done
+apps/viewer build: vite v8.3.6 building client environment for production...
+apps/viewer build: transforming...
+apps/viewer build: ✓ 52 modules transformed.
+apps/viewer build: rendering chunks...
+apps/viewer build: computing gzip size...
+apps/viewer build: dist/index.html                         0.57 kB │ gzip:  0.32 kB
+apps/viewer build: dist/observatory.html                   0.57 kB │ gzip:  0.32 kB
+apps/viewer build: dist/experiments/ex4/overview.svg       1.72 kB │ gzip:  0.65 kB
+apps/viewer build: dist/experiments/index.json             2.01 kB │ gzip:  0.89 kB
+apps/viewer build: dist/experiments/ex3/overview.svg       4.14 kB │ gzip:  1.48 kB
+apps/viewer build: dist/experiments/ex3/replay.json        4.91 kB │ gzip:  1.09 kB
+apps/viewer build: dist/experiments/ex5/overview.svg       5.80 kB │ gzip:  1.22 kB
+apps/viewer build: dist/experiments/ex2/overview.svg       6.87 kB │ gzip:  1.76 kB
+apps/viewer build: dist/classic.html                      14.04 kB │ gzip:  3.48 kB
+apps/viewer build: dist/experiments/ex1/overview.svg      14.69 kB │ gzip:  1.89 kB
+apps/viewer build: dist/experiments/ex6/overview.svg      24.14 kB │ gzip:  3.34 kB
+apps/viewer build: dist/experiments/ex4/replay.json       36.08 kB │ gzip:  4.31 kB
+apps/viewer build: dist/experiments/ex1/replay.json       42.25 kB │ gzip:  1.40 kB
+apps/viewer build: dist/experiments/ex2/replay.json       49.36 kB │ gzip:  1.21 kB
+apps/viewer build: dist/experiments/ex5/replay.json      191.65 kB │ gzip: 22.73 kB
+apps/viewer build: dist/experiments/ex6/replay.json      213.78 kB │ gzip: 24.13 kB
+apps/viewer build: dist/assets/observatory-D8eqzeqa.css    6.99 kB │ gzip:  2.34 kB
+apps/viewer build: dist/assets/classic-CkITEJCO.css       16.01 kB │ gzip:  4.83 kB
+apps/viewer build: dist/assets/observatory-CUV07Y2a.js    24.89 kB │ gzip:  9.19 kB
+apps/viewer build: dist/assets/classic-BrxefKTC.js        35.67 kB │ gzip: 11.82 kB
+apps/viewer build: dist/assets/timeline-C34cANrq.js      138.82 kB │ gzip: 38.82 kB
+apps/viewer build: ✓ built in 54ms
+apps/viewer build: Done
+
+Every saved round reconstructed with identical world and event hashes.

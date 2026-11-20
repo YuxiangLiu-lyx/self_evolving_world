@@ -4,7 +4,7 @@ import { expect, test, checkLayout } from './validators.js';
 test('rejects boundary/collision moves, conserves items and never executes a try', async ({
   page,
 }, testInfo) => {
-  await page.goto('/');
+  await page.goto('/classic.html');
   await page.locator('#import-file').setInputFiles({
     name: 'boundary-world.json',
     mimeType: 'application/json',
@@ -93,7 +93,7 @@ test('rejects boundary/collision moves, conserves items and never executes a try
 test('layout validator catches horizontal overflow regressions', async ({
   page,
 }) => {
-  await page.goto('/');
+  await page.goto('/classic.html');
   await page.addStyleTag({ content: 'body { min-width: 2200px !important; }' });
   await expect(checkLayout(page)).rejects.toThrow('Basic layout sanity');
   await page

@@ -47,7 +47,10 @@ export function analysisMaterial(root: string, id: string) {
   const record = readExperiment(root, experimentId(id));
   return {
     experiment: id,
-    actors: record.run.frames[0]?.agents.map((a) => a.id) ?? [],
+    actors:
+      'continuous' in record
+        ? (record.continuous.initial?.actors.map((a) => a.id) ?? [])
+        : (record.run.frames[0]?.agents.map((a) => a.id) ?? []),
     artifacts: Object.fromEntries(
       ['manifest.json', ...experimentFiles(record.manifest)].map((file) => [
         `experiment/${id}/${file}`,
