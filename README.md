@@ -18,7 +18,7 @@ These are exploratory runs with different rules and goals, not causal comparison
 
 [![Actual ex7 replay at round 1,000: continuous world, actor state, memory and happiness](experiment/ex7/final.png)](experiment/ex7/final.png)
 
-_Actual saved ex7 state. Replay is read-only and makes no model calls._
+_Actual saved ex7 state, viewable here without installation. Interactive replay runs locally after setup; it is read-only and makes no model calls._
 
 ## Five-minute quick start
 
@@ -32,7 +32,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open [the ex7 demo](http://127.0.0.1:5173/?experiment=ex7). Seek the timeline, follow an agent, switch to its personal view and inspect recorded events. No API key is needed. `/classic.html` retains the original grid inspector; old experiments preserve their original rules. See [development setup](docs/DEVELOPMENT.md) and [live-run/resume instructions](docs/CONTINUOUS_WORLD.md) for more.
+Open [Local replay (after setup)](http://127.0.0.1:5173/?experiment=ex7) while `pnpm dev` is running on your computer. This loopback URL points to your own machine; it is not a public hosted demo. Seek the timeline, follow an agent, switch to its personal view and inspect recorded events. No API key is needed. `/classic.html` retains the original grid inspector; old experiments preserve their original rules. See [development setup](docs/DEVELOPMENT.md) and [live-run/resume instructions](docs/CONTINUOUS_WORLD.md) for more.
 
 ## Development task entry
 
