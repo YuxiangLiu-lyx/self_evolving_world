@@ -36,16 +36,73 @@ Open [the ex7 demo](http://127.0.0.1:5173/?experiment=ex7). Seek the timeline, f
 
 ## Development task entry
 
-The **code-development harness** is a TypeScript coordinator, separate from the simulated agents. It controls order and evidence; the current Codex conversation implements changes and performs visual and semantic review. It does not launch another autonomous coding service.
+The **code-development harness** is a TypeScript coordinator, separate from the simulated agents. It controls order and evidence; the current Codex conversation implements changes and performs visual and semantic review. It does not launch another autonomous coding service. Its two connected flows are:
+
+**Task execution and experiment branches.** Actual changed files determine the `code` (including documentation), `experiment` or `mixed` route. Explicit experiment configuration selects the runner; the requested task label never skips checks. Saved-data analysis can run without allocating an experiment.
 
 ```mermaid
-flowchart LR
-    Intent[Intent + numbered plan] --> Work[Implementation / experiment]
-    Work --> Checks[Full validation]
-    Checks --> Review[Visual + full-diff review]
-    Review --> PR[Commit + PR + self-review]
-    PR --> Merge[Current CI + guarded merge]
-    Merge --> Verify[Independent completion check]
+flowchart TB
+    Intent[Intent + numbered plan] --> Prepare[Codex prepares code, docs or experiment]
+    Prepare --> Route[Actual files: code / experiment / mixed]
+    Route --> Run{Experiment requested?}
+    Run -->|No run| Targets{Analysis targets?}
+    Run -->|Yes| Allocate[Next exN or explicit reuse]
+    Allocate --> Mode{Experiment mode}
+    Mode -->|random| Random[Seeded run; no model calls]
+    Mode -->|survival| Survival[Bounded model programs]
+    Mode -->|Extensible protocols| World[Versioned world runner]
+    World -->|Development needed| Dev[Freeze + checkpoint; Codex implements and validates]
+    Dev -->|submit| World
+    World -->|Budget / failure| Pause[Checkpoint; stop world]
+    Pause -.->|Explicit valid resume| World
+    Random --> Evidence[Retained results + replay + visuals]
+    Survival --> Evidence
+    World -->|Complete| Evidence
+    Evidence --> Targets
+    Targets -->|Required| Analysis[Codex analyzes saved behavior]
+    Targets -->|None| Checks[Shared full validation and delivery below]
+    Analysis --> Checks
+    classDef conversation fill:#e8f2ff,stroke:#356ba6,color:#172b4d
+    classDef paused fill:#fff3cd,stroke:#9a7413,color:#493600
+    class Prepare,Dev,Analysis conversation
+    class Pause paused
+```
+
+Extensible protocols are `learning`, `evolution`, `coevolution` and `continuous`. Analysis targets combine new or changed experiment records with explicitly requested retrospective analyses. Blue nodes mark conversation work, handed over through version-bound JSON requests. Checkpoints preserve decisions and budgets; continuation does not reset exhausted budgets or blindly retry inference. Capture recovery reconstructs saved results without new model calls.
+
+**Shared acceptance and delivery.** Code, documentation, experiment-only and mixed tasks all pass the full suite. The default is guarded merge; local-only and PR-only require an explicit task-scoped exception.
+
+```mermaid
+%%{init: {'flowchart': {'nodeSpacing': 20, 'rankSpacing': 25, 'padding': 10}}}%%
+flowchart TB
+    Route{Actual change route?}
+    Route -->|Code / documentation| Checks
+    Route -->|Experiment only| Records[Validate experiment archives first]
+    Route -->|Mixed| Records
+    Records --> Checks
+    Checks[Full suite: types / lint / unit / build / archives / browser / docs]
+    Checks -->|Passed| Review[Codex reviews every screenshot, behavior result and changed file]
+    Checks -->|Failed| Fix[Codex fixes findings]
+    Review -->|Mismatch| Fix
+    Fix -->|next: fresh validation| Checks
+    Review -->|Passed| Policy{Recorded delivery policy}
+    Policy -->|Explicit local-only| Finish[Independent completion gate: policy-specific evidence and integration]
+    Policy -->|Publish| Commit[Reviewed commit + complete PR body]
+    Commit --> Publish[Publish PR; current quality + pr-policy]
+    Publish --> Comment[Codex exact-head COMMENT self-review]
+    Comment --> Current[Recheck remote review and current CI]
+    Current --> Delivery{Merge requested?}
+    Delivery -->|Explicit PR-only| Finish
+    Delivery -->|Default merge| Guard{Authority + exact head + no conflicts?}
+    Guard -->|Missing / failed| Stop[Stop; resolve failure or obtain actual authority]
+    Stop -.->|next: recheck prerequisites| Current
+    Guard -->|Passed| Merge[Connector merges reviewed head]
+    Merge --> Finish
+    Finish -->|Verified receipt| Done[Completed]
+    classDef conversation fill:#e8f2ff,stroke:#356ba6,color:#172b4d
+    classDef paused fill:#fff3cd,stroke:#9a7413,color:#493600
+    class Review,Fix,Commit,Comment,Merge conversation
+    class Stop paused
 ```
 
 | Layer                                                                             | Responsibility                                                                                        |
@@ -57,7 +114,7 @@ flowchart LR
 
 Start with `pnpm task -- start validation-results/intent.json`; continue with `submit`, `next` and `status`. [The harness guide](docs/TASK_HARNESS.md) defines the intent and response formats, including paused world-development handoffs.
 
-Every PR runs the complete suite, including Chromium. Current screenshot, behavior and requirement reviews bind to the source version. GitHub COMMENT records this conversation's self-review; it is not independent approval. Current `quality` and `pr-policy`, merge authority and verified integration are required for completion. See [validation](docs/VALIDATION.md) and the [PR contract](docs/PULL_REQUESTS.md).
+Source, plan or requirement changes invalidate acceptance; continuation rechecks prerequisites. Failed gates stop the task for explicit repair. GitHub COMMENT records this conversation's self-review, not independent approval; only the completion gate establishes completion. See [validation](docs/VALIDATION.md) and the [PR contract](docs/PULL_REQUESTS.md).
 
 ## Code and further reading
 
