@@ -2,121 +2,68 @@
 
 [![CI](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/workflows/ci.yml)
 
-A TypeScript project exploring autonomous AI agents and controlled world evolution. The independent [continuous world protocol](docs/CONTINUOUS_WORLD.md) supports continuous 2D movement, reviewed executable world extensions, persistent individual tasks and event-grounded wellbeing. A game observatory displays saved worlds without inference. The original grid foundation and its historical experiments retain their own rules. Browser validation and a task completion gate are part of the development workflow.
+**Can autonomous agents discover needs, develop capabilities and change their world in ways that deliver lasting benefits?** This research project tests that question in a reproducible world. The latest protocol combines continuous 2D space, physical costs, persistent objects, individual memory and happiness driven by actual outcomes.
 
-The classic inspector at `/classic.html` retains manual controls and scripted grid demos. An optional [single-round experiment](docs/ONE_ROUND_EXPERIMENT.md) requests one model decision for each of its three founding agents through ChatGPT OAuth and Responses. The separate [survival-program experiment](docs/SURVIVAL_EXPERIMENT.md) lets each actor execute model-written behavior code for 60 synchronous rounds with at most five calls. A separate [skill-learning protocol](docs/SKILL_LEARNING_EXPERIMENT.md) adds 18-round survival pressure, World Agent review, constrained generated skills and individual learning. The [heterogeneous evolution protocol](docs/EVOLUTION_EXPERIMENT.md) extends this with four comparable actors, 120 rounds, persistent ecology and World Agent-designed resource/mechanic additions. The separate continuous protocol adds reviewed host-code extensions; an unattended production NPC service remains future work. [PRODUCT](docs/PRODUCT.md) is the single source of feature status.
+**The mechanism:** agents act from private observations and request missing capabilities. A World Agent reviews functional equivalence, prerequisites, costs and effects. When implementation is needed, the world pauses and hands development to the current Codex conversation. Tested, versioned extensions become available; each actor must still learn and pay the execution costs. Requests and skill counts earn no reward. This is world-level learning, not model-weight training.
 
-[ex7](experiment/ex7/report.md) retains one real 1,000-round continuous observation: all three actors remained healthy, two new activities were implemented, seven nature observations and one persistent mosaic completed, and no mental satisfaction source appeared. [ex6](experiment/ex6/report.md) retains the preceding 180-round shared-facility observation.
+## What the experiments show
 
-Run a [numbered offline experiment](experiment/README.md) to check the founding world with seeded random actions and no model connection. Each run retains its objective, measured results, replay and visualizations under `experiment/exN/`. [ex5](experiment/ex5/report.md) records 120 rounds, three new resource types, seven shared skills and four starvation deaths, with a [detailed behavioral analysis](experiment/analyses/ex5/pr-16-heterogeneous-evolution.md). [ex4](experiment/ex4/report.md) records two generated food capabilities, individual learning and three healthy survivors over18 rounds. [ex3](experiment/ex3/report.md) records 12 successful ChatGPT calls, 60 rounds per actor, three survivors and three denied learning requests. [ex2](experiment/ex2/report.md) adds simultaneous rounds and successful collection; [ex1](experiment/ex1/report.md) remains the original sequential baseline.
+| Run                                                             | Observation                                                   | Measured outcome                                                                                                                                                                                                                                                                 |
+| --------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [ex7](experiment/analyses/ex7/pr-18-continuous-world.md)        | 3 agents, 1,000 rounds; continuous space and happiness goals  | All survived at full health. Two requested activities were implemented: seven nature observations completed and one persistent stone mosaic was made. Mean happiness stayed at 9.42–9.58/100; mental satisfaction remained zero, with no sustained benefit from either activity. |
+| [ex6](experiment/analyses/ex6/pr-17-development-coevolution.md) | 3 agents, 180 rounds; development goals and shared facilities | All survived. Agents consumed 41 cultivated meals and rested 26 times at another agent's platform: concrete supply and recovery benefits.                                                                                                                                        |
+| [ex5](experiment/ex5/report.md)                                 | 4 agents, 120 rounds; resource and skill evolution            | Seven shared skills emerged, but all four agents starved. Capability count did not establish usefulness.                                                                                                                                                                         |
 
-## Design goals
+These are exploratory runs with different rules and goals, not causal comparisons. [The archive](experiment/README.md) retains configuration, events, replay, analysis and model-call records where applicable; authored starting abilities and isolated test fixtures are excluded from autonomous discoveries.
 
-- **Human legibility:** clear explanations, responsibilities, diagrams, decisions, and acceptance evidence.
-- **Agent legibility:** a short [AGENTS.md](AGENTS.md) that points to task-specific context.
-- **Enforceable architecture:** strict TypeScript, linting, dependency rules, tests, and CI.
-- **Incremental development:** focused PRs that keep behavior, evidence, and documentation aligned.
+[![Actual ex7 replay at round 1,000: continuous world, actor state, memory and happiness](experiment/ex7/final.png)](experiment/ex7/final.png)
 
-Repository content is written in English; conversations with the user are in Chinese. See the [language policy](AGENTS.md#language-policy).
-
-The [World Foundation](docs/WORLD_FOUNDATION.md) is the fixed reference for starting items, base skills, and environment settings. Evolution must preserve this foundation and record extensions separately.
+_Actual saved ex7 state. Replay is read-only and makes no model calls._
 
 ## Five-minute quick start
 
-Use Node.js **24.22.2** from [.node-version](.node-version) and pnpm **10.34.9**. Switch through your Node version manager or use the [official release download](https://nodejs.org/dist/v24.22.2/) if needed.
+Use Node.js **24.22.2** and pnpm **10.34.9**, pinned in [.node-version](.node-version) and [package.json](package.json).
 
 ```bash
 git clone https://github.com/YuxiangLiu-lyx/self_evolving_world.git
 cd self_evolving_world
-node --version
 npm install --global pnpm@10.34.9
 pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open the local URL printed in the terminal, normally `http://127.0.0.1:5173`. No API key or external service is required.
-
-If zsh reports `command not found: pnpm`, install the pinned pnpm after selecting Node 24.22.2 with the commands above. Ensure the npm global prefix's `bin` directory is on your shell PATH, then run `rehash` or reopen the terminal. Verify both `pnpm --version` and `pnpm exec node --version`; do not disable engine checks.
-
-- The main page is the game observatory. Choose a saved experiment, or open `http://127.0.0.1:5173/?experiment=ex7`. Seek or play the recorded timeline, zoom and drag the map, follow an actor, use the minimap, locate events and compare adjacent states. Actor panels show recorded vitals, tasks, inventory, memory and happiness sources. Old records explicitly retain grid semantics.
-- Saved worlds are read-only; camera controls and playback never issue inference or advance simulation. Global and personal views inspect the same saved state.
-- Open `http://127.0.0.1:5173/classic.html` for the original manual grid demo, legacy import/export and historical inspector. The following controls apply to that classic page:
-- The default demo has 3 agents, 6 initial items, and 12 scripted actions. Select **Play** to replay it or continue manually.
-- Select an agent on the map or in the dropdown. Switch between **Global view** and **Agent vision**.
-- Use arrow buttons or WASD to move one cell. Pick up an item when standing on its cell.
-- Characters and founding items have distinct illustrations. Move and pickup are the current controls; legacy try records remain readable in old histories.
-- Play, pause, change speed, step through frames, or seek on the timeline. Historical frames cannot receive actions; return to **Latest frame** to continue.
-- Local session history lives in page memory. Export JSON before refreshing or starting a new world; import it to replay later. Archived experiments remain in `experiment/exN/` and reload through their URLs.
-
-All base rules live in [world.ts](packages/world-core/src/world.ts). Defaults are a 16×12 world and a vision radius of 4. Configure an initial world with `createWorld(setup)` or edit the viewer's [demo setup](apps/viewer/src/scenario.ts). Settings are fixed after initialization.
-
-## Validation and commands
-
-Install the test browser before the first full check. Linux CI also installs system dependencies using `--with-deps`.
-
-```bash
-pnpm exec playwright install chromium
-pnpm check
-```
-
-Use `pnpm task -- start validation-results/intent.json` for every task. Follow its current structured requests for implementation, every screenshot and behavior result, complete diff review, PR description and GitHub COMMENT self-review. Submit results and continue with `pnpm task -- next ID`; the program controls full validation, reviewed commit, publication, separately authorized merge and independent completion. Explicit no-PR/no-merge instructions remain current-plan exceptions. Legacy task commands resolve the same recorded task and cannot bypass its authorization or evidence. Standalone `pnpm validate` produces automated evidence only. See the [task entry](docs/TASK_HARNESS.md) and [validation criteria](docs/VALIDATION.md).
-
-| Command                                                                  | Purpose                                                                                                                |
-| ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `pnpm dev`                                                               | Build the core and start the viewer with the current experiment archive; restart after core changes or new experiments |
-| `pnpm build`                                                             | Build the core, CLI, and static viewer                                                                                 |
-| `pnpm preview`                                                           | Serve the built viewer on port 4173                                                                                    |
-| `pnpm experiment:run -- [seed] [rounds]`                                 | Create the next offline random experiment with results and browser visuals                                             |
-| `pnpm experiment:resume -- exN`                                          | Finish failed browser capture without replacing saved simulation data                                                  |
-| `pnpm experiment:check`                                                  | Validate all retained experiment records and deterministic results                                                     |
-| `pnpm harness -- "task name"`                                            | Continue the matching recorded task through the unified coordinator                                                    |
-| `pnpm experiment:login`                                                  | Authorize the optional experiment through ChatGPT in the browser                                                       |
-| `pnpm experiment:continuous`                                             | Continue a coordinator-authorized continuous observation with persistent tasks and versioned development               |
-| `pnpm experiment:evolution`                                              | Continue an authorized version5 task: offline smoke, four actors, 120 rounds and bounded world evolution               |
-| `pnpm experiment:learning`                                               | Continue a recorded learning experiment through the unified harness; 18 rounds and bounded model calls                 |
-| `pnpm experiment:survival`                                               | Run the next plan-funded survival experiment: 60 rounds, at most five requests per actor                               |
-| `pnpm experiment:once`                                                   | Request one decision for each of three agents and save a replay                                                        |
-| `pnpm demo`                                                              | Run the CLI and print initial, move, pickup, and try snapshots                                                         |
-| `pnpm check`                                                             | Run all automated checks, including real Chromium interactions                                                         |
-| `pnpm validate -- "task name"`                                           | Run full checks and capture screenshots; create a pending review                                                       |
-| `pnpm task:review -- "task name"`                                        | Continue the matching task; submit actual review through its structured request                                        |
-| `pnpm task:finish -- "task name"`                                        | Continue the matching task through the independent completion gate                                                     |
-| `pnpm pr:check -- validation-results/pr-body.md origin/main`             | Verify PR requirements, all changed paths, latest head, and completed local evidence                                   |
-| `pnpm task:publish -- validation-results/pr-body.md "Concrete PR title"` | Submit the current PR body or continue the recorded task; no independent merge path                                    |
-| `pnpm typecheck`                                                         | Check the root project, host-independent core, and browser module                                                      |
-| `pnpm lint`                                                              | Run strict ESLint checks                                                                                               |
-| `pnpm architecture:check`                                                | Check allowed dependencies, public entry points, cycles, and resolution                                                |
-| `pnpm test` / `pnpm test:watch`                                          | Test the core, replay, CLI, documentation checker, and completion gate                                                 |
-| `pnpm test:e2e`                                                          | Test the built viewer, replay, file round trips, and mobile layout                                                     |
-| `pnpm exec playwright show-report`                                       | Open browser test details and screenshot attachments                                                                   |
-| `pnpm demo:check`                                                        | Compare built CLI output in two independent processes                                                                  |
-| `pnpm docs:check`                                                        | Check Markdown, required documents, local links, and heading anchors                                                   |
-| `pnpm format:check` / `pnpm format`                                      | Check or fix formatting                                                                                                |
-
-The toolchain uses pnpm Workspace, TypeScript Strict / ESM, Vitest, Playwright, ESLint, Prettier, dependency-cruiser, and GitHub Actions. The interface uses native TypeScript/CSS and Vite without a frontend framework. Exact dependencies are in [package.json](package.json) and [pnpm-lock.yaml](pnpm-lock.yaml). Initial installation requires network access; the built simulation and replay run offline.
-
-CLI output contains full snapshots. The viewer imports the replay format produced by its export control.
-
-## Repository map and reading guide
-
-The canonical repository is [YuxiangLiu-lyx/self_evolving_world](https://github.com/YuxiangLiu-lyx/self_evolving_world), with `main` as the integration branch. Pushes and pull requests run the complete validation in [GitHub Actions](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions). Each run retains available browser reports, screenshots, and validation records for 14 days. Before implementation, summarize numbered requirements in a task plan. Every PR repeats those requirements, reviews every changed file against them, and requires full tests plus current evidence. Follow the [PR contract](docs/PULL_REQUESTS.md). See [version control and CI](docs/DEVELOPMENT.md#version-control-and-ci) for the contribution workflow.
-
-```text
-packages/world-core/  All base rules in world.ts; index.ts only re-exports
-apps/simulator/       Fixed demo, offline random runner and optional model experiment
-apps/viewer/          Map, manual controls, vision, and history replay
-scripts/              Task harness, experiment records and validation checks
-experiment/           Numbered goals, results, replays and visualizations
-docs/                 Overview, product, policies, ADRs, and execution plans
-.github/              CI and PR template
-```
-
-Start with the [project overview](docs/PROJECT_OVERVIEW.md), then the [architecture](ARCHITECTURE.md) and [feature inventory](docs/PRODUCT.md). Before developing, read the [development workflow](docs/DEVELOPMENT.md), [validation workflow](docs/VALIDATION.md), [documentation policy](docs/DOCUMENTATION_POLICY.md), and [agent guide](AGENTS.md).
-
-Decisions and acceptance records live in [ADRs](docs/decisions/README.md) and [execution plans](docs/exec-plans/README.md).
+Open [the ex7 demo](http://127.0.0.1:5173/?experiment=ex7). Seek the timeline, follow an agent, switch to its personal view and inspect recorded events. No API key is needed. `/classic.html` retains the original grid inspector; old experiments preserve their original rules. See [development setup](docs/DEVELOPMENT.md) and [live-run/resume instructions](docs/CONTINUOUS_WORLD.md) for more.
 
 ## Development task entry
 
-Use the [programmatic harness](docs/TASK_HARNESS.md) for new code, documentation and experiment tasks: `pnpm task -- start validation-results/intent.json`. It returns structured requests to the current conversation and resumes with `submit` or `next`; `status` shows current evidence and blockers. Legacy task commands are guarded compatibility entries; standalone diagnostic checks remain available. Every experiment also retains a [behavioral analysis](experiment/README.md#behavioral-analysis) with recommendations only.
+The **code-development harness** is a TypeScript coordinator, separate from the simulated agents. It controls order and evidence; the current Codex conversation implements changes and performs visual and semantic review. It does not launch another autonomous coding service.
 
-The [development and coevolution protocol](docs/COEVOLUTION_EXPERIMENT.md) adds a separately versioned three-actor,180-round target through the same programmatic task harness. It retains costed shared world changes, project memory, staged evidence and honest budget pauses.
+```mermaid
+flowchart LR
+    Intent[Intent + numbered plan] --> Work[Implementation / experiment]
+    Work --> Checks[Full validation]
+    Checks --> Review[Visual + full-diff review]
+    Review --> PR[Commit + PR + self-review]
+    PR --> Merge[Current CI + guarded merge]
+    Merge --> Verify[Independent completion check]
+```
+
+| Layer                                                                             | Responsibility                                                                                        |
+| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| [task.ts](scripts/task.ts) / [task-context.ts](scripts/task-context.ts)           | CLI entry; persist intent, versions, journals and evidence in `validation-results/`.                  |
+| [task-flow.ts](scripts/task-flow.ts)                                              | State machine; return structured work to this conversation and recheck prerequisites on continuation. |
+| [task-runtime.ts](scripts/task-runtime.ts)                                        | Invoke existing experiment, analysis, validation and delivery gates.                                  |
+| [task-entry.ts](scripts/task-entry.ts) / [task-worker.ts](scripts/task-worker.ts) | Route compatibility commands and guard internal workers against bypassing the coordinator.            |
+
+Start with `pnpm task -- start validation-results/intent.json`; continue with `submit`, `next` and `status`. [The harness guide](docs/TASK_HARNESS.md) defines the intent and response formats, including paused world-development handoffs.
+
+Every PR runs the complete suite, including Chromium. Current screenshot, behavior and requirement reviews bind to the source version. GitHub COMMENT records this conversation's self-review; it is not independent approval. Current `quality` and `pr-policy`, merge authority and verified integration are required for completion. See [validation](docs/VALIDATION.md) and the [PR contract](docs/PULL_REQUESTS.md).
+
+## Code and further reading
+
+- [`packages/world-core/`](packages/world-core/): deterministic rules and versioned protocols; no UI, I/O or model services.
+- [`apps/simulator/`](apps/simulator/): observations, model transport, persistent plans and execution. [`apps/viewer/`](apps/viewer/): saved-world visualization.
+- [`scripts/`](scripts/): development harness and experiment evidence. [`experiment/`](experiment/): retained runs and analyses.
+- [Feature status](docs/PRODUCT.md) · [Architecture](ARCHITECTURE.md) · [Agent guide](AGENTS.md) · [Decisions](docs/decisions/README.md) · [Execution plans](docs/exec-plans/README.md).
+
+This remains a research prototype. Reviewed extensions use trusted code; unattended production operation and general rollback remain planned. Repository content is English; user conversations are Chinese.

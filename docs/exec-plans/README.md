@@ -39,3 +39,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-17](completed/pr-17-development-coevolution.md): development motivation, costed persistent coevolution and real experimental evidence.
 
 - [PR-18](completed/pr-18-continuous-world.md): continuous physics, open versioned mechanisms and visuals, persistent wellbeing and the real 1,000-round ex7 observation.
+
+- [PR-19](completed/pr-19-readme-research-and-harness.md): concise research overview, real experiment demo and current development harness navigation.
