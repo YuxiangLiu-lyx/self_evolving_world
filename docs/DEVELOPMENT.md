@@ -12,13 +12,13 @@ Follow the [language policy](../AGENTS.md#language-policy): user conversations a
 
 Use the [unified task entry](TASK_HARNESS.md) for preparation, deterministic execution and continuation. The coordinator owns step ordering and branch conditions; this document retains environment and development constraints. Read the current project documents and record numbered requirements before implementation. Review every changed file and every current screenshot against the plan. Complete documentation before final validation; moving a plan also invalidates evidence.
 
-The program calls the existing full validation, review, reviewed commit, PR preflight, publication and final gates. Every route requires PR delivery by default. Merge requires its own actual instruction evidence; explicit no-PR/no-merge exceptions retain the [delivery contract](PULL_REQUESTS.md#automatic-pr-delivery-for-every-task). A local-only exception preserves the existing reviewed dirty-worktree path. Record outcomes honestly; failed checks and unresolved remote states remain incomplete.
+The program calls the existing scoped validation, review, reviewed commit, PR preflight, publication and final gates. Every route requires PR delivery by default. Merge requires its own actual instruction evidence; explicit no-PR/no-merge exceptions retain the [delivery contract](PULL_REQUESTS.md#automatic-pr-delivery-for-every-task). A local-only exception preserves the existing reviewed dirty-worktree path. Record outcomes honestly; failed checks and unresolved remote states remain incomplete.
 
 ## Offline world experiments and task harness
 
 Follow the [numbered experiment workflow](../experiment/README.md) for `pnpm experiment:run` and `pnpm experiment:check`. The run command allocates the next `experiment/exN`, uses an explicit seed without model calls, and records objectives, results, replay and actual browser visualizations. Inspect an existing run without creating another number by importing its replay or checking its artifacts.
 
-`pnpm harness` is an alias of the unified coordinator; the old task-name form continues an existing task. Standalone `pnpm validate` only produces automated evidence. It [classifies actual changes](VALIDATION.md#task-harness-routing) as code, experiment-only or mixed, and records the chosen route. Experiment-only and mixed work validates the archive before running full regression/browser checks. Code work runs the full suite, including any archived experiments. Every PR still needs an execution plan, full unfiltered tests, current visual/behavior review, requirement mapping and `task:finish`. Retained experiment files are tracked and source-fingerprinted; temporary validation output remains ignored.
+`pnpm harness` is an alias of the unified coordinator; the old task-name form continues an existing task. Standalone `pnpm validate` only produces automated evidence. It [classifies actual changes](VALIDATION.md#task-harness-routing) as code, experiment-only or mixed, and records the chosen route. The actual changed-file plan selects protocol reconstruction and browser scenarios. Code changes retain all unit tests; documentation-only changes do not rebuild worlds. Every PR still requires a plan, current full-diff review, applicable visual/behavior review, requirement mapping and `task:finish`. Unselected or reused checks are explicitly recorded.
 
 ## Optional model experiment
 
@@ -26,7 +26,7 @@ Follow [One-Round Experiment](ONE_ROUND_EXPERIMENT.md) for `pnpm experiment:logi
 
 ## Debugging failures
 
-`pnpm check` runs typecheck → lint → format → architecture → test → build → demo:check → experiment:check → analysis:check → test:e2e → docs, stopping at the first failure. After fixing a failure, run its individual check as needed, then rerun the full workflow. `pnpm format` fixes formatting only. `pnpm demo:check` compares complete built CLI output from two independent processes in different timezones.
+`pnpm check` runs typecheck → lint → format → architecture → test → build → demo:check → experiment:check → analysis:check → test:e2e → docs, stopping at the first failure. After fixing a failure, run its individual check as needed, then rerun selected acceptance. `pnpm format` fixes formatting only. `pnpm demo:check` compares complete built CLI output from two independent processes in different timezones.
 
 If engine checks fail, switch to the specified Node and pnpm versions instead of disabling `engine-strict`. If frozen installation reports a lockfile mismatch, confirm the manifest change, update the lockfile with `pnpm install`, and review the difference. Do not disable rules or delete tests to make CI pass.
 
@@ -40,7 +40,7 @@ Create a focused branch from current main after preserving existing changes, the
 
 The publisher opens/updates a PR against `main` using the repository's [PR template](../.github/pull_request_template.md). Inspect both `quality` and `pr-policy` for the latest PR revision and resolve failures before merging. Every PR must run the complete test suite; failed, skipped, unavailable, or stale results cannot pass acceptance. Keep commits and PR content in English. Do not force-push shared history or commit dependencies, build outputs, local credentials, or generated validation directories.
 
-[GitHub Actions](../.github/workflows/ci.yml) runs frozen install and `pnpm validate` on pushes, pull requests, and manual dispatch. This invokes the complete `pnpm check`, including the built CLI and Chromium. CI installs Chromium and its system dependencies. Actions use verified full commit SHAs. Toolchain upgrades must synchronize versions, lockfile, relevant ADR impacts, and validation.
+[GitHub Actions](../.github/workflows/ci.yml) runs frozen install and `pnpm validate` on main pushes, PR commit events and manual audits. Development-branch pushes and body edits do not run quality. CI independently derives the plan and installs Chromium only when browser checks are selected. Actions use verified full commit SHAs. Toolchain upgrades must synchronize versions, lockfile, relevant ADR impacts, and validation.
 
 Available HTML reports, screenshots, traces, and validation records are uploaded even when validation fails, under `validation-<commit SHA>-<run attempt>` with 14-day retention. Download them from the [Actions run](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions), extract the archive, and open its HTML report with Playwright. Failures before browser execution may have no screenshots. CI records automated success as pending review; it never fabricates visual approval. The task executor still performs the local visual/behavior review and completion gate.
 
@@ -48,7 +48,7 @@ The [PR contract](PULL_REQUESTS.md#github-checks-and-merge-restrictions) defines
 
 ## Viewer development and browser tests
 
-`pnpm dev` builds the core before starting Vite. Browser source changes reload automatically; restart after changing the core or completing a new experiment. The Vite configuration validates completed experiment records and serves their catalogue, replay and chart. `pnpm build` includes the same files in the static viewer output; rebuild to update that snapshot. Running/failed records are omitted so capture/resume builds remain possible, while full validation still rejects incomplete records. `pnpm build && pnpm test:e2e` starts a dedicated preview on port 4173 to test built output. Resolve port conflicts instead of reusing an unknown server. Tests work locally on macOS; Linux setup uses `pnpm exec playwright install --with-deps chromium`.
+`pnpm dev` builds the core before starting Vite. Browser source changes reload automatically; restart after changing the core or completing a new experiment. The Vite configuration checks completed archive integrity without deep reconstruction and serves their catalogue, replay and chart. `pnpm build` includes the same files in the static viewer output; rebuild to update that snapshot. Running/failed records are omitted so capture/resume builds remain possible, while full validation still rejects incomplete records. `pnpm build && pnpm test:e2e` starts a dedicated preview on port 4173 to test built output. Resolve port conflicts instead of reusing an unknown server. Tests work locally on macOS; Linux setup uses `pnpm exec playwright install --with-deps chromium`.
 
 If the shell cannot find pnpm, follow the [quick-start troubleshooting](../README.md#five-minute-quick-start). Check `pnpm --version` and `pnpm exec node --version` in a fresh zsh session and verify `pnpm dev` serves both the page and `/experiments/index.json`; a toolchain available only under a temporary agent PATH is insufficient.
 
@@ -62,8 +62,8 @@ Record the explicitly authorized [learning protocol](SKILL_LEARNING_EXPERIMENT.m
 
 ## Heterogeneous evolution experiments
 
-Record the [version5 protocol](EVOLUTION_EXPERIMENT.md) as `experiment.mode: "evolution"`, allocation `new`, with its actual user authorization. `pnpm experiment:evolution` continues that same task. A short offline smoke precedes allocation and real inference; do not change core/simulator source during a saved live run. Existing full verification, analysis, PR and authorized merge gates apply.
+Record the [version5 protocol](EVOLUTION_EXPERIMENT.md) as `experiment.mode: "evolution"`, allocation `new`, with its actual user authorization. `pnpm experiment:evolution` continues that same task. A short offline smoke precedes allocation and real inference; do not change core/simulator source during a saved live run. Existing selected verification, analysis, PR and authorized merge gates apply.
 
 ## Development and coevolution experiments
 
-Use the [version-6 protocol](COEVOLUTION_EXPERIMENT.md) with an explicitly authorized `coevolution` intent and new allocation. The guarded `pnpm experiment:coevolution` adapter uses the existing task sequence. Offline feasibility and mechanism/browser tests precede inference. Source-bound live checkpoints may accept reviewed declarations but cannot silently change the kernel. Budget-paused observations retain their actual horizon and all full validation/delivery requirements.
+Use the [version-6 protocol](COEVOLUTION_EXPERIMENT.md) with an explicitly authorized `coevolution` intent and new allocation. The guarded `pnpm experiment:coevolution` adapter uses the existing task sequence. Offline feasibility and mechanism/browser tests precede inference. Source-bound live checkpoints may accept reviewed declarations but cannot silently change the kernel. Budget-paused observations retain their actual horizon and all selected validation/delivery requirements.

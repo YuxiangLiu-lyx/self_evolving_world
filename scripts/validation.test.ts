@@ -1,3 +1,4 @@
+import { sealValidationReport } from './validation-evidence.js';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -46,6 +47,7 @@ describe('task completion evidence', () => {
         sha256: hashFile(join(root, `test-results/${id}.png`)),
       })),
     };
+    sealValidationReport(root, report);
     review = {
       runId: 'run-1',
       reviewer: 'fixture reviewer',

@@ -93,6 +93,26 @@ describe('automatic PR delivery for every task route', () => {
       ),
     ).toThrow('does not match');
   });
+  it('keeps exact-head quality after body-only edits while requiring current policy', () => {
+    const later = '2026-11-08T13:00:00Z';
+    const values = checks.map((check) => ({
+      ...check,
+      started_at: check.name === 'pr-policy' ? later : checksSince,
+    }));
+    expect(
+      inspectChecks({ total_count: 2, check_runs: values }, head, later),
+    ).toBe('passed');
+    expect(
+      inspectChecks({ total_count: 2, check_runs: checks }, head, later),
+    ).toBe('pending');
+    expect(
+      inspectChecks(
+        { total_count: 2, check_runs: values },
+        'b'.repeat(40),
+        later,
+      ),
+    ).toBe('pending');
+  });
   it('requires both current successful checks and refuses skipped, stale or incomplete evidence', () => {
     expect(
       inspectChecks({ total_count: 2, check_runs: checks }, head, checksSince),

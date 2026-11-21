@@ -48,7 +48,7 @@ const body = `# Pull Request
 - Reviewed head: ${head}
 - Task: Fixture requirement verification
 - Run ID: 12345678-1234-1234-1234-123456789abc
-- Full suite: PASS
+- Selected checks: PASS
 - Results: Full local validation passed, including unit and browser tests.
 - Visual and behavior review: Inspected all five current images and import behavior.
 
@@ -141,9 +141,9 @@ describe('pull request requirements contract', () => {
     ).toContain('verification findings');
     expect(
       check({
-        body: body.replace('Full suite: PASS', 'Full suite: PENDING'),
+        body: body.replace('Selected checks: PASS', 'Selected checks: PENDING'),
       }).join(),
-    ).toContain('Full automated suite');
+    ).toContain('selected automated checks');
   });
   it('rejects outdated head references and unchecked completion claims', () => {
     expect(check({ head: 'b'.repeat(40) }).join()).toContain('Review is stale');

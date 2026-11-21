@@ -1,18 +1,16 @@
+import { browserSelection } from '../../../scripts/validation-plan.js';
 import { copyFileSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { test, expect } from './validators.js';
 import type { Page, TestInfo } from '@playwright/test';
 import {
   experimentIds,
-  readExperiment,
+  validateExperiment,
   digest,
   writeExperimentJson,
 } from '../../../scripts/experiments.js';
 import { CONTINUOUS_ASSERTIONS } from '../../../scripts/continuous-analysis.js';
-import {
-  continuousRead,
-  reconstructContinuousSegment,
-} from '../../../scripts/continuous-store.js';
+import { continuousRead } from '../../../scripts/continuous-store.js';
 import type {
   V7ReplayIndex,
   V7ReplaySegment,
@@ -48,7 +46,9 @@ async function screenshot(
   await info.attach(`review:${name}`, { path, contentType: 'image/png' });
   return path;
 }
-const ids = (capture ? [capture] : experimentIds(root)).filter(
+const ids = (
+  capture ? [capture] : (browserSelection()?.archives ?? experimentIds(root))
+).filter(
   (id) =>
     (
       JSON.parse(
@@ -61,7 +61,7 @@ for (const id of ids)
     page,
   }, info) => {
     test.setTimeout(180_000);
-    const record = readExperiment(root, id, !!capture),
+    const record = validateExperiment(root, id, !!capture),
       directory = record.directory,
       index = continuousRead<V7ReplayIndex>(resolve(directory, 'replay.json'));
     await page.route('**/experiments/index.json', (route) =>
@@ -98,14 +98,9 @@ for (const id of ids)
         `${String(tick)} / ${String(index.observed)}`,
         { timeout: 90_000 },
       );
-      const part = present(
-        index.segments.find((p) => p.start <= tick && p.end >= tick),
-      );
-      const world = present(
-        reconstructContinuousSegment(
-          continuousRead<V7ReplaySegment>(resolve(directory, part.path)),
-        )[tick - part.start],
-      );
+      if (!('continuous' in record))
+        throw new Error('Expected continuous browser oracle.');
+      const world = present(record.continuous.frames[tick]);
       await expect(page.locator('#scene [data-scene-actor]')).toHaveCount(
         world.actors.length,
       );
@@ -179,7 +174,10 @@ for (const id of ids)
         errors: [],
       });
   });
-if (!capture) {
+if (
+  !capture &&
+  (!browserSelection() || browserSelection()?.groups.includes('historical'))
+) {
   test('historical ex6 gains a game presentation while retaining exact grid positions and original rules', async ({
     page,
   }, info) => {
@@ -188,7 +186,7 @@ if (!capture) {
     await expect(page.locator('#spatial-caption')).toContainText(
       'Historical grid simulation',
     );
-    const record = readExperiment(root, 'ex6');
+    const record = validateExperiment(root, 'ex6');
     for (const tick of [0, 90, 180]) {
       await page.locator('#time').fill(String(tick));
       await expect(page.locator('#round')).toHaveText(`${String(tick)} / 180`);
@@ -218,6 +216,11 @@ if (!capture) {
     ]);
     await screenshot(page, info, 'historical-unmeasured-vitals');
   });
+}
+if (
+  !capture &&
+  (!browserSelection() || browserSelection()?.groups.includes('continuous'))
+) {
   test('an isolated absent mechanism has a new renderer bound to its paid persistent state', async ({
     page,
   }, info) => {

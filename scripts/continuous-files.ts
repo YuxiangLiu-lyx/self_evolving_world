@@ -2,13 +2,11 @@ import { v7Clone } from '@self-evolving-world/world-core';
 import { resolveContinuousDevelopment } from '../apps/simulator/src/continuous-run.js';
 import { resolve } from 'node:path';
 import {
-  continuousHash,
   continuousAtomic,
   readContinuousExecution,
 } from './continuous-store.js';
 import {
-  continuousHistory,
-  continuousSources,
+  currentContinuousRuntimeMatches,
   captureContinuousBaseline,
   validateContinuousDevelopment,
   saveContinuousSource,
@@ -17,8 +15,7 @@ import {
 export function continuousCheckpoint(root: string, id: string) {
   const state = readContinuousExecution(root, id);
   if (
-    continuousHistory(root, id).at(-1)?.sourceHash !==
-      continuousHash(continuousSources(root)) &&
+    !currentContinuousRuntimeMatches(root, id) &&
     state.phase !== 'development'
   )
     throw new Error(

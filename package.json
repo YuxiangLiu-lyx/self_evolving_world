@@ -27,6 +27,7 @@
     "preview": "pnpm --filter @self-evolving-world/viewer preview",
     "test:e2e": "playwright test",
     "validate": "tsx scripts/validate.ts run",
+    "validate:audit": "tsx scripts/validate.ts run --audit",
     "task:finish": "tsx scripts/task-entry.ts finish",
     "demo:check": "tsx scripts/check-demo.ts",
     "demo": "pnpm build && node apps/simulator/dist/main.js",

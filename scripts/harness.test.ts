@@ -55,6 +55,57 @@ describe('task routing', () => {
       rmSync(root, { recursive: true, force: true });
     }
   });
+  it('protects every nested archive and rejects additions hidden by gitignore', () => {
+    const root = mkdtempSync(resolve(tmpdir(), 'world-batch-preservation-'));
+    const git = (...args: string[]): void => {
+      execFileSync('git', args, { cwd: root, stdio: 'pipe' });
+    };
+    try {
+      git('init', '-b', 'main');
+      git('config', 'user.email', 'fixture@example.test');
+      git('config', 'user.name', 'Fixture');
+      const paths = [
+        'configuration.json',
+        'calls/raw.json',
+        'replay/part.json',
+        'results.json',
+        'sources/revision.json',
+      ];
+      for (const path of paths) {
+        mkdirSync(resolve(root, 'experiment/ex1', path, '..'), {
+          recursive: true,
+        });
+        writeFileSync(resolve(root, 'experiment/ex1', path), 'original');
+      }
+      writeFileSync(
+        resolve(root, '.gitignore'),
+        'experiment/ex1/ignored.tmp\n',
+      );
+      git('add', '.');
+      git('commit', '-m', 'Archive fixture');
+      git('update-ref', 'refs/remotes/origin/main', 'HEAD');
+      for (const path of paths) {
+        writeFileSync(resolve(root, 'experiment/ex1', path), 'changed');
+        expect(() => {
+          checkArchivePreservation(root);
+        }).toThrow('changed');
+        rmSync(resolve(root, 'experiment/ex1', path));
+        expect(() => {
+          checkArchivePreservation(root);
+        }).toThrow('removed');
+        writeFileSync(resolve(root, 'experiment/ex1', path), 'original');
+      }
+      writeFileSync(
+        resolve(root, 'experiment/ex1/ignored.tmp'),
+        'hidden addition',
+      );
+      expect(() => {
+        checkArchivePreservation(root);
+      }).toThrow('Cannot add files');
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
   it('distinguishes code, experiment-only and mixed work without weakening validation', () => {
     expect(classifyChanges([]).kind).toBe('code');
     expect(classifyChanges(['README.md']).kind).toBe('code');

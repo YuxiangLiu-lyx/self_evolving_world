@@ -1,3 +1,5 @@
+import type { ValidationReport } from './validation.js';
+import { sealValidationReport } from './validation-evidence.js';
 import {
   continueLearningExecution,
   newLearningExecution,
@@ -83,6 +85,12 @@ function evidence(c: ReturnType<typeof makeContext>) {
     })),
   });
   // Synthetic reviews exercise isolated gates only; they are never task acceptance evidence.
+  sealValidationReport(
+    root,
+    JSON.parse(
+      readFileSync(resolve(root, 'validation-results/report.json'), 'utf8'),
+    ) as ValidationReport,
+  );
   save('validation-results/review.json', {
     runId: 'fixture-run',
     reviewer: 'Gate fixture',

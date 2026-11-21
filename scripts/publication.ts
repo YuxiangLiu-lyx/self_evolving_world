@@ -111,7 +111,7 @@ export function inspectChecks(
         check.name === name &&
         check.head_sha === head &&
         typeof check.started_at === 'string' &&
-        Date.parse(check.started_at) >= earliest &&
+        (name === 'quality' || Date.parse(check.started_at) >= earliest) &&
         object(check.app).slug === 'github-actions',
     );
     const current = matches.sort((a, b) => Number(b.id) - Number(a.id))[0];
