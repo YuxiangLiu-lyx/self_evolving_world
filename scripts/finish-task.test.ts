@@ -1,3 +1,5 @@
+import type { ValidationReport } from './validation.js';
+import { sealValidationReport } from './validation-evidence.js';
 import { spawnSync } from 'node:child_process';
 import {
   mkdirSync,
@@ -42,6 +44,12 @@ function evidence(status = 'passed'): void {
       sha256: hashFile(resolve(root, `test-results/${id}.png`)),
     })),
   });
+  sealValidationReport(
+    root,
+    JSON.parse(
+      readFileSync(resolve(root, 'validation-results/report.json'), 'utf8'),
+    ) as ValidationReport,
+  );
   save('validation-results/review.json', {
     runId: 'fixture-run',
     reviewer: 'Fixture reviewer',

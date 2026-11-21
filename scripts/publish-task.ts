@@ -94,9 +94,11 @@ try {
   run('pnpm', ['pr:check', '--', bodyFile, baseline]);
   run('git', ['fetch', 'origin']);
   const request = githubRequest(root);
+  let remoteBodyUnchanged = false;
   if (retry) {
     record = { ...previous, ...record };
     const existing = await request(`/pulls/${String(previous.number)}`);
+    remoteBodyUnchanged = object(existing).body === body;
     if (object(existing).merged === true) {
       if (policy.mode !== 'merge')
         throw new Error(
@@ -155,24 +157,29 @@ try {
     title,
     body,
   );
-  record = { ...record, ...pr };
+  // A self-review COMMENT updates PR metadata but does not change code or the body.
+  // Keep the body revision cutoff for an exact retry; quality is bound to head SHA.
+  const checksSince =
+    retry && remoteBodyUnchanged && typeof previous.checksSince === 'string'
+      ? previous.checksSince
+      : pr.checksSince;
+  record = { ...record, ...pr, checksSince };
   write('awaiting-ci');
   console.log(`PR: ${pr.url}. Waiting for current checks and mergeability.`);
   const expected = { number: pr.number, branch, head, body, base };
   let ready = false;
   for (let attempt = 0; attempt < 90; attempt++) {
     const current = await request(`/pulls/${String(pr.number)}`);
-    const identity = verifyPullRequest(current, branch, head, body);
+    verifyPullRequest(current, branch, head, body);
     if (object(object(current).base).sha !== base)
       throw new Error(
-        'Main advanced. Integrate main and repeat full validation/review.',
+        'Main advanced. Integrate main and repeat affected validation and current review.',
       );
-    record.checksSince = identity.checksSince;
+
     const checks = await request(
       `/commits/${head}/check-runs?filter=latest&per_page=100`,
     );
-    const passed =
-      inspectChecks(checks, head, identity.checksSince) === 'passed';
+    const passed = inspectChecks(checks, head, checksSince) === 'passed';
     if (
       object(current).mergeable === false ||
       object(current).mergeable_state === 'dirty'

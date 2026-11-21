@@ -6,7 +6,7 @@ export const ATTESTATIONS = [
   'All requirements are satisfied.',
   'Every changed file was reviewed against the requirements.',
   'No unrelated changes or unresolved requirement mismatches remain.',
-  'The full test suite passed without skipped or focused tests.',
+  'All selected checks passed without skipped or focused tests; exclusions and reuse are recorded.',
   'Current visual, behavior, and requirement reviews passed.',
   'The local review gate passed after the final edit.',
 ] as const;
@@ -198,8 +198,8 @@ export function pullRequestErrors(input: PullRequestInput): string[] {
       errors.push(
         'Review is stale: Reviewed head must equal the latest PR head SHA.',
       );
-    if (field(validation, 'Full suite') !== 'PASS')
-      errors.push('Full automated suite must pass.');
+    if (field(validation, 'Selected checks') !== 'PASS')
+      errors.push('All selected automated checks must pass.');
     const { task, runId } = validationFields(input.body);
     if (
       !meaningful(task) ||

@@ -25,11 +25,11 @@ List exact changed paths in code spans. Include every changed file, including te
 - Reviewed head: REPLACE_ME with the full latest PR head commit SHA.
 - Task: REPLACE_ME with the actual validation task name.
 - Run ID: REPLACE_ME with the completed local validation run ID.
-- Full suite: PENDING
-- Results: REPLACE_ME with environment, complete test counts, commands, evidence locations, and actual remote CI state.
-- Visual and behavior review: REPLACE_ME with concrete findings from every current screenshot and behavior result.
+- Selected checks: PENDING
+- Results: REPLACE_ME with environment, selected check reasons, counts, durations, deep rebuilds, reuse/not-applicable entries, evidence locations, and actual remote CI state.
+- Visual and behavior review: REPLACE_ME with concrete findings from each selected or dependency-bound reused screenshot and behavior result.
 
-Remote `quality` and `pr-policy` checks must both pass for the current revision before merging. An unavailable check is a blocker, not a waiver. New source or documentation edits require fresh validation and review; a new head requires updating this description.
+Remote `quality` and `pr-policy` checks must both pass for the current revision before merging. An unavailable check is a blocker, not a waiver. Changes require a fresh impact plan and current diff review; matching trusted check evidence may be reused; a new head requires updating this description.
 
 ## Code review
 
@@ -45,6 +45,6 @@ REPLACE_ME with affected PRODUCT records, architecture, ADRs, execution plan, an
 - [ ] All requirements are satisfied.
 - [ ] Every changed file was reviewed against the requirements.
 - [ ] No unrelated changes or unresolved requirement mismatches remain.
-- [ ] The full test suite passed without skipped or focused tests.
+- [ ] All selected checks passed without skipped or focused tests; exclusions and reuse are recorded.
 - [ ] Current visual, behavior, and requirement reviews passed.
 - [ ] The local review gate passed after the final edit.

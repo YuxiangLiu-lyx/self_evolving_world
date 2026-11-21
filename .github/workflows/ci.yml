@@ -2,8 +2,9 @@ name: CI
 
 on:
   push:
+    branches: [main]
   pull_request:
-    types: [opened, synchronize, reopened, edited, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review]
   workflow_dispatch:
 
 permissions:
@@ -28,10 +29,14 @@ jobs:
           cache: pnpm
       - name: Install pinned dependencies
         run: pnpm install --frozen-lockfile
+      - name: Derive checks from actual changes
+        id: plan
+        run: pnpm exec tsx scripts/validation-plan-cli.ts ${{ github.event_name == 'workflow_dispatch' && '--audit' || '' }}
       - name: Install Chromium and system dependencies
+        if: steps.plan.outputs.browser == 'true'
         run: pnpm exec playwright install --with-deps chromium
       - name: Validate code, browser behavior and documentation
-        run: pnpm validate -- "CI automated validation"
+        run: pnpm validate -- ${{ github.event_name == 'workflow_dispatch' && '--audit' || '' }} "CI automated validation"
       - name: Retain validation evidence
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -41,5 +46,6 @@ jobs:
             playwright-report/
             test-results/
             validation-results/
+            !validation-results/receipt-key
           retention-days: 14
           if-no-files-found: warn

@@ -43,3 +43,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-19](completed/pr-19-readme-research-and-harness.md): concise research overview, real experiment demo and current development harness navigation.
 
 - [PR-20](completed/pr-20-project-entry-and-architecture.md): explicit local replay, public repository metadata and version-aware architecture navigation.
+
+- [PR-22](completed/pr-22-scoped-validation.md): dependency-scoped acceptance, reconstruction reuse and CI delivery efficiency.

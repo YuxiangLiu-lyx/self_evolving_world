@@ -41,3 +41,5 @@ For a material change to an accepted decision, create a new ADR and mark the old
 - [0017](0017-development-coevolution.md): costed persistent objects, development goals, finite coexisting processes and budget-paused version-6 observations.
 
 - [0018](0018-continuous-world-and-wellbeing.md): independent continuous physics, versioned executable/visual packages, bounded experienced wellbeing and segmented long-window evidence.
+
+- [0020](0020-scoped-validation.md): dependency-scoped checks, authenticated reuse, batched archive preservation and nonduplicated CI.

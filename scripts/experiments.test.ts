@@ -28,7 +28,9 @@ import {
   EXPERIMENT_OBJECTIVE,
   EXPERIMENT_SCENES,
   experimentIds,
+  validateExperiment,
   readExperiment,
+  reconstructionMetrics,
   writeExperimentJson,
 } from './experiments.js';
 import { requiredScenes, sourceFingerprint } from './validation.js';
@@ -108,13 +110,38 @@ describe('numbered experiment artifacts', () => {
     rmSync(root, { recursive: true, force: true });
   });
 
+  it('reads metadata without replay and rebuilds identical dependency inputs only once', () => {
+    const before = reconstructionMetrics().length;
+    expect(readExperiment(root, 'ex1').manifest.id).toBe('ex1');
+    expect(reconstructionMetrics().length).toBe(before);
+    validateExperiment(root, 'ex1');
+    validateExperiment(root, 'ex1');
+    writeFileSync(resolve(root, 'README.md'), 'Only documentation changed.');
+    validateExperiment(root, 'ex1');
+    expect(
+      reconstructionMetrics()
+        .slice(before)
+        .map((m) => m.deepRebuilds),
+    ).toEqual([1, 0, 0]);
+    for (const path of [
+      'packages/world-core/src/world.ts',
+      'scripts/experiment-analysis.ts',
+    ]) {
+      mkdirSync(resolve(root, path, '..'), { recursive: true });
+      writeFileSync(resolve(root, path), 'Changed relevant dependency fixture');
+      validateExperiment(root, 'ex1');
+      expect(reconstructionMetrics().at(-1)?.deepRebuilds).toBe(1);
+    }
+    write('results.json', { changed: true });
+    expect(() => validateExperiment(root, 'ex1')).toThrow();
+  });
   it('validates reconstructed data and binds numbered visuals to task review and fingerprint', () => {
     expect(checkExperiments(root)).toEqual(['ex1']);
     expect(requiredScenes(root)).toContain('ex1-final');
     const before = sourceFingerprint(root);
     writeFileSync(resolve(directory, 'final.png'), 'altered');
     expect(sourceFingerprint(root)).not.toBe(before);
-    expect(() => readExperiment(root, 'ex1')).toThrow('hash mismatch');
+    expect(() => validateExperiment(root, 'ex1')).toThrow('hash mismatch');
   });
   it('reconstructs version-2 rounds and rejects schedule or batch corruption even with resealed hashes', () => {
     const measured = measureSynchronous(
@@ -144,7 +171,7 @@ describe('numbered experiment artifacts', () => {
       errors: [],
     });
     seal();
-    expect(readExperiment(root, 'ex1').results).toMatchObject({
+    expect(validateExperiment(root, 'ex1').results).toMatchObject({
       rounds: 160,
       totalActions: 480,
       collectedItems: 6,
@@ -159,10 +186,12 @@ describe('numbered experiment artifacts', () => {
       rounds: measured.run.replay.rounds.slice(1),
     });
     seal();
-    expect(() => readExperiment(root, 'ex1')).toThrow('seeded reconstruction');
+    expect(() => validateExperiment(root, 'ex1')).toThrow(
+      'seeded reconstruction',
+    );
     manifest.schedule = 'sequential';
     seal();
-    expect(() => readExperiment(root, 'ex1')).toThrow('identity or policy');
+    expect(() => validateExperiment(root, 'ex1')).toThrow('identity or policy');
   });
   it('publishes only validated replay and chart data with a numbered catalogue', () => {
     const assets = experimentAssets(root);
@@ -183,8 +212,13 @@ describe('numbered experiment artifacts', () => {
       ],
     });
     write('replay.json', {});
+    expect(() => experimentAssets(root)).toThrow('hash mismatch');
     seal();
-    expect(() => experimentAssets(root)).toThrow('seeded reconstruction');
+    // Integrity-only publication never claims semantic acceptance; the explicit gate still rejects forgery.
+    expect(() => experimentAssets(root)).not.toThrow();
+    expect(() => validateExperiment(root, 'ex1')).toThrow(
+      'seeded reconstruction',
+    );
   });
   it.each(['running', 'failed'])(
     'does not publish a %s record or prevent capture builds',
@@ -217,24 +251,24 @@ describe('numbered experiment artifacts', () => {
   it.each(['../ex1', 'ex0', 'ex01', 'ex-1'])(
     'rejects invalid directory identity %s',
     (id) => {
-      expect(() => readExperiment(root, id)).toThrow('IDs');
+      expect(() => validateExperiment(root, id)).toThrow('IDs');
     },
   );
   it('rejects incomplete runs and missing objectives even when file hashes agree', () => {
     manifest.status = 'failed';
     seal();
-    expect(() => readExperiment(root, 'ex1')).toThrow('did not complete');
+    expect(() => validateExperiment(root, 'ex1')).toThrow('did not complete');
     manifest.status = 'completed';
     manifest.objective = '';
     seal();
-    expect(() => readExperiment(root, 'ex1')).toThrow('objective');
+    expect(() => validateExperiment(root, 'ex1')).toThrow('objective');
   });
   it.each(['replay.json', 'results.json'])(
     'rejects fabricated %s even with an updated hash',
     (file) => {
       write(file, {});
       seal();
-      expect(() => readExperiment(root, 'ex1')).toThrow(
+      expect(() => validateExperiment(root, 'ex1')).toThrow(
         'seeded reconstruction',
       );
     },
@@ -244,24 +278,24 @@ describe('numbered experiment artifacts', () => {
     (file) => {
       writeFileSync(resolve(directory, file), 'Fabricated results');
       seal();
-      expect(() => readExperiment(root, 'ex1')).toThrow('disagrees');
+      expect(() => validateExperiment(root, 'ex1')).toThrow('disagrees');
     },
   );
   it('rejects missing visuals, invalid PNGs, failed browser checks and extra executable content', () => {
     writeFileSync(resolve(directory, 'final.png'), 'Not a PNG');
     seal();
-    expect(() => readExperiment(root, 'ex1')).toThrow('Invalid PNG');
+    expect(() => validateExperiment(root, 'ex1')).toThrow('Invalid PNG');
     rmSync(resolve(directory, 'final.png'));
-    expect(() => readExperiment(root, 'ex1')).toThrow();
+    expect(() => validateExperiment(root, 'ex1')).toThrow();
     writeFileSync(
       resolve(directory, 'final.png'),
       readFileSync(resolve(directory, 'initial.png')),
     );
     write('browser.json', { status: 'failed' });
     seal();
-    expect(() => readExperiment(root, 'ex1')).toThrow('browser checks');
+    expect(() => validateExperiment(root, 'ex1')).toThrow('browser checks');
     writeFileSync(resolve(directory, 'injected.ts'), 'throw new Error();');
-    expect(() => readExperiment(root, 'ex1')).toThrow('Unexpected');
+    expect(() => validateExperiment(root, 'ex1')).toThrow('Unexpected');
   });
   it('rejects symlink artifacts and unknown run directories', () => {
     rmSync(resolve(directory, 'final.png'));
@@ -269,7 +303,7 @@ describe('numbered experiment artifacts', () => {
       resolve(directory, 'initial.png'),
       resolve(directory, 'final.png'),
     );
-    expect(() => readExperiment(root, 'ex1')).toThrow('non-file');
+    expect(() => validateExperiment(root, 'ex1')).toThrow('non-file');
     mkdirSync(resolve(root, 'experiment/wrong-name'));
     expect(() => experimentIds(root)).toThrow('IDs');
   });

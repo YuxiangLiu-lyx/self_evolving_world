@@ -1,7 +1,7 @@
 # ADR-0005: Real Browser Validation and Task Completion Gate
 
 - Date: 2026-11-06
-- Decision status: Accepted
+- Decision status: Superseded in execution scope by [ADR-0020](0020-scoped-validation.md); actual review and delivery gates remain.
 
 ## Context
 
