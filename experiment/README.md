@@ -2,6 +2,7 @@
 
 Each numbered experiment is a retained, numbered record: `ex1`, `ex2`, `ex3`, and so on. Numbering is independent of the older optional model rounds in ignored `experiment-results/`. This directory is tracked and included in task fingerprints.
 
+- [ex8 report](ex8/report.md) and [behavioral analysis](analyses/ex8/pr-21-forest-lives.md): real forest observation, 897 rounds before the original decision budget ended, five requested capability packages, three living actors and bounded mental feedback; no formal deaths.
 - [ex7 report](ex7/report.md): one real 1,000-round continuous world; three healthy survivors, two implemented activities and no mental satisfaction source.
 - [ex6 report](ex6/report.md): real 180-round coevolution with persistent shared facilities and resource processes.
 - [ex5 report](ex5/report.md): real 120-round heterogeneous evolution with four starvation deaths retained.

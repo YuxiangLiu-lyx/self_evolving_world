@@ -65,6 +65,7 @@ export interface V7DevelopmentAttempt {
   outputTokens: null;
 }
 export interface V7Barrier {
+  technicalReason?: string;
   id: string;
   tick: number;
   actions: Record<string, V7Action>;
@@ -101,7 +102,10 @@ export interface V7RoundRecord {
   actions: Record<string, V7Action>;
   reviews: V7Review[];
   registrations: string[];
-  memory: Record<string, { notes: string[]; preferences: string[] }>;
+  memory: Record<
+    string,
+    { notes: string[]; preferences: string[]; intention?: string }
+  >;
   events: V7World['events'];
   tasks: Record<string, V7Cursor>;
 }
@@ -174,6 +178,15 @@ export function parseContinuousReviews(
       ability,
       learning,
       reason: v7String(r.reason, 'review reason'),
+      ...(world.config.forest
+        ? {
+            experienceReview: v7String(
+              r.experienceReview,
+              'explicit experience review',
+            ),
+            visualReview: v7String(r.visualReview, 'explicit visual review'),
+          }
+        : {}),
       specification: typeof r.specification === 'string' ? r.specification : '',
     };
   });
@@ -185,7 +198,7 @@ export function parseContinuousReviews(
   return result;
 }
 function parsePlan(text: string, state: V7Execution) {
-  const plan = v7ParsePlan(JSON.parse(text) as unknown);
+  const plan = v7ParsePlan(JSON.parse(text) as unknown, state.world.eventTypes);
   if (text.length * 2 > state.world.config.computation.inputBytes)
     throw new V7ComputePause(
       'Plan input exceeds parsing protection; world paused.',
@@ -504,9 +517,11 @@ export async function continueContinuousExecution(
           memory[actor.id] = {
             notes: plan.notes,
             preferences: plan.preferences,
+            ...(input.config.forest ? { intention: plan.intention } : {}),
           };
           actor.memory.notes = plan.notes;
           actor.memory.preferences = plan.preferences;
+          if (input.config.forest) actor.memory.intention = plan.intention;
         }
       }
       const result = v7Step(
@@ -584,7 +599,12 @@ export function resolveContinuousDevelopment(
     !barrier ||
     !attempt ||
     attempt.status !== 'started' ||
-    !barrier.reviews.length
+    (!barrier.reviews.length &&
+      !(
+        barrier.technicalReason ===
+          'Simulation computation budget exhausted; checkpoint the entire world.' &&
+        Object.keys(barrier.requests).length === 0
+      ))
   )
     throw new Error(
       'No complete reviewed and pre-counted implementation handoff.',

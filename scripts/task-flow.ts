@@ -126,7 +126,7 @@ export class TaskFlow {
       if (development)
         return this.handoff(
           'development',
-          'Inspect the saved World Agent request and constrained implementation. Submit a validated review batch or explicit rejection; no game round advances while development is pending.',
+          'Inspect the saved capability request or explicitly labeled technical pause and constrained implementation. Submit its validated development record; technical repairs do not invent an actor request or world-model review, and no game round advances while pending.',
           development,
         );
       const snapshot = this.snapshot();

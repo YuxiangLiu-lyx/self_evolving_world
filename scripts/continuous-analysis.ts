@@ -86,6 +86,24 @@ export function measureContinuous(
     totalActions,
     framesChecked: frames.length,
     invariantFailures: 0,
+    ...(final.config.forest
+      ? {
+          forest: {
+            model: state.model,
+            seed: final.config.seed,
+            deaths: events.filter((e) => e.type === 'died'),
+            respawns: events.filter((e) => e.type === 'respawned'),
+            seasons: [...new Set(frames.map((f) => f.state.season))],
+            lives: final.actors.map((a) => ({ id: a.id, life: a.life })),
+            zeroRecoveryRest: events.filter(
+              (e) => e.type === 'rested' && e.data.recovered === 0,
+            ).length,
+            monetaryCost: null,
+            monetaryCostNote:
+              'Plan-funded transport; per-call monetary charges and internal development usage are not metered.',
+          },
+        }
+      : {}),
     actors: final.actors.map((actor) => {
       const history = frames.flatMap((f) =>
           f.actors.filter((a) => a.id === actor.id),
@@ -234,6 +252,9 @@ export function continuousReport(
   state: V7Execution,
   results: ReturnType<typeof measureContinuous>,
 ): string {
+  const forestSummary = state.world.config.forest
+    ? `## Forest lifecycle and environment\n\nModel: ${state.model}. Seed: ${String(state.world.config.seed)}. Observed seasons: ${results.forest?.seasons.map((s) => (typeof s === 'string' ? s : 'unknown')).join(', ') ?? 'unknown'}. Deaths and respawns are retained with exact evidence and prior plans in results.json. Full-state replay remains independent of rendering. Monetary cost and internal developer usage are unknown; recorded role-specific tokens below are measured. These formal events are distinct from isolated forest-lab fixtures.\n\n${state.world.actors.map((a) => `${a.name}: ${String(a.life?.deaths ?? 0)} deaths, ${String((a.life?.total ?? 0) - (a.life?.deaths ?? 0))} remaining lives.`).join('\n\n')}\n\n`
+    : '';
   return `# ${id}: Continuous World and Persistent Wellbeing\n\n## Scope and observation window\n\n${CONTINUOUS_OBJECTIVE}\n\nObserved ${String(state.world.tick)} of ${String(state.windowTarget)} target rounds. State: ${state.phase}. ${state.reason ?? ''} This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.\n\n## Measured outcome\n\n| Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | New-ability successful rounds |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n${results.actors.map((a) => `| ${a.id} | ${String(a.alive)} | ${String(a.finalVitals.health)} | ${String(a.finalVitals.satiety)} | ${a.meanWellbeing.toFixed(2)} | ${a.finalWellbeing.total.toFixed(2)} | ${String(a.newlyMastered.length)} | ${String(a.successfulNewAbilityUses)} |`).join('\n')}\n\nRequests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits. Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.\n\n## Action distribution\n\n| Interface | Attempted | Successful rounds | Failed rounds |\n| --- | --- | --- | --- |\n${Object.entries(
     results.actions,
   )
@@ -243,7 +264,7 @@ export function continuousReport(
     )
     .join(
       '\n',
-    )}\n\n## Cost and limitations\n\n${results.calls.map((c) => `${c.role}: ${String(c.attempts)} attempted calls, ${String(c.failedOrRejected)} failed/rejected; ${String(c.inputTokens)} recorded input tokens and ${String(c.outputTokens)} recorded output tokens; ${String(c.unknownUsageAttempts)} attempts with unknown token usage; ${(c.elapsedMs / 1000).toFixed(1)} elapsed seconds.`).join('\n\n')}\n\n${String(results.development.handoffs)} pre-counted conversation development handoffs, ${String(results.development.failed)} failed validation attempts. ${results.development.limitation}\n\n## Evidence and reproduction\n\nConfiguration and isolated survival feasibility are in configuration.json and preflight.json. The feasibility oracle and isolated extension fixtures never enter ordinary decision context. Every actual inference has an immutable calls/ record, including transport failures. replay.json indexes checksummed segments; source-history.json binds retained source, packages, tests and activation boundaries. The observatory reconstructs saved rounds; playback cannot advance the world.\n\nRun \`pnpm experiment:check\` and \`pnpm test\` to validate saved evidence. Open \`/observatory.html?experiment=${id}\` for the game view. Use the current task's development handoff to continue a pending barrier; do not allocate a replacement run or repeat an uncertain call.\n\n## Interpretation\n\nThe current-conversation behavioral analysis accompanies this archive and traces actual problems, proposed functions, review, implementation, use and consequences. Shared object use is distinguished from explicit communication or consent. Novel names, proposals, installations and offspring counts are not happiness rewards. The observation window is resumable; completed capture is not world termination.\n`;
+    )}\n\n## Cost and limitations\n\n${results.calls.map((c) => `${c.role}: ${String(c.attempts)} attempted calls, ${String(c.failedOrRejected)} failed/rejected; ${String(c.inputTokens)} recorded input tokens and ${String(c.outputTokens)} recorded output tokens; ${String(c.unknownUsageAttempts)} attempts with unknown token usage; ${(c.elapsedMs / 1000).toFixed(1)} elapsed seconds.`).join('\n\n')}\n\n${String(results.development.handoffs)} pre-counted conversation development handoffs, ${String(results.development.failed)} failed validation attempts. ${results.development.limitation}\n\n## Evidence and reproduction\n\nConfiguration and isolated survival feasibility are in configuration.json and preflight.json. The feasibility oracle and isolated extension fixtures never enter ordinary decision context. Every actual inference has an immutable calls/ record, including transport failures. replay.json indexes checksummed segments; source-history.json binds retained source, packages, tests and activation boundaries. The observatory reconstructs saved rounds; playback cannot advance the world.\n\nRun \`pnpm experiment:check\` and \`pnpm test\` to validate saved evidence. Open \`/observatory.html?experiment=${id}\` for the game view. Use the current task's development handoff to continue a pending barrier; do not allocate a replacement run or repeat an uncertain call.\n\n${forestSummary}## Interpretation\n\nThe current-conversation behavioral analysis accompanies this archive and traces actual problems, proposed functions, review, implementation, use and consequences. Shared object use is distinguished from explicit communication or consent. Novel names, proposals, installations and offspring counts are not happiness rewards. The observation window is resumable; completed capture is not world termination.\n`;
 }
 export function continuousArtifactFiles(
   manifest: Record<string, unknown>,

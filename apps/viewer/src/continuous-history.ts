@@ -18,7 +18,10 @@ export interface SceneRound {
   actions: Record<string, V7Action>;
   reviews: V7Review[];
   registrations: string[];
-  memory: Record<string, { notes: string[]; preferences: string[] }>;
+  memory: Record<
+    string,
+    { notes: string[]; preferences: string[]; intention?: string }
+  >;
   events: V7World['events'];
   tasks: Record<string, V7Cursor>;
 }
@@ -64,6 +67,7 @@ export async function replaySceneSegment(
       if (m) {
         actor.memory.notes = m.notes;
         actor.memory.preferences = m.preferences;
+        if (m.intention !== undefined) actor.memory.intention = m.intention;
       }
     }
     const result = v7Step(input, record.actions, registry, {}, record.reviews);

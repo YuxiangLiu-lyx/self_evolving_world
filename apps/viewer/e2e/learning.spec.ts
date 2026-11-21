@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   acceptLearningProgram,
   advanceLearningRound,
@@ -7,7 +9,7 @@ import {
 import { initialLearningWorld } from '../../simulator/src/learning-scenario.js';
 import { serializeReplay } from '../src/timeline.js';
 import { captureReview, expect, test } from './validators.js';
-import { experimentIds, readExperiment } from '../../../scripts/experiments.js';
+import { experimentIds } from '../../../scripts/experiments.js';
 
 const request = {
   name: 'Resource gathering',
@@ -85,13 +87,17 @@ test('shows versioned terrain, individual learning and generated implementations
   await page.locator('#reset-button').click();
   await expect(page.locator('#capability-panel')).toBeHidden();
 });
+// Classification reads metadata only; the complete archive gate and archive-specific browser tests still validate every record.
 for (const id of experimentIds(process.cwd()).filter(
   (id) =>
-    readExperiment(
-      process.cwd(),
-      id,
-      process.env.WORLD_EXPERIMENT_CAPTURE === id,
-    ).manifest.version === 4,
+    (
+      JSON.parse(
+        readFileSync(
+          resolve(process.cwd(), 'experiment', id, 'manifest.json'),
+          'utf8',
+        ),
+      ) as { version: number }
+    ).version === 4,
 )) {
   if (process.env.WORLD_EXPERIMENT_CAPTURE === id) continue;
   test(`${id} opens learning history through the shared selector and survives reload`, async ({

@@ -11,6 +11,8 @@ pnpm task -- start validation-results/intent.json
 pnpm task -- status task-id
 pnpm task -- submit task-id validation-results/response.json
 pnpm task -- next task-id
+# A captured computation-only pause in this task's own unfinished run:
+pnpm task -- repair task-id
 # Changed requirements or plan location require a higher requirementsVersion:
 pnpm task -- amend task-id validation-results/revised-intent.json
 ```
@@ -102,6 +104,8 @@ All submitted files live under `validation-results/`. For example, a preparation
 
 The review handoff includes a patch and **all** changed paths: untracked contents must also be opened. Use the existing [visual and behavior criteria](VALIDATION.md#visual-review), not an automatic PASS generator. The program checks completeness and bindings but cannot prove judgment quality.
 
+The version-bound GitHub COMMENT lists every reviewed file and combines each screenshot's actual judgment with its original path and SHA-256 in one record. This avoids duplicate paths within the bounded review body; the full original local review remains hash-bound and all freshness/completeness gates still apply.
+
 ## Execution and recovery contract
 
 The [coordinator](../scripts/task-flow.ts) is the executable sequence. [Runtime effects](../scripts/task-runtime.ts) invoke existing allocation, complete validation, local review, PR preflight, publication and independent completion commands. The [migration map](exec-plans/completed/pr-13-programmatic-harness.md#migration-map) records their previous triggers and counterparts. No original test, screenshot, PR template requirement, CI check or conflict rule is removed.
@@ -109,6 +113,8 @@ The [coordinator](../scripts/task-flow.ts) is the executable sequence. [Runtime 
 `running` records an executing deterministic step without claiming completion. `needs_review` returns actual conversation work. `needs_fix` records a failed local gate. `needs_authorization` stops before an unauthorized merge. `blocked` records an unresolved publication/integration/environment failure. `completed` requires an independently accepted completion receipt, including explicit exception semantics. None is an agent-supplied whole-task verdict.
 
 Logs and journals are saved before commands. New experiments reconcile the before/after archive IDs before continuing. A known exited failure before allocation may retry on an explicit continuation; an uncertain interruption requires process/allocation investigation first. After confirming an interrupted process stopped, explicit `pnpm experiment:resume -- exN` routes to `pnpm task -- recover ID exN` and journals capture-only recovery for that allocated incomplete record; it never reissues inference. Completed simulations use existing capture-only resume; incomplete/corrupt simulation data stays failed. No inference is retried to obtain passing evidence. A command restart reuses the existing PR lookup/update and commit state; it does not blindly create another PR or experiment. The shared validation lock prevents two coordinator commands from writing current evidence concurrently; compatibility commands use the same coordinator lock. Internal workers additionally require the executing task lease, matching step, intent, checkout and evidence.
+
+A captured continuous computation-budget pause may use `repair` only while the task's own newly allocated run is unpublished, below its original target and development limit, with no pending or uncertain model call or actor review. The coordinator retains the failed capture under `technical-pauses/round-N/`, opens a counted technical development barrier and retains the original pending actions, calls, source history, seed and limits. The conversation supplies no fabricated actor request or world approval. Source validation reconstructs every committed round before a repair can resume the same unsettled round. This is not a budget-exhaustion override or a replacement experiment.
 
 Source, documentation, requirement or relevant artifact changes invalidate current acceptance. New validation still runs the **complete unfiltered suite** and replaces review/delivery evidence. There is no automatic repair loop. The existing publisher retains its bounded 90-attempt, ten-second CI polling and request timeouts. Fix failures in the conversation, then explicitly continue. Environment, authentication and service failures remain incomplete.
 

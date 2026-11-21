@@ -1,3 +1,4 @@
+import { forestCheckpointRepair } from './forest-checkpoint-repair.js';
 import { parseContinuousReviews } from '../apps/simulator/src/continuous-run.js';
 import type { V7Review } from '@self-evolving-world/world-core';
 import { CONTINUOUS_VISUALS } from '../apps/viewer/src/continuous-visuals.js';
@@ -71,7 +72,9 @@ export function continuousSources(root: string): Record<string, string> {
   if (existsSync(resolve(root, 'apps/viewer/public')))
     visit(resolve(root, 'apps/viewer/public'));
   for (const file of readdirSync(resolve(root, 'scripts')).filter(
-    (p) => p.startsWith('continuous-') && p.endsWith('.ts'),
+    (p) =>
+      (p.startsWith('continuous-') || p.startsWith('forest-')) &&
+      p.endsWith('.ts'),
   ))
     files[`scripts/${file}`] = readFileSync(
       resolve(root, 'scripts', file),
@@ -83,6 +86,7 @@ export function continuousSources(root: string): Record<string, string> {
     'apps/viewer/index.html',
     'apps/viewer/classic.html',
     'apps/viewer/observatory.html',
+    'apps/viewer/forest-lab.html',
     'apps/viewer/vite.config.ts',
     'packages/world-core/package.json',
     'apps/simulator/package.json',
@@ -231,7 +235,19 @@ export function validateContinuousDevelopment(
   // These enforce experiment identity, authorization and exactly-once budgets rather than world design.
   const protectedPaths =
     /(^scripts\/continuous-|continuous-policy\.ts$|continuous-(run|provider|input)\.ts$|packages\/world-core\/src\/world\.ts$|chatgpt-auth\.ts$|responses\.ts$|package\.json$|pnpm-lock\.yaml$)/;
-  if (changed.some((p) => protectedPaths.test(p) || !current[p]))
+  if (
+    changed.some(
+      (p) =>
+        !current[p] ||
+        (protectedPaths.test(p) &&
+          !forestCheckpointRepair(
+            p,
+            previous.files[p] ?? '',
+            continuousHash(current[p]),
+            declaration.compatibilityRepair,
+          )),
+    )
+  )
     throw new Error(
       'The run policy, controller, transport, source verifier and historical foundation require a separate run version. Source versions cannot be deleted.',
     );

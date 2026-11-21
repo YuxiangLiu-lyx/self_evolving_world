@@ -2,23 +2,24 @@
 
 [![CI](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/workflows/ci.yml)
 
-**Can autonomous agents discover needs, develop capabilities and change their world in ways that deliver lasting benefits?** This research project tests that question in a reproducible world. The latest protocol combines continuous 2D space, physical costs, persistent objects, individual memory and happiness driven by actual outcomes.
+**Can autonomous agents discover needs, develop capabilities and change their world in ways that deliver lasting benefits?** This research project tests that question in a reproducible world. The latest protocol combines a continuous 2D forest, finite lives, seasonal pressures, physical costs, persistent objects, individual memory and happiness driven by actual outcomes.
 
 **The mechanism:** agents act from private observations and request missing capabilities. A World Agent reviews functional equivalence, prerequisites, costs and effects. When implementation is needed, the world pauses and hands development to the current Codex conversation. Tested, versioned extensions become available; each actor must still learn and pay the execution costs. Requests and skill counts earn no reward. This is world-level learning, not model-weight training.
 
 ## What the experiments show
 
-| Run                                                             | Observation                                                   | Measured outcome                                                                                                                                                                                                                                                                 |
-| --------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [ex7](experiment/analyses/ex7/pr-18-continuous-world.md)        | 3 agents, 1,000 rounds; continuous space and happiness goals  | All survived at full health. Two requested activities were implemented: seven nature observations completed and one persistent stone mosaic was made. Mean happiness stayed at 9.42–9.58/100; mental satisfaction remained zero, with no sustained benefit from either activity. |
-| [ex6](experiment/analyses/ex6/pr-17-development-coevolution.md) | 3 agents, 180 rounds; development goals and shared facilities | All survived. Agents consumed 41 cultivated meals and rested 26 times at another agent's platform: concrete supply and recovery benefits.                                                                                                                                        |
-| [ex5](experiment/ex5/report.md)                                 | 4 agents, 120 rounds; resource and skill evolution            | Seven shared skills emerged, but all four agents starved. Capability count did not establish usefulness.                                                                                                                                                                         |
+| Run                                                             | Observation                                                          | Measured outcome                                                                                                                                                                                                                                                                 |
+| --------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [ex8](experiment/analyses/ex8/pr-21-forest-lives.md)            | 3 agents, 897 of 1,000 target rounds; forest ecology and three lives | The original decision budget ended the window. All three survived, but Lin finished at satiety 7.85. Five requested packages were used, including one shared shelter; 74 bounded experience awards occurred. No formal death or post-respawn adaptation was observed.            |
+| [ex7](experiment/analyses/ex7/pr-18-continuous-world.md)        | 3 agents, 1,000 rounds; continuous space and happiness goals         | All survived at full health. Two requested activities were implemented: seven nature observations completed and one persistent stone mosaic was made. Mean happiness stayed at 9.42–9.58/100; mental satisfaction remained zero, with no sustained benefit from either activity. |
+| [ex6](experiment/analyses/ex6/pr-17-development-coevolution.md) | 3 agents, 180 rounds; development goals and shared facilities        | All survived. Agents consumed 41 cultivated meals and rested 26 times at another agent's platform: concrete supply and recovery benefits.                                                                                                                                        |
+| [ex5](experiment/ex5/report.md)                                 | 4 agents, 120 rounds; resource and skill evolution                   | Seven shared skills emerged, but all four agents starved. Capability count did not establish usefulness.                                                                                                                                                                         |
 
 These are exploratory runs with different rules and goals, not causal comparisons. [The archive](experiment/README.md) retains configuration, events, replay, analysis and model-call records where applicable; authored starting abilities and isolated test fixtures are excluded from autonomous discoveries.
 
-[![Actual ex7 replay at round 1,000: continuous world, actor state, memory and happiness](experiment/ex7/final.png)](experiment/ex7/final.png)
+[![Actual ex8 replay at round 897: budget-paused forest, Lin hunger, lives and recorded experience](experiment/ex8/final.png)](experiment/ex8/final.png)
 
-_Actual saved ex7 state, viewable here without installation. Interactive replay runs locally after setup; it is read-only and makes no model calls._
+_Actual saved ex8 state at the original budget limit, viewable here without installation. Interactive replay runs locally after setup; it is read-only and makes no model calls._
 
 ## Five-minute quick start
 
@@ -32,7 +33,7 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open [Local replay (after setup)](http://127.0.0.1:5173/?experiment=ex7) while `pnpm dev` is running on your computer. This loopback URL points to your own machine; it is not a public hosted demo. Seek the timeline, follow an agent, switch to its personal view and inspect recorded events. No API key is needed. `/classic.html` retains the original grid inspector; old experiments preserve their original rules. See [development setup](docs/DEVELOPMENT.md) and [live-run/resume instructions](docs/CONTINUOUS_WORLD.md) for more.
+Open [Local replay (after setup)](http://127.0.0.1:5173/?experiment=ex8) while `pnpm dev` is running on your computer. This loopback URL points to your own machine; it is not a public hosted demo. Seek the timeline, follow an agent, switch to its personal view and inspect recorded events. No API key is needed. `/classic.html` retains the original grid inspector; old experiments preserve their original rules. See [development setup](docs/DEVELOPMENT.md) and [forest protocol and recorded limitations](docs/FOREST_WORLD.md), and [live-run/resume instructions](docs/CONTINUOUS_WORLD.md) for more.
 
 ## Development task entry
 

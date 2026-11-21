@@ -63,6 +63,7 @@ export function v7Install(
       radius: a.radius,
       parents: a.parents,
       bornAt: a.bornAt,
+      life: a.life ?? null,
     })),
     stacks: world.stacks,
   });
@@ -91,6 +92,7 @@ export function v7Install(
         radius: a.radius,
         parents: a.parents,
         bornAt: a.bornAt,
+        life: a.life ?? null,
       })),
       stacks: next.stacks,
     })
@@ -99,7 +101,10 @@ export function v7Install(
       'Migration changed protected goals, vitals, rewards, mastery, stock or run policy.',
     );
   for (const ability of pkg.abilities) {
-    if (pkg.id !== 'foundation-v7' && ability.authored)
+    if (
+      !['foundation-v7', 'foundation-forest'].includes(pkg.id) &&
+      ability.authored
+    )
       throw new Error(
         'A new capability cannot claim authored baseline status.',
       );
@@ -149,6 +154,14 @@ export function v7Install(
         'wellbeing',
         'satisfaction',
       ].includes(source.event) ||
+      (source.repeatWindow !== undefined &&
+        (source.repetition !== 'refresh' ||
+          source.mode !== 'hold' ||
+          !Number.isFinite(source.repeatWindow.rounds) ||
+          !Number.isFinite(source.repeatWindow.amount) ||
+          source.repeatWindow.rounds < source.cooldown ||
+          source.repeatWindow.amount <= 0 ||
+          source.repeatWindow.amount > source.amount)) ||
       source.amount <= 0 ||
       source.cap > next.config.mentalCap ||
       source.amount > source.cap ||
@@ -160,6 +173,36 @@ export function v7Install(
     )
       throw new Error('Invalid or ungrounded satisfaction rule.');
     next.satisfaction.push(v7Clone(source));
+  }
+  if (next.config.forest) {
+    const declared = pkg.events ?? [];
+    if (declared.some((e) => !/^[a-z][a-z0-9_-]*$/.test(e)))
+      throw new Error('Invalid declared event name.');
+    next.eventTypes = [...new Set([...(next.eventTypes ?? []), ...declared])];
+    for (const rule of next.satisfaction)
+      if (
+        [
+          { event: rule.event, interface: rule.interface },
+          ...(rule.alternativeTriggers ?? []),
+        ].some(
+          (trigger) =>
+            !next.eventTypes?.includes(trigger.event) ||
+            !next.abilities.some(
+              (ability) => ability.id === trigger.interface,
+            ) ||
+            [
+              'requested',
+              'learning',
+              'mastered',
+              'registered',
+              'wellbeing',
+              'satisfaction',
+            ].includes(trigger.event),
+        )
+      )
+        throw new Error(
+          'Satisfaction must reference a declared executable event.',
+        );
   }
   next.revisions.push(key);
   return v7Freeze(next);

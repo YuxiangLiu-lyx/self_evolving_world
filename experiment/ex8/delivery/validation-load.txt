@@ -1,0 +1,50 @@
+
+> self-evolving-world@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world
+> tsc --noEmit && pnpm --filter @self-evolving-world/world-core typecheck && pnpm --filter @self-evolving-world/viewer exec tsc --noEmit
+
+
+> @self-evolving-world/world-core@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world/packages/world-core
+> tsc -p tsconfig.json --noEmit
+
+
+> self-evolving-world@0.0.0 lint /Users/liuyuxiang/developer/self_evolving_world
+> eslint . --max-warnings 0
+
+
+> self-evolving-world@0.0.0 test:e2e /Users/liuyuxiang/developer/self_evolving_world
+> playwright test apps/viewer/e2e/survival.spec.ts apps/viewer/e2e/learning.spec.ts apps/viewer/e2e/experiment-browser.spec.ts
+
+[WebServer] (node:6411) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6426) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:6445) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 7 workers
+
+(node:6452) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6455) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6453) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6454) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6451) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6457) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:6456) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 apps/viewer/e2e/experiment-browser.spec.ts:127:1 › handles an unknown experiment, empty archive and invalid catalogue without losing the demo (401ms)
+  ✓  7 apps/viewer/e2e/learning.spec.ts:103:3 › ex4 opens learning history through the shared selector and survives reload (426ms)
+  ✓  3 apps/viewer/e2e/experiment-browser.spec.ts:154:1 › keeps the archive intact after invalid imports or replay loads and cancels obsolete selections (490ms)
+  ✓  5 apps/viewer/e2e/experiment-browser.spec.ts:110:1 › opens a direct experiment link on mobile with agent inspection and vision (535ms)
+  ✓  8 apps/viewer/e2e/survival.spec.ts:77:3 › ex3 opens its real survival history from the archive selector and restores the URL (223ms)
+  ✓  2 apps/viewer/e2e/experiment-browser.spec.ts:19:1 › switches between ex1 and ex2 and displays simultaneous moves and successful pickups on desktop and mobile (801ms)
+  ✓  4 apps/viewer/e2e/experiment-browser.spec.ts:60:1 › selects an archived experiment, navigates URLs and replays without changing its data (815ms)
+  ✓  6 apps/viewer/e2e/learning.spec.ts:55:1 › shows versioned terrain, individual learning and generated implementations on desktop and mobile (6.2s)
+  ✓  9 apps/viewer/e2e/survival.spec.ts:28:1 › replays survival programs, vital signs and denied learning on desktop and mobile (5.8s)
+
+  9 passed (7.8s)

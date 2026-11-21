@@ -1,0 +1,161 @@
+$ pnpm typecheck
+
+> self-evolving-world@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world
+> tsc --noEmit && pnpm --filter @self-evolving-world/world-core typecheck && pnpm --filter @self-evolving-world/viewer exec tsc --noEmit
+
+
+> @self-evolving-world/world-core@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world/packages/world-core
+> tsc -p tsconfig.json --noEmit
+
+
+$ pnpm architecture:check
+
+> self-evolving-world@0.0.0 architecture:check /Users/liuyuxiang/developer/self_evolving_world
+> depcruise --config dependency-cruiser.config.cjs apps packages
+
+
+✔ no dependency violations found (154 modules, 632 dependencies cruised)
+
+
+$ pnpm test
+
+> self-evolving-world@0.0.0 test /Users/liuyuxiang/developer/self_evolving_world
+> vitest run
+
+
+ RUN  v4.1.12 /Users/liuyuxiang/developer/self_evolving_world
+
+ ✓ packages/world-core/test/forest.test.ts (10 tests) 169ms
+ ✓ packages/world-core/test/forest-food.test.ts (8 tests) 177ms
+ ✓ scripts/harness.test.ts (3 tests) 370ms
+ ✓ scripts/experiments.test.ts (18 tests) 141ms
+ ✓ scripts/continuous-store.test.ts (2 tests) 265ms
+ ✓ apps/simulator/test/continuous.test.ts (6 tests) 302ms
+ ✓ packages/world-core/test/forest-wildlife.test.ts (3 tests) 89ms
+ ✓ scripts/documentation.test.ts (15 tests) 155ms
+ ✓ scripts/coevolution-source.test.ts (4 tests) 192ms
+ ✓ apps/simulator/test/random-run.test.ts (12 tests) 92ms
+ ✓ packages/world-core/test/continuous.test.ts (12 tests) 80ms
+ ✓ scripts/validation.test.ts (15 tests) 169ms
+ ✓ scripts/learning-analysis.test.ts (1 test) 54ms
+ ✓ apps/simulator/test/synchronous-run.test.ts (4 tests) 50ms
+ ✓ scripts/forest-navigation.test.ts (2 tests) 58ms
+ ✓ packages/world-core/test/continuous-nature.test.ts (2 tests) 33ms
+ ✓ apps/simulator/test/forest.test.ts (1 test) 60ms
+ ✓ scripts/survival-analysis.test.ts (2 tests) 31ms
+ ✓ apps/simulator/test/coevolution.test.ts (5 tests) 836ms
+ ✓ apps/simulator/test/experiment.test.ts (21 tests) 46ms
+ ✓ packages/world-core/test/continuous-mosaic.test.ts (2 tests) 39ms
+ ✓ packages/world-core/test/coevolution.test.ts (11 tests) 45ms
+ ✓ apps/simulator/test/learning-run.test.ts (5 tests) 47ms
+ ✓ apps/simulator/test/chatgpt-renewal.test.ts (1 test) 34ms
+ ✓ apps/simulator/test/survival-run.test.ts (5 tests) 27ms
+ ✓ scripts/pr-policy.test.ts (13 tests) 15ms
+ ✓ packages/world-core/test/evolution.test.ts (10 tests) 12ms
+ ✓ packages/world-core/test/learning.test.ts (22 tests) 15ms
+ ✓ apps/viewer/test/timeline.test.ts (7 tests) 19ms
+ ✓ packages/world-core/test/forest-perception.test.ts (1 test) 12ms
+ ✓ scripts/delivery-git.test.ts (4 tests) 1035ms
+     ✓ reports real conflicting paths without changing working files, branch or index  307ms
+ ✓ apps/simulator/test/chatgpt-auth.test.ts (9 tests) 8ms
+ ✓ scripts/github.test.ts (2 tests) 13ms
+ ✓ scripts/task-flow.test.ts (16 tests) 9ms
+ ✓ packages/world-core/test/program.test.ts (16 tests) 6ms
+ ✓ apps/simulator/test/evolution-run.test.ts (5 tests) 1206ms
+     ✓ pauses development at the same tick, resumes once, and audits every retained private input  1151ms
+ ✓ packages/world-core/test/world.test.ts (38 tests) 9ms
+ ✓ packages/world-core/test/survival.test.ts (7 tests) 7ms
+ ✓ scripts/delivery.test.ts (7 tests) 5ms
+ ✓ scripts/task-continuous-repair.test.ts (1 test) 7ms
+ ✓ packages/world-core/test/round.test.ts (5 tests) 4ms
+ ✓ scripts/publication.test.ts (5 tests) 3ms
+ ✓ apps/viewer/test/experiments.test.ts (10 tests) 4ms
+ ✓ apps/simulator/test/demo.test.ts (3 tests) 3ms
+ ✓ scripts/task-review.test.ts (8 tests) 3ms
+ ✓ scripts/unit-reporter.test.ts (6 tests) 2072ms
+     ✓ handles skipped test  387ms
+     ✓ handles todo test  421ms
+     ✓ handles expected failure  381ms
+     ✓ handles dynamic skip  328ms
+ ✓ scripts/finish-task.test.ts (4 tests) 1894ms
+     ✓ completes an explicit local-only task without credentials, publication or a network remote  501ms
+     ✓ requires publication when no local exception plan was supplied and replaces old success with failure  444ms
+     ✓ rejects evidence that has not passed local review and source changes after review  584ms
+     ✓ does not use the local-only entry point to waive default merge completion  363ms
+ ✓ scripts/task-runtime.test.ts (12 tests) 1824ms
+     ✓ retains complete committed and working review diffs larger than the capture buffer  362ms
+     ✓ commits the exact reviewed files once and keeps generated journals outside fingerprints  381ms
+ ✓ scripts/task-entry.test.ts (14 tests) 3160ms
+     ✓ binds evolution continuation to its mode, existing allocation and leased stage  315ms
+     ✓ permits only leased prepare/verify workers and blocks ungranted completion, changed review and source  301ms
+
+ Test Files  49 passed (49)
+      Tests  395 passed (395)
+   Start at  19:59:45
+   Duration  3.68s (transform 2.80s, setup 0ms, import 6.12s, tests 14.90s, environment 2ms)
+
+
+$ pnpm build
+
+> self-evolving-world@0.0.0 build /Users/liuyuxiang/developer/self_evolving_world
+> pnpm -r build
+
+Scope: 3 of 4 workspace projects
+packages/world-core build$ tsc -p tsconfig.json
+packages/world-core build: Done
+apps/simulator build$ tsc -p tsconfig.json
+apps/viewer build$ tsc --noEmit && vite build
+apps/simulator build: Done
+apps/viewer build: vite v8.3.6 building client environment for production...
+apps/viewer build: transforming...
+apps/viewer build: ✓ 62 modules transformed.
+apps/viewer build: rendering chunks...
+apps/viewer build: computing gzip size...
+apps/viewer build: dist/forest-lab.html                                   0.58 kB │ gzip:  0.32 kB
+apps/viewer build: dist/index.html                                        0.74 kB │ gzip:  0.35 kB
+apps/viewer build: dist/observatory.html                                  0.74 kB │ gzip:  0.35 kB
+apps/viewer build: dist/experiments/ex7/replay.json                       1.54 kB │ gzip:  0.69 kB
+apps/viewer build: dist/experiments/ex4/overview.svg                      1.72 kB │ gzip:  0.65 kB
+apps/viewer build: dist/experiments/index.json                            2.41 kB │ gzip:  1.04 kB
+apps/viewer build: dist/experiments/ex3/overview.svg                      4.14 kB │ gzip:  1.48 kB
+apps/viewer build: dist/experiments/ex3/replay.json                       4.91 kB │ gzip:  1.09 kB
+apps/viewer build: dist/experiments/ex5/overview.svg                      5.80 kB │ gzip:  1.22 kB
+apps/viewer build: dist/experiments/ex2/overview.svg                      6.87 kB │ gzip:  1.76 kB
+apps/viewer build: dist/classic.html                                     14.12 kB │ gzip:  3.49 kB
+apps/viewer build: dist/experiments/ex1/overview.svg                     14.69 kB │ gzip:  1.89 kB
+apps/viewer build: dist/experiments/ex6/overview.svg                     24.14 kB │ gzip:  3.34 kB
+apps/viewer build: dist/experiments/ex4/replay.json                      36.08 kB │ gzip:  4.31 kB
+apps/viewer build: dist/experiments/ex1/replay.json                      42.25 kB │ gzip:  1.40 kB
+apps/viewer build: dist/experiments/ex7/overview.svg                     44.25 kB │ gzip: 13.94 kB
+apps/viewer build: dist/experiments/ex2/replay.json                      49.36 kB │ gzip:  1.21 kB
+apps/viewer build: dist/experiments/ex5/replay.json                     191.65 kB │ gzip: 22.73 kB
+apps/viewer build: dist/experiments/ex6/replay.json                     213.78 kB │ gzip: 24.13 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000900-001000.json  695.34 kB │ gzip: 38.84 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000600-000700.json  730.99 kB │ gzip: 40.93 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000800-000900.json  731.41 kB │ gzip: 42.68 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000100-000200.json  740.54 kB │ gzip: 42.15 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000700-000800.json  748.80 kB │ gzip: 43.46 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000200-000300.json  751.98 kB │ gzip: 43.64 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000500-000600.json  773.42 kB │ gzip: 44.74 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000000-000100.json  773.77 kB │ gzip: 49.94 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000400-000500.json  786.06 kB │ gzip: 46.49 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000300-000400.json  898.19 kB │ gzip: 52.83 kB
+apps/viewer build: dist/assets/observatory-n1yR4nWg.css                   7.12 kB │ gzip:  2.38 kB
+apps/viewer build: dist/assets/classic-CkITEJCO.css                      16.01 kB │ gzip:  4.83 kB
+apps/viewer build: dist/assets/forestLab-UjoEDyqW.js                      3.44 kB │ gzip:  1.53 kB
+apps/viewer build: dist/assets/timeline-DH-sqpiH.js                       4.86 kB │ gzip:  1.53 kB
+apps/viewer build: dist/assets/observatory-DzknUve1.js                   17.45 kB │ gzip:  6.52 kB
+apps/viewer build: dist/assets/observatory-BSwpBNdG.js                   19.96 kB │ gzip:  7.47 kB
+apps/viewer build: dist/assets/classic-6QW85Sas.js                       35.70 kB │ gzip: 11.93 kB
+apps/viewer build: dist/assets/dist-fgZfXev-.js                         168.25 kB │ gzip: 48.45 kB
+apps/viewer build: ✓ built in 12.06s
+apps/viewer build: [33m[PLUGIN_TIMINGS] [0mJavaScript callbacks ran for 12.0s of this 12.1s build (100%).
+apps/viewer build: The slowest callbacks, timed inside each callback (the wait before a callback starts is excluded, the time it awaits is included):
+apps/viewer build:   - plugin validated-experiment-archive generateBundle (99%, 12.0s, 1 call)
+apps/viewer build: Additional callback time came from the callbacks below and from callbacks under 1s.
+apps/viewer build: 1 callback is listed without a time. Its calls overlapped, so the time inside one call includes work from other calls. To find its cost, profile the build with `node --cpu-prof`:
+apps/viewer build:   - plugin vite:build-html transform (4 calls)
+apps/viewer build: See https://rolldown.rs/reference/InputOptions.checks#bundlertimings for more details.
+apps/viewer build: Done
+
+Every saved round reconstructed with identical world and event hashes.

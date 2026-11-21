@@ -1,3 +1,4 @@
+import { foodTenths } from './forest-food-accounting.js';
 import type {
   V7Ability,
   V7ActionContext,
@@ -7,6 +8,7 @@ import type {
   V7World,
   V7Actor,
   V7Stack,
+  V7Resource,
 } from './continuous-types.js';
 import { v7Id, v7Number, v7String, v7RoundNumber } from './continuous-data.js';
 import { v7Distance, v7Reach } from './continuous-geometry.js';
@@ -75,6 +77,7 @@ export function v7Owned(
 ): V7Stack {
   const stack = world.stacks.find(
     (s) =>
+      !s.reservedFor &&
       s.owner === actor.id &&
       (s.id === target || `resource:${s.resource}` === target),
   );
@@ -89,7 +92,8 @@ export function v7ConsumeMaterials(
   for (const cost of costs) {
     let remaining = cost.quantity;
     for (const stack of world.stacks.filter(
-      (s) => s.owner === actor.id && s.resource === cost.resource,
+      (s) =>
+        !s.reservedFor && s.owner === actor.id && s.resource === cost.resource,
     )) {
       const count = Math.min(stack.quantity, remaining);
       stack.quantity -= count;
@@ -286,7 +290,12 @@ export const V7_BASE: V7Package = {
     'base.pickup': ({ world, actor, action, emit }) => {
       if (v7MosaicPickup({ world, actor, action, emit })) return done();
       const target = v7String(action.args.target, 'target'),
-        n = v7Number(action.args.quantity, 'quantity', 1);
+        n = v7Number(
+          action.args.quantity,
+          'quantity',
+          world.state.foodAssessment === 1 ? 0.1 : 1,
+        );
+      if (world.state.foodAssessment === 1) foodTenths(n);
       const stack = world.stacks
         .filter(
           (s) =>
@@ -336,14 +345,9 @@ export const V7_BASE: V7Package = {
         throw new Error(
           'Requested owned food quantity is unavailable or inedible.',
         );
-      v7Spend(actor, 1);
-      stack.quantity -= n;
       const before = actor.vitals.satiety;
-      actor.vitals.satiety = Math.min(100, before + n * resource.nutrition);
-      actor.vitals.health = Math.max(
-        0,
-        actor.vitals.health - n * resource.toxicity,
-      );
+      v7FoodEffect(actor, resource, n);
+      stack.quantity -= n;
       emit(
         'ate',
         `Consumed ${String(n)} ${resource.name}; gained ${String(actor.vitals.satiety - before)} satiety.`,
@@ -469,7 +473,12 @@ function transfer(
   give: boolean,
 ): V7HandlerResult {
   const stack = v7Owned(world, actor, v7String(action.args.target, 'target')),
-    n = v7Number(action.args.quantity, 'quantity', 1);
+    n = v7Number(
+      action.args.quantity,
+      'quantity',
+      world.state.foodAssessment === 1 ? 0.1 : 1,
+    );
+  if (world.state.foodAssessment === 1) foodTenths(n);
   if (stack.quantity < n) throw new Error('Insufficient owned quantity.');
   const recipient = give
     ? world.actors.find(
@@ -508,4 +517,24 @@ function transfer(
     stack.id,
   );
   return done([stack.id]);
+}
+
+/** Shared actual ingestion physiology; callers own material accounting and public evidence. */
+export function v7FoodEffect(
+  actor: V7Actor,
+  resource: V7Resource,
+  quantity: number,
+): void {
+  v7Number(quantity, 'consumed food quantity', 0.1);
+  if (resource.nutrition <= 0)
+    throw new Error('The actual material is not edible.');
+  v7Spend(actor, 1);
+  actor.vitals.satiety = Math.min(
+    100,
+    actor.vitals.satiety + quantity * resource.nutrition,
+  );
+  actor.vitals.health = Math.max(
+    0,
+    actor.vitals.health - quantity * resource.toxicity,
+  );
 }

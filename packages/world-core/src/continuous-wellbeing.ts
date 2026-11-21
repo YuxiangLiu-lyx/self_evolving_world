@@ -1,9 +1,12 @@
+import { forestClimate, forestPhysiology } from './forest-environment.js';
 import type { V7Actor, V7World } from './continuous-types.js';
 import { v7RoundNumber, v7Id } from './continuous-data.js';
 import { v7Condition } from './continuous-observation.js';
 import { v7Reach } from './continuous-geometry.js';
 
 export function v7Ambient(world: V7World, actor: V7Actor): number {
+  if (world.config.forest)
+    return forestClimate(world, actor.position).temperature;
   const ground =
     world.terrain[Math.floor(actor.position.y)]?.[
       Math.floor(actor.position.x)
@@ -15,6 +18,10 @@ export function v7Ambient(world: V7World, actor: V7Actor): number {
   );
 }
 export function v7Physiology(world: V7World, actor: V7Actor): void {
+  if (world.config.forest) {
+    forestPhysiology(world, actor);
+    return;
+  }
   if (actor.vitals.health <= 0) return;
   const v = actor.vitals,
     ambient = v7Ambient(world, actor);
@@ -43,7 +50,17 @@ export function v7Wellbeing(world: V7World): void {
     const old = actor.wellbeing.total;
     for (const rule of world.satisfaction) {
       let source = actor.wellbeing.sources.find((s) => s.source === rule.id);
-      if (source && world.tick > source.expires) source.value = 0;
+      const historyKey = `satisfaction-history:${rule.id}`;
+      const previousReward = actor.extensionState[historyKey];
+      let lastReward =
+        source?.lastTick ??
+        (typeof previousReward === 'number' ? previousReward : -Infinity);
+      if (source && rule.repeatWindow) {
+        source.layers = (source.layers ?? []).filter(
+          (p) => p.expires >= world.tick,
+        );
+        source.value = Math.max(0, ...source.layers.map((p) => p.value));
+      } else if (source && world.tick > source.expires) source.value = 0;
       else if (source && rule.mode === 'linear')
         source.value = Math.max(0, source.value - rule.cap / rule.duration);
       else if (
@@ -55,19 +72,48 @@ export function v7Wellbeing(world: V7World): void {
       for (const event of executed) {
         if (
           !event.success ||
-          event.actor !== actor.id ||
-          event.type !== rule.event ||
-          event.interface !== rule.interface ||
+          (world.config.forest &&
+            (actor.vitals.health <= 0 ||
+              world.events.some(
+                (e) => e.actor === actor.id && e.type === 'died',
+              ))) ||
+          !(rule.participants === 'participants'
+            ? Array.isArray(event.data.participants) &&
+              event.data.participants.includes(actor.id)
+            : event.actor === actor.id) ||
+          ![
+            { event: rule.event, interface: rule.interface },
+            ...(rule.alternativeTriggers ?? []),
+          ].some(
+            (trigger) =>
+              event.type === trigger.event &&
+              event.interface === trigger.interface,
+          ) ||
           ['requested', 'learning', 'mastered', 'registered'].includes(
             event.type,
           ) ||
-          !rule.conditions.every((c) => v7Condition(c, event.data))
+          !rule.conditions.every((c) =>
+            v7Condition(
+              c,
+              world.config.forest
+                ? {
+                    ...event.data,
+                    self: {
+                      ...actor.vitals,
+                      relationships: actor.relationships,
+                      preferences: actor.memory.preferences,
+                    },
+                  }
+                : event.data,
+            ),
+          )
         )
           continue;
         if (
-          source &&
-          (source.lastEvent === event.id ||
-            world.tick - source.lastTick < rule.cooldown)
+          (source && source.lastEvent === event.id) ||
+          world.tick -
+            (rule.repeatWindow ? lastReward : (source?.lastTick ?? -Infinity)) <
+            rule.cooldown
         )
           continue;
         if (!source) {
@@ -82,13 +128,28 @@ export function v7Wellbeing(world: V7World): void {
           actor.wellbeing.sources.push(source);
         }
         const amplitude =
-          rule.repetition === 'diminish'
-            ? rule.amount / (1 + source.exposures * 0.15)
-            : rule.amount;
+          rule.repeatWindow &&
+          world.tick - lastReward <= rule.repeatWindow.rounds
+            ? rule.repeatWindow.amount
+            : rule.repetition === 'diminish'
+              ? rule.amount / (1 + source.exposures * 0.15)
+              : rule.amount;
         source.value = Math.min(
           rule.cap,
           rule.repetition === 'add' ? source.value + amplitude : amplitude,
         );
+        if (rule.repeatWindow) {
+          source.layers = [
+            ...(source.layers ?? []),
+            { value: amplitude, expires: world.tick + rule.duration },
+          ];
+          source.value = Math.min(
+            rule.cap,
+            Math.max(...source.layers.map((p) => p.value)),
+          );
+          actor.extensionState[historyKey] = world.tick;
+          lastReward = world.tick;
+        }
         source.lastEvent = event.id;
         source.lastTick = world.tick;
         source.expires = world.tick + rule.duration;
@@ -119,6 +180,7 @@ export function v7Wellbeing(world: V7World): void {
           (0.25 * v.energy) / world.config.energyCap +
           0.2 * thermal),
     );
+    if (world.config.forest && v.health <= 0) actor.wellbeing.physical = 0;
     actor.wellbeing.mental = v7RoundNumber(
       Math.min(
         world.config.mentalCap,

@@ -14,6 +14,23 @@ Return the exact JSON plan schema. Each step names an implemented interface and 
 export const WORLD_CONTINUOUS_PROMPT = `Review the entire batch of functional capability requests against actual conditions. Compare function, prerequisites, inputs, costs and effects, not names. Reuse equivalent implemented capabilities. A reasonable missing capability must enter development with a concrete specification covering state, executable behavior, costs, ongoing effects, geometry/collision/interaction, presentation/event binding, public schema, learning, dependencies and migration. Missing current operations or resources is not a reason for permanent rejection. No activity category or era name is automatically forbidden. For complex requests, identify actual prerequisites and an executable precursor. Do not prescribe an applicant's future activities, give rescue stock or count proposed products as existing.
 Wellbeing is bounded and personal, not achievement accumulation. New mental sources require successful events, applicability, amount/cap, duration or maintenance conditions, repetition/cooldown, and a consistent rationale from experience. Requesting, learning, labels and narrative never award happiness. Repeated enjoyment may be legitimate; do not require novelty. Never reward duplicate functional sources under aliases. Health/survival remain independent. Physical comfort uses real hunger, health, fatigue and temperature; proposed shade/insulation must have real effects. Social/reproductive requests require actual participant consent/actions, persistent identities/relations, ongoing care and costs; one actor cannot act for others, and offspring count is not a reward. New actors share the global budgets. Ordinary contexts have no activity examples; do not turn these review considerations into a task list.
 Return {reviews:[{actor,decision,ability,reason,specification,learning}]}, exactly one per applicant. decision is reuse/develop/reject. ability is the existing interface ID for reuse, otherwise null. learning is the existing duration for reuse, a reasoned positive duration for development, or zero for rejection. specification is concise but executable enough for the current Codex conversation; all reasonable gaps go through that existing handoff, without recursive services. Provide public reasons without disclosing hidden resources. Implementation, individual study and actual use are separate; no simulation time passes during review or development.`;
+export const ORDINARY_FOREST_PROMPT =
+  ORDINARY_CONTINUOUS_PROMPT.replace(
+    'death is irreversible',
+    'each identity has three total lives, including the current first life; death drops possessions and cancels the plan, and after the third death participation ends',
+  )
+    .replace(
+      'Each round is one deterministic simulation second.',
+      'Each round is one simulation time unit; the displayed day/year are accelerated ecological cycles. Model and development waiting never advances time.',
+    )
+    .replace(
+      'The initial survival interfaces and safe food properties are authored starting knowledge.',
+      'The initial survival interfaces and the explicitly supplied known food properties are authored starting knowledge. Other nutrition, toxicity and material properties remain unknown until actual discovery.',
+    ) +
+  '\nPursue long-term health, survival and happiness through exploration and solving problems you encounter. A death record contains confirmed evidence and unknowns; consider it in this normal decision without assuming a standard solution. Subscribe only to exact events in the provided event catalogue. Nearby facts supersede dated memory. Missing experience rules may be reviewed together with a requested capability; no activity is required.';
+export const WORLD_FOREST_PROMPT =
+  WORLD_CONTINUOUS_PROMPT +
+  '\nFor every request explicitly evaluate three parts: real functional effects, personal experience feedback and visible presentation. Include experienceReview and visualReview text in every review. If the performed experience plausibly benefits wellbeing, specify a bounded executable event rule with participants, conditions, amount/cap, duration, repetition and cooldown; absence of a previously registered rule is never a substantive reason for zero feedback. If there is no benefit, state the experiential or physical reason. Do not reward application, naming, registration or learning. Personal applicability may use real prior events and relationships. Declare event names for subscription validation. Every multi-round operation must cancel on death without cloning or deleting escrow, and material/room effects must use actual state and shared geometry.';
 const string = { type: 'string' };
 const object = (properties: Record<string, unknown>) => ({
   type: 'object',
@@ -37,7 +54,10 @@ function outputSchema(schema: V7Schema): unknown {
     return array(schema.items ? outputSchema(schema.items) : string);
   return { ...schema };
 }
-export function continuousPlanSchema(abilities: V7Ability[]) {
+export function continuousPlanSchema(
+  abilities: V7Ability[],
+  events?: string[],
+) {
   const condition = nullable(
     object({
       path: string,
@@ -70,7 +90,7 @@ export function continuousPlanSchema(abilities: V7Ability[]) {
     ),
     repeat: count,
     until: condition,
-    interrupts: array(string),
+    interrupts: array(events ? { type: 'string', enum: events } : string),
     notes: array(string),
     preferences: array(string),
   });
@@ -110,8 +130,12 @@ export function continuousRequest(
     stream: true,
     instructions:
       role === 'ordinary'
-        ? ORDINARY_CONTINUOUS_PROMPT
-        : WORLD_CONTINUOUS_PROMPT,
+        ? 'environment' in input
+          ? ORDINARY_FOREST_PROMPT
+          : ORDINARY_CONTINUOUS_PROMPT
+        : 'physicalRules' in input && input.physicalRules.forest
+          ? WORLD_FOREST_PROMPT
+          : WORLD_CONTINUOUS_PROMPT,
     input: [{ role: 'user', content: JSON.stringify(input) }],
     text: {
       format: {
@@ -120,7 +144,10 @@ export function continuousRequest(
         strict: true,
         schema:
           role === 'ordinary'
-            ? continuousPlanSchema(input.catalogue.interfaces)
+            ? continuousPlanSchema(
+                input.catalogue.interfaces,
+                input.catalogue.events,
+              )
             : object({
                 reviews: array(
                   object({
@@ -132,6 +159,9 @@ export function continuousRequest(
                     ability: nullable(string),
                     reason: string,
                     specification: string,
+                    ...('physicalRules' in input && input.physicalRules.forest
+                      ? { experienceReview: string, visualReview: string }
+                      : {}),
                     learning: { type: 'integer', minimum: 0 },
                   }),
                 ),
@@ -142,21 +172,24 @@ export function continuousRequest(
 }
 /** Uses the existing explicitly authorized plan-funded endpoint; there is no paid fallback. */
 export function continuousProvider(
-  token: string,
+  token: string | (() => Promise<string>),
   model: string,
   transport: typeof fetch = fetch,
 ): V7Provider {
   return async (role, input) => {
     let evidence = '',
       usage: V7ProviderResult['usage'] = null;
-    const redact = (text: string) => text.replaceAll(token, '[REDACTED]');
+    let currentToken = typeof token === 'string' ? token : '';
+    const redact = (text: string) =>
+      currentToken ? text.replaceAll(currentToken, '[REDACTED]') : text;
     try {
+      if (typeof token === 'function') currentToken = await token();
       const response = await transport('https://api.openai.com/v1/responses', {
         method: 'POST',
         redirect: 'error',
         signal: AbortSignal.timeout(120_000),
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${currentToken}`,
           'Content-Type': 'application/json',
           Accept: 'text/event-stream',
         },
@@ -196,7 +229,10 @@ export function continuousProvider(
           }
         await Promise.resolve();
       });
-      if (decision.text.includes(token) || decision.responseId.includes(token))
+      if (
+        decision.text.includes(currentToken) ||
+        decision.responseId.includes(currentToken)
+      )
         throw new Error('Credential echo rejected.');
       return {
         text: decision.text,

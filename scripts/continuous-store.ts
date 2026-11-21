@@ -1,3 +1,4 @@
+import { FOREST_CONFIG } from '../apps/simulator/src/forest-scenario.js';
 import { createHash } from 'node:crypto';
 import {
   existsSync,
@@ -85,7 +86,8 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
     header.world.protocol !== 'continuous-v1' ||
     !Array.isArray(state.attempts) ||
     !Array.isArray(state.developments) ||
-    v7Signature(state.world.config) !== v7Signature(V7_CONFIG)
+    v7Signature(state.world.config) !==
+      v7Signature(state.world.config.forest ? FOREST_CONFIG : V7_CONFIG)
   )
     throw new Error(
       'Invalid continuous checkpoint or modified protected run configuration.',
@@ -168,6 +170,37 @@ export function continuousSink(root: string, id: string): V7Sink {
       return Promise.resolve();
     },
     checkpoint: (state, reason) => {
+      if (
+        state.world.config.forest &&
+        state.world.tick === 200 &&
+        reason.startsWith('Scheduled')
+      ) {
+        v7AssertWorld(state.world, continuousRegistry());
+        if (
+          state.pendingCall ||
+          state.barrier ||
+          state.attempts.some((a) => a.status === 'started')
+        )
+          throw new Error(
+            'Technical checkpoint has an unsettled call or round barrier.',
+          );
+        immutable(resolve(directory, 'checkpoints', 'technical-000200.json'), {
+          kind: 'technical-checkpoint',
+          tick: 200,
+          worldHash: continuousHash(state.world),
+          assertions: [
+            'world-invariants-checked',
+            'no-unsettled-round-or-call',
+            'durable-round-prefix',
+            'automatic-continuation-without-actor-guidance',
+          ],
+          attempts: state.attempts.length,
+          developmentHandoffs: state.developments.length,
+          season: state.world.state.season,
+          lives: state.world.actors.map((a) => ({ id: a.id, life: a.life })),
+          decision: 'continue',
+        });
+      }
       const key = reason.startsWith('Scheduled')
         ? `stage-${String(state.world.tick).padStart(6, '0')}`
         : `${state.phase}-${String(state.world.tick).padStart(6, '0')}-${String(state.attempts.length)}-${String(state.developments.length)}`;
@@ -358,6 +391,8 @@ export function reconstructContinuousSegment(
       if (memory) {
         actor.memory.notes = memory.notes;
         actor.memory.preferences = memory.preferences;
+        if (memory.intention !== undefined)
+          actor.memory.intention = memory.intention;
       }
     }
     const result = v7Step(input, round.actions, registry, {}, round.reviews);

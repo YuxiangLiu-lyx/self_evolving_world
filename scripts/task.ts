@@ -1,3 +1,4 @@
+import { requestContinuousTechnicalRepair } from './task-continuous-repair.js';
 import {
   mkdirSync,
   openSync,
@@ -72,12 +73,13 @@ try {
         'amend',
         'verify',
         'recover',
+        'repair',
       ].includes(command ?? '') ||
       args.length !==
         (['submit', 'amend', 'recover'].includes(command ?? '') ? 3 : 2)
     )
       throw new Error(
-        'Usage: pnpm task -- start intent.json | next ID | submit ID response.json | status ID | amend ID intent.json | verify ID | recover ID exN',
+        'Usage: pnpm task -- start intent.json | next ID | submit ID response.json | status ID | amend ID intent.json | verify ID | recover ID exN | repair ID',
       );
     mkdirSync(directory, { recursive: true });
     if (command !== 'status') unlock = lock();
@@ -98,6 +100,10 @@ try {
     };
     const effects = new LocalTaskEffects(root, save);
     const flow = new TaskFlow(context, effects, save);
+    if (command === 'repair') {
+      await requestContinuousTechnicalRepair(root, context);
+      save();
+    }
     if (command === 'recover') {
       requestCaptureRecovery(
         root,

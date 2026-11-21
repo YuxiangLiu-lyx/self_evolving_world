@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   createSurvivalWorld,
   replayPrograms,
@@ -5,7 +7,7 @@ import {
 import { DEMO_SETUP } from '../src/scenario.js';
 import { serializeReplay } from '../src/timeline.js';
 import { captureReview, expect, test } from './validators.js';
-import { experimentIds, readExperiment } from '../../../scripts/experiments.js';
+import { experimentIds } from '../../../scripts/experiments.js';
 
 const programs = Array.from({ length: 5 }, (_, i) =>
   ['lin', 'moss', 'sol'].map((agentId) => ({
@@ -59,13 +61,17 @@ test('replays survival programs, vital signs and denied learning on desktop and 
   await expect(page.locator('#survival-panel')).toBeHidden();
 });
 
+// Classification reads metadata only; the complete archive gate and archive-specific browser tests still validate every record.
 for (const id of experimentIds(process.cwd()).filter(
   (id) =>
-    readExperiment(
-      process.cwd(),
-      id,
-      process.env.WORLD_EXPERIMENT_CAPTURE === id,
-    ).manifest.version === 3,
+    (
+      JSON.parse(
+        readFileSync(
+          resolve(process.cwd(), 'experiment', id, 'manifest.json'),
+          'utf8',
+        ),
+      ) as { version: number }
+    ).version === 3,
 )) {
   if (process.env.WORLD_EXPERIMENT_CAPTURE === id) continue;
   test(`${id} opens its real survival history from the archive selector and restores the URL`, async ({

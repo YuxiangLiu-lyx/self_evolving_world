@@ -1,0 +1,44 @@
+
+> self-evolving-world@0.0.0 test:e2e /Users/liuyuxiang/developer/self_evolving_world
+> playwright test
+
+[WebServer] (node:63830) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:63845) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:63864) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+Error: ENOENT: no such file or directory, open '/Users/liuyuxiang/developer/self_evolving_world/experiment/ex8/replay.json'
+
+   at ../../../scripts/continuous-store.ts:44
+
+  42 | // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Checkpoint and replay validators narrow this private JSON boundary.
+  43 | export function continuousRead<T>(path: string): T {
+> 44 |   return JSON.parse(readFileSync(path, 'utf8')) as T;
+     |                     ^
+  45 | }
+  46 | function immutable(path: string, value: unknown): void {
+  47 |   if (existsSync(path)) {
+    at continuousRead (/Users/liuyuxiang/developer/self_evolving_world/scripts/continuous-store.ts:44:21)
+    at readContinuousExperiment (/Users/liuyuxiang/developer/self_evolving_world/scripts/continuous-analysis.ts:295:13)
+    at readExperiment (/Users/liuyuxiang/developer/self_evolving_world/scripts/experiments.ts:221:12)
+    at filter (/Users/liuyuxiang/developer/self_evolving_world/apps/viewer/e2e/learning.spec.ts:90:5)
+    at /Users/liuyuxiang/developer/self_evolving_world/apps/viewer/e2e/learning.spec.ts:88:47
+Error: ENOENT: no such file or directory, open '/Users/liuyuxiang/developer/self_evolving_world/experiment/ex8/replay.json'
+
+   at ../../../scripts/continuous-store.ts:44
+
+  42 | // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters -- Checkpoint and replay validators narrow this private JSON boundary.
+  43 | export function continuousRead<T>(path: string): T {
+> 44 |   return JSON.parse(readFileSync(path, 'utf8')) as T;
+     |                     ^
+  45 | }
+  46 | function immutable(path: string, value: unknown): void {
+  47 |   if (existsSync(path)) {
+    at continuousRead (/Users/liuyuxiang/developer/self_evolving_world/scripts/continuous-store.ts:44:21)
+    at readContinuousExperiment (/Users/liuyuxiang/developer/self_evolving_world/scripts/continuous-analysis.ts:295:13)
+    at readExperiment (/Users/liuyuxiang/developer/self_evolving_world/scripts/experiments.ts:221:12)
+    at filter (/Users/liuyuxiang/developer/self_evolving_world/apps/viewer/e2e/survival.spec.ts:64:5)
+    at /Users/liuyuxiang/developer/self_evolving_world/apps/viewer/e2e/survival.spec.ts:62:47
+
+ ELIFECYCLE  Command failed with exit code 1.

@@ -1,15 +1,19 @@
 import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import type { Route } from '@playwright/test';
 import { runRandomWorld } from '../../simulator/src/random-run.js';
-import { experimentAssets } from '../../../scripts/experiment-assets.js';
 import { captureReview, expect, test } from './validators.js';
 
-const assets = experimentAssets(process.cwd());
+// Build and the full archive gate validate all records. These unchanged fixture bytes need no second reconstruction during test discovery.
 const catalogue: unknown = JSON.parse(
-  assets.get('experiments/index.json') ?? 'null',
+  readFileSync(
+    resolve(process.cwd(), 'apps/viewer/dist/experiments/index.json'),
+    'utf8',
+  ),
 );
 const replay: unknown = JSON.parse(
-  assets.get('experiments/ex1/replay.json') ?? 'null',
+  readFileSync(resolve(process.cwd(), 'experiment/ex1/replay.json'), 'utf8'),
 );
 
 test('switches between ex1 and ex2 and displays simultaneous moves and successful pickups on desktop and mobile', async ({

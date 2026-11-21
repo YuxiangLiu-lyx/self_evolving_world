@@ -1,10 +1,10 @@
+import { renewableAccessToken } from '../apps/simulator/src/chatgpt-renewal.js';
 import { prepareContinuousWindow } from './continuous-window.js';
 import { resolve } from 'node:path';
 import { writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { V7_CONFIG } from '@self-evolving-world/world-core';
+import { initialForestWorld } from '../apps/simulator/src/forest-scenario.js';
 import type { V7World } from '@self-evolving-world/world-core';
-import { accessToken } from '../apps/simulator/src/chatgpt-auth.js';
 import { selectModel } from '../apps/simulator/src/responses.js';
 import { continuousProvider } from '../apps/simulator/src/continuous-provider.js';
 import {
@@ -15,7 +15,7 @@ import {
 import type { V7Execution } from '../apps/simulator/src/continuous-run.js';
 import { requireTaskWorker } from './task-worker.js';
 import { allocateExperiment, checkExperiments } from './experiments.js';
-import { continuousPreflight } from './continuous-preflight.js';
+import { forestPreflight } from './forest-preflight.js';
 import {
   continuousAtomic,
   continuousRead,
@@ -51,8 +51,11 @@ try {
     token: string | undefined;
   if (!id) {
     checkExperiments(root);
-    const preflight = continuousPreflight();
-    token = await accessToken();
+    const preflight = {
+      baseline: forestPreflight(),
+      respawn: forestPreflight(120, true),
+    };
+    token = await renewableAccessToken();
     const model = await selectModel(token);
     id = allocateExperiment(root);
     context.experiment.id = id;
@@ -63,7 +66,7 @@ try {
     const directory = resolve(root, 'experiment', id),
       git = (...args: string[]) =>
         execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
-    state = newContinuousExecution(model);
+    state = newContinuousExecution(model, 'chatgpt-plan', initialForestWorld());
     continuousAtomic(resolve(directory, 'manifest.json'), {
       format: 'self-evolving-world/experiment',
       version: 7,
@@ -84,7 +87,10 @@ try {
       },
       files: [],
     });
-    continuousAtomic(resolve(directory, 'configuration.json'), V7_CONFIG);
+    continuousAtomic(
+      resolve(directory, 'configuration.json'),
+      state.world.config,
+    );
     continuousAtomic(resolve(directory, 'preflight.json'), preflight);
     continuousAtomic(resolve(directory, 'initial.json'), state.world);
     continuousAtomic(resolve(directory, 'execution.json'), state);
@@ -92,7 +98,7 @@ try {
       root,
       id,
       state,
-      'Initial independent continuous-v1 engine. Offline policies and fixtures are excluded from ordinary inputs.',
+      'Initial forest-v1 extension of the continuous engine. Offline policies and fixtures are excluded from ordinary inputs.',
     );
   } else {
     const previous = continuousRead<Record<string, unknown>>(
@@ -123,10 +129,10 @@ try {
     await issueContinuousDevelopment(state, sink);
   }
   if (state.phase === 'running' || state.pendingCall) {
-    token ??= await accessToken();
+    token ??= await renewableAccessToken();
     state = await continueContinuousExecution(
       state,
-      continuousProvider(token, state.model),
+      continuousProvider(renewableAccessToken, state.model),
       sink,
     );
   }

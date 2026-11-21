@@ -1,0 +1,2157 @@
+{
+  "experiment": "ex8",
+  "provenance": "Formal recorded states and events; descriptive single-run evidence, not causal treatment estimates.",
+  "round": 897,
+  "phase": "paused",
+  "reason": "ordinary attempted-call budget exhausted.",
+  "events": {
+    "moved": 974,
+    "wellbeing": 2691,
+    "arrived": 207,
+    "gathered": 75,
+    "ate": 97,
+    "rested": 811,
+    "requested": 6,
+    "learning": 24,
+    "mastered": 14,
+    "wildlife-observation-started": 33,
+    "wildlife-observation-sampled": 66,
+    "wildlife-observation-completed": 33,
+    "satisfaction": 74,
+    "failed": 69,
+    "ripened": 111,
+    "animal-alert": 4,
+    "spoiled": 6,
+    "weather-changed": 117,
+    "target-changed": 59,
+    "season-changed": 12,
+    "actor-seen": 38,
+    "message": 22,
+    "waited": 13,
+    "food-assessment-started": 20,
+    "food-assessment-observed": 40,
+    "food-assessment-completed": 20,
+    "food-assessment-sampled": 17,
+    "warming-started": 47,
+    "warming-round-completed": 217,
+    "warming-comfort-qualified": 63,
+    "warming-completed": 41,
+    "shelter-build-started": 1,
+    "shelter-build-progress": 6,
+    "shelter-build-completed": 1,
+    "shelter-exposure-measured": 262,
+    "shelter-comfort-qualified": 24,
+    "discovered": 4,
+    "already-mastered": 1,
+    "warming-cancelled": 6,
+    "injured": 40,
+    "dropped": 2,
+    "route-inspection-completed": 2,
+    "shelter-protection-expired": 3
+  },
+  "agents": {
+    "lin": {
+      "finalVitals": {
+        "health": 100,
+        "satiety": 7.85,
+        "energy": 8.1536563,
+        "temperature": 21.32377396
+      },
+      "minimumVitals": {
+        "health": 100,
+        "satiety": 7.85,
+        "energy": 2.33904555,
+        "temperature": 7.03927372
+      },
+      "deaths": 0,
+      "actions": {
+        "navigate": 424,
+        "gather": 26,
+        "eat": 35,
+        "rest": 268,
+        "learn": 4,
+        "wait": 8,
+        "observe-wildlife": 24,
+        "message": 8,
+        "assess-food": 32,
+        "request": 1,
+        "active-warming": 65,
+        "drop": 1,
+        "inspect-route": 1
+      },
+      "occupiedCells": 250,
+      "mastered": [
+        [24, "Mastered observe-wildlife through actual study."],
+        [351, "Mastered assess-food through actual study."],
+        [471, "Mastered active-warming through actual study."],
+        [483, "Mastered build-shelter through actual study."],
+        [621, "Mastered inspect-route after one round of study."]
+      ],
+      "rewards": {
+        "nature-appreciation": 9,
+        "cautious-food-relief": 5,
+        "thermal-refuge": 12
+      },
+      "rewardValueSum": 40,
+      "roundsAboveTen": 109,
+      "peakWellbeing": [
+        12.88125,
+        235,
+        {
+          "physical": 9.88125,
+          "mental": 3,
+          "total": 12.88125,
+          "sources": [
+            {
+              "source": "nature-appreciation",
+              "value": 3,
+              "lastEvent": "event-229-lin-1054",
+              "lastTick": 229,
+              "expires": 241,
+              "exposures": 4,
+              "layers": [
+                {
+                  "value": 3,
+                  "expires": 241
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "zeroRecoveryRests": 4,
+      "longestRestRun": 9,
+      "longestEmptyRestWaitRun": 3,
+      "warming": {
+        "rounds": 65,
+        "energySpent": 195,
+        "negativeNetRounds": 0,
+        "totalAddedHeat": 22.75
+      },
+      "shelter": {
+        "measuredRounds": 114,
+        "positiveAvoidedCoolingRounds": 113,
+        "totalAvoidedOneStepCooling": 13.40994494
+      },
+      "failed": [
+        [34, "eat", "The requested owned item is unavailable."],
+        [
+          46,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          167,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          191,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          221,
+          "observe-wildlife",
+          "A living observer must currently see the actual animal through ordinary vision."
+        ],
+        [232, "eat", "The requested owned item is unavailable."],
+        [
+          234,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [256, "eat", "The requested owned item is unavailable."],
+        [
+          285,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [339, "eat", "The requested owned item is unavailable."],
+        [
+          354,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          355,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [361, "eat", "The requested owned item is unavailable."],
+        [
+          379,
+          "assess-food",
+          "The actual owned unreserved target quantity is unavailable."
+        ],
+        [
+          435,
+          "assess-food",
+          "The actual owned unreserved target quantity is unavailable."
+        ],
+        [
+          495,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          498,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          521,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          596,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          614,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          619,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          620,
+          "navigate",
+          "Navigation blocked: goal-overlap. Only observed or dated remembered geometry is used. Direct-segment blockers do not prove that every alternative route is blocked. Clearance is the signed margin under the authoritative inflated-shape collision rule."
+        ],
+        [
+          673,
+          "assess-food",
+          "The actual owned unreserved target quantity is unavailable."
+        ],
+        [
+          693,
+          "navigate",
+          "Navigation blocked: goal-overlap. Only observed or dated remembered geometry is used. Direct-segment blockers do not prove that every alternative route is blocked. Clearance is the signed margin under the authoritative inflated-shape collision rule."
+        ],
+        [
+          744,
+          "navigate",
+          "Navigation blocked: goal-overlap. Only observed or dated remembered geometry is used. Direct-segment blockers do not prove that every alternative route is blocked. Clearance is the signed margin under the authoritative inflated-shape collision rule."
+        ],
+        [
+          762,
+          "assess-food",
+          "The actual owned unreserved target quantity is unavailable."
+        ],
+        [
+          839,
+          "observe-wildlife",
+          "A living observer must currently see the actual animal through ordinary vision."
+        ],
+        [
+          840,
+          "navigate",
+          "Navigation blocked: goal-overlap. Only observed or dated remembered geometry is used. Direct-segment blockers do not prove that every alternative route is blocked. Clearance is the signed margin under the authoritative inflated-shape collision rule."
+        ],
+        [
+          897,
+          "assess-food",
+          "The actual owned unreserved target quantity is unavailable."
+        ]
+      ],
+      "foodConsumed": [
+        [
+          4,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-0-roots"]
+          }
+        ],
+        [
+          17,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-0-roots"]
+          }
+        ],
+        [
+          38,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-0-roots", "start-1-roots"]
+          }
+        ],
+        [
+          82,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "start-0-roots"
+          }
+        ],
+        [
+          108,
+          {
+            "quantity": 2,
+            "resource": "root",
+            "nutrition": 28,
+            "realized": 28,
+            "origin": "start-0-roots"
+          }
+        ],
+        [
+          171,
+          {
+            "quantity": 4,
+            "resource": "berry",
+            "nutrition": 32,
+            "realized": 32,
+            "origins": ["start-2-berries"]
+          }
+        ],
+        [
+          179,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origins": ["start-2-berries"]
+          }
+        ],
+        [
+          201,
+          {
+            "quantity": 2,
+            "resource": "berry",
+            "nutrition": 16,
+            "realized": 16,
+            "origin": "start-2-berries"
+          }
+        ],
+        [
+          233,
+          {
+            "quantity": 2,
+            "resource": "root",
+            "nutrition": 28,
+            "realized": 28,
+            "origin": "start-2-roots"
+          }
+        ],
+        [
+          277,
+          {
+            "quantity": 2,
+            "resource": "berry",
+            "nutrition": 16,
+            "realized": 16,
+            "origins": ["start-2-berries"]
+          }
+        ],
+        [
+          310,
+          {
+            "quantity": 2,
+            "resource": "root",
+            "nutrition": 28,
+            "realized": 28,
+            "origins": ["start-1-roots"]
+          }
+        ],
+        [
+          320,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "start-1-roots"
+          }
+        ],
+        [
+          340,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origins": ["start-1-berries"]
+          }
+        ],
+        [
+          362,
+          {
+            "quantity": 2,
+            "resource": "berry",
+            "nutrition": 16,
+            "realized": 16,
+            "origin": "start-1-berries"
+          }
+        ],
+        [
+          387,
+          {
+            "operation": "assessment-385-lin-1851",
+            "resource": "hazelnut",
+            "fraction": 0.1,
+            "before": {
+              "health": 100,
+              "satiety": 79.1,
+              "energy": 38.5,
+              "temperature": 16.47393332
+            },
+            "after": {
+              "health": 100,
+              "satiety": 80.9,
+              "energy": 37.5,
+              "temperature": 16.47393332
+            },
+            "origin": "start-1-nuts"
+          }
+        ],
+        [
+          390,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "start-1-berries"
+          }
+        ],
+        [
+          405,
+          {
+            "quantity": 2,
+            "resource": "berry",
+            "nutrition": 16,
+            "realized": 16,
+            "origin": "start-1-berries"
+          }
+        ],
+        [
+          429,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "forest-berry-1"
+          }
+        ],
+        [
+          440,
+          {
+            "operation": "assessment-438-lin-2138",
+            "resource": "plum",
+            "fraction": 0.1,
+            "before": {
+              "health": 100,
+              "satiety": 78.45,
+              "energy": 38.5,
+              "temperature": 14.83282466
+            },
+            "after": {
+              "health": 100,
+              "satiety": 79.35,
+              "energy": 37.5,
+              "temperature": 14.83282466
+            },
+            "origin": "forest-plum-2"
+          }
+        ],
+        [
+          443,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origins": ["forest-berry-1", "start-2-berries"]
+          }
+        ],
+        [
+          458,
+          {
+            "quantity": 2,
+            "resource": "berry",
+            "nutrition": 16,
+            "realized": 16,
+            "origin": "start-2-berries"
+          }
+        ],
+        [
+          496,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "start-2-roots"
+          }
+        ],
+        [
+          537,
+          {
+            "quantity": 2,
+            "resource": "root",
+            "nutrition": 28,
+            "realized": 28,
+            "origins": ["start-2-roots", "forest-root-1"]
+          }
+        ],
+        [
+          566,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "forest-root-1"
+          }
+        ],
+        [
+          630,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origins": ["start-2-berries"]
+          }
+        ],
+        [
+          659,
+          {
+            "quantity": 1,
+            "resource": "plum",
+            "nutrition": 9,
+            "realized": 9,
+            "origins": ["forest-plum-2"]
+          }
+        ],
+        [
+          660,
+          {
+            "quantity": 2,
+            "resource": "plum",
+            "nutrition": 18,
+            "realized": 18,
+            "origins": ["forest-plum-2"]
+          }
+        ],
+        [
+          662,
+          {
+            "quantity": 2,
+            "resource": "plum",
+            "nutrition": 18,
+            "realized": 18,
+            "origins": ["forest-plum-2"]
+          }
+        ],
+        [
+          676,
+          {
+            "operation": "assessment-674-lin-3795",
+            "resource": "hazelnut",
+            "fraction": 0.1,
+            "before": {
+              "health": 100,
+              "satiety": 58.95,
+              "energy": 27.35481499,
+              "temperature": 7.86522931
+            },
+            "after": {
+              "health": 100,
+              "satiety": 60.75,
+              "energy": 26.35481499,
+              "temperature": 7.86522931
+            },
+            "origin": "start-2-nuts"
+          }
+        ],
+        [
+          679,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origin": "start-2-nuts"
+          }
+        ],
+        [
+          731,
+          {
+            "operation": "assessment-729-lin-4109",
+            "resource": "hazelnut",
+            "fraction": 0.9,
+            "before": {
+              "health": 100,
+              "satiety": 43,
+              "energy": 36.83904555,
+              "temperature": 11.68107238
+            },
+            "after": {
+              "health": 100,
+              "satiety": 59.2,
+              "energy": 35.83904555,
+              "temperature": 11.68107238
+            },
+            "origin": "start-1-nuts"
+          }
+        ],
+        [
+          745,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origin": "start-2-nuts"
+          }
+        ],
+        [
+          759,
+          {
+            "operation": "assessment-757-lin-4253",
+            "resource": "hazelnut",
+            "fraction": 0.9,
+            "before": {
+              "health": 100,
+              "satiety": 59,
+              "energy": 26.80920584,
+              "temperature": 10.77735688
+            },
+            "after": {
+              "health": 100,
+              "satiety": 75.2,
+              "energy": 25.80920584,
+              "temperature": 10.77735688
+            },
+            "origin": "start-2-nuts"
+          }
+        ],
+        [
+          791,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["forest-root-1"]
+          }
+        ],
+        [
+          816,
+          {
+            "quantity": 1,
+            "resource": "plum",
+            "nutrition": 9,
+            "realized": 9,
+            "origins": ["forest-plum-0"]
+          }
+        ]
+      ]
+    },
+    "moss": {
+      "finalVitals": {
+        "health": 99.77343604,
+        "satiety": 88.85,
+        "energy": 28.8,
+        "temperature": 21.57091862
+      },
+      "minimumVitals": {
+        "health": 99.77343604,
+        "satiety": 21.1,
+        "energy": 1,
+        "temperature": 6.69644906
+      },
+      "deaths": 0,
+      "actions": {
+        "navigate": 395,
+        "gather": 22,
+        "eat": 34,
+        "rest": 274,
+        "learn": 4,
+        "wait": 21,
+        "observe-wildlife": 12,
+        "assess-food": 41,
+        "message": 8,
+        "active-warming": 85,
+        "drop": 1
+      },
+      "occupiedCells": 198,
+      "mastered": [
+        [24, "Mastered observe-wildlife through actual study."],
+        [340, "Mastered assess-food through actual study."],
+        [472, "Mastered build-shelter through actual study."],
+        [497, "Mastered active-warming through actual study."]
+      ],
+      "rewards": {
+        "nature-appreciation": 4,
+        "cautious-food-relief": 5,
+        "thermal-refuge": 12
+      },
+      "rewardValueSum": 29,
+      "roundsAboveTen": 62,
+      "peakWellbeing": [
+        12.93,
+        272,
+        {
+          "physical": 9.93,
+          "mental": 3,
+          "total": 12.93,
+          "sources": [
+            {
+              "source": "nature-appreciation",
+              "value": 3,
+              "lastEvent": "event-270-moss-1274",
+              "lastTick": 270,
+              "expires": 282,
+              "exposures": 2,
+              "layers": [
+                {
+                  "value": 3,
+                  "expires": 282
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "zeroRecoveryRests": 0,
+      "longestRestRun": 9,
+      "longestEmptyRestWaitRun": 11,
+      "warming": {
+        "rounds": 85,
+        "energySpent": 255,
+        "negativeNetRounds": 0,
+        "totalAddedHeat": 29.749999999999996
+      },
+      "shelter": {
+        "measuredRounds": 68,
+        "positiveAvoidedCoolingRounds": 68,
+        "totalAvoidedOneStepCooling": 7.27868096
+      },
+      "failed": [
+        [
+          38,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          90,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [136, "eat", "The requested owned item is unavailable."],
+        [
+          227,
+          "observe-wildlife",
+          "A living observer must currently see the actual animal through ordinary vision."
+        ],
+        [
+          273,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          348,
+          "assess-food",
+          "The actual owned unreserved target quantity is unavailable."
+        ],
+        [
+          459,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          505,
+          "observe-wildlife",
+          "A living observer must currently see the actual animal through ordinary vision."
+        ],
+        [
+          520,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          521,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          554,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          598,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          599,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          600,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          612,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          622,
+          "navigate",
+          "Navigation blocked: occupied-passage. Only observed or dated remembered geometry is used. Direct-segment blockers do not prove that every alternative route is blocked. Clearance is the signed margin under the authoritative inflated-shape collision rule. The observed bodies cover the full usable doorway cross-section."
+        ],
+        [
+          626,
+          "navigate",
+          "Navigation blocked: goal-overlap. Only observed or dated remembered geometry is used. Direct-segment blockers do not prove that every alternative route is blocked. Clearance is the signed margin under the authoritative inflated-shape collision rule."
+        ],
+        [
+          658,
+          "assess-food",
+          "The actual owned unreserved target quantity is unavailable."
+        ],
+        [
+          759,
+          "assess-food",
+          "The actual owned unreserved target quantity is unavailable."
+        ],
+        [
+          770,
+          "assess-food",
+          "Assessment requires health at least 80; sampling also requires satiety at most 90."
+        ]
+      ],
+      "foodConsumed": [
+        [
+          4,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "start-1-roots"
+          }
+        ],
+        [
+          14,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-1-roots"]
+          }
+        ],
+        [
+          116,
+          {
+            "quantity": 2,
+            "resource": "root",
+            "nutrition": 28,
+            "realized": 28,
+            "origins": ["start-1-roots", "start-1-roots"]
+          }
+        ],
+        [
+          123,
+          {
+            "quantity": 2,
+            "resource": "root",
+            "nutrition": 28,
+            "realized": 28,
+            "origins": ["start-1-roots"]
+          }
+        ],
+        [
+          137,
+          {
+            "quantity": 3,
+            "resource": "berry",
+            "nutrition": 24,
+            "realized": 24,
+            "origins": ["start-1-berries"]
+          }
+        ],
+        [
+          178,
+          {
+            "quantity": 3,
+            "resource": "berry",
+            "nutrition": 24,
+            "realized": 24,
+            "origins": ["start-1-berries", "forest-berry-0"]
+          }
+        ],
+        [
+          190,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origins": ["forest-berry-0"]
+          }
+        ],
+        [
+          206,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "forest-berry-0"
+          }
+        ],
+        [
+          217,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "forest-berry-0"
+          }
+        ],
+        [
+          244,
+          {
+            "quantity": 2,
+            "resource": "berry",
+            "nutrition": 16,
+            "realized": 16,
+            "origins": ["start-0-berries"]
+          }
+        ],
+        [
+          259,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "start-0-berries"
+          }
+        ],
+        [
+          271,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-0-roots"]
+          }
+        ],
+        [
+          284,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "forest-berry-1"
+          }
+        ],
+        [
+          308,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "start-0-roots"
+          }
+        ],
+        [
+          326,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "forest-berry-1"
+          }
+        ],
+        [
+          337,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "forest-berry-1"
+          }
+        ],
+        [
+          356,
+          {
+            "operation": "assessment-354-moss-1706",
+            "resource": "walnut",
+            "fraction": 0.1,
+            "before": {
+              "health": 100,
+              "satiety": 81.25,
+              "energy": 38.5,
+              "temperature": 19.19524558
+            },
+            "after": {
+              "health": 100,
+              "satiety": 83.45,
+              "energy": 37.5,
+              "temperature": 19.19524558
+            },
+            "origin": "forest-walnut-0"
+          }
+        ],
+        [
+          359,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "forest-berry-1"
+          }
+        ],
+        [
+          379,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "start-0-roots"
+          }
+        ],
+        [
+          401,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "start-0-roots"
+          }
+        ],
+        [
+          412,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "start-0-roots"
+          }
+        ],
+        [
+          426,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "start-0-berries"
+          }
+        ],
+        [
+          447,
+          {
+            "quantity": 2,
+            "resource": "berry",
+            "nutrition": 16,
+            "realized": 16,
+            "origins": ["forest-berry-0"]
+          }
+        ],
+        [
+          486,
+          {
+            "quantity": 2,
+            "resource": "berry",
+            "nutrition": 16,
+            "realized": 16,
+            "origin": "forest-berry-0"
+          }
+        ],
+        [
+          504,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "start-0-berries"
+          }
+        ],
+        [
+          519,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "forest-berry-1"
+          }
+        ],
+        [
+          615,
+          {
+            "operation": "assessment-613-moss-3389",
+            "resource": "walnut",
+            "fraction": 0.9,
+            "before": {
+              "health": 99.97231786,
+              "satiety": 21.1,
+              "energy": 28.83602682,
+              "temperature": 9.52655992
+            },
+            "after": {
+              "health": 99.97231786,
+              "satiety": 40.9,
+              "energy": 27.83602682,
+              "temperature": 9.52655992
+            },
+            "origin": "forest-walnut-0"
+          }
+        ],
+        [
+          636,
+          {
+            "quantity": 2,
+            "resource": "root",
+            "nutrition": 28,
+            "realized": 28,
+            "origins": ["start-1-roots"]
+          }
+        ],
+        [
+          665,
+          {
+            "operation": "assessment-663-moss-3735",
+            "resource": "hazelnut",
+            "fraction": 0.1,
+            "before": {
+              "health": 99.77343604,
+              "satiety": 36.4,
+              "energy": 33.19005689,
+              "temperature": 9.02771119
+            },
+            "after": {
+              "health": 99.77343604,
+              "satiety": 38.2,
+              "energy": 32.19005689,
+              "temperature": 9.02771119
+            },
+            "origin": "start-1-nuts"
+          }
+        ],
+        [
+          672,
+          {
+            "operation": "assessment-670-moss-3771",
+            "resource": "hazelnut",
+            "fraction": 0.9,
+            "before": {
+              "health": 99.77343604,
+              "satiety": 33.65,
+              "energy": 37.69005689,
+              "temperature": 8.92358682
+            },
+            "after": {
+              "health": 99.77343604,
+              "satiety": 49.85,
+              "energy": 36.69005689,
+              "temperature": 8.92358682
+            },
+            "origin": "start-1-nuts"
+          }
+        ],
+        [
+          675,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origin": "start-1-nuts"
+          }
+        ],
+        [
+          703,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origins": ["start-1-nuts"]
+          }
+        ],
+        [
+          731,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origin": "start-1-nuts"
+          }
+        ],
+        [
+          757,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origin": "start-1-nuts"
+          }
+        ],
+        [
+          762,
+          {
+            "operation": "assessment-760-moss-4270",
+            "resource": "walnut",
+            "fraction": 1,
+            "before": {
+              "health": 99.77343604,
+              "satiety": 63.35,
+              "energy": 29.5,
+              "temperature": 11.11484046
+            },
+            "after": {
+              "health": 99.77343604,
+              "satiety": 85.35,
+              "energy": 28.5,
+              "temperature": 11.11484046
+            },
+            "origin": "forest-walnut-0"
+          }
+        ],
+        [
+          767,
+          {
+            "operation": "assessment-765-moss-4300",
+            "resource": "walnut",
+            "fraction": 1,
+            "before": {
+              "health": 99.77343604,
+              "satiety": 82.1,
+              "energy": 26,
+              "temperature": 10.70006569
+            },
+            "after": {
+              "health": 99.77343604,
+              "satiety": 100,
+              "energy": 25,
+              "temperature": 10.70006569
+            },
+            "origin": "forest-walnut-0"
+          }
+        ],
+        [
+          816,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origin": "start-0-nuts"
+          }
+        ],
+        [
+          830,
+          {
+            "quantity": 2,
+            "resource": "berry",
+            "nutrition": 16,
+            "realized": 16,
+            "origin": "start-1-berries"
+          }
+        ],
+        [
+          847,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origin": "start-0-nuts"
+          }
+        ],
+        [
+          884,
+          {
+            "operation": "assessment-882-moss-4902",
+            "resource": "walnut",
+            "fraction": 1,
+            "before": {
+              "health": 99.77343604,
+              "satiety": 75.95,
+              "energy": 28.5,
+              "temperature": 18.82178229
+            },
+            "after": {
+              "health": 99.77343604,
+              "satiety": 97.95,
+              "energy": 27.5,
+              "temperature": 18.82178229
+            },
+            "origin": "forest-walnut-0"
+          }
+        ]
+      ]
+    },
+    "sol": {
+      "finalVitals": {
+        "health": 96.02177616,
+        "satiety": 89.5,
+        "energy": 39,
+        "temperature": 21.84589577
+      },
+      "minimumVitals": {
+        "health": 96.02177616,
+        "satiety": 41.45,
+        "energy": 0.33389597,
+        "temperature": 5.6562647
+      },
+      "deaths": 0,
+      "actions": {
+        "navigate": 407,
+        "gather": 27,
+        "eat": 36,
+        "rest": 269,
+        "request": 5,
+        "wait": 8,
+        "observe-wildlife": 35,
+        "message": 6,
+        "assess-food": 29,
+        "build-shelter": 6,
+        "learn": 1,
+        "active-warming": 67,
+        "inspect-route": 1
+      },
+      "occupiedCells": 204,
+      "mastered": [
+        [19, "Mastered observe-wildlife through actual study."],
+        [334, "Mastered assess-food through actual study."],
+        [469, "Mastered build-shelter through actual study."],
+        [516, "Mastered active-warming through actual study."],
+        [620, "Mastered inspect-route after one round of study."]
+      ],
+      "rewards": {
+        "nature-appreciation": 12,
+        "cautious-food-relief": 4,
+        "thermal-refuge": 11
+      },
+      "rewardValueSum": 45,
+      "roundsAboveTen": 155,
+      "peakWellbeing": [
+        13.04616718,
+        425,
+        {
+          "physical": 9.04616718,
+          "mental": 4,
+          "total": 13.04616718,
+          "sources": [
+            {
+              "source": "nature-appreciation",
+              "value": 3,
+              "lastEvent": "event-422-sol-2042",
+              "lastTick": 422,
+              "expires": 434,
+              "exposures": 10,
+              "layers": [
+                {
+                  "value": 3,
+                  "expires": 434
+                }
+              ]
+            },
+            {
+              "source": "cautious-food-relief",
+              "value": 1,
+              "lastEvent": "event-420-world-2027",
+              "lastTick": 420,
+              "expires": 426,
+              "exposures": 3,
+              "layers": [
+                {
+                  "value": 1,
+                  "expires": 426
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "zeroRecoveryRests": 0,
+      "longestRestRun": 7,
+      "longestEmptyRestWaitRun": 0,
+      "warming": {
+        "rounds": 67,
+        "energySpent": 201,
+        "negativeNetRounds": 0,
+        "totalAddedHeat": 23.45
+      },
+      "shelter": {
+        "measuredRounds": 80,
+        "positiveAvoidedCoolingRounds": 76,
+        "totalAvoidedOneStepCooling": 7.79182698
+      },
+      "failed": [
+        [22, "eat", "The requested owned item is unavailable."],
+        [
+          93,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          116,
+          "observe-wildlife",
+          "A living observer must currently see the actual animal through ordinary vision."
+        ],
+        [
+          167,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          169,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [284, "eat", "The requested owned item is unavailable."],
+        [
+          339,
+          "assess-food",
+          "The actual owned unreserved target quantity is unavailable."
+        ],
+        [
+          415,
+          "assess-food",
+          "The actual owned unreserved target quantity is unavailable."
+        ],
+        [
+          540,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          541,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          542,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          580,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          594,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          602,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          614,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          619,
+          "navigate",
+          "No route in currently observed terrain; choose another destination or investigate the obstruction."
+        ],
+        [
+          639,
+          "navigate",
+          "Navigation unknown: bounded-search-exhausted. Only observed or dated remembered geometry is used. Direct-segment blockers do not prove that every alternative route is blocked. Clearance is the signed margin under the authoritative inflated-shape collision rule."
+        ],
+        [
+          642,
+          "navigate",
+          "Navigation blocked: goal-overlap. Only observed or dated remembered geometry is used. Direct-segment blockers do not prove that every alternative route is blocked. Clearance is the signed margin under the authoritative inflated-shape collision rule."
+        ],
+        [
+          672,
+          "navigate",
+          "Navigation blocked: goal-overlap. Only observed or dated remembered geometry is used. Direct-segment blockers do not prove that every alternative route is blocked. Clearance is the signed margin under the authoritative inflated-shape collision rule."
+        ],
+        [
+          897,
+          "navigate",
+          "Navigation blocked: goal-overlap. Only observed or dated remembered geometry is used. Direct-segment blockers do not prove that every alternative route is blocked. Clearance is the signed margin under the authoritative inflated-shape collision rule."
+        ]
+      ],
+      "foodConsumed": [
+        [
+          4,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-2-roots"]
+          }
+        ],
+        [
+          27,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-2-roots", "forest-root-1"]
+          }
+        ],
+        [
+          44,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-2-roots", "forest-root-1"]
+          }
+        ],
+        [
+          67,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "start-2-roots"
+          }
+        ],
+        [
+          132,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["forest-root-1"]
+          }
+        ],
+        [
+          168,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["forest-root-1"]
+          }
+        ],
+        [
+          188,
+          {
+            "quantity": 2,
+            "resource": "root",
+            "nutrition": 28,
+            "realized": 28,
+            "origins": ["forest-root-1", "forest-root-1"]
+          }
+        ],
+        [
+          199,
+          {
+            "quantity": 2,
+            "resource": "root",
+            "nutrition": 28,
+            "realized": 28,
+            "origin": "start-2-roots"
+          }
+        ],
+        [
+          217,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "forest-root-1"
+          }
+        ],
+        [
+          239,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-2-roots"]
+          }
+        ],
+        [
+          253,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["forest-root-1"]
+          }
+        ],
+        [
+          270,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 12.85,
+            "origins": ["start-2-roots"]
+          }
+        ],
+        [
+          288,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 11.7,
+            "origin": "start-2-roots"
+          }
+        ],
+        [
+          344,
+          {
+            "operation": "assessment-342-sol-1628",
+            "resource": "hazelnut",
+            "fraction": 0.1,
+            "before": {
+              "health": 100,
+              "satiety": 63.6,
+              "energy": 30.7,
+              "temperature": 20.37627975
+            },
+            "after": {
+              "health": 100,
+              "satiety": 65.4,
+              "energy": 29.7,
+              "temperature": 20.37627975
+            },
+            "origin": "start-0-nuts"
+          }
+        ],
+        [
+          347,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "forest-root-1"
+          }
+        ],
+        [
+          359,
+          {
+            "quantity": 2,
+            "resource": "berry",
+            "nutrition": 16,
+            "realized": 16,
+            "origin": "start-0-berries"
+          }
+        ],
+        [
+          379,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "start-0-roots"
+          }
+        ],
+        [
+          395,
+          {
+            "operation": "assessment-393-sol-1889",
+            "resource": "hazelnut",
+            "fraction": 0.2,
+            "before": {
+              "health": 100,
+              "satiety": 76.25,
+              "energy": 37.80845838,
+              "temperature": 14.99966485
+            },
+            "after": {
+              "health": 100,
+              "satiety": 79.85,
+              "energy": 36.80845838,
+              "temperature": 14.99966485
+            },
+            "origin": "start-0-nuts"
+          }
+        ],
+        [
+          418,
+          {
+            "operation": "assessment-416-sol-2006",
+            "resource": "apple",
+            "fraction": 0.1,
+            "before": {
+              "health": 100,
+              "satiety": 64.9,
+              "energy": 36.5,
+              "temperature": 15.2315077
+            },
+            "after": {
+              "health": 100,
+              "satiety": 65.9,
+              "energy": 35.5,
+              "temperature": 15.2315077
+            },
+            "origin": "forest-apple-2"
+          }
+        ],
+        [
+          425,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "start-0-berries"
+          }
+        ],
+        [
+          428,
+          {
+            "operation": "assessment-426-sol-2065",
+            "resource": "hazelnut",
+            "fraction": 0.7,
+            "before": {
+              "health": 100,
+              "satiety": 67.4,
+              "energy": 37.5,
+              "temperature": 15.29998972
+            },
+            "after": {
+              "health": 100,
+              "satiety": 80,
+              "energy": 36.5,
+              "temperature": 15.29998972
+            },
+            "origin": "start-0-nuts"
+          }
+        ],
+        [
+          433,
+          {
+            "operation": "assessment-431-sol-2099",
+            "resource": "apple",
+            "fraction": 0.9,
+            "before": {
+              "health": 100,
+              "satiety": 76.75,
+              "energy": 34,
+              "temperature": 15.01896966
+            },
+            "after": {
+              "health": 100,
+              "satiety": 85.75,
+              "energy": 33,
+              "temperature": 15.01896966
+            },
+            "origin": "forest-apple-2"
+          }
+        ],
+        [
+          455,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origin": "start-0-roots"
+          }
+        ],
+        [
+          513,
+          {
+            "quantity": 2,
+            "resource": "hazelnut",
+            "nutrition": 36,
+            "realized": 36,
+            "origin": "start-0-nuts"
+          }
+        ],
+        [
+          539,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origin": "start-0-nuts"
+          }
+        ],
+        [
+          564,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origins": ["forest-hazelnut-1"]
+          }
+        ],
+        [
+          615,
+          {
+            "quantity": 2,
+            "resource": "hazelnut",
+            "nutrition": 36,
+            "realized": 36,
+            "origins": ["forest-hazelnut-1"]
+          }
+        ],
+        [
+          659,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origins": ["forest-hazelnut-1"]
+          }
+        ],
+        [
+          677,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origin": "forest-hazelnut-1"
+          }
+        ],
+        [
+          694,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origin": "start-2-nuts"
+          }
+        ],
+        [
+          729,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origin": "start-2-nuts"
+          }
+        ],
+        [
+          773,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-2-roots"]
+          }
+        ],
+        [
+          818,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origins": ["forest-hazelnut-1"]
+          }
+        ],
+        [
+          832,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-0-roots"]
+          }
+        ],
+        [
+          842,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origins": ["start-0-nuts"]
+          }
+        ],
+        [
+          851,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "start-0-berries"
+          }
+        ],
+        [
+          870,
+          {
+            "quantity": 1,
+            "resource": "hazelnut",
+            "nutrition": 18,
+            "realized": 18,
+            "origins": ["start-1-nuts"]
+          }
+        ],
+        [
+          875,
+          {
+            "quantity": 1,
+            "resource": "berry",
+            "nutrition": 8,
+            "realized": 8,
+            "origin": "start-1-berries"
+          }
+        ],
+        [
+          896,
+          {
+            "quantity": 1,
+            "resource": "root",
+            "nutrition": 14,
+            "realized": 14,
+            "origins": ["start-1-roots"]
+          }
+        ]
+      ]
+    }
+  },
+  "calls": {
+    "ordinary": {
+      "attempts": 400,
+      "status": {
+        "accepted": 398,
+        "failed": 2
+      },
+      "inputTokens": 4755601,
+      "outputTokens": 126513,
+      "unknownUsage": 2
+    },
+    "world": {
+      "attempts": 6,
+      "status": {
+        "accepted": 6
+      },
+      "inputTokens": 42775,
+      "outputTokens": 5663,
+      "unknownUsage": 0
+    }
+  },
+  "development": 6,
+  "communications": [
+    {
+      "tick": 215,
+      "actor": "lin",
+      "target": "sol",
+      "type": "message",
+      "description": "I've confirmed berries and meadow roots are safe; roots restore 14 satiety. Have you discovered other safe foods or seen wildlife recently? I'm exploring northeast."
+    },
+    {
+      "tick": 216,
+      "actor": "sol",
+      "target": "lin",
+      "type": "message",
+      "description": "I also confirmed roots restore 14 satiety with no toxicity. A roe deer is currently visible near (20.75,29.13), foraging; stationary two-round observation has provided nature appreciation. I last saw a boar near (32.2,25.3) at tick 162, not a current location. Other foods remain untested by me."
+    },
+    {
+      "tick": 265,
+      "actor": "lin",
+      "target": "sol",
+      "type": "message",
+      "description": "The meadow roots at (16.1,24) are currently empty, and my carried roots spoiled at tick 255. Have you found any stocked sources of safe food? I'm checking the berry patch at (12.7,21.2)."
+    },
+    {
+      "tick": 267,
+      "actor": "sol",
+      "target": "lin",
+      "type": "message",
+      "description": "At tick 263 I saw 1 root remaining at (21.2,21.3); I have not rechecked it. At tick 262 the berry patch you are checking had 1 berry. Plums at (13.2,23.3) currently have stock 6, but I have not tested their safety. Roots and berries remain my only confirmed safe foods."
+    },
+    {
+      "tick": 284,
+      "actor": "lin",
+      "target": "sol",
+      "type": "message",
+      "description": "I see 1 root at (16.1,24), and you are closer. I'll leave that source to you and check the berry source at (14.2,16.3), last seen stocked at tick 206; its current stock is unknown."
+    },
+    {
+      "tick": 492,
+      "actor": "moss",
+      "target": "sol",
+      "type": "message",
+      "description": "The dry grass at (14.2,16.3) is empty. I have six branches but need eight dry-grass units for shelter. Have you seen another stocked patch?"
+    },
+    {
+      "tick": 493,
+      "actor": "sol",
+      "target": "moss",
+      "type": "message",
+      "description": "I gathered the eight dry-grass units from that patch for my shelter. I have not observed another stocked patch. I am building a refuge near (16,17)."
+    },
+    {
+      "tick": 499,
+      "actor": "lin",
+      "target": "sol",
+      "type": "message",
+      "description": "I see you're building a shelter. May I use it for warmth when finished? The nearby dry-grass source is empty; do you know another available source?"
+    },
+    {
+      "tick": 512,
+      "actor": "sol",
+      "target": "lin",
+      "type": "message",
+      "description": "The shelter at (16,17) is complete; you may share it. Its entrance is at (16,18). I have not observed another stocked dry-grass patch."
+    },
+    {
+      "tick": 531,
+      "actor": "moss",
+      "target": "lin",
+      "type": "message",
+      "description": "I am cold and outside the south entrance. May I share the shelter with you and Sol? I will wait outside for confirmation."
+    },
+    {
+      "tick": 536,
+      "actor": "lin",
+      "target": "moss",
+      "type": "message",
+      "description": "I have no objection to sharing, but this is Sol's shelter and I cannot speak for Sol. Please ask Sol directly. Inside, the shelter halves cooling but does not supply heat; exercise has warmed me at an energy cost."
+    },
+    {
+      "tick": 544,
+      "actor": "sol",
+      "target": "lin",
+      "type": "message",
+      "description": "I have failed to find an exit route three times from (16,17). You are near the doorway at (16,18); I do not know whether that is the cause. Could you move clear of the doorway so I can try leaving to gather food?"
+    },
+    {
+      "tick": 546,
+      "actor": "lin",
+      "target": "sol",
+      "type": "message",
+      "description": "I have moved to the east side of the interior to clear the doorway. Please try your exit again; I do not know whether my position caused the blockage."
+    },
+    {
+      "tick": 552,
+      "actor": "moss",
+      "target": "sol",
+      "type": "message",
+      "description": "May I share your shelter for warmth? I am outside near the entrance, temperature 8.36 and energy 17. I will wait for your consent before entering."
+    },
+    {
+      "tick": 553,
+      "actor": "sol",
+      "target": "moss",
+      "type": "message",
+      "description": "Yes, you may share the shelter. I have cleared the doorway and am leaving to look for food. The interior reduces cooling but does not stop it; resting restores energy. Please keep the doorway clear when possible."
+    },
+    {
+      "tick": 584,
+      "actor": "moss",
+      "target": "lin",
+      "type": "message",
+      "description": "I am warming and resting here to prevent further cold injury. My satiety was 48 at tick 572 and I have no established safe food left. Have you recently seen available berries or meadow roots, or any food you could spare?"
+    },
+    {
+      "tick": 589,
+      "actor": "lin",
+      "target": "moss",
+      "type": "message",
+      "description": "I have no established safe food carried. At tick 544 the berry plant at (12.7,21.2) had 1 berry; current stock is unknown. Roots at (16.1,24) and (21.2,21.3) were empty at ticks 504 and 517. I will recover energy and check the berries. My small hazelnut and plum samples caused no observed adverse effects, but do not establish safety."
+    },
+    {
+      "tick": 601,
+      "actor": "moss",
+      "target": "sol",
+      "type": "message",
+      "description": "Three exit attempts failed. You are near the shelter doorway at (16,17.8); could you move aside from the entrance so I can leave to seek food? My satiety is 30 and temperature 9.38."
+    },
+    {
+      "tick": 611,
+      "actor": "moss",
+      "target": "sol",
+      "type": "message",
+      "description": "My satiety is now 23.7 and I need to leave for food. Exit attempts failed at ticks 598\u2013600; the cause is uncertain. Could you move away from the doorway at (16,18), preferably to a side inside the shelter, so I can try leaving?"
+    },
+    {
+      "tick": 618,
+      "actor": "moss",
+      "target": "sol",
+      "type": "message",
+      "description": "I have consumed my last walnut and have no food left. Exit routing has repeatedly failed; you are currently near the doorway at (16,17.8). Could you please move to a side inside, such as (15.5,16.8), to let me test the exit? The cause of failure is still uncertain."
+    },
+    {
+      "tick": 623,
+      "actor": "moss",
+      "target": "sol",
+      "type": "message",
+      "description": "The route report at tick 622 confirms your body blocked the usable doorway. I have no food and satiety 35.7. Could you move sideways outside, for example toward (17.5,19), so Lin and I can leave through (16,18)?"
+    },
+    {
+      "tick": 648,
+      "actor": "lin",
+      "target": "sol",
+      "type": "message",
+      "description": "I need to leave to find food; my satiety is 32.15. Your position at the doorway blocks my exit. Could you please move outside and to one side, for example (17.5,18.8), leaving the doorway clear?"
+    }
+  ],
+  "notes": [
+    "Reward values are not accumulated lifetime happiness; active sources expire and are capped.",
+    "Added heat and avoided cooling are measured one-step code effects, not causal estimates of lifetime health or success.",
+    "Food safety observations apply only to observed portions and conditions.",
+    "Development internal model use and monetary charges are unknown."
+  ],
+  "manifestSha256": "3493e097e6b18975efc48e0417f2b4e5e67ecff432a4adb4f1af9aef70cb4b86",
+  "source": "experiment/ex8/manifest.json and its bound replay segments, calls and execution state; counts derived from the identical retained committed round states.",
+  "liveSourceSnapshots": 7,
+  "deliverySourceSnapshots": 1
+}

@@ -21,7 +21,13 @@ import {
   requestCaptureRecovery,
   type CommandRunner,
 } from './task-runtime.js';
-import { hashFile, REVIEW_SCENES, sourceFingerprint } from './validation.js';
+import {
+  hashFile,
+  object,
+  readJson,
+  REVIEW_SCENES,
+  sourceFingerprint,
+} from './validation.js';
 import {
   analysisMaterial,
   analysisPaths,
@@ -233,6 +239,23 @@ describe('existing gates behind the task runtime', () => {
     expect(body).toContain('Synthetic fixture image review.');
     expect(body).toContain(hashFile(resolve(root, 'test-results/desktop.png')));
     expect(body).toContain(plan);
+    const imageSection =
+      body.split('### Screenshot judgments and provenance').at(1) ?? '';
+    const records = JSON.parse(
+      imageSection.split('```json\n').at(1)?.split('\n```').at(0) ?? '',
+    ) as unknown[];
+    const originalReport = readJson(
+      resolve(root, 'validation-results/report.json'),
+    );
+    const originalReview = readJson(
+      resolve(root, 'validation-results/review.json'),
+    );
+    for (const shot of object(originalReport).evidence as unknown[])
+      expect(records).toContainEqual(expect.objectContaining(object(shot)));
+    for (const judgment of object(originalReview).visual as unknown[])
+      expect(records).toContainEqual(expect.objectContaining(object(judgment)));
+    expect(records).toHaveLength(REVIEW_SCENES.length);
+    expect(body.split('test-results/desktop.png')).toHaveLength(2);
     c.body.head = 'old-head';
     expect(() => reviewBody(root, c)).toThrow('current reviewed head');
     c.body.head = snapshot.head;

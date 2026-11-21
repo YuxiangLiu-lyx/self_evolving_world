@@ -39,6 +39,17 @@ export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
       .join('');
     return `<circle r=".5" fill="#cec5a0" fill-opacity=".12" stroke="#b0b68c" stroke-opacity=".5" stroke-width=".022" ${o.kind === 'stone-mosaic-work' ? 'stroke-dasharray=".06 .06"' : ''}/><g opacity="${o.kind === 'stone-mosaic-work' ? '.5' : '1'}">${stones}</g>${o.kind === 'stone-mosaic-work' ? `<text y="-.62" text-anchor="middle" fill="#f3dfb4" font-size=".19">${typeof o.data.elapsed === 'number' ? String(o.data.elapsed) : '?'} / 3</text>` : ''}`;
   },
+  plant: source,
+  animal: (o) =>
+    `<ellipse rx=".4" ry=".2" fill="${color(o.visual.color)}"/><circle cx=".35" cy="-.06" r=".14" fill="${color(o.visual.color)}"/><path d="M-.25-.15L-.3-.3M-.25.15L-.3.3M.2-.15L.25-.3M.2.15L.25.3" stroke="${color(o.visual.color)}" stroke-width=".07"/>`,
+  cave: (o) =>
+    o.spatial.shape.kind === 'rectangle'
+      ? `<rect x="${String(-o.spatial.shape.width / 2)}" y="${String(-o.spatial.shape.height / 2)}" width="${String(o.spatial.shape.width)}" height="${String(o.spatial.shape.height)}" fill="${color(o.visual.color)}"/><path d="M-.7 2V1.2Q0 .3.7 1.2V2" fill="#263c35"/>`
+      : '',
+  enclosure: (o) =>
+    o.spatial.shape.kind === 'rectangle'
+      ? `<rect x="${String(-o.spatial.shape.width / 2)}" y="${String(-o.spatial.shape.height / 2)}" width="${String(o.spatial.shape.width)}" height="${String(o.spatial.shape.height)}" fill="${color(o.visual.color)}"/>`
+      : '',
   tree: foliage,
   rock,
   'berry-shrub': source,
