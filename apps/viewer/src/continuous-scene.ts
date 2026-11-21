@@ -43,7 +43,7 @@ export function continuousScene(
         id: s.id,
         x: s.position.x,
         y: s.position.y,
-        label: `${String(s.quantity)} ${s.resource}`,
+        label: `${String(s.quantity)} ${s.resource}${s.mantle ? ` · ${s.id} · condition ${String(s.mantle.condition)}` : ''}`,
         color:
           world.resources.find((r) => r.id === s.resource)?.color ?? '#e4dbbe',
       })),

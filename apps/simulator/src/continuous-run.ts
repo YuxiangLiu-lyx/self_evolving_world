@@ -1,3 +1,5 @@
+import { forestPlanArguments } from './forest-plan-arguments.js';
+import { continuousInputText } from './forest-input-encoding.js';
 import {
   V7_WINDOW,
   V7_STAGE_INTERVAL,
@@ -131,7 +133,7 @@ export function newContinuousExecution(
     developments: [],
     phase: 'running',
     reason: null,
-    windowTarget: V7_WINDOW,
+    windowTarget: world.config.experience?.targetRounds ?? V7_WINDOW,
     barrier: null,
     pendingCall: null,
     registrations: [],
@@ -211,6 +213,11 @@ function parsePlan(text: string, state: V7Execution) {
       throw new Error(
         'Plan names an unimplemented interface; use the functional request interface.',
       );
+    if (state.world.config.experience)
+      step.action.args = forestPlanArguments(
+        ability.parameters,
+        step.action.args,
+      );
     v7Validate(ability.parameters, step.action.args);
   }
   return plan;
@@ -285,7 +292,7 @@ async function invoke(
     return;
   }
   if (
-    JSON.stringify(input).length * 2 >
+    continuousInputText(input).length * 2 >
     state.world.config.computation.inputBytes
   ) {
     state.phase = 'paused';
@@ -601,8 +608,10 @@ export function resolveContinuousDevelopment(
     attempt.status !== 'started' ||
     (!barrier.reviews.length &&
       !(
-        barrier.technicalReason ===
-          'Simulation computation budget exhausted; checkpoint the entire world.' &&
+        [
+          'Simulation computation budget exhausted; checkpoint the entire world.',
+          'Observation input exceeds computational context protection; no hidden truncation or inference.',
+        ].includes(barrier.technicalReason ?? '') &&
         Object.keys(barrier.requests).length === 0
       ))
   )
@@ -616,7 +625,14 @@ export function resolveContinuousDevelopment(
     const ability = state.world.abilities.find(
       (a) => a.id === assignments[r.actor],
     );
-    if (!ability || ability.learning !== r.learning)
+    const alreadyMastered =
+      saved.world.actors
+        .find((a) => a.id === r.actor)
+        ?.mastered.includes(ability?.id ?? '') &&
+      saved.world.abilities.some(
+        (a) => a.id === ability?.id && a.learning === ability.learning,
+      );
+    if (!ability || (ability.learning !== r.learning && !alreadyMastered))
       throw new Error(
         'Implemented assignment must preserve the reviewed learning duration.',
       );
@@ -627,6 +643,21 @@ export function resolveContinuousDevelopment(
       reason: `${r.reason} Implemented at the preserved round boundary.`,
     };
   });
+  if (
+    barrier.technicalReason ===
+    'Observation input exceeds computational context protection; no hidden truncation or inference.'
+  ) {
+    if (
+      Object.keys(barrier.actions).length ||
+      barrier.reviews.length ||
+      packages.length ||
+      Object.keys(assignments).length
+    )
+      throw new Error(
+        'Context-only recovery cannot execute, install or review an actor action.',
+      );
+    state.barrier = null;
+  }
   state.registrations.push(...packages);
   attempt.status = 'accepted';
   attempt.finishedAt = new Date().toISOString();

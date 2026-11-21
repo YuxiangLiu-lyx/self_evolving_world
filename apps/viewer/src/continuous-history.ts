@@ -4,6 +4,8 @@ import {
   v7Clone,
   v7Step,
   v7Signature,
+  v7PrepareReplayCursors,
+  v7FinishTasks,
 } from '@self-evolving-world/world-core';
 import type {
   V7World,
@@ -30,6 +32,7 @@ export interface SceneSegment {
   start: number;
   initial: V7World;
   rounds: SceneRound[];
+  initialCursors?: Record<string, V7Cursor>;
 }
 export interface SceneIndex {
   version: 7;
@@ -53,6 +56,7 @@ export async function replaySceneSegment(
   const registry = continuousRegistry();
   let world = segment.initial;
   const frames = [world];
+  const cursors = v7Clone(segment.initialCursors ?? {});
   for (const record of segment.rounds) {
     for (const key of record.registrations)
       world = v7Install(world, registry, key);
@@ -70,11 +74,22 @@ export async function replaySceneSegment(
         if (m.intention !== undefined) actor.memory.intention = m.intention;
       }
     }
-    const result = v7Step(input, record.actions, registry, {}, record.reviews);
+    if (segment.initialCursors)
+      v7PrepareReplayCursors(world, record.tasks, cursors);
+    const result = v7Step(
+      input,
+      record.actions,
+      registry,
+      cursors,
+      record.reviews,
+    );
+    if (segment.initialCursors) v7FinishTasks(world, result, cursors);
     if (
       result.paused ||
       (await browserDigest(v7Signature(result.world))) !== record.after ||
-      v7Signature(result.world.events) !== v7Signature(record.events)
+      v7Signature(result.world.events) !== v7Signature(record.events) ||
+      (segment.initialCursors &&
+        v7Signature(cursors) !== v7Signature(record.tasks))
     )
       throw new Error(`Replay mismatch at ${String(record.tick)}.`);
     world = result.world;

@@ -1,0 +1,18 @@
+
+> self-evolving-world@0.0.0 test:e2e /Users/liuyuxiang/developer/self_evolving_world
+> playwright test apps/viewer/e2e/forest.spec.ts --grep 'isolated local fire'
+
+[WebServer] (node:19033) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19048) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:19067) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:19080) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  1 apps/viewer/e2e/forest.spec.ts:625:1 › isolated local fire renders paid construction, real flames and exhausted finite fuel (1.2s)
+
+  1 passed (2.6s)

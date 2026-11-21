@@ -140,7 +140,13 @@ export const FOREST_WARMING: V7Package = {
       current.lastTick = world.tick;
       current.temperatureBefore = actor.vitals.temperature;
       current.healthBefore = actor.vitals.health;
-      return { complete: current.remainingRounds === 1, writes: [] };
+      return {
+        complete: current.remainingRounds === 1,
+        writes: [],
+        ...(world.config.experience
+          ? { remaining: Math.max(0, current.remainingRounds - 1) }
+          : {}),
+      };
     },
   },
   migrate: (world) => {

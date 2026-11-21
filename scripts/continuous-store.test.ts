@@ -1,3 +1,4 @@
+import { initialForestExperienceWorld } from '../apps/simulator/src/forest-experience-scenario.js';
 import { initialForestWorld } from '../apps/simulator/src/forest-scenario.js';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -22,6 +23,29 @@ import {
 import type { V7ReplaySegment } from './continuous-store.js';
 
 describe('continuous durable segmented evidence', () => {
+  it('binds the new experience checkpoint to its exact 650/60/20 budgets and immutable mental policy', () => {
+    const root = mkdtempSync(resolve(tmpdir(), 'experience-checkpoint-'));
+    try {
+      const state = newContinuousExecution(
+        'fixture',
+        'isolated-fixture',
+        initialForestExperienceWorld(),
+      );
+      const path = resolve(root, 'experiment/ex1/execution.json');
+      continuousAtomic(path, state);
+      expect(readContinuousExecution(root, 'ex1')).toEqual(state);
+      expect(state.windowTarget).toBe(1200);
+      const altered = v7Clone(state);
+      if (!altered.world.config.experience) throw new Error('Missing policy');
+      altered.world.config.experience.restMin = 0.1;
+      continuousAtomic(path, altered);
+      expect(() => readContinuousExecution(root, 'ex1')).toThrow(
+        'protected run configuration',
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
   it('accepts an unchanged forest checkpoint and rejects altered forest budgets or hunger', () => {
     const root = mkdtempSync(resolve(tmpdir(), 'forest-checkpoint-'));
     try {

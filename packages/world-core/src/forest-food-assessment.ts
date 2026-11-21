@@ -268,7 +268,7 @@ export const FOREST_FOOD_ASSESSMENT: V7Package = {
         const r = world.resources.find((r) => r.id === material.resource);
         if (!r) throw new Error('Unknown actual material.');
         const before = { ...actor.vitals };
-        v7FoodEffect(actor, r, fraction);
+        v7FoodEffect(actor, r, fraction, world, material);
         foodSetQuantity(material, 0);
         operation.ingested = true;
         operation.nourishment = actor.vitals.satiety - before.satiety;
@@ -303,6 +303,14 @@ export const FOREST_FOOD_ASSESSMENT: V7Package = {
       }
       return {
         complete: operation.elapsed >= (mode === 'sample' ? 5 : 2),
+        ...(world.config.experience
+          ? {
+              remaining: Math.max(
+                0,
+                (mode === 'sample' ? 5 : 2) - operation.elapsed,
+              ),
+            }
+          : {}),
         writes: [],
       };
     },

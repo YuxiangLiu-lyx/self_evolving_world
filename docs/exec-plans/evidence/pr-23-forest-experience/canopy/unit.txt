@@ -1,0 +1,11 @@
+
+ RUN  v4.1.12 /Users/liuyuxiang/developer/self_evolving_world
+
+ ✓ apps/simulator/test/forest-operation-continuity.test.ts (4 tests) 451ms
+ ✓ apps/simulator/test/forest-canopy.test.ts (7 tests) 1081ms
+
+ Test Files  2 passed (2)
+      Tests  11 passed (11)
+   Start at  06:17:37
+   Duration  1.31s (transform 293ms, setup 0ms, import 365ms, tests 1.53s, environment 0ms)
+

@@ -1,3 +1,5 @@
+import { forestBoundOperation } from './forest-operations.js';
+import { forestResolveAction } from './forest-references.js';
 import type {
   V7Action,
   V7Condition,
@@ -14,6 +16,7 @@ import {
   v7Number,
   v7Record,
   v7String,
+  v7Signature,
 } from './continuous-data.js';
 import { v7Distance, v7Reach } from './continuous-geometry.js';
 import {
@@ -115,6 +118,7 @@ function advance(cursor: V7Cursor): void {
     cursor.cycle += 1;
   }
   cursor.navigation = null;
+  if (cursor.operation !== undefined) cursor.operation = null;
 }
 export function v7TaskAction(
   world: V7World,
@@ -147,7 +151,13 @@ export function v7TaskAction(
       advance(cursor);
       continue;
     }
-    if (world.config.forest && cursor.startedAt < world.tick) {
+    if (world.state.operationContinuity === 1)
+      cursor.operation = forestBoundOperation(world, actor, step.action);
+    if (
+      world.config.forest &&
+      cursor.startedAt < world.tick &&
+      !cursor.operation
+    ) {
       const problem = v7ReferenceIssue(world, actorId, step.action);
       if (problem) {
         cursor.reason = problem;
@@ -174,29 +184,42 @@ export function v7FinishTasks(
       result.world.config.forest &&
       result.world.events.some(
         (e) =>
-          (e.actor === actor.id || e.target === actor.id) &&
-          ([
-            'died',
-            'respawned',
-            'mastered',
-            'message',
-            'animal-alert',
-            'season-changed',
-            'spoiled',
-            'shelter-protection-expired',
-          ].includes(e.type) ||
-            (e.type === 'injured' &&
-              (old.vitals.health - actor.vitals.health >= 8 ||
-                Math.floor(old.vitals.health / 20) !==
-                  Math.floor(actor.vitals.health / 20) ||
-                !before.events.some(
-                  (p) =>
-                    p.actor === actor.id &&
-                    p.type === 'injured' &&
-                    p.description === e.description,
-                )))),
+          (result.world.config.experience &&
+            e.type === 'message' &&
+            e.target === actor.id &&
+            e.data.urgency === 'urgent' &&
+            (e.data.subject === actor.id ||
+              e.data.subject === cursor.operation?.action.args.target)) ||
+          ((e.actor === actor.id || e.target === actor.id) &&
+            ([
+              'died',
+              'respawned',
+              'mastered',
+              ...(!result.world.config.experience ? ['message'] : []),
+              'animal-alert',
+              'season-changed',
+              'spoiled',
+              'shelter-protection-expired',
+            ].includes(e.type) ||
+              (e.type === 'injured' &&
+                (old.vitals.health - actor.vitals.health >= 8 ||
+                  Math.floor(old.vitals.health / 20) !==
+                    Math.floor(actor.vitals.health / 20) ||
+                  !before.events.some(
+                    (p) =>
+                      p.actor === actor.id &&
+                      p.type === 'injured' &&
+                      p.description === e.description,
+                  ))))),
       )
     ) {
+      if (
+        result.world.config.experience &&
+        result.world.events.some(
+          (e) => e.actor === actor.id && ['died', 'respawned'].includes(e.type),
+        )
+      )
+        cursor.operation = null;
       cursor.reason =
         'Important observed change requires a fresh decision: ' +
         result.world.events
@@ -228,7 +251,13 @@ export function v7FinishTasks(
       result.world.events.some(
         (e) =>
           cursor.plan.interrupts.includes(e.type) &&
-          (e.actor === actor.id || e.target === actor.id),
+          (e.actor === actor.id || e.target === actor.id) &&
+          (!result.world.config.experience ||
+            e.type !== 'message' ||
+            (e.target === actor.id &&
+              e.data.urgency === 'urgent' &&
+              (e.data.subject === actor.id ||
+                e.data.subject === cursor.operation?.action.args.target))),
       )
     )
       cursor.reason = 'An actor-selected interrupt event occurred.';
@@ -241,6 +270,16 @@ export function v7ReferenceIssue(
   id: string,
   action: V7Action,
 ): string | null {
+  if (world.config.experience) {
+    const actor = world.actors.find((a) => a.id === id);
+    if (!actor) return 'Unknown actor.';
+    try {
+      forestResolveAction(world, actor, action);
+      return null;
+    } catch (error) {
+      return error instanceof Error ? error.message : 'Invalid reference.';
+    }
+  }
   const observation = v7Observe(world, id),
     actor = observation.self;
   const target = action.args.target,
@@ -290,4 +329,22 @@ export function v7ReferenceIssue(
       return 'The navigation target is no longer in observed or dated remembered state.';
   }
   return null;
+}
+/** Restore accepted plan boundaries before replaying actual actions; never choose a new strategy. */
+export function v7PrepareReplayCursors(
+  world: V7World,
+  recorded: Record<string, V7Cursor>,
+  cursors: Record<string, V7Cursor>,
+): void {
+  for (const [id, saved] of Object.entries(recorded)) {
+    const previous = cursors[id];
+    if (
+      !previous ||
+      previous.startedAt !== saved.startedAt ||
+      v7Signature(previous.plan) !== v7Signature(saved.plan)
+    )
+      cursors[id] = v7Cursor(saved.plan, saved.startedAt);
+    const cursor = cursors[id];
+    if (cursor) v7TaskAction(world, id, cursor);
+  }
 }

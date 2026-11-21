@@ -1,3 +1,17 @@
+import { recuperationFrames } from '../../simulator/test/fixtures/recuperation.js';
+import { canopyFrames } from '../../simulator/test/fixtures/canopy.js';
+import {
+  willowFixture,
+  willowStudy,
+  willowOperation,
+} from '../../simulator/test/fixtures/willow.js';
+import { fireOperation } from '../../simulator/test/fixtures/local-fire.js';
+import {
+  fireSetup,
+  fireWait,
+  fireRegistry,
+} from '../../simulator/test/fixtures/local-fire.js';
+import { initialForestExperienceWorld } from '../../simulator/src/forest-experience-scenario.js';
 import { test, expect } from './validators.js';
 import type { Page, TestInfo } from '@playwright/test';
 import {
@@ -7,6 +21,7 @@ import {
   V7_PACKAGES,
   v7Step,
   v7Remember,
+  v7Wellbeing,
 } from '@self-evolving-world/world-core';
 import type { V7World, V7Action } from '@self-evolving-world/world-core';
 import { initialForestWorld } from '../../simulator/src/forest-scenario.js';
@@ -492,4 +507,270 @@ test('isolated paid route diagnosis distinguishes a verified corner, real occupa
     await seek(page, index);
     await screenshot(page, info, `isolated-route-${name}`);
   }
+});
+
+test('isolated dietary experience and neutral sustained mood remain separate from physical wellbeing', async ({
+  page,
+}, info) => {
+  const world = v7Clone(initialForestExperienceWorld());
+  const actor = world.actors[0];
+  if (!actor) throw new Error('Missing isolated actor');
+  actor.vitals.satiety = 35;
+  v7Wellbeing(world);
+  world.stacks.push({
+    id: 'isolated-meal',
+    resource: 'root',
+    quantity: 1,
+    owner: actor.id,
+    position: { ...actor.position },
+    origin: 'isolated-fixture',
+    decay: 0,
+  });
+  const result = v7Step(
+    world,
+    {
+      lin: {
+        interface: 'eat',
+        args: { target: 'item:isolated-meal', quantity: 1 },
+      },
+      moss: { interface: 'wait', args: {} },
+      sol: { interface: 'wait', args: {} },
+    },
+    v7Registry(V7_PACKAGES),
+  );
+  expect(result.outcomes.lin?.success).toBe(true);
+  await load(page, [world, result.world]);
+  await expect(page.locator('#fixture-happiness')).toContainText(
+    'Sustained mood 0.00',
+  );
+  await screenshot(page, info, 'isolated-experience-neutral');
+  await seek(page, 1);
+  await expect(page.locator('#fixture-happiness')).toContainText(
+    'Meal pleasure 0.80',
+  );
+  await expect(page.locator('#fixture-events')).toContainText(
+    'meal-experience',
+  );
+  await screenshot(page, info, 'isolated-experience-real-meal');
+});
+
+test('isolated portable insulation shows actual paid work, worn condition and the same dropped item', async ({
+  page,
+}, info) => {
+  const registry = v7Registry(V7_PACKAGES);
+  let w = v7Clone(
+    v7Install(
+      initialForestExperienceWorld(),
+      registry,
+      'portable-insulation@1',
+    ),
+  );
+  w.objects = [];
+  w.processes = [];
+  w.terrain = w.terrain.map((r) => '.'.repeat(r.length));
+  w.tick = 600;
+  w.time = 600;
+  w.actors.forEach((a, i) => {
+    a.position = { x: 10 + 2 * i, y: 10 };
+    a.vitals.temperature = 10;
+    a.vitals.satiety = 90;
+  });
+  w.stacks = ['bark', 'vine'].map((resource, i) => ({
+    id: 'isolated-' + resource,
+    resource,
+    quantity: i ? 2 : 4,
+    owner: 'lin',
+    position: { x: 10, y: 10 },
+    origin: 'isolated-input',
+  }));
+  const wait: V7Action = { interface: 'wait', args: {} };
+  const execute = (action: V7Action) => {
+    const r = v7Step(w, { lin: action, moss: wait, sol: wait }, registry);
+    expect(r.outcomes.lin?.success).toBe(true);
+    w = v7Clone(r.world);
+  };
+  for (let i = 0; i < 4; i++)
+    execute(
+      i
+        ? wait
+        : { interface: 'learn', args: { ability: 'portable-insulation' } },
+    );
+  execute({ interface: 'portable-insulation', args: { mode: 'craft' } });
+  const frames = [v7Clone(w)];
+  for (let i = 1; i < 5; i++)
+    execute({ interface: 'portable-insulation', args: { mode: 'craft' } });
+  const item = w.stacks.find((s) => s.mantle);
+  if (!item?.mantle) throw new Error('Missing actual manufactured item');
+  // Explicit isolated rendering boundary: show worn/wet condition without implying formal behavior.
+  item.mantle.condition = 12;
+  item.mantle.moisture = 1;
+  execute({
+    interface: 'portable-insulation',
+    args: { mode: 'equip', target: item.id },
+  });
+  frames.push(v7Clone(w));
+  execute({ interface: 'drop', args: { target: item.id, quantity: 1 } });
+  expect(w.stacks.find((s) => s.id === item.id)?.owner).toBeNull();
+  frames.push(v7Clone(w));
+  await load(page, frames);
+  await expect(page.locator('#fixture-events')).toContainText('4 remaining');
+  await screenshot(page, info, 'isolated-insulation-paid-work');
+  await seek(page, 1);
+  await expect(page.locator('#fixture-state')).toContainText(
+    'worn, condition 11',
+  );
+  await expect(page.locator('#fixture-events')).toContainText(
+    'remaining; net temperature',
+  );
+  await screenshot(page, info, 'isolated-insulation-wet-worn');
+  await seek(page, 2);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'Transferred the same persistent mantle',
+  );
+  await screenshot(page, info, 'isolated-insulation-ground-identity');
+});
+
+test('isolated local fire renders paid construction, real flames and exhausted finite fuel', async ({
+  page,
+}, info) => {
+  const fixture = fireSetup();
+  const work = fixture.frames.find((w) =>
+    w.objects.some((o) => o.kind === 'hearth-work'),
+  );
+  if (!work) throw new Error('Missing paid construction frame');
+  let w = v7Clone(fixture.world);
+  w = v7Clone(
+    v7Step(w, { lin: fireWait, moss: fireWait, sol: fireWait }, fireRegistry)
+      .world,
+  );
+  const burning = v7Clone(w);
+  for (let i = 0; i < 40; i++)
+    w = v7Clone(
+      v7Step(w, { lin: fireWait, moss: fireWait, sol: fireWait }, fireRegistry)
+        .world,
+    );
+  await load(page, [work, burning, w]);
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await expect(page.locator('#fixture-events')).toContainText(
+    'fire-work-progress',
+  );
+  await screenshot(page, info, 'isolated-fire-paid-construction');
+  await seek(page, 1);
+  await expect(page.locator('#fixture-events')).toContainText('fire-burned');
+  await page.waitForTimeout(150);
+  await screenshot(page, info, 'isolated-fire-finite-combustion');
+  await seek(page, 2);
+  await page.waitForTimeout(150);
+  await screenshot(page, info, 'isolated-fire-exhausted-ash');
+});
+
+test('isolated willow processing shows paid work, finite stock and actual material provenance', async ({
+  page,
+}, info) => {
+  let w = willowStudy(willowFixture());
+  const strip = willowOperation(w, 'strip', 'isolated-willow');
+  expect(strip.outcomes.every((o) => o?.success)).toBe(true);
+  w = strip.world;
+  const bast = w.stacks.find((s) => s.resource === 'willow-bast');
+  if (!bast) throw new Error('Missing real bast');
+  const twist = willowOperation(w, 'twist', bast.id);
+  expect(twist.outcomes.every((o) => o?.success)).toBe(true);
+  w = twist.world;
+  const cord = w.stacks.find((s) => s.resource === 'bast-cord');
+  if (!cord) throw new Error('Missing real cord');
+  w = fireOperation(w, {
+    interface: 'drop',
+    args: { target: cord.id, quantity: 1 },
+  }).world;
+  const first = strip.frames[0],
+    turning = twist.frames[0];
+  if (!first || !turning) throw new Error('Missing paid frames');
+  await load(page, [first, strip.world, turning, w]);
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await expect(page.locator('#fixture-events')).toContainText('3 remaining');
+  await screenshot(page, info, 'isolated-willow-paid-strip');
+  await seek(page, 1);
+  await expect(page.locator('#fixture-state')).toContainText(
+    'willow-bark from isolated-willow',
+  );
+  await expect(page.locator('#fixture-state')).toContainText('stock 2');
+  await screenshot(page, info, 'isolated-willow-separated-materials');
+  await seek(page, 2);
+  await screenshot(page, info, 'isolated-willow-paid-twist');
+  await seek(page, 3);
+  await expect(page.locator('#fixture-events')).toContainText('dropped');
+  await screenshot(page, info, 'isolated-willow-manufactured-cord');
+});
+
+test('isolated canopy exposes paid construction, open coverage, actual drying and expired posts', async ({
+  page,
+}, info) => {
+  const f = canopyFrames(),
+    first = f.built.frames[0];
+  if (!first) throw new Error('Missing paid canopy frame');
+  let expired = v7Clone(f.covered);
+  const roof = expired.objects.find((o) => o.kind === 'rain-canopy');
+  if (!roof) throw new Error('Missing real roof');
+  roof.data.condition = 0.001;
+  expired = v7Clone(
+    v7Step(
+      expired,
+      { lin: fireWait, moss: fireWait, sol: fireWait },
+      fireRegistry,
+    ).world,
+  );
+  await load(page, [first, f.built.world, f.covered, expired]);
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await expect(page.locator('#fixture-events')).toContainText('5 remaining');
+  await screenshot(page, info, 'isolated-canopy-paid-work');
+  await seek(page, 1);
+  await screenshot(page, info, 'isolated-canopy-open-posts');
+  await seek(page, 2);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'Covered mantle moisture',
+  );
+  await screenshot(page, info, 'isolated-canopy-actual-drying');
+  await seek(page, 3);
+  await screenshot(page, info, 'isolated-canopy-expired-cover');
+});
+
+test('isolated recuperation shows paid stationary progress, qualified relief and real cancellation without invented furniture', async ({
+  page,
+}, info) => {
+  const r = recuperationFrames();
+  const completed = v7Clone(r.world);
+  const cancelled = v7Step(
+    r.frames[1] ?? completed,
+    { lin: fireWait, moss: fireWait, sol: fireWait },
+    fireRegistry,
+  ).world;
+  await load(page, [
+    r.frames[0] ?? completed,
+    r.frames[3] ?? completed,
+    completed,
+    cancelled,
+  ]);
+  await expect(page.locator('#fixture-state')).toContainText(
+    'healed 0.25 health',
+  );
+  await expect(page.locator('#fixture-events')).toContainText('5 remaining');
+  await screenshot(page, info, 'isolated-recuperation-paid-progress');
+  await seek(page, 1);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'recuperation-relief-qualified',
+  );
+  await screenshot(page, info, 'isolated-recuperation-actual-relief');
+  await seek(page, 2);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'recuperation-completed',
+  );
+  await screenshot(page, info, 'isolated-recuperation-completed');
+  await seek(page, 3);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'recuperation-cancelled',
+  );
+  await screenshot(page, info, 'isolated-recuperation-cancelled');
 });

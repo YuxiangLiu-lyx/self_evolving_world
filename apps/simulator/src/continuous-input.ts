@@ -1,3 +1,4 @@
+import { forestExperienceSummary } from './forest-experience-context.js';
 import {
   V7_GOAL,
   forestClimate,
@@ -53,6 +54,12 @@ export function ordinaryContinuousInput(
       ? forestDecisionEvidence(self, harness)
       : { harness, extensionState: self.extensionState };
   return {
+    ...(world.config.experience
+      ? {
+          experience: forestExperienceSummary(self),
+          execution: cursor?.operation ?? null,
+        }
+      : {}),
     harness: evidence.harness,
     protocol: world.protocol,
     goal: V7_GOAL,

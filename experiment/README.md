@@ -2,6 +2,7 @@
 
 Each numbered experiment is a retained, numbered record: `ex1`, `ex2`, `ex3`, and so on. Numbering is independent of the older optional model rounds in ignored `experiment-results/`. This directory is tracked and included in task fingerprints.
 
+- [ex9 report](ex9/report.md) and [behavioral analysis](analyses/ex9/pr-23-forest-experience.md): one real 1,200-round observation; five new capabilities, three actually used by all actors, paid material/equipment/health benefits, and no deaths. Fire and canopy remained unused; all failed calls and technical pauses are retained.
 - [ex8 report](ex8/report.md) and [behavioral analysis](analyses/ex8/pr-21-forest-lives.md): real forest observation, 897 rounds before the original decision budget ended, five requested capability packages, three living actors and bounded mental feedback; no formal deaths.
 - [ex7 report](ex7/report.md): one real 1,000-round continuous world; three healthy survivors, two implemented activities and no mental satisfaction source.
 - [ex6 report](ex6/report.md): real 180-round coevolution with persistent shared facilities and resource processes.
@@ -13,7 +14,7 @@ Each numbered experiment is a retained, numbered record: `ex1`, `ex2`, `ex3`, an
 
 ## Browse saved history
 
-Run `pnpm dev` and open the printed local URL (normally `http://127.0.0.1:5173`). The main page is the game observatory; choose a completed archive or open `http://127.0.0.1:5173/?experiment=ex7`. Seek/play its saved timeline, select actors, switch between global and personal views, zoom/pan/follow, locate events and compare adjacent states. Vitals, tasks, memory and happiness panels show recorded data; unmeasured historical values remain unmeasured. Camera and playback never advance simulation or call models.
+Run `pnpm dev` and open the printed local URL (normally `http://127.0.0.1:5173`). The main page is the game observatory; choose a completed archive or open `http://127.0.0.1:5173/?experiment=ex9`. Seek/play its saved timeline, select actors, switch between global and personal views, zoom/pan/follow, locate events and compare adjacent states. Vitals, tasks, memory and happiness panels show recorded data; unmeasured historical values remain unmeasured. Camera and playback never advance simulation or call models.
 
 The original grid inspector remains at `/classic.html`, with its archive overview links, legacy import/export, URL back/forward behavior and manual demo controls. It redirects continuous archives to the game observatory. Local demos/imports remain available there through **Demo / local session**, **New world** and **Import history**.
 
@@ -83,3 +84,5 @@ Use the [continuous protocol](../docs/CONTINUOUS_WORLD.md) with `experiment.mode
 Version 7 retains configuration, initial/execution state, immutable per-call records, 100-round replay segments and index, 200-round checkpoints/reports, source/visual snapshots, validation logs and browser evidence. `pnpm experiment:check` reconstructs the record without inference; the legacy 500-round and 1 MB importer limits do not apply to this separate segmented protocol. Stage reports never become actor hints. A budget or engineering pause is reported separately from a completed observation.
 
 Continue a pending live barrier with `pnpm task -- next TASK_ID` and its exact development response. A later authorized larger observation uses a new explicit reuse task and larger target, preserving the captured prior window, identities, tasks and call counts through the existing [continuation contract](../docs/CONTINUOUS_WORLD.md#calls-journals-and-windows). Source integrity must match the retained revision; opening playback does not continue inference. ex7's post-window delivery corrections are separately versioned, retain all live sources and do not rewrite events or count as autonomous discoveries.
+
+The opt-in [forest experience protocol](../docs/FOREST_EXPERIENCE.md) used by ex9 fixes a 1,200-round target, 650 ordinary attempts, 60 world attempts and 20 counted development handoffs. It separates substantial meal history, temporary pleasure and slow mental state, with shared references and durable paid operations. Ex7/ex8 retain their original settings. [Detailed final measurements](../docs/exec-plans/evidence/pr-23-forest-experience/final-results.md) distinguish requests, implementation, learning, actual use and benefit.

@@ -2,11 +2,11 @@
 
 This document owns current modules, interfaces, and dependency boundaries. Feature status belongs to [PRODUCT](docs/PRODUCT.md); context is in the [project overview](docs/PROJECT_OVERVIEW.md). The pure core exposes independently versioned protocols through one public package entry point. The fixed founding rules remain in world.ts; their grid and skill limits do not constrain the separate continuous protocol.
 
-| Area                     | Scope                                                                                                     | Entry                                                              |
-| ------------------------ | --------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| Current Continuous World | Continuous-v1 / ex7: deterministic physics, reviewed mechanisms, persistent memory and recorded wellbeing | [Current protocol and game observatory](#current-continuous-world) |
-| Legacy Foundation        | Fixed grid and three base skills; retained histories and separately versioned grid extensions             | [Founding contracts](#legacy-foundation)                           |
-| Development Harness      | Repository-only task routing, conversation handoffs, evidence, PR and merge gates                         | [Coordinator boundary](#development-harness)                       |
+| Area                     | Scope                                                                                                         | Entry                                                              |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Current Continuous World | Continuous-v1 / ex7–ex9: deterministic physics, reviewed mechanisms, persistent memory and recorded wellbeing | [Current protocol and game observatory](#current-continuous-world) |
+| Legacy Foundation        | Fixed grid and three base skills; retained histories and separately versioned grid extensions                 | [Founding contracts](#legacy-foundation)                           |
+| Development Harness      | Repository-only task routing, conversation handoffs, evidence, PR and merge gates                             | [Coordinator boundary](#development-harness)                       |
 
 The main viewer opens the current game observatory; `/classic.html` retains the grid inspector. Both replay saved experiments without model calls. A historical run keeps its original protocol even when shown in the newer presentation.
 
@@ -31,6 +31,24 @@ Request-driven forest-wildlife, food-assessment and shelter packages add paid at
 Active warming settles measured exertion after ordinary physiology and shares the existing relief source through validated alternative event triggers. Versioned forest-routing uses observed geometry and exact swept collision to supplement the broad navigation grid with bounded local corner connections. Navigation and paid route inspection share target resolution; diagnostics distinguish proven obstruction from unknown search or terrain, and never move an actor. Geometry revisions invalidate stale route evidence without changing physical instances or historical transitions.
 
 Viewer forest-canvas draws read-only scene frames and registered components; observatory retains camera, selection and replay. The explicitly isolated forest-lab accepts authored test recordings for visual inspection. Neither renderer imports simulator code or advances the world. See [ADR-0019](docs/decisions/0019-forest-lives-and-experience.md).
+
+### Forest experience policy
+
+The opt-in [experience policy](docs/FOREST_EXPERIENCE.md) keeps old transitions while adding kernel-level reference resolution and completion/progress contracts. Pure forest-references resolves only observed identities (or dated navigation memory). Forest-experience settles substantial actual meals and slow mental state; continuous wellbeing owns event-grounded transient/maintained sources. Simulator forest-experience-scenario fixes initial conditions and existing public capabilities without individual mastery; forest-experience-context computes bounded factual summaries. Existing checkpoints, source revisions and scoped validation retain the same development and delivery path. See [ADR-0021](docs/decisions/0021-forest-execution-and-experience.md).
+
+The round-447 requested portable-insulation package adds an optional persistent stack component. Its work module owns costed escrow, manufacturing, repairs and lifecycle cleanup; a separate pure exposure helper composes physical cooling reduction inside forest physiology without a dependency cycle. Shared transfers preserve indivisible item identity. The canvas reads actual equipment, wetness and condition, while inventory and ground labels retain the item ID. This package is activated only at its recorded development boundary, not in prior archives or initial personal mastery.
+
+The later request-driven fire, willow-material and rain-canopy modules share that physical path. Fire separates paid fuel/kit work, environmental combustion and exposure; willow retains finite stock, actual material lineage and unchanged compatible recipe costs. Canopy construction owns explicit material escrow and real post geometry, while a separate environment phase settles roof wear and mantle moisture once before insulation. Its roof is not an enclosure or a heat source. All experience evidence reaches the central wellbeing evaluator, which settles each shared source once across alternative triggers.
+
+The round-495 operation-continuity package stores paid bindings in actor state independently of replaceable plans. The shared dispatcher accepts the original or canonical identity, including consistent typed references in declared material arrays; it does not re-resolve consumed inputs or reinterpret unrelated fields. Life/tick identity, finite progress and cancellation remain authoritative. Valid pending legacy work can migrate; completed/cancelled work cannot be recreated.
+
+The simulator's lossless input codec applies only to large experience observations/reviews. Exact shared values and named-column record tables reconstruct the entire JSON input; byte protection measures the same representation sent to transport. Optional output placeholders normalize only declared optional fields before public validation. Raw inputs, model outputs, failed attempts, technical pauses and source activation boundaries remain retained. Formatting repairs are not evidence that model interpretation is unchanged.
+
+The optional `local-fire@1` package uses the shared resolver for nested material references, persistent kit identity, paid work and physical hearth geometry. Its finite weather-dependent combustion runs before physiology; heat enters before thermal damage, while event-grounded maintained refuge settles in the central wellbeing account. A separate read-only visual projects actual work, fuel, flame, cover and residue. See [the reviewed extension contract](docs/FOREST_EXPERIENCE.md#reviewed-local-fire-extension).
+
+`willow-materials@1` extends existing finite stock with paid material separation, provenance and physically checked recipe compatibility. Optional strict-output fields use explicit null transport placeholders, normalized only when the public schema declares omission legal; shared reference validation then applies normally. Context encoding and output normalization do not alter world state, goals or byte/call budgets.
+
+The reviewed `recuperate@1` extension settles paid recovery only after real exposure, injury and death. Its terminal result updates the existing task outcome and operation cursor; it does not modify ordinary rest, grant health on installation or create collision geometry. See the [experience protocol](docs/FOREST_EXPERIENCE.md#requested-recuperation-at-round-777).
 
 ## Legacy Foundation
 

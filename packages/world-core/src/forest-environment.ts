@@ -1,3 +1,4 @@
+import { fireExposure } from './forest-fire-exposure.js';
 import type {
   V7Actor,
   V7Data,
@@ -108,7 +109,21 @@ export function forestClimate(world: V7World, position: V7Point) {
     light = Math.max(light * 0.15, Number(object.data.light ?? 0));
     moisture = Number(object.data.moisture ?? moisture);
   }
+  const rain = Math.max(
+    0,
+    Math.sin(world.time / 37 + (world.config.seed % 11)),
+  );
+  const wind = 0.5 + 0.5 * Math.sin(world.time / 53 + (world.config.seed % 7));
+  if (world.config.experience && !indoor)
+    temperature -= world.config.experience.exposure * (rain + wind);
   return {
+    ...(world.config.experience
+      ? {
+          rain: v7RoundNumber(rain),
+          wind: v7RoundNumber(wind),
+          exposure: indoor ? 'buffered' : 'outdoors',
+        }
+      : {}),
     temperature: v7RoundNumber(temperature),
     light: v7RoundNumber(light),
     moisture,
@@ -135,6 +150,10 @@ export function forestGrowth(world: V7World, object: V7Object): number {
   const light = Math.max(climate.light, Number(object.data.light ?? 0));
   const moisture = Number(object.data.moisture ?? climate.moisture);
   return (
+    (world.config.experience
+      ? world.config.experience.growthScale /
+        (1 + Number(object.data.depletion ?? 0) / 20)
+      : 1) *
     Math.max(
       0,
       Math.min(
@@ -290,6 +309,11 @@ export function forestEnvironment(world: V7World): void {
   for (const object of world.objects.filter(
     (o) => Number(o.data.interval) > 0,
   )) {
+    if (world.config.experience)
+      object.data.depletion = Math.max(
+        0,
+        Number(object.data.depletion ?? 0) - 0.005,
+      );
     object.data.growth =
       Number(object.data.growth ?? 0) + forestGrowth(world, object);
     const interval = Number(object.data.interval);
@@ -318,7 +342,17 @@ export function forestEnvironment(world: V7World): void {
     const owner = world.actors.find((a) => a.id === stack.owner),
       position = owner?.position ?? stack.position;
     const temperature = forestClimate(world, position).temperature;
-    stack.decay = (stack.decay ?? 0) + Math.max(0.15, (temperature + 4) / 24);
+    const preservation = world.config.experience
+      ? Math.min(
+          1,
+          ...world.objects
+            .filter((o) => v7Interior(position, o.spatial))
+            .map((o) => Math.max(0.1, Number(o.data.preservation ?? 1))),
+        )
+      : 1;
+    stack.decay =
+      (stack.decay ?? 0) +
+      Math.max(0.15, (temperature + 4) / 24) * preservation;
     if (stack.decay >= lifetime) {
       forestEvent(
         world,
@@ -362,7 +396,35 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
     insulation,
     !!shelter,
   );
-  actor.vitals.temperature = exposure.temperature;
+  actor.vitals.temperature = insulationExposure(
+    world,
+    actor,
+    before.temperature,
+    exposure.temperature,
+    exposure.shelteredColdLoss,
+    climate,
+    (type, item, data) => {
+      forestEvent(
+        world,
+        type,
+        type === 'insulation-exposure-measured'
+          ? `Portable insulation avoided ${Number(data.avoidedCooling).toFixed(3)} cooling; ${Number(data.remainingCooling).toFixed(3)} remaining; net temperature ${Number(data.netChange).toFixed(3)}.`
+          : type === 'rain-canopy-exposure-measured'
+            ? `Covered mantle moisture ${Number(data.before).toFixed(2)} to ${Number(data.after).toFixed(2)}; actual drying avoided ${Number(data.avoidedCooling).toFixed(4)} cooling.`
+            : 'The mantle is worn out; it now provides no protection.',
+        actor.position,
+        actor.id,
+        data,
+        item,
+      );
+      const event = world.events.at(-1);
+      if (event)
+        event.interface =
+          type === 'rain-canopy-exposure-measured'
+            ? 'rain-canopy-work'
+            : 'portable-insulation';
+    },
+  );
   if (shelter) {
     const coldDiscomfort = (temperature: number) =>
       Math.min(1, Math.max(0, 16 - temperature) / 12);
@@ -391,6 +453,24 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
       shelter.id,
     );
   }
+  actor.vitals.temperature = fireExposure(
+    world,
+    actor,
+    actor.vitals.temperature,
+    (id, data) => {
+      forestEvent(
+        world,
+        'fire-exposure-measured',
+        'Actual finite fire heat reached this actor before thermal damage.',
+        actor.position,
+        actor.id,
+        data,
+        id,
+      );
+      const e = world.events.at(-1);
+      if (e) e.interface = 'tend-fire';
+    },
+  );
   const starvation = before.satiety <= 0 ? world.config.starvation : 0;
   const thermal =
     Math.max(0, 7 - actor.vitals.temperature, actor.vitals.temperature - 34) *
@@ -418,3 +498,4 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
       },
     );
 }
+import { insulationExposure } from './forest-insulation-exposure.js';

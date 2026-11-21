@@ -1,4 +1,4 @@
-/** Exact ex8 technical repairs. Preserved snapshots, call journal, prompts, seed and budgets remain mandatory. */
+/** Exact technical repairs. Preserved snapshots, call journal, prompts, seed and budgets remain mandatory. */
 const repairs: Record<string, { before: string; after: string }> = {
   'apps/simulator/src/continuous-input.ts': {
     before: 'ce34371a69a8b99f3a84bff016037f3585ab06a468c871de2343187f7c86bcb6',
@@ -39,6 +39,75 @@ export function forestCheckpointRepair(
   after: string,
   declaration: unknown,
 ): boolean {
+  // Ex9 development-1 exposed missing operation cursors in replay at round 86.
+  // This exact store revision only adds cursor-bearing segments and replay verification;
+  // the original cursor-free parts remain retained and no live action/controller policy changes.
+  if (declaration === 'experience-operation-replay-v1')
+    return (
+      path === 'scripts/continuous-store.ts' &&
+      before ===
+        'f679e28ffa9fb72c984e294196b2ee151f27e3150d2214cd3cdeb4557a3157df' &&
+      after ===
+        'e402f607f8cd5887c32456af5fa9f5d44e39d9a015b3853914a395dfe0bb49bd'
+    );
+  // Ex9 round 451 stopped before inference. This exact codec/controller repair preserves
+  // every JSON fact and the existing byte cap, prompts, output schema and role budgets.
+  if (declaration === 'experience-lossless-input-v1') {
+    const pairs: Record<string, { before: string; after: string }> = {
+      'apps/simulator/src/continuous-run.ts': {
+        before:
+          'cc71b865ce5699974db83db5a158571ac91ffd72881865d6da0a5654bd8d6762',
+        after:
+          '7d82ea3b0315838c3c63875094de8b16e3c46638f8e64082958fb0b007941024',
+      },
+      'apps/simulator/src/continuous-provider.ts': {
+        before:
+          '2d37fe465b009e307cf7a5aa8cbddb7f87ff9eacd97c51a568626ed5a6234d0e',
+        after:
+          '3f9c8fc0e07471770d8a8cc9d6b19f833a5339b784eda68e628525dd5be203c4',
+      },
+    };
+    const pair = pairs[path];
+    return pair?.before === before && pair.after === after;
+  }
+  // Ex9 round 458: preserve public optional-argument semantics in strict output transport.
+  if (declaration === 'experience-optional-arguments-v1') {
+    const pairs: Record<string, { before: string; after: string }> = {
+      'apps/simulator/src/continuous-run.ts': {
+        before:
+          '7d82ea3b0315838c3c63875094de8b16e3c46638f8e64082958fb0b007941024',
+        after:
+          'a6829bedd90662ff6c212b0667cc84e94a3044cfc7a17aac4896a497980e7788',
+      },
+      'apps/simulator/src/continuous-provider.ts': {
+        before:
+          '3f9c8fc0e07471770d8a8cc9d6b19f833a5339b784eda68e628525dd5be203c4',
+        after:
+          '79f844d90af10d9674ddb385fe0d2a75d2819d37f18e07e7e19fd87141908951',
+      },
+    };
+    const pair = pairs[path];
+    return pair?.before === before && pair.after === after;
+  }
+  // Ex9 round 495: an unchanged already-mastered interface needs no duplicate learning.
+  if (declaration === 'experience-operation-continuity-v1') {
+    const pairs: Record<string, { before: string; after: string }> = {
+      'apps/simulator/src/continuous-run.ts': {
+        before:
+          'a6829bedd90662ff6c212b0667cc84e94a3044cfc7a17aac4896a497980e7788',
+        after:
+          '135a3267a92be3c643b9b64688b154aa064141bade3d119b89741babfa407c89',
+      },
+      'scripts/continuous-source.ts': {
+        before:
+          'a9bf51774b44e4268c19f061c466b3c65fda6e50a2685435bb5459ac8d1a7eef',
+        after:
+          '4833b83c3358cf4674574be289677c78236a5019a37e217e492606969314c9bb',
+      },
+    };
+    const pair = pairs[path];
+    return pair?.before === before && pair.after === after;
+  }
   const repair = repairs[path];
   return (
     declaration === 'forest-checkpoint-config-v1' &&

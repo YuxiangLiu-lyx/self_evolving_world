@@ -1,3 +1,5 @@
+import { canopyVisual, canopyPostVisual } from './forest-canopy-visual.js';
+import { fireVisual } from './forest-fire-visual.js';
 import type { V7Object, V7Event } from '@self-evolving-world/world-core';
 export const svgText = (value: string): string =>
   value
@@ -20,6 +22,9 @@ const rock: ContinuousVisual = (o) =>
 const source: ContinuousVisual = (o) =>
   `<ellipse cy=".16" rx=".5" ry=".26" fill="#274e34" opacity=".3"/><path d="M-.38 .05Q-.53-.35-.2-.32Q0-.59.18-.31Q.5-.37.36.08Z" fill="${color(o.visual.color)}" stroke="#365c3d" stroke-width=".035"/>${Array.from({ length: Math.min(6, Number(o.data.stock ?? 0)) }, (_, i) => `<circle cx="${String(Math.cos(i * 2.4) * 0.25)}" cy="${String(-0.1 + Math.sin(i * 2.4) * 0.17)}" r=".06" fill="${color(o.visual.accent)}"/>`).join('')}`;
 export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
+  'stone-hearth': fireVisual,
+  'rain-canopy': canopyVisual,
+  'canopy-post': canopyPostVisual,
   'stone-mosaic': (o) => {
     const offsets = Array.isArray(o.data.offsets) ? o.data.offsets : [];
     const stones = offsets

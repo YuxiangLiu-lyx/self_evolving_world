@@ -16,6 +16,8 @@ import type { V7ReplayIndex, V7ReplaySegment } from './continuous-store.js';
 import { continuousHistory } from './continuous-source.js';
 export const CONTINUOUS_OBJECTIVE =
   'Observe one continuous world with three initially autonomous actors pursuing health, survival and happiness across a first 1000-round window, allowing reviewed executable world and harness development without prescribed activities or causal attribution to individual mechanisms.';
+export const EXPERIENCE_OBJECTIVE =
+  'Observe three real actors for 1200 target rounds under consistent execution semantics, seasonal pressure, diet experience and sustained mental state; capability requests and emergent activities are optional observations, not success criteria.';
 export const CONTINUOUS_ASSERTIONS = [
   'segment-integrity-and-deterministic-reconstruction',
   'initial-midpoint-final-state',
@@ -101,6 +103,117 @@ export function measureContinuous(
             monetaryCost: null,
             monetaryCostNote:
               'Plan-funded transport; per-call monetary charges and internal development usage are not metered.',
+          },
+        }
+      : {}),
+    ...(final.config.experience
+      ? {
+          experience: {
+            counting:
+              'Action counts measure executed rounds, including progress rounds. Initial non-authored interfaces may be learned but are not newly developed. Completed operation events and measured physical effects are separate evidence. Pre-action reference invalidations can trigger a decision without a failed execution event.',
+            referenceDecisionInvalidations: state.attempts
+              .filter(
+                (a) =>
+                  a.role === 'ordinary' &&
+                  /Reference (?:unavailable|ambiguous|insufficient|wrong-kind|reserved|invalid)/.test(
+                    a.reason,
+                  ),
+              )
+              .map((a) => ({
+                call: a.id,
+                tick: a.tick,
+                actor: a.actor,
+                reason: a.reason,
+                status: a.status,
+              })),
+            learnedBaselineInterfaces: final.actors.map((a) => ({
+              actor: a.id,
+              abilities: a.mastered.filter((id) =>
+                frames[0]?.abilities.some(
+                  (old) => old.id === id && !old.authored,
+                ),
+              ),
+            })),
+            developedInterfaceExecution: final.abilities
+              .filter(
+                (a) => !frames[0]?.abilities.some((old) => old.id === a.id),
+              )
+              .map((a) => ({
+                id: a.id,
+                personallyMasteredBy: final.actors
+                  .filter((actor) => actor.mastered.includes(a.id))
+                  .map((actor) => actor.id),
+                executionRounds: records.flatMap((r) =>
+                  Object.entries(r.actions)
+                    .filter(([, action]) => action.interface === a.id)
+                    .map(([actor]) => ({
+                      tick: r.tick,
+                      actor,
+                      failed: r.events.some(
+                        (e) => e.actor === actor && e.type === 'failed',
+                      ),
+                    })),
+                ),
+                completedOperations: events.filter(
+                  (e) =>
+                    e.interface === a.id &&
+                    e.actor !== null &&
+                    e.success &&
+                    (e.type.endsWith('-completed') ||
+                      [
+                        'insulation-equipped',
+                        'insulation-unequipped',
+                        'fire-fed',
+                        'fire-extinguished',
+                      ].includes(e.type)),
+                ),
+              })),
+            referenceFailures: events.filter(
+              (e) =>
+                e.type === 'failed' &&
+                typeof e.data.reasonCode === 'string' &&
+                e.data.reasonCode.startsWith('reference-'),
+            ),
+            completedOperationEvents: events.filter((e) =>
+              e.type.endsWith('-completed'),
+            ),
+            messageDecisionReasons: state.attempts
+              .filter((a) => a.role === 'ordinary' && /message/.test(a.reason))
+              .map((a) => ({
+                id: a.id,
+                actor: a.actor,
+                tick: a.tick,
+                reason: a.reason,
+              })),
+            decisionRate:
+              state.attempts.filter((a) => a.role === 'ordinary').length /
+              Math.max(1, final.tick * final.actors.length),
+            meals: events.filter((e) => e.type === 'meal-experience'),
+            recovery: events
+              .filter((e) => e.type === 'rested')
+              .map((e) => ({ tick: e.tick, actor: e.actor, ...e.data })),
+            trajectories: frames
+              .filter((f) => f.tick % 20 === 0 || f.tick === final.tick)
+              .map((f) => ({
+                tick: f.tick,
+                actors: f.actors.map((a) => ({
+                  id: a.id,
+                  vitals: a.vitals,
+                  mental: a.experience?.mental,
+                  pleasure: a.experience?.pleasure,
+                  monotony: a.experience?.monotony,
+                })),
+              })),
+            baselineInterfaces: frames[0]?.abilities.map((a) => a.id) ?? [],
+            newlyImplemented: final.abilities
+              .filter(
+                (a) => !frames[0]?.abilities.some((old) => old.id === a.id),
+              )
+              .map((a) => ({ id: a.id, equivalence: a.equivalence })),
+            failedActions: events.filter((e) => e.type === 'failed'),
+            benefits: events.filter((e) =>
+              /benefit|qualified|exposure|relief/.test(e.type),
+            ),
           },
         }
       : {}),
@@ -255,7 +368,7 @@ export function continuousReport(
   const forestSummary = state.world.config.forest
     ? `## Forest lifecycle and environment\n\nModel: ${state.model}. Seed: ${String(state.world.config.seed)}. Observed seasons: ${results.forest?.seasons.map((s) => (typeof s === 'string' ? s : 'unknown')).join(', ') ?? 'unknown'}. Deaths and respawns are retained with exact evidence and prior plans in results.json. Full-state replay remains independent of rendering. Monetary cost and internal developer usage are unknown; recorded role-specific tokens below are measured. These formal events are distinct from isolated forest-lab fixtures.\n\n${state.world.actors.map((a) => `${a.name}: ${String(a.life?.deaths ?? 0)} deaths, ${String((a.life?.total ?? 0) - (a.life?.deaths ?? 0))} remaining lives.`).join('\n\n')}\n\n`
     : '';
-  return `# ${id}: Continuous World and Persistent Wellbeing\n\n## Scope and observation window\n\n${CONTINUOUS_OBJECTIVE}\n\nObserved ${String(state.world.tick)} of ${String(state.windowTarget)} target rounds. State: ${state.phase}. ${state.reason ?? ''} This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.\n\n## Measured outcome\n\n| Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | New-ability successful rounds |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n${results.actors.map((a) => `| ${a.id} | ${String(a.alive)} | ${String(a.finalVitals.health)} | ${String(a.finalVitals.satiety)} | ${a.meanWellbeing.toFixed(2)} | ${a.finalWellbeing.total.toFixed(2)} | ${String(a.newlyMastered.length)} | ${String(a.successfulNewAbilityUses)} |`).join('\n')}\n\nRequests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits. Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.\n\n## Action distribution\n\n| Interface | Attempted | Successful rounds | Failed rounds |\n| --- | --- | --- | --- |\n${Object.entries(
+  return `# ${id}: Continuous World and Persistent Wellbeing\n\n## Scope and observation window\n\n${state.world.config.experience ? EXPERIENCE_OBJECTIVE : CONTINUOUS_OBJECTIVE}\n\nObserved ${String(state.world.tick)} of ${String(state.windowTarget)} target rounds. State: ${state.phase}. ${state.reason ?? ''} This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.\n\n## Measured outcome\n\n| Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | ${state.world.config.experience ? 'Learned-interface successful rounds' : 'New-ability successful rounds'} |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n${results.actors.map((a) => `| ${a.id} | ${String(a.alive)} | ${String(a.finalVitals.health)} | ${String(a.finalVitals.satiety)} | ${a.meanWellbeing.toFixed(2)} | ${a.finalWellbeing.total.toFixed(2)} | ${String(a.newlyMastered.length)} | ${String(a.successfulNewAbilityUses)} |`).join('\n')}\n\nRequests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits.${state.world.config.experience ? ' In this policy the table includes personally learned baseline interfaces; results.experience separately lists newly developed interfaces, personal mastery, completed operations and pre-action reference invalidations. The initial ex8 catalogue is not new ex9 discovery.' : ''} Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.\n\n## Action distribution\n\n| Interface | Attempted | Successful rounds | Failed rounds |\n| --- | --- | --- | --- |\n${Object.entries(
     results.actions,
   )
     .map(
@@ -309,7 +422,7 @@ export function readContinuousExperiment(
   for (const part of index.segments) {
     const path = resolve(directory, part.path);
     if (
-      !/^replay\/part-\d+(?:-\d+)?\.json$/.test(part.path) ||
+      !/^replay\/(?:part|execution)-\d+(?:-\d+)?\.json$/.test(part.path) ||
       continuousHash(readFileSync(path, 'utf8')) !== part.sha256
     )
       throw new Error('Invalid continuous replay segment.');

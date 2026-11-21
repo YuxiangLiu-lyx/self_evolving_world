@@ -1,0 +1,125 @@
+
+> self-evolving-world@0.0.0 test /Users/liuyuxiang/developer/self_evolving_world
+> vitest run
+
+
+ RUN  v4.1.12 /Users/liuyuxiang/developer/self_evolving_world
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 20/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 40/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 60/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 80/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 100/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+ ✓ scripts/harness.test.ts (4 tests) 838ms
+     ✓ protects every nested archive and rejects additions hidden by gitignore  483ms
+ ✓ packages/world-core/test/forest-shelter.test.ts (7 tests) 804ms
+     ✓ expires after 160 actual exposure rounds while retaining walls; paid maintenance restores only 160  537ms
+ ✓ apps/simulator/test/forest-insulation.test.ts (7 tests) 1101ms
+ ✓ apps/simulator/test/evolution-run.test.ts (5 tests) 1182ms
+     ✓ pauses development at the same tick, resumes once, and audits every retained private input  1124ms
+ ✓ apps/simulator/test/forest-willow.test.ts (6 tests) 1267ms
+   ✓ qualifies real willow panels and manufactured cord for unchanged mantle and hearth recipe costs  756ms
+ ✓ scripts/delivery-git.test.ts (4 tests) 1112ms
+     ✓ reports real conflicting paths without changing working files, branch or index  306ms
+ ✓ apps/simulator/test/forest-experience.test.ts (11 tests) 612ms
+ ✓ apps/simulator/test/coevolution.test.ts (5 tests) 909ms
+     ✓ counts every failed attempt and freezes the whole world on the 120th ordinary call  313ms
+ ✓ scripts/forest-experience-replay.test.ts (1 test) 1652ms
+     ✓ reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events  1652ms
+ ✓ apps/simulator/test/forest-canopy.test.ts (7 tests) 1745ms
+   ✓ covered actual mantle drying improves only its existing cooling effect; another actor and ground item can use the same paid roof  362ms
+   ✓ requires whole-body coverage, preserves expired mass/posts, and keeps shared relief capped and single-settled  369ms
+   ✓ settles genuine maintained relief once per actor and refuses learning or fabricated coverage rewards  365ms
+ ✓ apps/simulator/test/continuous.test.ts (6 tests) 338ms
+ ✓ scripts/validation.test.ts (15 tests) 232ms
+ ✓ scripts/unit-reporter.test.ts (6 tests) 2173ms
+     ✓ handles skipped test  363ms
+     ✓ handles todo test  396ms
+     ✓ handles expected failure  374ms
+     ✓ handles focused test  357ms
+     ✓ handles dynamic skip  404ms
+ ✓ scripts/continuous-store.test.ts (3 tests) 419ms
+     ✓ recovers the committed world after interruption, reconstructs fractional navigation and preserves a shorter window when continued  313ms
+ ✓ packages/world-core/test/forest-food.test.ts (8 tests) 231ms
+ ✓ apps/simulator/test/forest-operation-continuity.test.ts (4 tests) 728ms
+   ✓ starts fresh released material at zero work and rejects malformed counters or changed target without terminal resurrection  324ms
+ ✓ scripts/coevolution-source.test.ts (4 tests) 203ms
+ ✓ scripts/documentation.test.ts (15 tests) 163ms
+ ✓ packages/world-core/test/forest-wildlife.test.ts (3 tests) 111ms
+ ✓ packages/world-core/test/forest.test.ts (10 tests) 274ms
+ ✓ packages/world-core/test/forest-warming.test.ts (5 tests) 158ms
+ ✓ packages/world-core/test/forest-routing.test.ts (6 tests) 183ms
+ ✓ scripts/experiments.test.ts (19 tests) 250ms
+ ✓ scripts/learning-analysis.test.ts (1 test) 68ms
+ ✓ apps/simulator/test/forest-fire.test.ts (8 tests) 2410ms
+     ✓ preserves component mass and kit identity; a finite fire warms another actor and consumes fuel without healing  850ms
+     ✓ maintains the existing capped refuge source only after real sustained relief and decays without inventing low mood  314ms
+     ✓ other participants learn independently and can feed the shared site; builder death leaves the fire operating  382ms
+ ✓ apps/simulator/test/random-run.test.ts (12 tests) 111ms
+ ✓ apps/simulator/test/forest-input-encoding.test.ts (3 tests) 135ms
+ ✓ scripts/forest-navigation.test.ts (2 tests) 106ms
+ ✓ packages/world-core/test/continuous.test.ts (12 tests) 119ms
+ ✓ apps/simulator/test/forest-context.test.ts (2 tests) 73ms
+ ✓ apps/simulator/test/learning-run.test.ts (5 tests) 56ms
+ ✓ apps/simulator/test/forest.test.ts (1 test) 79ms
+ ✓ apps/simulator/test/synchronous-run.test.ts (4 tests) 93ms
+ ✓ scripts/finish-task.test.ts (4 tests) 2402ms
+     ✓ completes an explicit local-only task without credentials, publication or a network remote  653ms
+     ✓ requires publication when no local exception plan was supplied and replaces old success with failure  420ms
+     ✓ rejects evidence that has not passed local review and source changes after review  803ms
+     ✓ does not use the local-only entry point to waive default merge completion  525ms
+ ✓ scripts/survival-analysis.test.ts (2 tests) 40ms
+ ✓ packages/world-core/test/continuous-mosaic.test.ts (2 tests) 50ms
+ ✓ apps/simulator/test/experiment.test.ts (21 tests) 51ms
+ ✓ scripts/pr-policy.test.ts (13 tests) 26ms
+ ✓ apps/simulator/test/chatgpt-renewal.test.ts (1 test) 19ms
+ ✓ apps/simulator/test/survival-run.test.ts (5 tests) 33ms
+ ✓ packages/world-core/test/coevolution.test.ts (11 tests) 34ms
+ ✓ scripts/task-continuous-repair.test.ts (2 tests) 70ms
+ ✓ packages/world-core/test/continuous-nature.test.ts (2 tests) 40ms
+ ✓ apps/viewer/test/timeline.test.ts (7 tests) 25ms
+ ✓ scripts/github.test.ts (2 tests) 21ms
+ ✓ packages/world-core/test/learning.test.ts (22 tests) 22ms
+ ✓ apps/simulator/test/chatgpt-auth.test.ts (9 tests) 15ms
+ ✓ packages/world-core/test/evolution.test.ts (10 tests) 16ms
+ ✓ packages/world-core/test/forest-perception.test.ts (1 test) 18ms
+ ✓ scripts/validation-cache.test.ts (3 tests) 12ms
+ ✓ packages/world-core/test/program.test.ts (16 tests) 8ms
+ ✓ packages/world-core/test/world.test.ts (38 tests) 12ms
+ ✓ scripts/task-flow.test.ts (16 tests) 14ms
+ ✓ scripts/delivery.test.ts (7 tests) 8ms
+ ✓ packages/world-core/test/survival.test.ts (7 tests) 6ms
+ ✓ packages/world-core/test/round.test.ts (5 tests) 6ms
+ ✓ apps/viewer/test/experiments.test.ts (10 tests) 5ms
+ ✓ apps/simulator/test/demo.test.ts (3 tests) 5ms
+ ✓ scripts/validation-plan.test.ts (8 tests) 7ms
+ ✓ scripts/publication.test.ts (6 tests) 6ms
+ ✓ scripts/task-review.test.ts (8 tests) 6ms
+ ✓ scripts/task-runtime.test.ts (14 tests) 3066ms
+     ✓ uses the current base for changed delivery and retains the published base only for an exact retry  552ms
+     ✓ requests validation for changed scope or untrusted receipts before requesting review  436ms
+     ✓ retains complete committed and working review diffs larger than the capture buffer  373ms
+     ✓ commits the exact reviewed files once and keeps generated journals outside fingerprints  404ms
+ ✓ scripts/task-entry.test.ts (14 tests) 4132ms
+     ✓ binds learning continuation to its mode, existing allocation and leased stage  313ms
+     ✓ permits only leased prepare/verify workers and blocks ungranted completion, changed review and source  355ms
+     ✓ matches random intent and prevents an unrecorded model invocation or repeated allocation  399ms
+     ✓ rejects raw publish-task.ts before credentials, allocation or accepting evidence  464ms
+     ✓ rejects raw finish-task.ts before credentials, allocation or accepting evidence  449ms
+     ✓ rejects raw validate.ts before credentials, allocation or accepting evidence  346ms
+
+ Test Files  63 passed (63)
+      Tests  480 passed (480)
+   Start at  06:18:39
+   Duration  4.96s (transform 4.62s, setup 0ms, import 11.47s, tests 30.11s, environment 4ms)
+

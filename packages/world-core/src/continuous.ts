@@ -1,4 +1,9 @@
+import { FOREST_RECUPERATION } from './forest-recuperation.js';
+import { FOREST_CANOPY } from './forest-canopy.js';
+import { FOREST_WILLOW, FOREST_OPERATION_CONTINUITY } from './forest-willow.js';
+import { FOREST_FIRE } from './forest-fire.js';
 import { FOREST_ROUTE_INSPECTION } from './forest-route-inspection.js';
+import { FOREST_INSULATION } from './forest-insulation.js';
 import { FOREST_WARMING } from './forest-warming.js';
 import { FOREST_FOOD_ASSESSMENT } from './forest-food-assessment.js';
 import { FOREST_SHELTER } from './forest-shelter.js';
@@ -23,6 +28,12 @@ export const V7_PACKAGES: V7Package[] = [
   FOREST_SHELTER,
   FOREST_WARMING,
   FOREST_ROUTE_INSPECTION,
+  FOREST_INSULATION,
+  FOREST_FIRE,
+  FOREST_WILLOW,
+  FOREST_OPERATION_CONTINUITY,
+  FOREST_CANOPY,
+  FOREST_RECUPERATION,
 ];
 export const continuousRegistry = () => v7Registry(V7_PACKAGES);
 export function v7PublicCatalogue(world: V7World, actorId?: string) {

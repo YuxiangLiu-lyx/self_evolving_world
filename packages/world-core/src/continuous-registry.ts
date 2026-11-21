@@ -57,6 +57,7 @@ export function v7Install(
       id: a.id,
       vitals: a.vitals,
       wellbeing: a.wellbeing,
+      ...(world.config.experience ? { experience: a.experience } : {}),
       mastered: a.mastered,
       learning: a.learning,
       position: a.position,
@@ -86,6 +87,7 @@ export function v7Install(
         id: a.id,
         vitals: a.vitals,
         wellbeing: a.wellbeing,
+        ...(world.config.experience ? { experience: a.experience } : {}),
         mastered: a.mastered,
         learning: a.learning,
         position: a.position,
@@ -122,6 +124,30 @@ export function v7Install(
       (!ability.authored && ability.learning < 1)
     )
       throw new Error('Learning needs a positive mechanism-specific duration.');
+    if (world.config.experience) {
+      if (!ability.execution || !ability.references)
+        throw new Error(
+          'New interfaces require explicit execution and reference contracts.',
+        );
+      if (
+        ability.execution.duration !== null &&
+        (!Number.isSafeInteger(ability.execution.duration) ||
+          ability.execution.duration < 1)
+      )
+        throw new Error(
+          'Execution duration must be positive or state-dependent.',
+        );
+      if (ability.parameters.properties?.target && !ability.references.target)
+        throw new Error(
+          'Target parameters must use the shared reference resolver.',
+        );
+      if (
+        Object.keys(ability.references).some(
+          (key) => !ability.parameters.properties?.[key],
+        )
+      )
+        throw new Error('Reference contracts must name declared parameters.');
+    }
     next.abilities.push(v7Clone(ability));
   }
   for (const resource of pkg.resources) {
@@ -133,6 +159,28 @@ export function v7Install(
       )
     )
       throw new Error('Invalid physical resource properties.');
+    if (
+      world.config.experience &&
+      resource.nutrition > 0 &&
+      (!resource.food ||
+        !resource.food.method.trim() ||
+        !Number.isFinite(resource.food.quality) ||
+        resource.food.quality < 0 ||
+        resource.food.quality > 1 ||
+        !resource.food.ingredients.length ||
+        resource.food.ingredients.some(
+          (i) =>
+            !world.resources.some((r) => r.id === i.resource) ||
+            !Number.isFinite(i.share) ||
+            i.share <= 0,
+        ) ||
+        Math.abs(
+          resource.food.ingredients.reduce((n, i) => n + i.share, 0) - 1,
+        ) > 1e-8)
+    )
+      throw new Error(
+        'New food requires actual known ingredient shares, processing and bounded quality.',
+      );
     next.resources.push(v7Clone(resource));
   }
   for (const source of pkg.satisfaction) {
@@ -184,6 +232,7 @@ export function v7Install(
         [
           { event: rule.event, interface: rule.interface },
           ...(rule.alternativeTriggers ?? []),
+          ...(rule.maintenance?.alternativeTriggers ?? []),
         ].some(
           (trigger) =>
             !next.eventTypes?.includes(trigger.event) ||

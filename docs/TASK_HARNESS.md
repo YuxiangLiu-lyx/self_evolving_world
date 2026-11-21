@@ -11,7 +11,7 @@ pnpm task -- start validation-results/intent.json
 pnpm task -- status task-id
 pnpm task -- submit task-id validation-results/response.json
 pnpm task -- next task-id
-# A captured computation-only pause in this task's own unfinished run:
+# A captured computation or pre-inference context pause in this task's own unfinished run:
 pnpm task -- repair task-id
 # Changed requirements or plan location require a higher requirementsVersion:
 pnpm task -- amend task-id validation-results/revised-intent.json
@@ -143,3 +143,13 @@ The [learning-v1 protocol](SKILL_LEARNING_EXPERIMENT.md) is an explicit new-expe
 When a real coevolution request needs a new interpreter effect, first run `next` with the unchanged registered engine to retain the development baseline. The development file may include an `implementation` review alongside the usual barrier, tick, proposal and notes. The adapter verifies the allowed source boundary, unchanged full executed/call prefix and complete unit/type/lint/architecture/build checks before accepting the new source revision. A source change outside that boundary requires a new run. The same coordinator handles declaration-only work, analysis and final selected browser/PR gates; source extension validation does not complete the task.
 
 The independent `continuous` mode uses the same experiment/development/analysis/capture/delivery stages. Its fixed initial observation and shared budgets are defined in [Continuous World](CONTINUOUS_WORLD.md); `pnpm experiment:continuous` is a coordinator-bound compatibility entry, not a standalone inference bypass.
+
+The same technical-repair handoff accepts the exact experience-mode context-protection pause only before inference, with no pending call, review barrier, uncertain attempt or exhausted budget. It retains the original capture and creates an empty, counted technical barrier; context-only recovery cannot install packages or actions and clears the barrier before normal decisions. [Forest Experience](FOREST_EXPERIENCE.md#retained-context-pause-and-lossless-transport-repair) documents the lossless JSON transport repair and its fixed-limit tests.
+
+An implementation repair can target an unchanged interface already personally
+mastered before its handoff. The ex9 continuation repair keeps the original
+learning cost and permits that existing master to reuse it without duplicate
+study; both controller and file adapter enforce the same preexisting-mastery
+condition. New or unmastered assignments still require the exact reviewed
+learning duration. This does not waive source-prefix replay, unit checks,
+review, budgets or version retention, and supplies no mastery or reward.

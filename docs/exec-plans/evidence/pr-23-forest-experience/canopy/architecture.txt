@@ -1,0 +1,7 @@
+
+> self-evolving-world@0.0.0 architecture:check /Users/liuyuxiang/developer/self_evolving_world
+> depcruise --config dependency-cruiser.config.cjs apps packages
+
+
+✔ no dependency violations found (200 modules, 859 dependencies cruised)
+

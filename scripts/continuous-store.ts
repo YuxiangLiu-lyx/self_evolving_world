@@ -1,3 +1,4 @@
+import { FOREST_EXPERIENCE_CONFIG } from '../apps/simulator/src/forest-experience-scenario.js';
 import { FOREST_CONFIG } from '../apps/simulator/src/forest-scenario.js';
 import { createHash } from 'node:crypto';
 import {
@@ -17,8 +18,10 @@ import {
   v7Install,
   v7Step,
   continuousRegistry,
+  v7PrepareReplayCursors,
+  v7FinishTasks,
 } from '@self-evolving-world/world-core';
-import type { V7World } from '@self-evolving-world/world-core';
+import type { V7World, V7Cursor } from '@self-evolving-world/world-core';
 import type {
   V7Execution,
   V7Sink,
@@ -61,6 +64,8 @@ export interface V7ReplaySegment {
   start: number;
   initial: V7World;
   rounds: V7StoredRound[];
+  /** Experience operations bind exact identities and progress across segment boundaries. */
+  initialCursors?: Record<string, V7Cursor>;
 }
 export interface V7ReplayIndex {
   format: 'self-evolving-world/replay';
@@ -87,7 +92,13 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
     !Array.isArray(state.attempts) ||
     !Array.isArray(state.developments) ||
     v7Signature(state.world.config) !==
-      v7Signature(state.world.config.forest ? FOREST_CONFIG : V7_CONFIG)
+      v7Signature(
+        state.world.config.experience
+          ? FOREST_EXPERIENCE_CONFIG
+          : state.world.config.forest
+            ? FOREST_CONFIG
+            : V7_CONFIG,
+      )
   )
     throw new Error(
       'Invalid continuous checkpoint or modified protected run configuration.',
@@ -288,6 +299,7 @@ export function buildContinuousReplay(
     : null;
   const restored = new Map<number, { record: V7StoredRound; world: V7World }>();
   let start = initial;
+  let initialCursors: Record<string, V7Cursor> = {};
   // Segment size is a storage/cache choice, not a world or observation-window limit.
   for (let first = 1; first <= state.world.tick; first += 100) {
     const rounds: V7StoredRound[] = [];
@@ -336,8 +348,11 @@ export function buildContinuousReplay(
       start: first - 1,
       initial: start,
       rounds,
+      ...(initial.config.experience
+        ? { initialCursors: v7Clone(initialCursors) }
+        : {}),
     };
-    const path = `replay/part-${String(first - 1).padStart(6, '0')}-${String(rounds.at(-1)?.tick ?? first - 1).padStart(6, '0')}.json`;
+    const path = `replay/${initial.config.experience ? 'execution' : 'part'}-${String(first - 1).padStart(6, '0')}-${String(rounds.at(-1)?.tick ?? first - 1).padStart(6, '0')}.json`;
     immutable(resolve(directory, path), segment);
     index.segments.push({
       path,
@@ -348,6 +363,7 @@ export function buildContinuousReplay(
         .digest('hex'),
     });
     start = last;
+    initialCursors = rounds.at(-1)?.tasks ?? {};
   }
   if (!index.segments.length) {
     const path = 'replay/part-000000.json';
@@ -375,6 +391,7 @@ export function reconstructContinuousSegment(
   let world = segment.initial;
   const frames = [world],
     registry = continuousRegistry();
+  const cursors = v7Clone(segment.initialCursors ?? {});
   v7AssertWorld(world);
   for (const round of segment.rounds) {
     if (round.tick !== world.tick + 1)
@@ -395,11 +412,22 @@ export function reconstructContinuousSegment(
           actor.memory.intention = memory.intention;
       }
     }
-    const result = v7Step(input, round.actions, registry, {}, round.reviews);
+    if (segment.initialCursors)
+      v7PrepareReplayCursors(world, round.tasks, cursors);
+    const result = v7Step(
+      input,
+      round.actions,
+      registry,
+      cursors,
+      round.reviews,
+    );
+    if (segment.initialCursors) v7FinishTasks(world, result, cursors);
     if (
       result.paused ||
       continuousHash(result.world) !== round.after ||
-      v7Signature(result.world.events) !== v7Signature(round.events)
+      v7Signature(result.world.events) !== v7Signature(round.events) ||
+      (segment.initialCursors &&
+        v7Signature(cursors) !== v7Signature(round.tasks))
     )
       throw new Error(
         `Continuous reconstruction disagrees at round ${String(round.tick)}.`,

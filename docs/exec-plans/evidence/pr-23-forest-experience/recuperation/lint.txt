@@ -1,0 +1,4 @@
+
+> self-evolving-world@0.0.0 lint /Users/liuyuxiang/developer/self_evolving_world
+> eslint . --max-warnings 0
+

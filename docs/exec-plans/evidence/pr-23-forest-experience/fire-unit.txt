@@ -1,0 +1,11 @@
+
+ RUN  v4.1.12 /Users/liuyuxiang/developer/self_evolving_world
+
+ ✓ apps/simulator/test/forest-fire.test.ts (8 tests) 1307ms
+     ✓ preserves component mass and kit identity; a finite fire warms another actor and consumes fuel without healing  455ms
+
+ Test Files  1 passed (1)
+      Tests  8 passed (8)
+   Start at  05:20:18
+   Duration  1.52s (transform 127ms, setup 0ms, import 157ms, tests 1.31s, environment 0ms)
+

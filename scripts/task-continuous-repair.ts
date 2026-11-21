@@ -2,6 +2,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { v7Clone } from '@self-evolving-world/world-core';
 import type { V7Execution } from '../apps/simulator/src/continuous-run.js';
+import { worldContinuousInput } from '../apps/simulator/src/continuous-input.js';
 import { issueContinuousDevelopment } from '../apps/simulator/src/continuous-run.js';
 import { continuousCheckpoint } from './continuous-files.js';
 import { captureContinuousBaseline } from './continuous-source.js';
@@ -76,9 +77,21 @@ export async function requestContinuousTechnicalRepair(
   });
   const next = v7Clone(state);
   // Structural extension is serialized here before the runtime receives its typed recovery contract.
-  if (!state.barrier || !reason)
-    throw new Error('Missing validated technical barrier.');
-  const barrier = { ...state.barrier, technicalReason: reason };
+  if (!reason) throw new Error('Missing validated technical reason.');
+  const barrier = {
+    ...(state.barrier ?? {
+      id: `context-${String(state.world.tick)}`,
+      tick: state.world.tick,
+      actions: {},
+      requests: {},
+      reviews: [],
+      worldAttempts: 0,
+      errors: [],
+      input: worldContinuousInput(state.world, {}),
+      developmentAttempt: null,
+    }),
+    technicalReason: reason,
+  };
   next.barrier = barrier;
   await issueContinuousDevelopment(next, continuousSink(root, id));
   captureContinuousBaseline(root, id, next);
@@ -106,20 +119,33 @@ export async function requestContinuousTechnicalRepair(
 
 /** Refuse ambiguous calls, budget exhaustion, settled windows and actor review barriers. */
 export function assertContinuousTechnicalRepair(state: V7Execution): void {
-  const reason =
-    'Simulation computation budget exhausted; checkpoint the entire world.';
+  const computation =
+    state.reason ===
+      'Simulation computation budget exhausted; checkpoint the entire world.' &&
+    !!state.barrier;
+  const context =
+    state.reason ===
+      'Observation input exceeds computational context protection; no hidden truncation or inference.' &&
+    state.barrier === null &&
+    !!state.world.config.experience;
   if (
     state.phase !== 'paused' ||
-    state.reason !== reason ||
-    !state.barrier ||
+    !(computation || context) ||
     state.pendingCall ||
     state.attempts.some((a) => a.status === 'started') ||
     state.world.tick >= state.windowTarget ||
     state.developments.length >= state.world.config.budgets.development ||
-    Object.keys(state.barrier.requests).length ||
-    state.barrier.reviews.length
+    (state.barrier &&
+      (Object.keys(state.barrier.requests).length ||
+        state.barrier.reviews.length)) ||
+    (context &&
+      (['ordinary', 'world'] as const).some(
+        (role) =>
+          state.attempts.filter((a) => a.role === role).length >=
+          state.world.config.budgets[role],
+      ))
   )
     throw new Error(
-      'Only a durable, unsettled computation-only round can request technical development; budgets and uncertain calls cannot be bypassed.',
+      'Only a durable, unsettled computation or pre-inference context pause can request technical development; budgets and uncertain calls cannot be bypassed.',
     );
 }

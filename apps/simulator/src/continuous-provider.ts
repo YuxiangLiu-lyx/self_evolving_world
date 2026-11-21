@@ -1,3 +1,4 @@
+import { continuousInputText } from './forest-input-encoding.js';
 import { V7_GOAL } from '@self-evolving-world/world-core';
 import type { V7Ability, V7Schema } from '@self-evolving-world/world-core';
 import { readDecisionStream } from './responses.js';
@@ -31,6 +32,12 @@ export const ORDINARY_FOREST_PROMPT =
 export const WORLD_FOREST_PROMPT =
   WORLD_CONTINUOUS_PROMPT +
   '\nFor every request explicitly evaluate three parts: real functional effects, personal experience feedback and visible presentation. Include experienceReview and visualReview text in every review. If the performed experience plausibly benefits wellbeing, specify a bounded executable event rule with participants, conditions, amount/cap, duration, repetition and cooldown; absence of a previously registered rule is never a substantive reason for zero feedback. If there is no benefit, state the experiential or physical reason. Do not reward application, naming, registration or learning. Personal applicability may use real prior events and relationships. Declare event names for subscription validation. Every multi-round operation must cancel on death without cloning or deleting escrow, and material/room effects must use actual state and shared geometry.';
+export const ORDINARY_EXPERIENCE_PROMPT =
+  ORDINARY_FOREST_PROMPT +
+  '\nYour factual experience summary distinguishes physical state, transient pleasure and slowly changing mental state. Absence of a pleasure source is neutral. Meals reflect real ingredients, processing and intake; names and tiny portions do not create rewards. References share the declared resolver: item:ID, object:ID, resource:ID; ambiguous categories require an actual candidate ID. Repeat means complete executions, never elapsed rounds. Ongoing work continues until complete with progress shown; interrupted work follows its declared cancellation rule. A global pause preserves progress and costs. Successful outgoing messages and ordinary received information normally preserve the plan; an urgent incoming message must concern you or your current target. When making a normal decision you may reconsider any prior approach using discoveries, repeated failures and observed costs. To request a missing function describe the problem, desired effect and known conditions; method, inputs and costs may be unknown. No particular project, skill request or activity is required.';
+export const WORLD_EXPERIENCE_PROMPT =
+  WORLD_FOREST_PROMPT +
+  '\nThis policy separates transient pleasure from slow sustained mental state. Evaluate event-grounded maintained sources where appropriate: gradual accumulation, bounded saturation, decay and actual continued participation. Actual experiments establishing new observed information may qualify; mastery alone never does. Unknown requested methods or costs are your review responsibility, not grounds to reject a reasonable effect. Every generated ability declares shared reference parameters and complete-execution/progress/cancellation contracts, including escrow ownership and actual remaining work. Implement new physical mechanisms when needed. Food composition and processing provenance must trace real consumed inputs, with no label-only diversity. Review temporary pleasure and maintained satisfaction separately; never alter protected mental accounts or suppress basic nutrition. Describe observable paid effects and their replay representation, and require actual separate participant actions for social consent.';
 const string = { type: 'string' };
 const object = (properties: Record<string, unknown>) => ({
   type: 'object',
@@ -46,7 +53,13 @@ function outputSchema(schema: V7Schema): unknown {
       Object.fromEntries(
         Object.entries(schema.properties ?? {}).map(([k, v]) => [
           k,
-          outputSchema(v),
+          schema.required?.includes(k)
+            ? outputSchema(v)
+            : {
+                ...nullable(outputSchema(v)),
+                description:
+                  'Null denotes an omitted optional argument; it is never an item reference or a default material.',
+              },
         ]),
       ),
     );
@@ -131,12 +144,16 @@ export function continuousRequest(
     instructions:
       role === 'ordinary'
         ? 'environment' in input
-          ? ORDINARY_FOREST_PROMPT
+          ? 'experience' in input
+            ? ORDINARY_EXPERIENCE_PROMPT
+            : ORDINARY_FOREST_PROMPT
           : ORDINARY_CONTINUOUS_PROMPT
         : 'physicalRules' in input && input.physicalRules.forest
-          ? WORLD_FOREST_PROMPT
+          ? input.physicalRules.experience
+            ? WORLD_EXPERIENCE_PROMPT
+            : WORLD_FOREST_PROMPT
           : WORLD_CONTINUOUS_PROMPT,
-    input: [{ role: 'user', content: JSON.stringify(input) }],
+    input: [{ role: 'user', content: continuousInputText(input) }],
     text: {
       format: {
         type: 'json_schema',

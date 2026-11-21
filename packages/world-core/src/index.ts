@@ -191,3 +191,20 @@ export { FOREST_WARMING, warmingAfterPhysiology } from './forest-warming.js';
 export { v7NavigationTarget } from './continuous-navigation-target.js';
 export { forestRoute, ForestRouteFailure } from './forest-routing.js';
 export { FOREST_ROUTE_INSPECTION } from './forest-route-inspection.js';
+
+export * from './forest-references.js';
+
+export * from './forest-experience.js';
+export { FOREST_INSULATION } from './forest-insulation.js';
+
+export { FOREST_FIRE, hearthSpatial } from './forest-fire.js';
+export { fireState } from './forest-fire-exposure.js';
+
+export { FOREST_WILLOW } from './forest-willow.js';
+
+export {
+  canopyCover,
+  canopyTransmission,
+  canopyPosts,
+  canopySpatial,
+} from './forest-canopy-geometry.js';
