@@ -169,7 +169,7 @@ describe('existing gates behind the task runtime', () => {
     const report = readJson(
       resolve(root, 'validation-results/report.json'),
     ) as ValidationReport;
-    report.plan = makePlan(root);
+    report.plan = makePlan(root, false, git(root, 'rev-parse', 'origin/main'));
     report.evidence = [];
     report.browserTests = 0;
     const review = readJson(resolve(root, 'validation-results/review.json'));
@@ -181,7 +181,7 @@ describe('existing gates behind the task runtime', () => {
     git(root, 'add', '.');
     git(root, 'commit', '-m', 'Integrated documentation fixture');
     git(root, 'update-ref', 'refs/remotes/origin/main', 'HEAD');
-    report.plan = makePlan(root);
+    report.plan = makePlan(root, false, git(root, 'rev-parse', 'origin/main'));
     save('validation-results/report.json', report);
     expect(runtime.validationState(c)).toBe('stale');
     sealValidationReport(root, report);
@@ -190,7 +190,7 @@ describe('existing gates behind the task runtime', () => {
     save('validation-results/report.json', report);
     sealValidationReport(root, report);
     expect(runtime.validationState(c)).toBe('stale');
-    report.plan = makePlan(root);
+    report.plan = makePlan(root, false, git(root, 'rev-parse', 'origin/main'));
     save('validation-results/report.json', report);
     expect(runtime.validationState(c)).toBe('stale');
   });
