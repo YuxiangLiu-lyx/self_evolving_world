@@ -191,11 +191,14 @@ export function checkAnalyses(root: string): void {
     if (!entry.isDirectory())
       throw new Error('Analysis archives must be experiment directories.');
     const id = experimentId(entry.name);
+    const tasks = new Set<string>();
     for (const file of readdirSync(resolve(directory, id))) {
       if (!/\.(json|md)$/.test(file))
         throw new Error('Unexpected companion analysis artifact.');
-      // Checking either half also rejects an orphan Markdown report or JSON record.
-      checkAnalysis(root, id, file.replace(/\.(json|md)$/, ''));
+      tasks.add(file.replace(/\.(json|md)$/, ''));
     }
+    // Each check validates both halves and reconstructs every bound artifact.
+    // Deduplicate only within this invocation; never cache acceptance across edits.
+    for (const task of tasks) checkAnalysis(root, id, task);
   }
 }

@@ -622,6 +622,35 @@ describe('retained behavioral analysis', () => {
     expect(() => {
       checkAnalyses(root);
     }).toThrow();
+    writeAnalysis(root, a);
+    rmSync(resolve(root, analysisPaths('ex3', a.taskId).markdown));
+    expect(() => {
+      checkAnalyses(root);
+    }).toThrow();
+    writeAnalysis(root, a);
+    checkAnalyses(root);
+    const second = { ...a, taskId: 'second-analysis' };
+    writeAnalysis(root, second);
+    checkAnalyses(root);
+    writeFileSync(
+      resolve(root, analysisPaths('ex3', second.taskId).markdown),
+      'Changed after the previous complete collection check.',
+    );
+    expect(() => {
+      checkAnalyses(root);
+    }).toThrow('readable report');
+    writeAnalysis(root, { ...second, artifacts: {} });
+    expect(() => {
+      checkAnalyses(root);
+    }).toThrow('artifacts changed');
+    writeAnalysis(root, second);
+    writeFileSync(
+      resolve(root, 'experiment/analyses/ex3/unexpected.txt'),
+      'Unexpected',
+    );
+    expect(() => {
+      checkAnalyses(root);
+    }).toThrow('Unexpected companion');
   });
 });
 
