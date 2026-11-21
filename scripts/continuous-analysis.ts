@@ -399,7 +399,16 @@ export function readContinuousExperiment(
       totalActions: results.totalActions,
     },
     run: { frames: [] as WorldState[] },
-    continuous: { initial: frames[0], final: state.world },
+    continuous: {
+      initial: frames[0],
+      final: state.world,
+      frames: Object.fromEntries(
+        [0, Math.floor(state.world.tick / 2), state.world.tick].map((tick) => [
+          tick,
+          frames[tick],
+        ]),
+      ),
+    },
     results,
   };
 }

@@ -61,7 +61,7 @@ flowchart TB
     World -->|Complete| Evidence
     Evidence --> Targets
     Targets -->|Required| Analysis[Codex analyzes saved behavior]
-    Targets -->|None| Checks[Shared full validation and delivery below]
+    Targets -->|None| Checks[Shared scoped validation and delivery below]
     Analysis --> Checks
     classDef conversation fill:#e8f2ff,stroke:#356ba6,color:#172b4d
     classDef paused fill:#fff3cd,stroke:#9a7413,color:#493600
@@ -71,7 +71,7 @@ flowchart TB
 
 Extensible protocols are `learning`, `evolution`, `coevolution` and `continuous`. Analysis targets combine new or changed experiment records with explicitly requested retrospective analyses. Blue nodes mark conversation work, handed over through version-bound JSON requests. Checkpoints preserve decisions and budgets; continuation does not reset exhausted budgets or blindly retry inference. Capture recovery reconstructs saved results without new model calls.
 
-**Shared acceptance and delivery.** Code, documentation, experiment-only and mixed tasks all pass the full suite. The default is guarded merge; local-only and PR-only require an explicit task-scoped exception.
+**Shared acceptance and delivery.** Code, documentation, experiment-only and mixed tasks all pass the checks selected from actual dependencies. The default is guarded merge; local-only and PR-only require an explicit task-scoped exception.
 
 ```mermaid
 %%{init: {'flowchart': {'nodeSpacing': 20, 'rankSpacing': 25, 'padding': 10}}}%%
@@ -81,11 +81,11 @@ flowchart TB
     Route -->|Experiment only| Records[Validate experiment archives first]
     Route -->|Mixed| Records
     Records --> Checks
-    Checks[Full suite: types / lint / unit / build / archives / browser / docs]
-    Checks -->|Passed| Review[Codex reviews every screenshot, behavior result and changed file]
+    Checks[Impact plan: selected checks + dependency-bound evidence]
+    Checks -->|Passed| Review[Codex reviews new scenes, reused provenance, behavior and full diff]
     Checks -->|Failed| Fix[Codex fixes findings]
     Review -->|Mismatch| Fix
-    Fix -->|next: fresh validation| Checks
+    Fix -->|next: affected validation| Checks
     Review -->|Passed| Policy{Recorded delivery policy}
     Policy -->|Explicit local-only| Finish[Independent completion gate: policy-specific evidence and integration]
     Policy -->|Publish| Commit[Reviewed commit + complete PR body]

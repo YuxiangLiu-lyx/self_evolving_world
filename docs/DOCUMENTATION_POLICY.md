@@ -26,7 +26,7 @@ WORLD_FOUNDATION preserves version-1 semantics. Ordinary feature synchronization
 1. New or changed functionality: update the corresponding Feature ID, status, acceptance criteria, and evidence in PRODUCT within the same PR.
 2. Changed module responsibilities, interfaces, or dependencies: update ARCHITECTURE and automated dependency rules. Mark future modules as Planned.
 3. Important architectural decisions: add an ADR or mark a previous decision as superseded. Preserve the decision history.
-4. Task completion: record real results, unexecuted checks, and limitations, then archive the plan. Never describe incomplete acceptance as passed. All tasks, including documentation edits, follow [validation](VALIDATION.md); documentation changes invalidate the previous fingerprint.
+4. Task completion: record real results, unexecuted checks, and limitations, then archive the plan. Never describe incomplete acceptance as passed. All tasks, including documentation edits, follow [validation](VALIDATION.md); documentation changes invalidate document/diff evidence, while matching dependency-bound world and visual checks remain reusable.
 5. Changed commands, environment versions, or reading paths: update README, the development workflow, and navigation. Do not duplicate feature status tables.
 
 ## Automated validation scope

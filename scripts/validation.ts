@@ -1,11 +1,12 @@
+import type { CheckPlan } from './validation-plan.js';
+import {
+  verifyValidationReport,
+  type CheckResult,
+} from './validation-evidence.js';
 import { createHash } from 'node:crypto';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
-import {
-  checkExperiments,
-  experimentIds,
-  EXPERIMENT_SCENES,
-} from './experiments.js';
+import { experimentIds, EXPERIMENT_SCENES } from './experiments.js';
 import type { TaskRoute } from './harness.js';
 
 export const REVIEW_SCENES = [
@@ -77,13 +78,33 @@ export interface ValidationReport {
   browserTests: number;
   evidence: Evidence[];
   route?: TaskRoute;
+  plan?: CheckPlan;
+  checks?: CheckResult[];
   error?: string;
 }
 
-export function requiredScenes(root: string): string[] {
+export function requiredScenes(root: string, plan?: CheckPlan): string[] {
+  const scenes = plan
+    ? REVIEW_SCENES.filter((id) => {
+        const group = /^historical-/.test(id)
+          ? 'historical'
+          : /^(isolated-|continuous-)/.test(id)
+            ? 'continuous'
+            : id.startsWith('survival-')
+              ? 'survival'
+              : id.startsWith('learning-')
+                ? 'learning'
+                : id.startsWith('evolution-')
+                  ? 'evolution'
+                  : id.startsWith('coevolution-')
+                    ? 'coevolution'
+                    : 'classic';
+        return plan.browserGroups.includes(group);
+      })
+    : REVIEW_SCENES;
   return [
-    ...REVIEW_SCENES,
-    ...experimentIds(root).flatMap((id) =>
+    ...scenes,
+    ...(plan?.browserArchives ?? experimentIds(root)).flatMap((id) =>
       EXPERIMENT_SCENES.map((scene) => `${id}-${scene}`),
     ),
   ];
@@ -156,7 +177,10 @@ function artifactPath(root: string, path: unknown): string {
   if (!nonempty(path) || isAbsolute(path))
     throw new Error('Invalid evidence path.');
   const resolved = resolve(root, path);
-  const part = relative(resolve(root, 'test-results'), resolved);
+  const evidenceRoot = path.startsWith('validation-results/evidence/')
+    ? 'validation-results/evidence'
+    : 'test-results';
+  const part = relative(resolve(root, evidenceRoot), resolved);
   if (part === '..' || part.startsWith(`..${sep}`) || isAbsolute(part)) {
     throw new Error('Screenshot evidence must stay inside test-results.');
   }
@@ -168,6 +192,7 @@ function artifactPath(root: string, path: unknown): string {
 export function browserEvidence(
   root: string,
   value: unknown,
+  plan?: CheckPlan,
 ): {
   tests: number;
   evidence: Evidence[];
@@ -185,7 +210,7 @@ export function browserEvidence(
   if (!Array.isArray(report.screenshots))
     throw new Error('Missing screenshots.');
   const screenshots = report.screenshots.map(object);
-  const evidence = requiredScenes(root).map((id) => {
+  const evidence = requiredScenes(root, plan).map((id) => {
     const matches = screenshots.filter((entry) => entry.id === id);
     const shot = matches[0];
     if (matches.length !== 1 || shot === undefined || !nonempty(shot.path)) {
@@ -216,7 +241,13 @@ export function completionErrors(
     const report = object(rawReport);
     const review = object(rawReview);
     const errors: string[] = [];
-    checkExperiments(root);
+    const plan = report.plan as CheckPlan | undefined;
+    const scenes = requiredScenes(root, plan);
+    try {
+      verifyValidationReport(root, report as unknown as ValidationReport);
+    } catch (error) {
+      errors.push(error instanceof Error ? error.message : String(error));
+    }
     if (
       report.version !== 1 ||
       !nonempty(report.runId) ||
@@ -228,12 +259,12 @@ export function completionErrors(
       );
     }
     if (report.status !== 'awaiting-review' && report.status !== 'passed') {
-      errors.push('Full automated validation has not passed.');
+      errors.push('Selected automated validation has not passed.');
     }
     if (
       typeof report.browserTests !== 'number' ||
       !Number.isSafeInteger(report.browserTests) ||
-      report.browserTests < 1
+      report.browserTests < (scenes.length ? 1 : 0)
     )
       errors.push('Missing successful browser tests.');
     if (report.sourceHash !== sourceFingerprint(root))
@@ -244,12 +275,9 @@ export function completionErrors(
       throw new Error('Missing visual evidence/review.');
     const evidence = report.evidence.map(object);
     const visual = review.visual.map(object);
-    if (
-      evidence.length !== requiredScenes(root).length ||
-      visual.length !== requiredScenes(root).length
-    )
+    if (evidence.length !== scenes.length || visual.length !== scenes.length)
       errors.push('Every required screenshot must be reviewed.');
-    for (const id of requiredScenes(root)) {
+    for (const id of scenes) {
       const shots = evidence.filter((entry) => entry.id === id);
       const reviews = visual.filter((entry) => entry.id === id);
       const shot = shots[0];

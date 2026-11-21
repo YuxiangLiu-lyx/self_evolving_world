@@ -18,7 +18,7 @@ import {
   digest,
   experimentFiles,
   measureSynchronous,
-  readExperiment,
+  validateExperiment,
   writeExperimentJson,
 } from './experiments.js';
 
@@ -58,7 +58,7 @@ function captureRecord(id: string, manifest: Record<string, unknown>): void {
         ]),
       ),
     });
-    readExperiment(root, id);
+    validateExperiment(root, id);
   } catch (error) {
     writeExperimentJson(path, {
       ...manifest,
@@ -76,7 +76,7 @@ try {
     );
   } else if (command === 'resume' && args.length === 1 && args[0]) {
     requireTaskWorker(root, 'resume', args);
-    const { directory, manifest } = readExperiment(root, args[0], true);
+    const { directory, manifest } = validateExperiment(root, args[0], true);
     if (manifest.status === 'completed')
       throw new Error('Completed experiments cannot be overwritten.');
     run('pnpm', ['build']);

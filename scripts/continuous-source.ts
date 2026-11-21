@@ -95,6 +95,66 @@ export function continuousSources(root: string): Record<string, string> {
     files[path] = readFileSync(resolve(root, path), 'utf8');
   return files;
 }
+/** Runtime identity excludes acceptance tooling/tests while retained snapshots keep their original full hashes. */
+export function continuousRuntimeSources(
+  files: Record<string, string>,
+): Record<string, string> {
+  return Object.fromEntries(
+    Object.entries(files).flatMap(([path, value]) => {
+      if (
+        path.startsWith('packages/world-core/src/') ||
+        path.startsWith('apps/simulator/src/') ||
+        path.startsWith('apps/viewer/src/') ||
+        path.startsWith('apps/viewer/public/') ||
+        /^scripts\/continuous-(cli|store|window)\.ts$/.test(path)
+      )
+        return [[path, value]];
+      if (path.endsWith('package.json')) {
+        const p = JSON.parse(value) as {
+          dependencies?: unknown;
+          optionalDependencies?: unknown;
+          engines?: unknown;
+        };
+        return [
+          [
+            path,
+            JSON.stringify({
+              dependencies: p.dependencies,
+              optionalDependencies: p.optionalDependencies,
+              engines: p.engines,
+            }),
+          ],
+        ];
+      }
+      return [];
+    }),
+  );
+}
+export function continuousRuntimeHash(files: Record<string, string>): string {
+  return continuousHash(continuousRuntimeSources(files));
+}
+export function currentContinuousRuntimeMatches(
+  root: string,
+  id: string,
+): boolean {
+  const revision = continuousHistory(root, id).at(-1);
+  if (!revision) return false;
+  const retained = continuousRead<Record<string, string>>(
+    resolve(
+      root,
+      'experiment',
+      id,
+      'sources',
+      `revision-${String(revision.id)}.json`,
+    ),
+  );
+  if (continuousHash(retained) !== revision.sourceHash)
+    throw new Error('Retained runtime source integrity failed.');
+  return (
+    continuousRuntimeHash(retained) ===
+    continuousRuntimeHash(continuousSources(root))
+  );
+}
 export function continuousHistory(
   root: string,
   id: string,
@@ -143,8 +203,7 @@ export function captureContinuousBaseline(
   if (
     state.phase !== 'development' ||
     !state.barrier ||
-    continuousHistory(root, id).at(-1)?.sourceHash !==
-      continuousHash(continuousSources(root))
+    !currentContinuousRuntimeMatches(root, id)
   )
     return;
   const path = resolve(
@@ -218,19 +277,30 @@ export function validateContinuousDevelopment(
       );
   const previous = continuousHistory(root, id).at(-1);
   if (!previous) throw new Error('Missing retained source baseline.');
-  const current = continuousSources(root),
-    changed = [
-      ...new Set([...Object.keys(previous.files), ...Object.keys(current)]),
-    ]
-      .filter(
-        (p) =>
-          previous.files[p] !==
-          (current[p] === undefined ? undefined : continuousHash(current[p])),
-      )
-      .sort();
-  if (v7Signature(changed) !== v7Signature([...(paths as string[])].sort()))
+  const current = continuousSources(root);
+  const beforeRuntime = continuousRuntimeSources(
+    continuousRead<Record<string, string>>(
+      resolve(
+        root,
+        'experiment',
+        id,
+        'sources',
+        `revision-${String(previous.id)}.json`,
+      ),
+    ),
+  );
+  const afterRuntime = continuousRuntimeSources(current);
+  const changed = [
+    ...new Set([...Object.keys(beforeRuntime), ...Object.keys(afterRuntime)]),
+  ]
+    .filter((p) => beforeRuntime[p] !== afterRuntime[p])
+    .sort();
+  const declaredRuntime = (paths as string[])
+    .filter((p) => p in beforeRuntime || p in afterRuntime)
+    .sort();
+  if (v7Signature(changed) !== v7Signature(declaredRuntime))
     throw new Error(
-      `Declared source paths must match actual changes: ${changed.join(', ')}`,
+      `Declared runtime source paths must match actual changes: ${changed.join(', ')}`,
     );
   // These enforce experiment identity, authorization and exactly-once budgets rather than world design.
   const protectedPaths =

@@ -16,8 +16,15 @@ import {
 } from './coevolution-analysis.js';
 import { evolutionSmoke } from './evolution-smoke.js';
 import { measureEvolution, EVOLUTION_POLICY } from './evolution-analysis.js';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
+import { EvidenceCache } from './validation-cache.js';
 import {
+  archiveVersion,
+  experimentInput,
+  fingerprint,
+} from './validation-inputs.js';
+import {
+  appendFileSync,
   existsSync,
   lstatSync,
   mkdirSync,
@@ -205,7 +212,7 @@ function measureLegacy(
   };
 }
 
-export function readExperiment(root: string, id: string, pending = false) {
+function reconstructExperiment(root: string, id: string, pending = false) {
   experimentId(id);
   const directory = resolve(root, 'experiment', id);
   if (!lstatSync(directory).isDirectory())
@@ -545,6 +552,179 @@ export function readExperiment(root: string, id: string, pending = false) {
 
 export function checkExperiments(root: string): string[] {
   const ids = experimentIds(root);
-  for (const id of ids) readExperiment(root, id);
+  for (const id of ids) validateExperiment(root, id);
   return ids;
+}
+
+/** Metadata only. No inference, replay, report regeneration or implicit acceptance. */
+export function readExperiment(root: string, id: string, pending = false) {
+  experimentId(id);
+  const directory = resolve(root, 'experiment', id);
+  if (
+    !lstatSync(directory).isDirectory() ||
+    !lstatSync(resolve(directory, 'manifest.json')).isFile()
+  )
+    throw new Error('Invalid experiment directory or manifest.');
+  const manifest = jsonObject(
+    readExperimentJson(resolve(directory, 'manifest.json')),
+  );
+  if (
+    manifest.id !== id ||
+    manifest.format !== 'self-evolving-world/experiment'
+  )
+    throw new Error('Invalid experiment identity.');
+  if (!pending && manifest.status !== 'completed')
+    throw new Error(`Experiment did not complete: ${id}`);
+  if (
+    typeof manifest.objective !== 'string' ||
+    typeof manifest.steps !== 'number'
+  )
+    throw new Error('Missing experiment configuration.');
+  const schedules = [
+    '',
+    '',
+    'simultaneous-round-v1',
+    'survival-v1',
+    'learning-v1',
+    'evolution-v1',
+    'coevolution-v1',
+    'continuous-v1',
+  ];
+  const version = archiveVersion(root, id);
+  const results = jsonObject(
+    readExperimentJson(resolve(directory, 'results.json')),
+  );
+  return {
+    directory,
+    manifest,
+    results,
+    config: {
+      id,
+      objective: manifest.objective,
+      steps: manifest.steps,
+      ...(typeof manifest.seed === 'number' ? { seed: manifest.seed } : {}),
+      ...(version >= 2
+        ? {
+            schedule: version === 2 ? ROUND_SCHEDULE : schedules[version],
+            totalActions: results.totalActions,
+          }
+        : {}),
+    },
+  };
+}
+
+/** Hashes and complete file inventory; deliberately does not execute historical rules. */
+export function checkExperimentIntegrity(
+  root: string,
+  id: string,
+): ReturnType<typeof readExperiment> {
+  const record = readExperiment(root, id),
+    { directory, manifest } = record;
+  const files = experimentFiles(manifest),
+    hashes = jsonObject(manifest.artifacts);
+  const visit = (path: string, prefix = ''): string[] =>
+    readdirSync(path, { withFileTypes: true }).flatMap((entry) => {
+      const relative = `${prefix}${entry.name}`;
+      if (entry.isDirectory())
+        return visit(resolve(path, entry.name), `${relative}/`);
+      if (!entry.isFile())
+        throw new Error(`Invalid non-file artifact: ${id}/${relative}`);
+      return [relative];
+    });
+  if (
+    !isDeepStrictEqual(
+      visit(directory).sort(),
+      ['manifest.json', ...files].sort(),
+    )
+  )
+    throw new Error(`Unexpected experiment artifacts: ${id}`);
+  if (!isDeepStrictEqual(Object.keys(hashes).sort(), [...files].sort()))
+    throw new Error(`Incomplete artifact manifest: ${id}`);
+  for (const file of files) {
+    if (
+      !file ||
+      file.startsWith('/') ||
+      file.includes('..') ||
+      file.includes('\\') ||
+      hashes[file] !== digest(resolve(directory, file))
+    )
+      throw new Error(`Artifact hash mismatch: ${id}/${file}`);
+  }
+  return record;
+}
+
+export interface ReconstructionMetric {
+  id: string;
+  input: string;
+  status: 'passed' | 'reused';
+  durationMs: number;
+  deepRebuilds: number;
+  originRun: string;
+}
+const metrics: ReconstructionMetric[] = [];
+function recordReconstruction(
+  root: string,
+  metric: ReconstructionMetric,
+): void {
+  metrics.push(metric);
+  const run = process.env.WORLD_VALIDATION_RUN;
+  if (run && /^[a-f0-9-]+$/.test(run)) {
+    const directory = resolve(root, 'validation-results/rebuilds');
+    mkdirSync(directory, { recursive: true });
+    appendFileSync(
+      resolve(directory, `${run}.jsonl`),
+      JSON.stringify(metric) + '\n',
+    );
+  }
+}
+export const reconstructionMetrics = (): readonly ReconstructionMetric[] =>
+  metrics;
+export function experimentFingerprint(root: string, id: string): string {
+  experimentId(id);
+  const version = archiveVersion(root, id);
+  return fingerprint(root, (p) => experimentInput(p, id, version));
+}
+/** Explicit deep acceptance. Only runner-authenticated, exactly matching results may be reused. */
+export function validateExperiment(
+  root: string,
+  id: string,
+  pending = false,
+): ReturnType<typeof reconstructExperiment> {
+  if (pending) return reconstructExperiment(root, id, true);
+  const started = performance.now(),
+    input = experimentFingerprint(root, id);
+  const cache = new EvidenceCache(
+    root,
+    process.env.WORLD_VALIDATION_RUN ?? randomUUID(),
+  );
+  const previous = cache.read<ReturnType<typeof reconstructExperiment>>(
+    `experiment:${id}`,
+    input,
+  );
+  if (previous) {
+    recordReconstruction(root, {
+      id,
+      input,
+      status: 'reused',
+      durationMs: performance.now() - started,
+      deepRebuilds: 0,
+      originRun: previous.originRun,
+    });
+    return previous.value;
+  }
+  const result = reconstructExperiment(root, id);
+  checkExperimentIntegrity(root, id);
+  if (experimentFingerprint(root, id) !== input)
+    throw new Error('Archive inputs changed during reconstruction.');
+  const durationMs = performance.now() - started;
+  const receipt = cache.write(`experiment:${id}`, input, result, durationMs);
+  recordReconstruction(root, {
+    id,
+    input,
+    status: 'passed',
+    durationMs,
+    deepRebuilds: 1,
+    originRun: receipt.originRun,
+  });
+  return result;
 }

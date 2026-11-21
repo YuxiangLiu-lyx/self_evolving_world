@@ -43,3 +43,5 @@ For a material change to an accepted decision, create a new ADR and mark the old
 - [0018](0018-continuous-world-and-wellbeing.md): independent continuous physics, versioned executable/visual packages, bounded experienced wellbeing and segmented long-window evidence.
 
 - [0019](0019-forest-lives-and-experience.md): opt-in forest ecology, finite lives, experience review, shared enclosure geometry and retained continuous provenance.
+
+- [0020](0020-scoped-validation.md): dependency-scoped checks, authenticated reuse, batched archive preservation and nonduplicated CI.

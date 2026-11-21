@@ -17,7 +17,7 @@ Implement the complete next iteration from main f0441a9 and run a new real three
 - R9: Add isolated regressions for lives, death/respawn, inventory conservation, persistent world and cross-life memory, seasons, cave/building passage, and request–review–development–learning–execution–experience–other-agent reuse. Isolated fixture behavior remains distinct from autonomous experiment results.
 - R10: After development and full regression checks, allocate the next exN and run the existing real-model transport for three agents toward 1,000 rounds with a technical checkpoint at 200–300 and at least one clear environmental change. Continue automatically absent technical blockers; retain exact early-stop reasons for exhausted lives/budgets and resumable checkpoints for blockers.
 - R11: Record model, seed, parameters and attempted-call budgets before inference. Preserve all actual calls, failures, source versions and same-round development barriers; never substitute scripted behavior, reroll, insert activity hints or replace a paused run. Report ordinary, world and development counts/costs separately, marking unmetered costs unknown.
-- R12: Run the complete unfiltered test suite, inspect the actual interface and every current required image/behavior result/changed file, archive a factual behavior analysis and formal-versus-isolated visuals, then complete reviewed commit, full PR body, version-bound COMMENT self-review, current quality/pr-policy checks, guarded merge and independent completion. Deliver run entry, report, key replays and remaining limitations.
+- R12: Run every programmatically selected check, retaining the unfiltered unit suite for code changes; inspect selected new interface evidence, verify dependency-bound reused reviews and review every current changed file, archive a factual behavior analysis and formal-versus-isolated visuals, then complete reviewed commit, full PR body, version-bound COMMENT self-review, current quality/pr-policy checks, guarded merge and independent completion. Deliver run entry, report, key replays and remaining limitations.
 
 ## Scope and exclusions
 
@@ -113,3 +113,9 @@ The behavioral analysis proposes clearer target/repetition contracts, event refi
 - Task: Forest survival, finite lives and real three-agent observation
 - Mode: merge
 - No archive reuse, no-PR or no-merge exception is requested.
+
+## Acceptance-only integration after PR #16
+
+The user explicitly requested scoped validation and authorized its policy/CI changes. Integrate main 7822be0 (PR #16) into this existing branch and continue task pr-21-forest-lives with its recorded ex8 journal. This continuation is acceptance and delivery only: no inference, allocation, experiment resumption, budget reset, changed world mechanics or archive/source-snapshot rewrite. The original checkpoint remains budget-paused at round 897. R12 now follows ADR 0020; the earlier full-suite requirements and twenty-minute workaround above describe retained historical attempts, not current policy.
+
+Conflict resolution preserves forest features and technical-repair documentation, adopts lightweight analysis binding checks, retains both ADR/plan indexes and restores the ten-minute CI bound. PR #16 passed 381 unit tests and 28 browser tests; its current-head CI reconstructed ex1-ex7 once each in one workflow, with about 123 seconds of check computation and roughly three minutes total. Those measurements exclude ex8; this branch's fresh scoped receipts will report its larger workload separately. Existing timeout logs and the prior 624-second ex8 quality job remain the comparison baseline. All original experiment files and checkpoint records are preserved; original task state is retained before amendment.

@@ -47,10 +47,26 @@ export function analysisMaterial(root: string, id: string) {
   const record = readExperiment(root, experimentId(id));
   return {
     experiment: id,
-    actors:
-      'continuous' in record
-        ? (record.continuous.initial?.actors.map((a) => a.id) ?? [])
-        : (record.run.frames[0]?.agents.map((a) => a.id) ?? []),
+    actors: (() => {
+      const replay = object(readJson(resolve(record.directory, 'replay.json')));
+      const initial =
+        record.manifest.version === 7
+          ? object(
+              object(
+                readJson(
+                  resolve(
+                    record.directory,
+                    String(object((replay.segments as unknown[])[0]).path),
+                  ),
+                ),
+              ).initial,
+            )
+          : object(replay.initial);
+      const actors = initial.actors ?? initial.agents;
+      if (!Array.isArray(actors))
+        throw new Error('Missing archived actor identities.');
+      return actors.map((a) => String(object(a).id));
+    })(),
     artifacts: Object.fromEntries(
       ['manifest.json', ...experimentFiles(record.manifest)].map((file) => [
         `experiment/${id}/${file}`,
@@ -191,14 +207,14 @@ export function checkAnalyses(root: string): void {
     if (!entry.isDirectory())
       throw new Error('Analysis archives must be experiment directories.');
     const id = experimentId(entry.name);
-    const tasks = new Set<string>();
-    for (const file of readdirSync(resolve(directory, id))) {
+    const files = readdirSync(resolve(directory, id));
+    for (const file of files) {
       if (!/\.(json|md)$/.test(file))
         throw new Error('Unexpected companion analysis artifact.');
-      tasks.add(file.replace(/\.(json|md)$/, ''));
+      const stem = file.replace(/\.(json|md)$/, '');
+      if (!files.includes(`${stem}.json`) || !files.includes(`${stem}.md`))
+        throw new Error('Missing companion analysis pair.');
+      if (file.endsWith('.json')) checkAnalysis(root, id, stem);
     }
-    // Each check validates both halves and reconstructs every bound artifact.
-    // Deduplicate only within this invocation; never cache acceptance across edits.
-    for (const task of tasks) checkAnalysis(root, id, task);
   }
 }

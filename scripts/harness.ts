@@ -1,5 +1,6 @@
+import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
-import { existsSync, lstatSync, readFileSync } from 'node:fs';
+import { existsSync, lstatSync, readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 export interface TaskRoute {
@@ -72,37 +73,47 @@ export function checkArchivePreservation(
       if (match[1]) exceptions.add(match[1]);
     }
   }
-  const files = git(
-    'ls-tree',
-    '-r',
-    '--name-only',
-    base,
-    '--',
-    'experiment',
-  ).split('\n');
+  // One tree query covers every blob, including calls, snapshots and nested replay parts.
+  const entries = git('ls-tree', '-r', '-z', base, '--', 'experiment')
+    .split('\0')
+    .filter(Boolean);
+  const files = new Set<string>();
   const existing = new Set<string>();
-  for (const file of files) {
+  for (const entry of entries) {
+    const match = /^([0-9]+) blob ([a-f0-9]+)\t(.+)$/.exec(entry);
+    if (!match) throw new Error('Unsupported archive tree entry.');
+    const [, mode, expected, file] = match;
+    if (!file) throw new Error('Missing archive path.');
     const id = /^experiment\/(ex[1-9]\d*)\//.exec(file)?.[1];
     if (!id) continue;
     existing.add(id);
-    const path = resolve(root, file);
+    files.add(file);
     if (exceptions.has(id)) continue;
-    if (!existsSync(path) || !lstatSync(path).isFile())
+    const path = resolve(root, file);
+    if (mode !== '100644' || !existsSync(path) || !lstatSync(path).isFile())
       throw new Error(
         `Archived experiment cannot be removed or replaced: ${file}`,
       );
-    const original = execFileSync('git', ['show', `${base}:${file}`], {
-      cwd: root,
-      maxBuffer: 20_000_000,
-    });
-    if (!original.equals(readFileSync(path)))
+    const data = readFileSync(path);
+    const actual = createHash(expected?.length === 64 ? 'sha256' : 'sha1')
+      .update(`blob ${String(data.length)}\0`)
+      .update(data)
+      .digest('hex');
+    if (actual !== expected)
       throw new Error(
         `Archived experiment changed: ${file}. Allocate a new exN, or record the user's explicit reuse instruction in the current plan.`,
       );
   }
-  for (const file of route.files) {
-    const id = /^experiment\/(ex[1-9]\d*)\//.exec(file)?.[1];
-    if (id && existing.has(id) && !exceptions.has(id) && !files.includes(file))
-      throw new Error(`Cannot add files to an existing experiment: ${file}`);
-  }
+  // Walk actual directories: ignored/untracked additions must not evade Git's diff.
+  const visit = (directory: string): void => {
+    for (const entry of readdirSync(resolve(root, directory), {
+      withFileTypes: true,
+    })) {
+      const file = `${directory}/${entry.name}`;
+      if (entry.isDirectory()) visit(file);
+      else if (!entry.isFile() || !files.has(file))
+        throw new Error(`Cannot add files to an existing experiment: ${file}`);
+    }
+  };
+  for (const id of existing) if (!exceptions.has(id)) visit(`experiment/${id}`);
 }

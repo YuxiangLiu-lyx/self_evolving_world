@@ -1,3 +1,4 @@
+import { browserSelection } from '../../../scripts/validation-plan.js';
 import { copyFileSync, readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -9,7 +10,7 @@ import {
   experimentId,
   experimentIds,
   EXPERIMENT_SCENES,
-  readExperiment,
+  validateExperiment,
   writeExperimentJson,
 } from '../../../scripts/experiments.js';
 import { captureReview, expect, test } from './validators.js';
@@ -17,7 +18,11 @@ import { captureReview, expect, test } from './validators.js';
 const root = process.cwd();
 const capture = process.env.WORLD_EXPERIMENT_CAPTURE;
 if (capture !== undefined) experimentId(capture);
-const ids = (capture === undefined ? experimentIds(root) : [capture]).filter(
+const ids = (
+  capture === undefined
+    ? (browserSelection()?.archives ?? experimentIds(root))
+    : [capture]
+).filter(
   (id) =>
     (
       JSON.parse(
@@ -138,7 +143,7 @@ for (const id of ids) {
     page,
   }, info) => {
     test.setTimeout(60_000);
-    const record = readExperiment(root, id, capture !== undefined);
+    const record = validateExperiment(root, id, capture !== undefined);
     if ('continuous' in record)
       throw new Error(
         'Continuous archives use their dedicated segmented browser contract.',

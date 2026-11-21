@@ -140,8 +140,7 @@ try {
     );
     if (identity.number !== receipt.number || identity.url !== receipt.url)
       throw new Error('Delivery PR identity changed.');
-    const since =
-      policy.mode === 'merge' ? receipt.checksSince : identity.checksSince;
+    const since = receipt.checksSince;
     if (
       inspectChecks(
         await request(`/commits/${head}/check-runs?filter=latest&per_page=100`),

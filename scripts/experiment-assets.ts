@@ -3,7 +3,7 @@ import { resolve } from 'node:path';
 import {
   experimentIds,
   jsonObject,
-  readExperiment,
+  checkExperimentIntegrity,
   readExperimentJson,
 } from './experiments.js';
 
@@ -17,7 +17,7 @@ export function experimentAssets(root: string): Map<string, string> {
     );
     // Capture/resume builds must remain possible before a run is complete.
     if (manifest.status === 'running' || manifest.status === 'failed') continue;
-    const record = readExperiment(root, id);
+    const record = checkExperimentIntegrity(root, id);
     entries.push({ ...record.config, createdAt: record.manifest.createdAt });
     const exposed =
       manifest.version === 7
