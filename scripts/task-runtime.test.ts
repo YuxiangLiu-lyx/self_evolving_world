@@ -42,6 +42,7 @@ import {
 import { allocateExperiment, experimentIds } from './experiments.js';
 import { reviewBody } from './task-review.js';
 import { classifyChanges } from './harness.js';
+import { makePlan } from './validation-plan.js';
 
 const repository = process.cwd(),
   plan = 'docs/exec-plans/active/pr-99-fixture.md';
@@ -143,6 +144,56 @@ afterEach(() => {
 });
 
 describe('existing gates behind the task runtime', () => {
+  it('uses the current base for changed delivery and retains the published base only for an exact retry', () => {
+    const c = makeContext(),
+      runtime = new LocalTaskEffects(root, () => {}),
+      previous = git(root, 'rev-parse', 'HEAD');
+    c.publication = {
+      base: previous,
+      head: previous,
+      sourceHash: sourceFingerprint(root),
+    };
+    git(root, 'commit', '--allow-empty', '-m', 'Integrated main fixture');
+    git(root, 'update-ref', 'refs/remotes/origin/main', 'HEAD');
+    expect(runtime.snapshot(c).base).toBe(git(root, 'rev-parse', 'HEAD'));
+    expect(c.publication.base).toBe(previous);
+    c.publication.head = git(root, 'rev-parse', 'HEAD');
+    expect(runtime.snapshot(c).base).toBe(previous);
+    writeFileSync(resolve(root, 'new-scope.md'), 'New reviewed scope');
+    expect(runtime.snapshot(c).base).toBe(git(root, 'rev-parse', 'HEAD'));
+  });
+  it('requests validation for changed scope or untrusted receipts before requesting review', () => {
+    const c = makeContext(),
+      runtime = new LocalTaskEffects(root, () => {});
+    evidence(c);
+    const report = readJson(
+      resolve(root, 'validation-results/report.json'),
+    ) as ValidationReport;
+    report.plan = makePlan(root);
+    report.evidence = [];
+    report.browserTests = 0;
+    const review = readJson(resolve(root, 'validation-results/review.json'));
+    save('validation-results/review.json', { ...object(review), visual: [] });
+    save('validation-results/report.json', report);
+    sealValidationReport(root, report);
+    expect(runtime.validationState(c)).toBe('passed');
+    // The same file bytes move into the base; prior scope cannot be reused there.
+    git(root, 'add', '.');
+    git(root, 'commit', '-m', 'Integrated documentation fixture');
+    git(root, 'update-ref', 'refs/remotes/origin/main', 'HEAD');
+    report.plan = makePlan(root);
+    save('validation-results/report.json', report);
+    expect(runtime.validationState(c)).toBe('stale');
+    sealValidationReport(root, report);
+    expect(runtime.validationState(c)).toBe('passed');
+    report.plan = { ...report.plan, files: [plan] };
+    save('validation-results/report.json', report);
+    sealValidationReport(root, report);
+    expect(runtime.validationState(c)).toBe('stale');
+    report.plan = makePlan(root);
+    save('validation-results/report.json', report);
+    expect(runtime.validationState(c)).toBe('stale');
+  });
   it('retains complete committed and working review diffs larger than the capture buffer', () => {
     const c = makeContext(),
       runtime = new LocalTaskEffects(root, () => {}),

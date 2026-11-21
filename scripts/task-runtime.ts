@@ -45,6 +45,8 @@ import {
   type Snapshot,
 } from './task-context.js';
 import type { TaskEffects } from './task-flow.js';
+import type { ValidationReport } from './validation.js';
+import { verifyValidationReport } from './validation-evidence.js';
 
 export type CommandRunner = (
   args: string[],
@@ -132,7 +134,9 @@ export class LocalTaskEffects implements TaskEffects {
   }
   snapshot(c: TaskContext): Snapshot {
     const base =
-      typeof c.publication?.base === 'string'
+      typeof c.publication?.base === 'string' &&
+      c.publication.head === git(this.root, 'rev-parse', 'HEAD') &&
+      c.publication.sourceHash === sourceFingerprint(this.root)
         ? c.publication.base
         : 'origin/main';
     const branch = git(this.root, 'branch', '--show-current');
@@ -412,6 +416,8 @@ export class LocalTaskEffects implements TaskEffects {
         return 'stale';
       if (report.status !== 'awaiting-review' && report.status !== 'passed')
         return 'missing';
+      // Scope/receipt changes require a new plan, not another review of stale evidence.
+      verifyValidationReport(this.root, report as unknown as ValidationReport);
       if (!Array.isArray(report.evidence)) return 'stale';
       for (const entry of report.evidence) {
         const e = object(entry);
@@ -554,14 +560,7 @@ export class LocalTaskEffects implements TaskEffects {
     )
       throw new Error('PR body is not bound to this reviewed version.');
     this.inputFile(c.body.path);
-    this.command(c, [
-      'pr:check',
-      '--',
-      c.body.path,
-      typeof c.publication?.base === 'string'
-        ? c.publication.base
-        : 'origin/main',
-    ]);
+    this.command(c, ['pr:check', '--', c.body.path, this.snapshot(c).base]);
   }
   publish(c: TaskContext): Record<string, unknown> {
     if (!c.body || c.intent.delivery.mode === 'local-only')
