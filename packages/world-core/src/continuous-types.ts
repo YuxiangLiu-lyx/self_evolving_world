@@ -17,6 +17,8 @@ export interface V7Spatial extends V7Point {
   reserved?: boolean;
   interaction: number;
   entrances: V7Point[];
+  /** Forest extension: rectangle walls with a south-facing doorway in local coordinates. */
+  enclosure?: { wall: number; doorway: number; roof: string };
 }
 export interface V7Visual {
   component: string;
@@ -43,6 +45,15 @@ export interface V7Resource {
   nutrition: number;
   toxicity: number;
   color: string;
+  properties?: {
+    hardness: number;
+    flexibility: number;
+    fuel: number;
+    decay: number;
+    minGrowth: number;
+    optimalGrowth: number;
+    moisture: number;
+  };
 }
 export interface V7Stack {
   id: string;
@@ -51,6 +62,12 @@ export interface V7Stack {
   position: V7Point;
   owner: string | null;
   origin: string;
+  /** Canonical fixed-point accounting after food-assessment installation; quantity remains public resource units. */
+  quantityTenths?: number;
+  /** Owned material reserved by a real ongoing operation, still counted as carried mass. */
+  reservedFor?: string;
+  harvestedAt?: number;
+  decay?: number;
 }
 export interface V7Vital {
   health: number;
@@ -65,6 +82,7 @@ export interface V7Satisfaction {
   lastTick: number;
   expires: number;
   exposures: number;
+  layers?: { value: number; expires: number }[];
 }
 export interface V7Wellbeing {
   physical: number;
@@ -79,6 +97,9 @@ export interface V7Memory {
   experiences: { tick: number; event: string; summary: string }[];
   notes: string[];
   preferences: string[];
+  intention?: string;
+  important?: { tick: number; event: string; type: string; summary: string }[];
+  discoveries?: Record<string, V7Data>;
 }
 export interface V7Actor {
   id: string;
@@ -95,6 +116,12 @@ export interface V7Actor {
   extensionState: V7Data;
   bornAt: number;
   parents: string[];
+  life?: {
+    total: number;
+    deaths: number;
+    spawn: V7Point;
+    lastDeath: V7Data | null;
+  };
 }
 export interface V7Condition {
   path: string;
@@ -183,6 +210,8 @@ export interface V7SatisfactionRule {
   event: string;
   interface: string;
   conditions: V7Condition[];
+  /** Reviewed alternative evidence routes share this exact source and reward history. */
+  alternativeTriggers?: { event: string; interface: string }[];
   amount: number;
   cap: number;
   duration: number;
@@ -191,6 +220,9 @@ export interface V7SatisfactionRule {
   cooldown: number;
   rationale: string;
   revision: string;
+  participants?: 'actor' | 'participants';
+  /** Keep overlapping rewards as their maximum; repetition uses a smaller amount within this window. */
+  repeatWindow?: { rounds: number; amount: number };
 }
 export interface V7Configuration {
   protocol: 'continuous-v1';
@@ -209,6 +241,13 @@ export interface V7Configuration {
   mentalCap: number;
   budgets: { ordinary: number; world: number; development: number };
   computation: { workPerRound: number; inputBytes: number; stateBytes: number };
+  forest?: {
+    version: 1;
+    day: number;
+    year: number;
+    respawnSatiety: number;
+    lives: number;
+  };
 }
 export interface V7World {
   protocol: 'continuous-v1';
@@ -228,6 +267,7 @@ export interface V7World {
   events: V7Event[];
   nextIdentity: number;
   identityScope: string;
+  eventTypes?: string[];
 }
 export interface V7Observation {
   tick: number;
@@ -273,6 +313,9 @@ export interface V7Package {
     (world: V7World, process: V7Process, work: V7Work) => void
   >;
   visualComponents: string[];
+  events?: string[];
+  /** Release pending work/escrow at the death position before respawn, without refunding effort. */
+  onDeath?: (world: V7World, actor: V7Actor) => void;
   stateSchemas?: Record<string, V7Schema>;
   /** Only private observations enter a learned actor-selected memory adapter. */
   harness?: Record<

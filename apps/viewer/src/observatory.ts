@@ -1,3 +1,5 @@
+import { forestClimate } from '@self-evolving-world/world-core';
+import { drawForestCanvas } from './forest-canvas.js';
 import type { V7World, V7Cursor } from '@self-evolving-world/world-core';
 import {
   continuousScene,
@@ -14,7 +16,7 @@ import './observatory.css';
 
 const root = document.getElementById('observatory');
 if (!root) throw new Error('Missing observatory root.');
-root.innerHTML = `<header class="obs-header"><div class="brand"><div class="brand-mark" aria-hidden="true">♧</div><div><div class="eyebrow">Self-evolving world</div><h1>World Observatory</h1><p>A living record of choices and consequences</p></div></div><div class="header-controls"><a id="classic-link" href="./classic.html">Classic inspector ↗</a><select id="archive" aria-label="Saved experiment"></select></div></header><main class="obs-layout"><section class="world-column"><div class="world-toolbar"><div><div class="eyebrow" id="world-label">Loading archive</div><h2 id="world-title">Life, at its own pace</h2></div><div class="mode-controls"><button id="global" aria-pressed="true">Whole world</button><button id="private" aria-pressed="false">Personal view</button></div></div><div class="world-stage"><svg class="world-canvas" id="scene" role="img" aria-label="Recorded world scene" viewBox="0 0 24 24"></svg><div class="stage-tag" id="stage-tag">READ-ONLY OBSERVATION</div><div class="camera-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="fit">Fit</button><button id="follow" aria-pressed="false">Follow</button><button id="geometry" aria-pressed="false">Geometry</button></div><svg id="minimap" class="minimap" role="img" aria-label="World minimap"></svg><div class="stage-caption" id="spatial-caption">Drag to pan · Scroll to zoom · Select a character</div></div><div class="timeline-card"><div class="playback"><button id="previous" aria-label="Previous round">‹</button><button id="play">Play</button><button id="next" aria-label="Next round">›</button><input id="time" type="range" min="0" max="0" value="0" aria-label="Observation round"/><span class="round-value" id="round">0 / 0</span><button id="compare" aria-pressed="false">Before</button></div><p class="timeline-note" id="timeline-note">Playback reads saved state; it never advances the experiment.</p></div><div class="events-head"><h3>What happened here</h3><span class="badge" id="event-count">0 events</span></div><div class="event-list" id="events"></div></section><aside class="obs-aside"><section class="observer-card"><div class="eyebrow">Individual perspective</div><div class="actor-heading"><h3 id="actor-name">—</h3><select id="actor" aria-label="Observed actor"></select></div><div class="coordinates" id="coordinates"></div><div class="vitals" id="vitals"></div><div class="eyebrow inventory-heading">Carried items</div><div id="carried" class="carried-items"></div></section><section class="observer-card"><div class="eyebrow">Experienced wellbeing</div><h3>How life feels</h3><div class="wellbeing-number" id="happiness">—</div><div class="wellbeing-split"><div id="body-bar" class="wellbeing-body"></div><div id="mind-bar" class="wellbeing-mind"></div></div><div class="small-label" id="happiness-split">Physical comfort + other satisfaction</div><div id="sources"></div></section><section class="observer-card"><div class="eyebrow">Personal continuity</div><h3>Intent & memory</h3><p id="task">No saved task.</p><ul class="memory-list" id="memory"></ul><p id="learning"></p><details><summary>Recent experience</summary><ul class="memory-list" id="experiences"></ul></details></section><section class="observer-card"><div class="eyebrow">World state</div><h3 id="object-title">A closer look</h3><p id="object-description">Select a visible object to inspect its actual geometry, state and provenance.</p><pre class="object-state" id="object-state"></pre></section></aside></main><div id="status" class="obs-status" role="status">Loading recorded evidence…</div>`;
+root.innerHTML = `<header class="obs-header"><div class="brand"><div class="brand-mark" aria-hidden="true">♧</div><div><div class="eyebrow">Self-evolving world</div><h1>World Observatory</h1><p>A living record of choices and consequences</p></div></div><div class="header-controls"><a id="classic-link" href="./classic.html">Classic inspector ↗</a><select id="archive" aria-label="Saved experiment"></select></div></header><main class="obs-layout"><section class="world-column"><div class="world-toolbar"><div><div class="eyebrow" id="world-label">Loading archive</div><h2 id="world-title">Life, at its own pace</h2></div><div class="mode-controls"><button id="global" aria-pressed="true">Whole world</button><button id="private" aria-pressed="false">Personal view</button></div></div><div class="world-stage"><canvas id="forest-scene" aria-label="Recorded forest canvas" hidden></canvas><svg class="world-canvas" id="scene" role="img" aria-label="Recorded world scene" viewBox="0 0 24 24"></svg><div class="stage-tag" id="stage-tag">READ-ONLY OBSERVATION</div><div class="camera-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="fit">Fit</button><button id="follow" aria-pressed="false">Follow</button><button id="geometry" aria-pressed="false">Geometry</button></div><svg id="minimap" class="minimap" role="img" aria-label="World minimap"></svg><div class="stage-caption" id="spatial-caption">Drag to pan · Scroll to zoom · Select a character</div></div><div class="timeline-card"><div class="playback"><button id="previous" aria-label="Previous round">‹</button><button id="play">Play</button><button id="next" aria-label="Next round">›</button><input id="time" type="range" min="0" max="0" value="0" aria-label="Observation round"/><span class="round-value" id="round">0 / 0</span><button id="compare" aria-pressed="false">Before</button></div><p class="timeline-note" id="timeline-note">Playback reads saved state; it never advances the experiment.</p></div><div class="events-head"><h3>What happened here</h3><span class="badge" id="event-count">0 events</span></div><div class="event-list" id="events"></div></section><aside class="obs-aside"><section class="observer-card"><div class="eyebrow">Individual perspective</div><div class="actor-heading"><h3 id="actor-name">—</h3><select id="actor" aria-label="Observed actor"></select></div><div class="coordinates" id="coordinates"></div><div class="vitals" id="vitals"></div><div class="eyebrow inventory-heading">Carried items</div><div id="carried" class="carried-items"></div></section><section class="observer-card"><div class="eyebrow">Experienced wellbeing</div><h3>How life feels</h3><div class="wellbeing-number" id="happiness">—</div><div class="wellbeing-split"><div id="body-bar" class="wellbeing-body"></div><div id="mind-bar" class="wellbeing-mind"></div></div><div class="small-label" id="happiness-split">Physical comfort + other satisfaction</div><div id="sources"></div></section><section class="observer-card"><div class="eyebrow">Personal continuity</div><h3>Intent & memory</h3><p id="task">No saved task.</p><ul class="memory-list" id="memory"></ul><p id="learning"></p><details><summary>Important experience</summary><ul class="memory-list" id="important"></ul></details><details><summary>Past wildlife sightings</summary><ul class="memory-list" id="sightings"></ul></details><details><summary>Route inspection evidence</summary><p id="route-evidence"></p></details><details><summary>Food assessment evidence</summary><ul class="memory-list" id="assessments"></ul></details><details><summary>Recent experience</summary><ul class="memory-list" id="experiences"></ul></details></section><section class="observer-card"><div class="eyebrow">World state</div><h3 id="object-title">A closer look</h3><p id="object-description">Select a visible object to inspect its actual geometry, state and provenance.</p><pre class="object-state" id="object-state"></pre></section></aside></main><div id="status" class="obs-status" role="status">Loading recorded evidence…</div>`;
 function el(id: string): HTMLElement {
   const e = document.getElementById(id);
   if (!e) throw new Error(`Missing observatory element: ${id}`);
@@ -24,6 +26,11 @@ function select(id: string): HTMLSelectElement {
   return el(id) as HTMLSelectElement;
 }
 const scene = document.getElementById('scene') as unknown as SVGSVGElement;
+const forestCanvas = document.getElementById(
+  'forest-scene',
+) as HTMLCanvasElement;
+let priorFrame: SceneFrame | undefined,
+  animation = 0;
 const mini = document.getElementById('minimap') as unknown as SVGSVGElement;
 const slider = el('time') as HTMLInputElement;
 let id = '',
@@ -55,6 +62,8 @@ async function asset(path: string): Promise<string> {
   return response.text();
 }
 function updateCamera(): void {
+  if (frame?.continuous?.config.forest)
+    drawForestCanvas(forestCanvas, frame, actor, camera, geometry);
   scene.setAttribute(
     'viewBox',
     `${String(camera.x)} ${String(camera.y)} ${String(camera.size)} ${String(camera.size)}`,
@@ -77,7 +86,28 @@ function render(): void {
   if (!frame) return;
   const current = frame,
     self = frame.actors.find((a) => a.id === actor);
+  const isForest = !!current.continuous?.config.forest;
+  forestCanvas.hidden = !isForest;
+  scene.classList.toggle('forest-hit-regions', isForest);
   scene.innerHTML = sceneSvg(current, actor, geometry);
+  if (isForest) {
+    cancelAnimationFrame(animation);
+    const started = performance.now();
+    const animate = (now: number): void => {
+      const progress = Math.min(1, (now - started) / 300);
+      drawForestCanvas(
+        forestCanvas,
+        current,
+        actor,
+        camera,
+        geometry,
+        progress,
+        priorFrame,
+      );
+      if (progress < 1) animation = requestAnimationFrame(animate);
+    };
+    animation = requestAnimationFrame(animate);
+  }
   mini.innerHTML =
     sceneSvg(current, '', false) +
     `<rect data-camera x="${String(camera.x)}" y="${String(camera.y)}" width="${String(camera.size)}" height="${String(camera.size)}" fill="none" stroke="#fff5cc" stroke-width=".3"/>`;
@@ -96,6 +126,11 @@ function render(): void {
     : 'Continuous coordinates · Fixed simulation time · Drag to pan';
   el('world-label').textContent =
     `${id} / ${frame.legacy ? 'Historical archive' : 'Continuous world'}`;
+  if (current.continuous?.config.forest && self) {
+    const climate = forestClimate(current.continuous, self.position);
+    el('world-label').textContent =
+      `${id} / ${climate.season} · ${climate.temperature.toFixed(1)}° · ${climate.trend}`;
+  }
   const allActors =
     current.continuous?.actors ??
     legacy?.frames[frame.tick]?.agents ??
@@ -107,7 +142,7 @@ function render(): void {
   if (self) {
     el('actor-name').textContent = self.name;
     el('coordinates').textContent =
-      `Position ${self.position.x.toFixed(3)} · ${self.position.y.toFixed(3)}${self.vitals.health <= 0 ? ' · Deceased' : ''}`;
+      `Position ${self.position.x.toFixed(3)} · ${self.position.y.toFixed(3)}${self.vitals.health <= 0 ? ' · Deceased' : ''}${self.life ? ` · Lives ${String(self.life.total - self.life.deaths)} / ${String(self.life.total)}` : ''}`;
     el('vitals').innerHTML = [
       ['Health', self.vitals.health, 100],
       ['Satiety', self.vitals.satiety, 100],
@@ -143,6 +178,55 @@ function render(): void {
     el('carried').textContent = inventory.length
       ? inventory.join(' · ')
       : 'Nothing carried';
+    el('important').innerHTML = (self.memory.important ?? [])
+      .slice(-8)
+      .map((e) => `<li>Round ${String(e.tick)} · ${svgText(e.summary)}</li>`)
+      .join('');
+    const sightings = self.extensionState['wildlife:sightings'];
+    el('sightings').innerHTML = Array.isArray(sightings)
+      ? sightings
+          .slice(-4)
+          .map((s) => `<li>Past sighting · ${svgText(JSON.stringify(s))}</li>`)
+          .join('')
+      : '';
+    const evidenceText = (value: unknown): string =>
+      svgText(
+        typeof value === 'string'
+          ? value
+          : typeof value === 'number'
+            ? String(value)
+            : 'Unknown',
+      );
+    const assessments = self.extensionState['food-assessment:records'];
+    el('assessments').innerHTML = Array.isArray(assessments)
+      ? assessments
+          .slice(-4)
+          .map((record) => {
+            if (!record || typeof record !== 'object' || Array.isArray(record))
+              return '';
+            const sensory = record.sensory;
+            const details =
+              sensory && typeof sensory === 'object' && !Array.isArray(sensory)
+                ? [
+                    sensory.appearance,
+                    sensory.texture,
+                    sensory.odor,
+                    sensory.deterioration,
+                  ]
+                    .filter((value) => typeof value === 'string')
+                    .join(' ')
+                : '';
+            return `<li>Rounds ${evidenceText(record.startTick)}–${evidenceText(record.endTick)} · ${evidenceText(record.resource)} · ${evidenceText(record.status)}. ${svgText(details)} Intake: ${record.ingested ? evidenceText(record.fraction) : '0'} units; observed nourishment ${evidenceText(record.nourishment)}. ${record.adverse ? 'Adverse evidence recorded.' : 'No adverse evidence recorded in this window.'} ${record.confounding ? 'Other food intake confounds this record.' : ''} ${evidenceText(record.uncertainty)}</li>`;
+          })
+          .join('')
+      : '';
+    const routeEvidence = self.extensionState['route:lastInspection'];
+    el('route-evidence').textContent =
+      routeEvidence &&
+      typeof routeEvidence === 'object' &&
+      !Array.isArray(routeEvidence)
+        ? `Round ${String(Number(routeEvidence.tick))}: ${typeof routeEvidence.status === 'string' ? routeEvidence.status : 'unknown'} / ${typeof routeEvidence.reasonCode === 'string' ? routeEvidence.reasonCode : 'unknown'}. Observed blockers: ${Array.isArray(routeEvidence.observedBlockers) ? routeEvidence.observedBlockers.filter((x) => typeof x === 'string').join(', ') || 'none established' : 'unknown'}. Dated evidence; current occupancy must be checked again.`
+        : 'No personal route inspection recorded.';
     el('experiences').innerHTML = self.memory.experiences
       .slice(-5)
       .map((e) => `<li>Round ${String(e.tick)} · ${svgText(e.summary)}</li>`)
@@ -179,9 +263,23 @@ function render(): void {
         ? 'No continuous-world state has been inferred for this archive.'
         : `${String(self.mastered.length)} mastered interfaces · ${String(self.memory.objects.length)} dated object memories`;
   }
-  const events = frame.events.filter(
-    (e) => e.type !== 'satisfaction' || e.actor === actor,
-  );
+  const events = frame.events
+    .filter(
+      (e) =>
+        (e.type !== 'satisfaction' || e.actor === actor) &&
+        !(
+          frame?.continuous?.config.forest &&
+          (e.type === 'waited' ||
+            (e.type === 'rested' && e.data.recovered === 0))
+        ),
+    )
+    .sort((a, b) => {
+      const important = (type: string) =>
+        ['died', 'respawned', 'injured', 'satisfaction', 'mastered'].includes(
+          type,
+        );
+      return Number(important(b.type)) - Number(important(a.type));
+    });
   el('event-count').textContent = `${String(events.length)} events`;
   el('events').innerHTML =
     events
@@ -262,6 +360,7 @@ async function seek(requested: number): Promise<void> {
       }
       const world = value.frames[at - part.start];
       if (!world) throw new Error('Missing reconstructed frame.');
+      priorFrame = frame ?? undefined;
       frame = continuousScene(world, privateView ? actor : null);
       tasks = value.segment.rounds.find((r) => r.tick === at)?.tasks ?? {};
     }
@@ -463,3 +562,7 @@ try {
 } catch (error) {
   status(error instanceof Error ? error.message : 'Catalogue failed.', true);
 }
+
+window.addEventListener('resize', updateCamera);
+
+window.addEventListener('forest-visual-ready', updateCamera);

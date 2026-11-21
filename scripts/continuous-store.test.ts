@@ -1,3 +1,4 @@
+import { initialForestWorld } from '../apps/simulator/src/forest-scenario.js';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
@@ -21,6 +22,33 @@ import {
 import type { V7ReplaySegment } from './continuous-store.js';
 
 describe('continuous durable segmented evidence', () => {
+  it('accepts an unchanged forest checkpoint and rejects altered forest budgets or hunger', () => {
+    const root = mkdtempSync(resolve(tmpdir(), 'forest-checkpoint-'));
+    try {
+      const state = newContinuousExecution(
+        'fixture',
+        'isolated-fixture',
+        initialForestWorld(),
+      );
+      const path = resolve(root, 'experiment/ex1/execution.json');
+      continuousAtomic(path, state);
+      expect(readContinuousExecution(root, 'ex1')).toEqual(state);
+      const altered = v7Clone(state);
+      altered.world.config.budgets.ordinary += 1;
+      continuousAtomic(path, altered);
+      expect(() => readContinuousExecution(root, 'ex1')).toThrow(
+        'protected run configuration',
+      );
+      altered.world.config.budgets.ordinary -= 1;
+      altered.world.config.hunger += 0.01;
+      continuousAtomic(path, altered);
+      expect(() => readContinuousExecution(root, 'ex1')).toThrow(
+        'protected run configuration',
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
   it('recovers the committed world after interruption, reconstructs fractional navigation and preserves a shorter window when continued', async () => {
     const root = mkdtempSync(resolve(tmpdir(), 'continuous-journal-'));
     try {

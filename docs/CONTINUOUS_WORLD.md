@@ -2,6 +2,8 @@
 
 Version 7 uses `continuous-v1`. It is an independent experimental world, not a reinterpretation of ex1-ex6 or a revision of the founding catalogue. The [execution plan](exec-plans/completed/pr-18-continuous-world.md) records requirements and current acceptance; [PRODUCT](PRODUCT.md) owns feature status. Entry remains the [programmatic task coordinator](TASK_HARNESS.md).
 
+The separately configured [forest-v1 extension](FOREST_WORLD.md) adds the next environment and lifecycle without changing ex7 history. Its current acceptance is tracked in PRODUCT.
+
 ## Physics and observation
 
 The initial world is 24 by 24 continuous distance units with three actors at unequal floating-point positions, a five-unit observation radius, established perennial food, loose material and persistent natural geometry. A simulation round advances one fixed time unit after a same-start-state action barrier. Display time, model latency, development and review never advance metabolism. Coordinates and velocities are real numbers. The navigation solver uses a half-unit numerical search mesh and line-of-sight simplification; this discretizes route search only. Actual positions, destinations, travel, costs, swept collision and interaction are continuous. Persisted noninteger state is normalized to eight decimal places so Node and browser replay agree despite floating-point math-library differences.

@@ -31,7 +31,7 @@ Use the [template](../.github/pull_request_template.md). Keep its section and fi
 - **Requirements:** copy the plan's numbered requirements verbatim. The referenced plan must be changed in this PR.
 - **Scope:** provide the repository-relative plan path, in-scope work and exclusions.
 - **Requirement review:** map each requirement to exact changed paths in code spans, explain the implementation, identify actual verification and findings, and record `PASS` only when satisfied. Multiple rows per requirement are allowed. Every changed file must appear. For renames, use the destination path reported by GitHub and explain the old path in prose.
-- **Validation:** record the latest full head SHA, actual local task/run ID, complete suite result, environment/counts, review findings and evidence locations. Remote CI state must be accurate and separate from local results.
+- **Validation:** record the latest full head SHA, actual local task/run ID, selected-check dispositions, trigger reasons, durations/rebuild counts, environment/counts, review findings and evidence locations. Remote CI state must be accurate and separate from local results.
 - **Code review:** name the actual reviewer and record the full-diff comparison, risks, and resolved deviations.
 - **Documentation synchronization:** identify relevant PRODUCT, architecture, ADR, plan, and usage updates, or explain why each is unchanged.
 - **Completion checklist:** all attestations must be checked before the gate can pass.

@@ -1,0 +1,25 @@
+{
+  "kind": "technical-computation-recovery",
+  "reason": "Simulation computation budget exhausted; checkpoint the entire world.",
+  "tick": 166,
+  "retained": {
+    "technical-pauses/round-166/manifest.json": "f0efe9ace72d8dcb6e9ba533bbb3f1b9046d109c68359a74dc1c975fd6acc314",
+    "technical-pauses/round-166/execution.json": "187f93be7095c0b7ad999b72bf886bb37b6c6619da6e93d9177850db14482410",
+    "technical-pauses/round-166/replay.json": "17202d39a41cb85d256e938c1b7c354e97515b744e0358d45da18a9368044b6d",
+    "technical-pauses/round-166/results.json": "e8bfb0d068736dfdbf4bdb804b390ef2618ba9b2c4a04a9e9e7b5fb12acfeaea",
+    "technical-pauses/round-166/browser.json": "7d318799159eaefc846e5f65e0045efc1fb8f728059c60f54ab18b185f0cc2d2",
+    "technical-pauses/round-166/initial.png": "67634cd6fabbc4a80ac3628dd931ec409c308a1f5072c6fea6a49f4740ec5cf3",
+    "technical-pauses/round-166/midpoint.png": "c6910f6db47e0bbc05b6128edf9429c93c0fd1367dec9e69edb7426cde7736af",
+    "technical-pauses/round-166/final.png": "93ee9c38ae432cef1ace3ab773c57433dc54afcbce3eb3857cb32ef4f334dc5a",
+    "technical-pauses/round-166/overview.svg": "6c1c80f8375ace895e80e2a4569b5c4579eca8d633328cef4c3090c2c0ee91ac",
+    "technical-pauses/round-166/overview.png": "3ae8b0acae702fd38cb99ee78f198ac21a512ab8bc16e19ee9de001a96143c44",
+    "technical-pauses/round-166/report.txt": "c8da8d827c66d377d8366ecd1e84764cd8c8d529b9a735f1f75a651fbee15fb7"
+  },
+  "worldHash": "0a6d5c83e35bc72d274f897209aba80ae2a242937f5a81830072a785d9e3ec28",
+  "attemptsHash": "2ca595679ec5dd6c1bd1f755b57319b5ca355fa7722eb6dfc948cfdeb415667b",
+  "target": 1000,
+  "basis": "The current task requires repairing technical blockers and continuing the same original run.",
+  "actorRequest": false,
+  "modelCalls": 0,
+  "reportRetention": "Original generated report bytes retained as report.txt, including its known Markdown formatting defect."
+}

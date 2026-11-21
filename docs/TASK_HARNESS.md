@@ -11,6 +11,8 @@ pnpm task -- start validation-results/intent.json
 pnpm task -- status task-id
 pnpm task -- submit task-id validation-results/response.json
 pnpm task -- next task-id
+# A captured computation-only pause in this task's own unfinished run:
+pnpm task -- repair task-id
 # Changed requirements or plan location require a higher requirementsVersion:
 pnpm task -- amend task-id validation-results/revised-intent.json
 ```
@@ -102,6 +104,8 @@ All submitted files live under `validation-results/`. For example, a preparation
 
 The review handoff includes a patch and **all** changed paths: untracked contents must also be opened. Use the existing [visual and behavior criteria](VALIDATION.md#visual-review), not an automatic PASS generator. The program checks completeness and bindings but cannot prove judgment quality.
 
+The version-bound GitHub COMMENT lists every reviewed file and combines each screenshot's actual judgment with its original path and SHA-256 in one record. This avoids duplicate paths within the bounded review body; the full original local review remains hash-bound and all freshness/completeness gates still apply.
+
 ## Execution and recovery contract
 
 The [coordinator](../scripts/task-flow.ts) is the executable sequence. [Runtime effects](../scripts/task-runtime.ts) invoke existing allocation, scoped validation, local review, PR preflight, publication and independent completion commands. The [migration map](exec-plans/completed/pr-13-programmatic-harness.md#migration-map) records their previous triggers and counterparts. Tests and scene contracts remain available; the impact planner selects relevant checks. Required CI names, actual review and conflict/integration gates remain enforced.
@@ -110,7 +114,11 @@ The [coordinator](../scripts/task-flow.ts) is the executable sequence. [Runtime 
 
 Logs and journals are saved before commands. New experiments reconcile the before/after archive IDs before continuing. A known exited failure before allocation may retry on an explicit continuation; an uncertain interruption requires process/allocation investigation first. After confirming an interrupted process stopped, explicit `pnpm experiment:resume -- exN` routes to `pnpm task -- recover ID exN` and journals capture-only recovery for that allocated incomplete record; it never reissues inference. Completed simulations use existing capture-only resume; incomplete/corrupt simulation data stays failed. No inference is retried to obtain passing evidence. A command restart reuses the existing PR lookup/update and commit state; it does not blindly create another PR or experiment. The shared validation lock prevents two coordinator commands from writing current evidence concurrently; compatibility commands use the same coordinator lock. Internal workers additionally require the executing task lease, matching step, intent, checkout and evidence.
 
+A captured continuous computation-budget pause may use `repair` only while the task's own newly allocated run is unpublished, below its original target and development limit, with no pending or uncertain model call or actor review. The coordinator retains the failed capture under `technical-pauses/round-N/`, opens a counted technical development barrier and retains the original pending actions, calls, source history, seed and limits. The conversation supplies no fabricated actor request or world approval. Source validation reconstructs every committed round before a repair can resume the same unsettled round. This is not a budget-exhaustion override or a replacement experiment.
+
 Changes require a current impact plan and renewed diff review. Dependency-bound check evidence remains reusable when its own inputs and output bytes match; missing or invalidated selected evidence reruns. Code changes retain all unit tests. Explicit audits select the full suite. There is no automatic repair loop. The existing publisher retains its bounded 90-attempt, ten-second CI polling and request timeouts. Fix failures in the conversation, then explicitly continue. Environment, authentication and service failures remain incomplete.
+
+After integrating newer main, a changed head or source uses the current base for review and PR file mapping. Only an exact published head/source retry retains its original base, including verification after merge. The original publication journal remains intact. Changed scope or invalid receipts return to validation; a new review cannot approve a stale plan.
 
 ## Supported entries and self-review boundary
 
@@ -120,7 +128,7 @@ Changes require a current impact plan and renewed diff review. Dependency-bound 
 
 The `remote-review` handoff contains the exact GitHub COMMENT payload: task/revision/plan, reviewed commit, validation run, source and review hashes, every reviewed path, actual visual/behavior/requirement findings, and screenshot paths/hashes. Publish it through the current conversation's GitHub connector and submit the tool result. The program queries the PR reviews and requires a submitted COMMENT with identical body and commit; it records the GitHub account, review ID and URL. A matching record is reused after interruption. Missing, dismissed, altered or wrong-head records block delivery. Changes to local review evidence require review again. Local-only tasks remain offline.
 
-This is explicitly **current-conversation Codex self-review**, never independent approval. The connected account is the publisher identity, not evidence of a second reviewer. The record makes the findings and their provenance auditable; it cannot prove that screenshots were seen or that semantic/causal conclusions are correct. Complete visual and semantic review remains the conversation's responsibility. No extra reviewer, model service or approval is introduced. CI may need rerunning after a review changes PR update time under the existing strict freshness rule; never weaken that check.
+This is explicitly **current-conversation Codex self-review**, never independent approval. The connected account is the publisher identity, not evidence of a second reviewer. The record makes the findings and their provenance auditable; it cannot prove that screenshots were seen or that semantic/causal conclusions are correct. Complete visual and semantic review remains the conversation's responsibility. No extra reviewer, model service or approval is introduced. A COMMENT does not invalidate exact-head quality evidence; PR contract checks remain bound to the reviewed body revision.
 
 The supported command boundary prevents accidental alternate-entry bypass. It is not a security sandbox against editing repository source/state or invoking GitHub directly with credentials. Do not fabricate authorization or review evidence.
 

@@ -23,7 +23,13 @@ import {
   requestCaptureRecovery,
   type CommandRunner,
 } from './task-runtime.js';
-import { hashFile, REVIEW_SCENES, sourceFingerprint } from './validation.js';
+import {
+  hashFile,
+  object,
+  readJson,
+  REVIEW_SCENES,
+  sourceFingerprint,
+} from './validation.js';
 import {
   analysisMaterial,
   analysisPaths,
@@ -36,6 +42,7 @@ import {
 import { allocateExperiment, experimentIds } from './experiments.js';
 import { reviewBody } from './task-review.js';
 import { classifyChanges } from './harness.js';
+import { makePlan } from './validation-plan.js';
 
 const repository = process.cwd(),
   plan = 'docs/exec-plans/active/pr-99-fixture.md';
@@ -137,6 +144,56 @@ afterEach(() => {
 });
 
 describe('existing gates behind the task runtime', () => {
+  it('uses the current base for changed delivery and retains the published base only for an exact retry', () => {
+    const c = makeContext(),
+      runtime = new LocalTaskEffects(root, () => {}),
+      previous = git(root, 'rev-parse', 'HEAD');
+    c.publication = {
+      base: previous,
+      head: previous,
+      sourceHash: sourceFingerprint(root),
+    };
+    git(root, 'commit', '--allow-empty', '-m', 'Integrated main fixture');
+    git(root, 'update-ref', 'refs/remotes/origin/main', 'HEAD');
+    expect(runtime.snapshot(c).base).toBe(git(root, 'rev-parse', 'HEAD'));
+    expect(c.publication.base).toBe(previous);
+    c.publication.head = git(root, 'rev-parse', 'HEAD');
+    expect(runtime.snapshot(c).base).toBe(previous);
+    writeFileSync(resolve(root, 'new-scope.md'), 'New reviewed scope');
+    expect(runtime.snapshot(c).base).toBe(git(root, 'rev-parse', 'HEAD'));
+  });
+  it('requests validation for changed scope or untrusted receipts before requesting review', () => {
+    const c = makeContext(),
+      runtime = new LocalTaskEffects(root, () => {});
+    evidence(c);
+    const report = readJson(
+      resolve(root, 'validation-results/report.json'),
+    ) as ValidationReport;
+    report.plan = makePlan(root, false, git(root, 'rev-parse', 'origin/main'));
+    report.evidence = [];
+    report.browserTests = 0;
+    const review = readJson(resolve(root, 'validation-results/review.json'));
+    save('validation-results/review.json', { ...object(review), visual: [] });
+    save('validation-results/report.json', report);
+    sealValidationReport(root, report);
+    expect(runtime.validationState(c)).toBe('passed');
+    // The same file bytes move into the base; prior scope cannot be reused there.
+    git(root, 'add', '.');
+    git(root, 'commit', '-m', 'Integrated documentation fixture');
+    git(root, 'update-ref', 'refs/remotes/origin/main', 'HEAD');
+    report.plan = makePlan(root, false, git(root, 'rev-parse', 'origin/main'));
+    save('validation-results/report.json', report);
+    expect(runtime.validationState(c)).toBe('stale');
+    sealValidationReport(root, report);
+    expect(runtime.validationState(c)).toBe('passed');
+    report.plan = { ...report.plan, files: [plan] };
+    save('validation-results/report.json', report);
+    sealValidationReport(root, report);
+    expect(runtime.validationState(c)).toBe('stale');
+    report.plan = makePlan(root, false, git(root, 'rev-parse', 'origin/main'));
+    save('validation-results/report.json', report);
+    expect(runtime.validationState(c)).toBe('stale');
+  });
   it('retains complete committed and working review diffs larger than the capture buffer', () => {
     const c = makeContext(),
       runtime = new LocalTaskEffects(root, () => {}),
@@ -241,6 +298,23 @@ describe('existing gates behind the task runtime', () => {
     expect(body).toContain('Synthetic fixture image review.');
     expect(body).toContain(hashFile(resolve(root, 'test-results/desktop.png')));
     expect(body).toContain(plan);
+    const imageSection =
+      body.split('### Screenshot judgments and provenance').at(1) ?? '';
+    const records = JSON.parse(
+      imageSection.split('```json\n').at(1)?.split('\n```').at(0) ?? '',
+    ) as unknown[];
+    const originalReport = readJson(
+      resolve(root, 'validation-results/report.json'),
+    );
+    const originalReview = readJson(
+      resolve(root, 'validation-results/review.json'),
+    );
+    for (const shot of object(originalReport).evidence as unknown[])
+      expect(records).toContainEqual(expect.objectContaining(object(shot)));
+    for (const judgment of object(originalReview).visual as unknown[])
+      expect(records).toContainEqual(expect.objectContaining(object(judgment)));
+    expect(records).toHaveLength(REVIEW_SCENES.length);
+    expect(body.split('test-results/desktop.png')).toHaveLength(2);
     c.body.head = 'old-head';
     expect(() => reviewBody(root, c)).toThrow('current reviewed head');
     c.body.head = snapshot.head;
@@ -607,6 +681,35 @@ describe('retained behavioral analysis', () => {
     expect(() => {
       checkAnalyses(root);
     }).toThrow();
+    writeAnalysis(root, a);
+    rmSync(resolve(root, analysisPaths('ex3', a.taskId).markdown));
+    expect(() => {
+      checkAnalyses(root);
+    }).toThrow();
+    writeAnalysis(root, a);
+    checkAnalyses(root);
+    const second = { ...a, taskId: 'second-analysis' };
+    writeAnalysis(root, second);
+    checkAnalyses(root);
+    writeFileSync(
+      resolve(root, analysisPaths('ex3', second.taskId).markdown),
+      'Changed after the previous complete collection check.',
+    );
+    expect(() => {
+      checkAnalyses(root);
+    }).toThrow('readable report');
+    writeAnalysis(root, { ...second, artifacts: {} });
+    expect(() => {
+      checkAnalyses(root);
+    }).toThrow('artifacts changed');
+    writeAnalysis(root, second);
+    writeFileSync(
+      resolve(root, 'experiment/analyses/ex3/unexpected.txt'),
+      'Unexpected',
+    );
+    expect(() => {
+      checkAnalyses(root);
+    }).toThrow('Unexpected companion');
   });
 });
 

@@ -1,3 +1,4 @@
+export * from './forest-thermal.js';
 export {
   CORE_RULES,
   DEFAULT_SETTINGS,
@@ -174,3 +175,19 @@ export * from './continuous-wellbeing.js';
 export * from './continuous-kernel.js';
 export * from './continuous-tasks.js';
 export * from './continuous.js';
+
+export * from './forest-environment.js';
+export * from './forest-foundation.js';
+export * from './forest-lives.js';
+export * from './forest-wildlife.js';
+export * from './forest-perception.js';
+
+export * from './forest-food-accounting.js';
+export * from './forest-food-assessment.js';
+export * from './forest-shelter.js';
+
+export { FOREST_WARMING, warmingAfterPhysiology } from './forest-warming.js';
+
+export { v7NavigationTarget } from './continuous-navigation-target.js';
+export { forestRoute, ForestRouteFailure } from './forest-routing.js';
+export { FOREST_ROUTE_INSPECTION } from './forest-route-inspection.js';

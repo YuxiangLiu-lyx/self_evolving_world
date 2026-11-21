@@ -15,7 +15,12 @@ import {
   v7Record,
   v7String,
 } from './continuous-data.js';
-import { v7Condition, v7ConditionContext } from './continuous-observation.js';
+import { v7Distance, v7Reach } from './continuous-geometry.js';
+import {
+  v7Condition,
+  v7ConditionContext,
+  v7Observe,
+} from './continuous-observation.js';
 
 function condition(value: unknown): V7Condition | null {
   if (value === null) return null;
@@ -44,7 +49,10 @@ function repeat(value: unknown): number {
     throw new Error('Task repeats must be safe integers.');
   return result;
 }
-export function v7ParsePlan(value: unknown): V7Plan {
+export function v7ParsePlan(
+  value: unknown,
+  eventTypes?: readonly string[],
+): V7Plan {
   const p = v7Record(value);
   if (
     Object.keys(p).sort().join(',') !==
@@ -58,6 +66,10 @@ export function v7ParsePlan(value: unknown): V7Plan {
       throw new Error('Expected text records.');
     return v as string[];
   };
+  if (eventTypes && strings(p.interrupts).some((e) => !eventTypes.includes(e)))
+    throw new Error(
+      'Unknown interrupt event; use the registered event catalogue.',
+    );
   const steps: V7TaskStep[] = p.steps.map((raw: unknown) => {
     const s = v7Record(raw),
       a = v7Record(s.action),
@@ -135,6 +147,13 @@ export function v7TaskAction(
       advance(cursor);
       continue;
     }
+    if (world.config.forest && cursor.startedAt < world.tick) {
+      const problem = v7ReferenceIssue(world, actorId, step.action);
+      if (problem) {
+        cursor.reason = problem;
+        return null;
+      }
+    }
     return step.action;
   }
   cursor.reason = 'The actor-defined task is complete.';
@@ -151,6 +170,42 @@ export function v7FinishTasks(
       old = before.actors.find((a) => a.id === actor.id),
       outcome = result.outcomes[actor.id];
     if (!cursor || !old || !outcome) continue;
+    if (
+      result.world.config.forest &&
+      result.world.events.some(
+        (e) =>
+          (e.actor === actor.id || e.target === actor.id) &&
+          ([
+            'died',
+            'respawned',
+            'mastered',
+            'message',
+            'animal-alert',
+            'season-changed',
+            'spoiled',
+            'shelter-protection-expired',
+          ].includes(e.type) ||
+            (e.type === 'injured' &&
+              (old.vitals.health - actor.vitals.health >= 8 ||
+                Math.floor(old.vitals.health / 20) !==
+                  Math.floor(actor.vitals.health / 20) ||
+                !before.events.some(
+                  (p) =>
+                    p.actor === actor.id &&
+                    p.type === 'injured' &&
+                    p.description === e.description,
+                )))),
+      )
+    ) {
+      cursor.reason =
+        'Important observed change requires a fresh decision: ' +
+        result.world.events
+          .filter((e) => e.actor === actor.id || e.target === actor.id)
+          .map((e) => e.type)
+          .join(', ');
+      cursor.navigation = null;
+      continue;
+    }
     if (!outcome.success) cursor.reason = outcome.reason;
     else if (
       result.world.events.some(
@@ -178,4 +233,61 @@ export function v7FinishTasks(
     )
       cursor.reason = 'An actor-selected interrupt event occurred.';
   }
+}
+
+/** Checks only personally observable references; it never selects a replacement strategy. */
+export function v7ReferenceIssue(
+  world: V7World,
+  id: string,
+  action: V7Action,
+): string | null {
+  const observation = v7Observe(world, id),
+    actor = observation.self;
+  const target = action.args.target,
+    quantity = Number(action.args.quantity ?? 1);
+  if (['eat', 'drop', 'give'].includes(action.interface)) {
+    const stacks = observation.stacks.filter(
+      (s) =>
+        !s.reservedFor &&
+        s.owner === id &&
+        (s.id === target || `resource:${s.resource}` === target),
+    );
+    if (stacks.reduce((n, s) => n + s.quantity, 0) < quantity)
+      return 'The required owned quantity no longer exists.';
+  }
+  if (action.interface === 'gather') {
+    const object = observation.objects.find((o) => o.id === target);
+    if (
+      !object ||
+      !v7Reach(actor, object.spatial) ||
+      Number(object.data.stock) < quantity
+    )
+      return 'The source, position or available quantity changed; inspect current facts.';
+  }
+  if (action.interface === 'pickup') {
+    if (
+      !observation.stacks.some(
+        (s) =>
+          s.owner === null &&
+          (s.id === target || `resource:${s.resource}` === target) &&
+          s.quantity >= quantity &&
+          v7Distance(actor.position, s.position) <=
+            actor.radius + world.config.interaction,
+      )
+    )
+      return 'The required ground stack or pickup position is no longer available.';
+  }
+  if (action.interface === 'navigate' && typeof target === 'string' && target) {
+    const remembered = actor.memory.objects.find(
+      (m) => m.object.id === target,
+    )?.object;
+    const stack = actor.memory.stacks.find(
+      (m) =>
+        m.stack.owner === null &&
+        (m.stack.id === target || `resource:${m.stack.resource}` === target),
+    )?.stack;
+    if (!remembered && !stack)
+      return 'The navigation target is no longer in observed or dated remembered state.';
+  }
+  return null;
 }

@@ -4,6 +4,8 @@
 - Status: Accepted
 - Extends: [ADR-0005](0005-browser-validation-gate.md) and [ADR-0006](0006-requirement-traceability.md), preserving complete tests and actual visual review.
 
+The unconditional full-suite and all-image acceptance clauses below are historical and superseded by [ADR-0020](0020-scoped-validation.md). Other architectural decisions remain unchanged.
+
 ## Context
 
 The user requests the first random-action world experiment, retained goals/results/visualizations under `experiment/ex1`, increasing experiment numbers, and separate harness flows for code and experiment changes. The existing optional model experiment is a different operation and must not be invoked for an offline run.

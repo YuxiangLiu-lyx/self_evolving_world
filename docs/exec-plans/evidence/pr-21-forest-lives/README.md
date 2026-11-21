@@ -1,0 +1,7 @@
+# PR-21 Evidence
+
+`formal-ex8-facts.json` and `formal-ex8-outcomes.json` contain descriptive measurements from the completed ex8 archive at 897 committed rounds. Their manifest digest binds the canonical source artifacts. The time series includes the initial state. The PNG and SVG are standalone views of those actual states, not isolated policies or causal treatment comparisons. Recreate them with Python and Matplotlib 3.11.2 using `python plot-ex8.py` from any directory. The plotting script performs no simulation or inference.
+
+`feasibility.json` is isolated calibration; `rejected-review.json`, `rejected-cave-exterior.png` and `rejected-final-death.png` preserve the initial visual defects. They are not current passing screenshots and are not autonomous experimental behavior. Current accepted browser images are bound by the final task validation and GitHub self-review; ex8's own initial/midpoint/final browser captures are retained in its archive.
+
+Formal replay landmarks: 17–24 first requested attention and individual adoption; 331–356 food assessment development and use; 464–503 shelter request, learning and real construction; 512–555 shared permission and occupancy; 619–626 requested route diagnosis and subsequent exit movement; 663 protection expiry; 693–711 cave entry; 800 next spring; 842–897 predator avoidance and Lin's unresolved food deficit. No formal death or respawn occurred.

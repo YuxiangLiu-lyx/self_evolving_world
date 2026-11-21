@@ -32,6 +32,17 @@ export function reviewBody(root: string, c: TaskContext): string {
     throw new Error(
       'Self-review evidence changed or is not bound to the current reviewed head.',
     );
+  const { visual, ...findings } = object(review);
+  const evidence = object(report).evidence;
+  if (!Array.isArray(visual) || !Array.isArray(evidence))
+    throw new Error('Missing visual evidence/review.');
+  // Keep each current image's judgment and authoritative provenance together.
+  // The complete original local review remains bound by its SHA-256 above.
+  const images = evidence.map((value) => {
+    const shot = object(value);
+    const judgment = visual.map(object).find((item) => item.id === shot.id);
+    return { ...judgment, ...shot };
+  });
   const body = [
     '## Current-conversation Codex self-review',
     'This is a self-review by the implementing Codex conversation, published through the connected GitHub account. It is not independent approval. Structural checks establish evidence coverage and freshness, not honest visual inspection, correct judgment or causal proof.',
@@ -46,11 +57,12 @@ export function reviewBody(root: string, c: TaskContext): string {
     ...c.review.files.map((file) => `- ${file}`),
     '### Actual recorded findings',
     '```json',
-    JSON.stringify(review, null, 2),
+    JSON.stringify(findings, null, 2),
     '```',
-    '### Screenshot provenance',
+    '### Screenshot judgments and provenance',
+    'Each record retains the actual judgment and original screenshot path/hash once; no evidence or finding is omitted.',
     '```json',
-    JSON.stringify(object(report).evidence, null, 2),
+    `[\n${images.map((entry) => JSON.stringify(entry)).join(',\n')}\n]`,
     '```',
     'Screenshot bytes and complete logs are retained in local validation evidence and the CI artifact; this review retains findings and content hashes. No independent reviewer or model service was invoked.',
   ].join('\n\n');

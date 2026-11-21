@@ -1,5 +1,7 @@
 import {
   V7_GOAL,
+  forestClimate,
+  v7Distance,
   v7Observe,
   v7PublicCatalogue,
   v7Load,
@@ -8,6 +10,7 @@ import {
   v7Freeze,
   v7Clone,
 } from '@self-evolving-world/world-core';
+import { forestDecisionEvidence } from './forest-context.js';
 import type {
   V7Action,
   V7Cursor,
@@ -45,8 +48,12 @@ export function ordinaryContinuousInput(
       )
         harness[key] = adapter(v7Freeze(v7Clone(o)), work);
     }
+  const evidence =
+    world.state.shelterConstruction === 1
+      ? forestDecisionEvidence(self, harness)
+      : { harness, extensionState: self.extensionState };
   return {
-    harness,
+    harness: evidence.harness,
     protocol: world.protocol,
     goal: V7_GOAL,
     tick: world.tick,
@@ -61,7 +68,8 @@ export function ordinaryContinuousInput(
       learning: self.learning,
       mastered: self.mastered,
       relationships: self.relationships,
-      extensionState: self.extensionState,
+      extensionState: evidence.extensionState,
+      ...(self.life ? { life: self.life } : {}),
     },
     observation: {
       actors: o.actors,
@@ -70,12 +78,29 @@ export function ordinaryContinuousInput(
       terrain: o.terrain,
       events: o.events,
     },
+    ...(world.config.forest
+      ? { environment: forestClimate(world, self.position) }
+      : {}),
     memory: {
+      ...(world.config.forest
+        ? {
+            important: self.memory.important?.slice(-16),
+            discoveries: self.memory.discoveries,
+            death: self.life?.lastDeath,
+          }
+        : {}),
       notes: self.memory.notes,
       preferences: self.memory.preferences,
       experiences: self.memory.experiences.slice(-12),
       rememberedObjects: self.memory.objects
         .filter((x) => !o.objects.some((p) => p.id === x.object.id))
+        .sort((a, b) =>
+          world.config.forest
+            ? v7Distance(self.position, a.object.spatial) -
+              v7Distance(self.position, b.object.spatial)
+            : 0,
+        )
+        .slice(0, world.config.forest ? 16 : Infinity)
         .map((m) => ({ ...objectFact(m.object), lastObservedAt: m.seenAt })),
       rememberedGround: self.memory.stacks
         .filter(
@@ -83,6 +108,8 @@ export function ordinaryContinuousInput(
             x.stack.owner === null &&
             !o.stacks.some((p) => p.id === x.stack.id),
         )
+        .sort((a, b) => (world.config.forest ? b.seenAt - a.seenAt : 0))
+        .slice(0, world.config.forest ? 10 : Infinity)
         .map((m) => ({ ...m.stack, lastObservedAt: m.seenAt })),
     },
     previousTask: cursor
@@ -93,9 +120,17 @@ export function ordinaryContinuousInput(
           reason: cursor.reason,
         }
       : null,
-    catalogue: v7PublicCatalogue(world),
+    catalogue: v7PublicCatalogue(world, id),
     rules: {
       dt: world.config.dt,
+      ...(world.config.forest
+        ? {
+            timeUnit: 'simulation time unit; ecological cycles are accelerated',
+            lives: world.config.forest.lives,
+            dayLength: world.config.forest.day,
+            yearLength: world.config.forest.year,
+          }
+        : {}),
       speed: world.config.speed,
       vision: world.config.vision,
       pickupReach: self.radius + world.config.interaction,

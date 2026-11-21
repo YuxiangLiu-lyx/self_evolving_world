@@ -1,3 +1,20 @@
+import { v7NavigationTarget } from './continuous-navigation-target.js';
+import {
+  ForestRouteFailure,
+  forestRoute,
+  forestRouteData,
+} from './forest-routing.js';
+import { routeInspectionAfterRound } from './forest-route-inspection.js';
+import { warmingAfterPhysiology } from './forest-warming.js';
+import {
+  normalizeFoodAccounting,
+  foodTenths,
+} from './forest-food-accounting.js';
+import { foodAssessmentAfterRound } from './forest-food-assessment.js';
+import { shelterAfterRound } from './forest-shelter.js';
+import { forestPerception } from './forest-perception.js';
+import { forestEnvironment } from './forest-environment.js';
+import { forestLives } from './forest-lives.js';
 import type {
   V7Action,
   V7Actor,
@@ -5,7 +22,6 @@ import type {
   V7Data,
   V7Event,
   V7HandlerResult,
-  V7Point,
   V7Registry,
   V7RoundResult,
   V7World,
@@ -18,14 +34,12 @@ import {
   v7Json,
   v7Freeze,
   v7Id,
-  v7Number,
   v7Signature,
   v7String,
   v7Validate,
   v7Work,
 } from './continuous-data.js';
 import {
-  v7Approach,
   v7Reach,
   v7Distance,
   v7Inside,
@@ -46,6 +60,8 @@ export interface V7Review {
   ability: string | null;
   reason: string;
   specification: string;
+  experienceReview?: string;
+  visualReview?: string;
   learning: number;
 }
 interface Proposal {
@@ -55,6 +71,7 @@ interface Proposal {
   events: V7Event[];
   complete: boolean;
   error: string | null;
+  diagnostic?: V7Data;
   moved: boolean;
   cursor: V7Cursor | null;
 }
@@ -135,57 +152,24 @@ function navigation(
     target?: string | null,
   ) => void,
 ): V7HandlerResult {
-  const target =
-    typeof action.args.target === 'string' ? action.args.target : '';
-  let goal: V7Point;
-  if (target) {
-    const object = actor.memory.objects.find(
-      (m) => m.object.id === target,
-    )?.object;
-    const stack = actor.memory.stacks
-      .filter(
-        (m) =>
-          m.stack.owner === null &&
-          (m.stack.id === target || `resource:${m.stack.resource}` === target),
-      )
-      .sort(
-        (a, b) =>
-          v7Distance(actor.position, a.stack.position) -
-          v7Distance(actor.position, b.stack.position),
-      )[0]?.stack;
-    if (!object && !stack)
-      throw new Error(
-        'Navigation target is not in personal observations or memory.',
-      );
-    goal = object
-      ? v7Approach(actor, object.spatial)
-      : { x: stack?.position.x ?? 0, y: stack?.position.y ?? 0 };
-    const actual = world.objects.find((o) => o.id === target);
-    if (actual && object && v7Distance(actor.position, goal) < 0.05) {
-      emit('arrived', `Arrived at ${target}.`, { distance: 0 }, target);
-      return { complete: true, writes: [] };
-    }
-    if (
-      stack &&
-      v7Distance(actor.position, goal) <=
-        actor.radius + world.config.interaction * 0.8
-    ) {
-      emit(
-        'arrived',
-        `Within pickup reach of ${stack.id}.`,
-        { distance: 0 },
-        stack.id,
-      );
-      return { complete: true, writes: [] };
-    }
-  } else
-    goal = {
-      x: v7Number(action.args.x, 'destination x'),
-      y: v7Number(action.args.y, 'destination y'),
-    };
+  const { target, goal, arrival } = v7NavigationTarget(world, actor, action);
+  if (arrival) {
+    emit('arrived', arrival.description, { distance: 0 }, arrival.target);
+    return { complete: true, writes: [] };
+  }
   const obstacleKey = v7Signature(v7Obstacles(world, actor));
   // Route from authoritative personal memory each tick; cache is diagnostic, never hidden replay state.
-  const path = v7Route(world, actor, goal, work);
+  const diagnostic =
+    world.state.forestRouting === 1
+      ? forestRoute(world, actor, goal, work)
+      : null;
+  if (
+    diagnostic &&
+    !diagnostic.path.length &&
+    v7Distance(actor.position, goal) >= 0.03
+  )
+    throw new ForestRouteFailure(diagnostic);
+  const path = diagnostic?.path ?? v7Route(world, actor, goal, work);
   if (v7Distance(actor.position, goal) < 0.03) {
     emit('arrived', 'Arrived at the selected position.', { distance: 0 });
     return { complete: true, writes: [] };
@@ -221,7 +205,7 @@ function navigation(
   if (cursor)
     cursor.navigation = {
       goal,
-      obstacleKey,
+      obstacleKey: diagnostic?.geometryRevision ?? obstacleKey,
       path: traveled.path.length ? path : path.slice(1),
     };
   const reachedObject = target
@@ -290,6 +274,15 @@ export function v7AssertWorld(world: V7World, registry?: V7Registry): void {
     }
     const s = object.spatial;
     if (
+      s.enclosure &&
+      (s.shape.kind !== 'rectangle' ||
+        s.enclosure.wall <= 0 ||
+        s.enclosure.doorway <= 0 ||
+        s.enclosure.doorway >= s.shape.width ||
+        s.enclosure.wall * 2 >= Math.min(s.shape.width, s.shape.height))
+    )
+      throw new Error('Invalid enclosure walls or doorway.');
+    if (
       ![
         s.x,
         s.y,
@@ -318,8 +311,12 @@ export function v7AssertWorld(world: V7World, registry?: V7Registry): void {
     }
   for (const stack of world.stacks)
     if (
-      !Number.isSafeInteger(stack.quantity) ||
-      stack.quantity < 1 ||
+      (world.state.foodAssessment === 1
+        ? stack.quantity <= 0 ||
+          foodTenths(stack.quantity) < 1 ||
+          (stack.quantityTenths !== undefined &&
+            stack.quantityTenths !== foodTenths(stack.quantity))
+        : !Number.isSafeInteger(stack.quantity) || stack.quantity < 1) ||
       !world.resources.some((r) => r.id === stack.resource) ||
       (stack.owner !== null && !world.actors.some((a) => a.id === stack.owner))
     )
@@ -337,6 +334,12 @@ export function v7Step(
   cursors: Record<string, V7Cursor> = {},
   reviews: V7Review[] = [],
 ): V7RoundResult {
+  const savedWorld = world;
+  if (world.state.foodAssessment === 1) {
+    const encoded = v7Clone(world);
+    normalizeFoodAccounting(encoded);
+    world = v7Freeze(encoded);
+  }
   const work = v7Work(world.config.computation.workPerRound),
     proposals: Proposal[] = [],
     outcomes: V7RoundResult['outcomes'] = {};
@@ -361,6 +364,8 @@ export function v7Step(
         data: V7Data = {},
         target: string | null = null,
       ): void => {
+        if (trial.config.forest && !trial.eventTypes?.includes(type))
+          throw new Error(`Undeclared event: ${type}.`);
         trial.events.push({
           id: v7Id(trial, 'event'),
           tick: trial.tick,
@@ -484,11 +489,13 @@ export function v7Step(
                 !after ||
                 v7Signature({
                   wellbeing: after.wellbeing,
+                  life: after.life ?? null,
                   mastered: after.mastered,
                   learning: after.learning,
                 }) !==
                   v7Signature({
                     wellbeing: old.wellbeing,
+                    life: old.life ?? null,
                     mastered: old.mastered,
                     learning: old.learning,
                   })
@@ -506,12 +513,14 @@ export function v7Step(
           'resources',
           'satisfaction',
           'revisions',
+          ...(world.config.forest ? ['eventTypes' as const] : []),
         ] as const)
           if (v7Signature(trial[field]) !== v7Signature(world[field]))
             throw new Error(
               'Runtime actions cannot change registered rules or protected run policy.',
             );
         trial.stacks = trial.stacks.filter((s) => s.quantity > 0);
+        normalizeFoodAccounting(trial);
         v7AssertWorld(trial, registry);
         proposals.push({
           actor: actorId,
@@ -537,6 +546,9 @@ export function v7Step(
           events: [],
           complete: true,
           error: error instanceof Error ? error.message : 'Execution failed.',
+          ...(error instanceof ForestRouteFailure
+            ? { diagnostic: forestRouteData(error.evidence) }
+            : {}),
           moved: false,
           cursor: null,
         });
@@ -667,7 +679,19 @@ export function v7Step(
           position:
             world.actors.find((a) => a.id === p.actor)?.position ?? null,
           target: null,
-          data: {},
+          data:
+            p.diagnostic ??
+            (world.state.forestRouting === 1 &&
+            actions[p.actor]?.interface === 'navigate'
+              ? {
+                  reasonCode: conflicts.has(p.actor)
+                    ? 'simultaneous-conflict'
+                    : 'invalid-target-or-movement',
+                  observedBlockers: [],
+                  clearance: null,
+                  observationLimited: true,
+                }
+              : {}),
         });
       else {
         mergeProposal(next, p.world, p.writes);
@@ -686,6 +710,7 @@ export function v7Step(
         mastered: a.mastered,
         learning: a.learning,
         wellbeing: a.wellbeing,
+        life: a.life ?? null,
       })),
     });
     for (const process of [...next.processes])
@@ -710,13 +735,22 @@ export function v7Step(
           mastered: a.mastered,
           learning: a.learning,
           wellbeing: a.wellbeing,
+          life: a.life ?? null,
         })),
       })
     )
       throw new Error(
         'Processes cannot rewrite protected rules, learning or wellbeing accounts.',
       );
+    forestEnvironment(next);
     for (const actor of next.actors) v7Physiology(next, actor);
+    warmingAfterPhysiology(next);
+    forestLives(world, next, cursors, registry);
+    foodAssessmentAfterRound(world, next);
+    shelterAfterRound(world, next);
+    routeInspectionAfterRound(next);
+    normalizeFoodAccounting(next);
+    forestPerception(world, next);
     v7Wellbeing(next);
     v7Remember(next);
     v7AssertWorld(next, registry);
@@ -730,7 +764,7 @@ export function v7Step(
     };
   } catch (error) {
     if (error instanceof V7ComputePause)
-      return { world, outcomes: {}, paused: error.message };
+      return { world: savedWorld, outcomes: {}, paused: error.message };
     throw error;
   }
 }

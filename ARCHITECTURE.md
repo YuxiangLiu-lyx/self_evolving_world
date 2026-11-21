@@ -20,6 +20,18 @@ Simulator continuous-scenario/input/provider/run modules own the independent ini
 
 The separate observatory entry renders continuous-scene/visuals/history modules with a bounded segment cache, camera, event and state inspection. Its historical adapter preserves old grid positions and explicitly labels the different simulation. Camera time and animations never affect world time. See [ADR-0018](docs/decisions/0018-continuous-world-and-wellbeing.md).
 
+### Forest extension
+
+The opt-in [forest-v1 extension](docs/FOREST_WORLD.md) retains the continuous replay envelope and historical transitions. Pure forest-foundation/environment/lives modules own resource properties, deterministic climate/animals, finite-life settlement and event declarations. Continuous geometry owns shared enclosure walls, doorway passage, occlusion and indoor predicates. Optional package death cleanup releases pending escrow before respawn; protected life accounts cannot be changed by ordinary handlers.
+
+Simulator forest-scenario owns genesis while existing continuous input/provider/run modules select forest privacy, event schemas, mandatory experience/visual reviews and normal post-death decisions. Repository forest-preflight is an isolated feasibility oracle; its policies and fixture abilities never enter formal inputs. The existing durable store binds the round-200 technical checkpoint and retains the same source, call, development and guarded delivery path.
+
+Request-driven forest-wildlife, food-assessment and shelter packages add paid attention, conserved fractional escrow, persistent enclosures and measured cold relief through the same registry. Food and construction completion settle after injury/death before reward evaluation. Simulator forest-context projects bounded decision evidence without changing complete stored personal records or earlier calls. The thermal split preserves unsheltered results and shared geometry determines actual shelter occupancy.
+
+Active warming settles measured exertion after ordinary physiology and shares the existing relief source through validated alternative event triggers. Versioned forest-routing uses observed geometry and exact swept collision to supplement the broad navigation grid with bounded local corner connections. Navigation and paid route inspection share target resolution; diagnostics distinguish proven obstruction from unknown search or terrain, and never move an actor. Geometry revisions invalidate stale route evidence without changing physical instances or historical transitions.
+
+Viewer forest-canvas draws read-only scene frames and registered components; observatory retains camera, selection and replay. The explicitly isolated forest-lab accepts authored test recordings for visual inspection. Neither renderer imports simulator code or advances the world. See [ADR-0019](docs/decisions/0019-forest-lives-and-experience.md).
+
 ## Legacy Foundation
 
 The diagram and module table below describe the original fixed-grid path. Later grid protocols have their own sections; continuous-v1 uses the separate kernel described above. Restrictions such as three fixed skills and no host-code skill execution apply to the foundation.
