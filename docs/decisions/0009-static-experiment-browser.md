@@ -4,6 +4,8 @@
 - Status: Accepted
 - Extends: [ADR-0004](0004-fixed-world-and-replay.md) and [ADR-0008](0008-numbered-experiments-and-task-routing.md).
 
+The unconditional full-suite and all-image acceptance clauses below are historical and superseded by [ADR-0020](0020-scoped-validation.md). Other architectural decisions remain unchanged.
+
 ## Context
 
 The user wants one local webpage with a dropdown for numbered experiments. Retained records already contain validated replay data and charts, but require manual import. The existing viewer has all required timeline and agent-inspection controls.
