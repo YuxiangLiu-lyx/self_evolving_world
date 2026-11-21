@@ -106,6 +106,10 @@ The review handoff includes a patch and **all** changed paths: untracked content
 
 The version-bound GitHub COMMENT lists every reviewed file and combines each screenshot's actual judgment with its original path and SHA-256 in one record. This avoids duplicate paths within the bounded review body; the full original local review remains hash-bound and all freshness/completeness gates still apply.
 
+The review body is bounded at 65,000 characters, below GitHub's single-body limit.
+Large experiment archives retain every reviewed path and screenshot judgment;
+the size guard never truncates evidence or relaxes review freshness.
+
 ## Execution and recovery contract
 
 The [coordinator](../scripts/task-flow.ts) is the executable sequence. [Runtime effects](../scripts/task-runtime.ts) invoke existing allocation, scoped validation, local review, PR preflight, publication and independent completion commands. The [migration map](exec-plans/completed/pr-13-programmatic-harness.md#migration-map) records their previous triggers and counterparts. Tests and scene contracts remain available; the impact planner selects relevant checks. Required CI names, actual review and conflict/integration gates remain enforced.
