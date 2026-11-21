@@ -1,9 +1,23 @@
 import { continuousRuntimeHash } from './continuous-source.js';
 import { describe, expect, it } from 'vitest';
 import { selectChecks } from './validation-plan.js';
+import { experimentInput } from './validation-inputs.js';
 const archives = { ex1: 1, ex2: 2, ex3: 3, ex4: 4, ex5: 5, ex6: 6, ex7: 7 };
 const plan = (files: string[]) => selectChecks(files, archives, 'fixture-base');
 describe('dependency-scoped acceptance plans', () => {
+  it('includes replay and visual registries imported by archive validators', () => {
+    expect(experimentInput('apps/viewer/src/timeline.ts', 'ex3', 3)).toBe(true);
+    expect(experimentInput('apps/viewer/src/timeline.ts', 'ex7', 7)).toBe(
+      false,
+    );
+    expect(
+      experimentInput('apps/viewer/src/continuous-visuals.ts', 'ex7', 7),
+    ).toBe(true);
+    expect(
+      experimentInput('scripts/forest-checkpoint-repair.ts', 'ex8', 7),
+    ).toBe(true);
+    expect(experimentInput('apps/viewer/src/style.css', 'ex3', 3)).toBe(false);
+  });
   it('separates acceptance tools and package scripts from frozen runtime identity', () => {
     const original = {
       'packages/world-core/src/continuous-kernel.ts': 'world',

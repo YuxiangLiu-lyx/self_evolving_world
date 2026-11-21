@@ -126,6 +126,7 @@ describe('numbered experiment artifacts', () => {
     for (const path of [
       'packages/world-core/src/world.ts',
       'scripts/experiment-analysis.ts',
+      'apps/viewer/src/timeline.ts',
     ]) {
       mkdirSync(resolve(root, path, '..'), { recursive: true });
       writeFileSync(resolve(root, path), 'Changed relevant dependency fixture');

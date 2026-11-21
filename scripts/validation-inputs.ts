@@ -84,6 +84,11 @@ export function experimentInput(
     path.startsWith(`experiment/${id}/`) ||
     runtimeInput(path, version) ||
     toolchainInput(path) ||
+    // Archive validators also consume these viewer-side replay/visual registries.
+    (version <= 6 && path === 'apps/viewer/src/timeline.ts') ||
+    (version === 7 &&
+      (path === 'apps/viewer/src/continuous-visuals.ts' ||
+        path === 'scripts/forest-checkpoint-repair.ts')) ||
     (path.startsWith('scripts/') &&
       !path.endsWith('.test.ts') &&
       /(?:experiments|analysis|source|store|preflight|smoke|validation-(?:cache|inputs))\.ts$/.test(
