@@ -170,7 +170,7 @@ function render(): void {
           .filter((s) => s.owner === actor)
           .map(
             (s) =>
-              `${String(s.quantity)} ${current.continuous?.resources.find((r) => r.id === s.resource)?.name ?? s.resource}`,
+              `${String(s.quantity)} ${current.continuous?.resources.find((r) => r.id === s.resource)?.name ?? s.resource}${s.processing ? ` · ${s.id} · source ${s.origin} · moisture ${(100 * (s.fuelMoisture ?? 0)).toFixed(0)}%` : ''}${s.mantle ? ` · ${s.id} · ${s.mantle.equipped ? 'worn' : 'unequipped'} · condition ${String(s.mantle.condition)}/160 · moisture ${(100 * s.mantle.moisture).toFixed(0)}%` : ''}`,
           )
       : (legacy?.frames[frame.tick]?.agents
           .find((a) => a.id === actor)
@@ -239,6 +239,9 @@ function render(): void {
     el('happiness-split').textContent = frame.legacy
       ? 'This historical protocol did not measure happiness.'
       : `${self.wellbeing.physical.toFixed(1)} physical / 10 · ${self.wellbeing.mental.toFixed(1)} other / 90`;
+    if (self.experience)
+      el('happiness-split').textContent +=
+        ` · Sustained mood ${self.experience.mental.toFixed(2)} · Meal pleasure ${self.experience.pleasure.toFixed(2)} · Diet monotony ${(100 * self.experience.monotony).toFixed(0)}%`;
     el('sources').innerHTML =
       self.wellbeing.sources
         .filter((s) => s.value > 0)
@@ -246,7 +249,10 @@ function render(): void {
           (s) =>
             `<div class="source-row"><span>${svgText(current.continuous?.satisfaction.find((r) => r.id === s.source)?.name ?? s.source)}</span><strong>${s.value.toFixed(1)}</strong></div>`,
         )
-        .join('') ||
+        .join('') +
+        (self.experience && self.experience.pleasure > 0
+          ? `<div class="source-row"><span>Meal pleasure</span><strong>${self.experience.pleasure.toFixed(1)}</strong></div>`
+          : '') ||
       (frame.legacy ? '' : '<p>No active nonphysical satisfaction source.</p>');
     const task = tasks[actor];
     el('task').textContent = task
@@ -254,6 +260,9 @@ function render(): void {
       : frame.legacy
         ? 'Historical decisions remain available in the classic inspector.'
         : 'No active saved task at this boundary.';
+    if (task?.operation)
+      el('task').textContent +=
+        ` · Operation ${String(task.operation.elapsed)} rounds performed, ${task.operation.remaining === null ? 'remaining work unknown' : `${String(task.operation.remaining)} remaining`}`;
     el('memory').innerHTML = [...self.memory.notes, ...self.memory.preferences]
       .map((s) => `<li>${svgText(s)}</li>`)
       .join('');

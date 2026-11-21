@@ -1,0 +1,11 @@
+
+ RUN  v4.1.12 /Users/liuyuxiang/developer/self_evolving_world
+
+ ✓ apps/simulator/test/forest-willow.test.ts (6 tests) 707ms
+   ✓ qualifies real willow panels and manufactured cord for unchanged mantle and hearth recipe costs  377ms
+
+ Test Files  1 passed (1)
+      Tests  6 passed (6)
+   Start at  05:42:22
+   Duration  931ms (transform 139ms, setup 0ms, import 171ms, tests 707ms, environment 0ms)
+

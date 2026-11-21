@@ -50,6 +50,8 @@ export function v7Wellbeing(world: V7World): void {
     const old = actor.wellbeing.total;
     for (const rule of world.satisfaction) {
       let source = actor.wellbeing.sources.find((s) => s.source === rule.id);
+      if (source && rule.maintenance)
+        source.value = source.transient ?? source.value;
       const historyKey = `satisfaction-history:${rule.id}`;
       const previousReward = actor.extensionState[historyKey];
       let lastReward =
@@ -60,7 +62,13 @@ export function v7Wellbeing(world: V7World): void {
           (p) => p.expires >= world.tick,
         );
         source.value = Math.max(0, ...source.layers.map((p) => p.value));
-      } else if (source && world.tick > source.expires) source.value = 0;
+      } else if (
+        source &&
+        world.config.experience &&
+        rule.mode === 'maintained'
+      )
+        source.value = Math.max(0, source.value * Math.exp(-1 / rule.duration));
+      else if (source && world.tick > source.expires) source.value = 0;
       else if (source && rule.mode === 'linear')
         source.value = Math.max(0, source.value - rule.cap / rule.duration);
       else if (
@@ -136,7 +144,11 @@ export function v7Wellbeing(world: V7World): void {
               : rule.amount;
         source.value = Math.min(
           rule.cap,
-          rule.repetition === 'add' ? source.value + amplitude : amplitude,
+          world.config.experience && rule.mode === 'maintained'
+            ? source.value + amplitude / 6
+            : rule.repetition === 'add'
+              ? source.value + amplitude
+              : amplitude,
         );
         if (rule.repeatWindow) {
           source.layers = [
@@ -167,6 +179,75 @@ export function v7Wellbeing(world: V7World): void {
           data: { source: rule.id, evidence: event.id, value: source.value },
         });
       }
+      if (rule.maintenance) {
+        const m = rule.maintenance;
+        const evidence = executed.find(
+          (e) =>
+            e.success &&
+            e.actor === actor.id &&
+            [
+              { event: m.event, interface: m.interface },
+              ...(m.alternativeTriggers ?? []),
+            ].some(
+              (trigger) =>
+                e.type === trigger.event && e.interface === trigger.interface,
+            ),
+        );
+        if (evidence && actor.vitals.health > 0 && !source) {
+          source = {
+            source: rule.id,
+            value: 0,
+            lastEvent: '',
+            lastTick: -1,
+            expires: 0,
+            exposures: 0,
+          };
+          actor.wellbeing.sources.push(source);
+        }
+        if (source) {
+          source.transient = source.value;
+          source.sustained = Math.min(
+            rule.cap,
+            Math.max(
+              0,
+              (source.sustained ?? 0) +
+                (evidence && actor.vitals.health > 0
+                  ? m.gain *
+                    (m.roundsField
+                      ? Math.max(
+                          0,
+                          Math.min(
+                            m.maxRounds ?? 1,
+                            Number(evidence.data[m.roundsField] ?? 0),
+                          ),
+                        )
+                      : 1)
+                  : -m.decay),
+            ),
+          );
+          source.value = Math.min(
+            rule.cap,
+            Math.max(source.transient, source.sustained),
+          );
+          if (evidence)
+            world.events.push({
+              id: v7Id(world, 'event'),
+              tick: world.tick,
+              actor: actor.id,
+              type: 'satisfaction-maintained',
+              interface: evidence.interface,
+              success: true,
+              description: `${rule.name}: actual activity maintained the shared satisfaction source.`,
+              position: { ...actor.position },
+              target: rule.id,
+              data: {
+                evidence: evidence.id,
+                sustained: source.sustained,
+                value: source.value,
+              },
+            });
+        }
+      }
     }
     const v = actor.vitals;
     const thermal = Math.max(
@@ -184,7 +265,11 @@ export function v7Wellbeing(world: V7World): void {
     actor.wellbeing.mental = v7RoundNumber(
       Math.min(
         world.config.mentalCap,
-        actor.wellbeing.sources.reduce((n, s) => n + s.value, 0),
+        actor.wellbeing.sources.reduce((n, s) => n + s.value, 0) +
+          (world.config.experience &&
+          world.tick <= (actor.experience?.pleasureUntil ?? -1)
+            ? (actor.experience?.pleasure ?? 0)
+            : 0),
       ),
     );
     actor.wellbeing.total =

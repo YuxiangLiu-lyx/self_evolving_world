@@ -1,0 +1,10 @@
+
+ RUN  v4.1.12 /Users/liuyuxiang/developer/self_evolving_world
+
+ ✓ apps/simulator/test/forest-recuperation.test.ts (7 tests) 624ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  06:55:15
+   Duration  858ms (transform 146ms, setup 0ms, import 180ms, tests 624ms, environment 0ms)
+

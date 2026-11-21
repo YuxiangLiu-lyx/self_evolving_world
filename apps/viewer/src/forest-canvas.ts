@@ -1,3 +1,4 @@
+import { drawWillowWork, drawWillowItem } from './forest-willow-visual.js';
 import {
   forestClimate,
   v7Interior,
@@ -11,6 +12,7 @@ import type {
   V7Actor,
   V7Object,
   V7Point,
+  V7Stack,
 } from '@self-evolving-world/world-core';
 import type { SceneFrame } from './continuous-scene.js';
 import { CONTINUOUS_VISUALS } from './continuous-visuals.js';
@@ -222,7 +224,9 @@ function object(
       );
     return;
   }
-  ellipse(c, 0.13, 0.12, 0.58, 0.22, '#1b302b40');
+  if (o.kind === 'canopy-post') ellipse(c, 0.03, 0.03, 0.12, 0.06, '#1b302b40');
+  else if (!['rain-canopy', 'rain-canopy-work'].includes(o.kind))
+    ellipse(c, 0.13, 0.12, 0.58, 0.22, '#1b302b40');
   if (packageVisual(c, o)) {
     c.restore();
     return;
@@ -313,6 +317,8 @@ function object(
     }
   }
   c.restore();
+  if (o.data.resource === 'willow' && o.kind === 'tree')
+    label(c, `Willow · stock ${String(Number(o.data.stock))}`, x, y - 1.75);
 }
 function actor(
   c: CanvasRenderingContext2D,
@@ -320,6 +326,7 @@ function actor(
   selected: string,
   phase: number,
   active: string | null,
+  mantle?: V7Stack['mantle'],
 ): void {
   c.save();
   c.translate(a.position.x, a.position.y);
@@ -336,6 +343,19 @@ function actor(
   }
   if (dead) c.rotate(-Math.PI / 2);
   const exercising = !dead && !!a.extensionState['warming:pending'];
+  const status = a.extensionState['recuperation:lastStatus'];
+  const recoveryCancelled =
+    active === 'recuperate' &&
+    !a.extensionState['recuperation:pending'] &&
+    !!status &&
+    typeof status === 'object' &&
+    !Array.isArray(status) &&
+    status.status === 'cancelled';
+  const recuperating = !dead && active === 'recuperate' && !recoveryCancelled;
+  if (recuperating) {
+    c.translate(0, 0.13);
+    c.scale(1, 0.75);
+  }
   const gait =
     active === 'navigate' || exercising
       ? Math.sin(phase * Math.PI * 4) * 0.09
@@ -344,11 +364,12 @@ function actor(
   c.lineWidth = 0.1;
   c.beginPath();
   c.moveTo(-0.08, -0.02);
-  c.lineTo(-0.1, 0.17 + gait);
+  c.lineTo(recuperating ? -0.22 : -0.1, recuperating ? 0.08 : 0.17 + gait);
   c.moveTo(0.08, -0.02);
-  c.lineTo(0.1, 0.17 - gait);
+  c.lineTo(recuperating ? 0.22 : 0.1, recuperating ? 0.08 : 0.17 - gait);
   c.stroke();
   ellipse(c, 0, -0.19, 0.18, 0.23, color);
+  if (mantle) drawMantle(c, mantle);
   circle(c, 0, -0.48, 0.13, '#ddc2a0');
   ellipse(c, -0.015, -0.55, 0.135, 0.07, '#584b3b');
   c.strokeStyle = color;
@@ -362,21 +383,53 @@ function actor(
   c.moveTo(0.15, -0.3);
   c.lineTo(
     0.25,
-    (active && active !== 'rest' && active !== 'active-warming') || exercising
+    (active &&
+      active !== 'rest' &&
+      active !== 'active-warming' &&
+      active !== 'recuperate') ||
+      exercising
       ? -0.3 - Math.sin(phase * Math.PI) * 0.12
       : -0.1,
   );
   c.stroke();
+  drawWillowWork(c, a, active, phase);
   c.restore();
   label(c, a.name, a.position.x, a.position.y - 0.86);
   if (active && active !== 'wait')
     label(
       c,
-      active.replaceAll('_', ' '),
+      recoveryCancelled
+        ? 'recuperation cancelled'
+        : active.replaceAll('_', ' '),
       a.position.x,
       a.position.y + 0.65,
       '#dfd8ad',
     );
+  if (recuperating) {
+    const pending = a.extensionState['recuperation:pending'];
+    const last = a.extensionState['recuperation:lastRound'];
+    if (pending && typeof pending === 'object' && !Array.isArray(pending))
+      label(
+        c,
+        `${String(Number(pending.remaining))} rounds left · +${Number(pending.healed).toFixed(2)} health`,
+        a.position.x,
+        a.position.y + 1.03,
+        '#c3d3bb',
+      );
+    else if (
+      last &&
+      typeof last === 'object' &&
+      !Array.isArray(last) &&
+      Number(last.healing) > 0
+    )
+      label(
+        c,
+        `Recovered +${Number(last.cumulativeHealing).toFixed(2)} health`,
+        a.position.x,
+        a.position.y + 1.03,
+        '#c3d3bb',
+      );
+  }
 }
 
 /** A read-only projection; animation phase and device pixels never touch simulation state. */
@@ -615,6 +668,9 @@ export function drawForestCanvas(
         phase,
         frame.events.find((ev) => ev.actor === a.id && ev.interface)
           ?.interface ?? null,
+        frame.continuous?.stacks.find(
+          (s) => s.owner === a.id && s.mantle?.equipped,
+        )?.mantle,
       );
     }
   }
@@ -724,8 +780,25 @@ export function drawForestCanvas(
     );
   }
   for (const s of frame.stacks.filter((s) => !beneathClosedRoof(s))) {
-    ellipse(c, s.x, s.y, 0.16, 0.1, s.color);
-    label(c, s.label, s.x, s.y + 0.4);
+    const mantle = frame.continuous?.stacks.find(
+      (item) => item.id === s.id,
+    )?.mantle;
+    if (mantle) {
+      c.save();
+      c.translate(s.x, s.y + 0.18);
+      c.rotate(Math.PI / 2);
+      c.scale(0.75, 0.75);
+      drawMantle(c, mantle);
+      c.restore();
+    } else {
+      const item = frame.continuous?.stacks.find((item) => item.id === s.id);
+      if (!item || !drawWillowItem(c, item))
+        ellipse(c, s.x, s.y, 0.16, 0.1, s.color);
+    }
+    const processed = frame.continuous?.stacks.find(
+      (item) => item.id === s.id,
+    )?.processing;
+    label(c, s.label, s.x, s.y + (mantle ? 0.95 : processed ? 1.05 : 0.4));
   }
   routeOverlay(c, frame, selected);
   for (const e of frame.events) {
@@ -790,3 +863,4 @@ export function drawForestCanvas(
     c.fillRect(0, 0, frame.width, frame.height);
   }
 }
+import { drawMantle } from './forest-insulation-visual.js';

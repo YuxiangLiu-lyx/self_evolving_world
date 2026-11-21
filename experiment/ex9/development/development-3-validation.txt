@@ -1,0 +1,186 @@
+$ pnpm typecheck
+
+> self-evolving-world@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world
+> tsc --noEmit && pnpm --filter @self-evolving-world/world-core typecheck && pnpm --filter @self-evolving-world/viewer exec tsc --noEmit
+
+
+> @self-evolving-world/world-core@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world/packages/world-core
+> tsc -p tsconfig.json --noEmit
+
+
+$ pnpm architecture:check
+
+> self-evolving-world@0.0.0 architecture:check /Users/liuyuxiang/developer/self_evolving_world
+> depcruise --config dependency-cruiser.config.cjs apps packages
+
+
+✔ no dependency violations found (184 modules, 781 dependencies cruised)
+
+
+$ pnpm test
+
+> self-evolving-world@0.0.0 test /Users/liuyuxiang/developer/self_evolving_world
+> vitest run
+
+
+ RUN  v4.1.12 /Users/liuyuxiang/developer/self_evolving_world
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 20/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 40/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+ ✓ scripts/harness.test.ts (4 tests) 975ms
+     ✓ protects every nested archive and rejects additions hidden by gitignore  504ms
+ ✓ apps/simulator/test/forest-experience.test.ts (11 tests) 1152ms
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 60/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+ ✓ apps/simulator/test/coevolution.test.ts (5 tests) 1911ms
+     ✓ counts every failed attempt and freezes the whole world on the 120th ordinary call  459ms
+     ✓ returns development to the conversation and resumes the exact barrier with a real validated declaration  545ms
+     ✓ blocks uncertain call recovery and rejects altered checkpoints  430ms
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 80/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+ ✓ packages/world-core/test/forest-shelter.test.ts (7 tests) 2221ms
+     ✓ expires after 160 actual exposure rounds while retaining walls; paid maintenance restores only 160  1816ms
+ ✓ apps/simulator/test/forest-insulation.test.ts (7 tests) 2468ms
+     ✓ preserves exact item identity through equip, giving, pickup and death; another actor studies before equipping  723ms
+     ✓ repairs with paid input and equal-mass scrap without changing item identity or duplicating mass  410ms
+     ✓ measures modest cooling protection, combines it multiplicatively, wears out once, and never awards warm-weather ownership  694ms
+ ✓ apps/simulator/test/continuous.test.ts (6 tests) 1029ms
+     ✓ journals each attempt before inference and runs long tasks without per-round calls  875ms
+ ✓ scripts/continuous-store.test.ts (3 tests) 1358ms
+     ✓ recovers the committed world after interruption, reconstructs fractional navigation and preserves a shorter window when continued  1043ms
+ ✓ scripts/delivery-git.test.ts (4 tests) 2520ms
+     ✓ reports real conflicting paths without changing working files, branch or index  662ms
+     ✓ rejects a conflict-free but outdated branch and invalid baselines  960ms
+     ✓ rejects exceptions in unchanged historical plans and accepts only the current task plan  641ms
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 100/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+ ✓ apps/simulator/test/evolution-run.test.ts (5 tests) 3140ms
+     ✓ pauses development at the same tick, resumes once, and audits every retained private input  3077ms
+ ✓ scripts/validation.test.ts (15 tests) 662ms
+ ✓ packages/world-core/test/forest-food.test.ts (8 tests) 817ms
+ ✓ packages/world-core/test/forest-warming.test.ts (5 tests) 483ms
+ ✓ scripts/experiments.test.ts (19 tests) 586ms
+ ✓ scripts/coevolution-source.test.ts (4 tests) 473ms
+ ✓ packages/world-core/test/forest.test.ts (10 tests) 695ms
+ ✓ packages/world-core/test/forest-routing.test.ts (6 tests) 424ms
+ ✓ scripts/unit-reporter.test.ts (6 tests) 4232ms
+     ✓ handles skipped test  380ms
+     ✓ handles todo test  740ms
+     ✓ handles expected failure  1127ms
+     ✓ handles focused test  987ms
+     ✓ handles dynamic skip  717ms
+ ✓ packages/world-core/test/continuous.test.ts (12 tests) 319ms
+ ✓ scripts/documentation.test.ts (15 tests) 331ms
+ ✓ scripts/learning-analysis.test.ts (1 test) 175ms
+ ✓ apps/simulator/test/random-run.test.ts (12 tests) 309ms
+ ✓ apps/simulator/test/forest.test.ts (1 test) 144ms
+ ✓ packages/world-core/test/forest-wildlife.test.ts (3 tests) 346ms
+ ✓ apps/simulator/test/synchronous-run.test.ts (4 tests) 144ms
+ ✓ apps/simulator/test/learning-run.test.ts (5 tests) 114ms
+ ✓ apps/simulator/test/forest-context.test.ts (2 tests) 103ms
+ ✓ packages/world-core/test/continuous-mosaic.test.ts (2 tests) 76ms
+ ✓ apps/simulator/test/experiment.test.ts (21 tests) 56ms
+ ✓ scripts/forest-navigation.test.ts (2 tests) 185ms
+ ✓ scripts/survival-analysis.test.ts (2 tests) 55ms
+ ✓ apps/simulator/test/survival-run.test.ts (5 tests) 50ms
+ ✓ apps/simulator/test/chatgpt-renewal.test.ts (1 test) 31ms
+ ✓ scripts/pr-policy.test.ts (13 tests) 36ms
+ ✓ apps/viewer/test/timeline.test.ts (7 tests) 33ms
+ ✓ packages/world-core/test/continuous-nature.test.ts (2 tests) 65ms
+ ✓ packages/world-core/test/evolution.test.ts (10 tests) 26ms
+ ✓ packages/world-core/test/coevolution.test.ts (11 tests) 54ms
+ ✓ scripts/finish-task.test.ts (4 tests) 4806ms
+     ✓ completes an explicit local-only task without credentials, publication or a network remote  974ms
+     ✓ requires publication when no local exception plan was supplied and replaces old success with failure  1413ms
+     ✓ rejects evidence that has not passed local review and source changes after review  1665ms
+     ✓ does not use the local-only entry point to waive default merge completion  753ms
+ ✓ packages/world-core/test/learning.test.ts (22 tests) 34ms
+ ✓ packages/world-core/test/forest-perception.test.ts (1 test) 17ms
+ ✓ scripts/validation-cache.test.ts (3 tests) 14ms
+ ✓ apps/simulator/test/chatgpt-auth.test.ts (9 tests) 17ms
+ ✓ scripts/github.test.ts (2 tests) 27ms
+ ✓ scripts/task-flow.test.ts (16 tests) 14ms
+ ✓ packages/world-core/test/world.test.ts (38 tests) 14ms
+ ✓ scripts/task-continuous-repair.test.ts (1 test) 17ms
+ ✓ packages/world-core/test/round.test.ts (5 tests) 8ms
+ ✓ packages/world-core/test/program.test.ts (16 tests) 18ms
+ ✓ packages/world-core/test/survival.test.ts (7 tests) 9ms
+ ✓ scripts/delivery.test.ts (7 tests) 10ms
+ ✓ scripts/validation-plan.test.ts (8 tests) 8ms
+ ✓ scripts/publication.test.ts (6 tests) 7ms
+ ✓ apps/viewer/test/experiments.test.ts (10 tests) 7ms
+ ✓ apps/simulator/test/demo.test.ts (3 tests) 5ms
+ ✓ scripts/task-review.test.ts (8 tests) 7ms
+ ❯ scripts/forest-experience-replay.test.ts (1 test | 1 failed) 5423ms
+     × reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events 5422ms
+ ✓ apps/simulator/test/forest-fire.test.ts (8 tests) 5553ms
+     ✓ preserves component mass and kit identity; a finite fire warms another actor and consumes fuel without healing  2275ms
+     ✓ wet ignition fails; paid interrupted ignition never refunds tinder or durability  861ms
+     ✓ wall occlusion prevents heat; the physical solver still applies overheating damage  769ms
+     ✓ maintains the existing capped refuge source only after real sustained relief and decays without inventing low mood  614ms
+     ✓ other participants learn independently and can feed the shared site; builder death leaves the fire operating  583ms
+ ✓ scripts/task-runtime.test.ts (14 tests) 5715ms
+     ✓ uses the current base for changed delivery and retains the published base only for an exact retry  1447ms
+     ✓ requests validation for changed scope or untrusted receipts before requesting review  1036ms
+     ✓ retains complete committed and working review diffs larger than the capture buffer  787ms
+     ✓ commits the exact reviewed files once and keeps generated journals outside fingerprints  591ms
+     ✓ binds actual self-review findings and screenshot hashes to the exact current commit  493ms
+ ✓ scripts/task-entry.test.ts (14 tests) 6739ms
+     ✓ binds learning continuation to its mode, existing allocation and leased stage  360ms
+     ✓ binds evolution continuation to its mode, existing allocation and leased stage  948ms
+     ✓ routes old harness/review/finish/publication to the same context without a merge switch  614ms
+     ✓ submits only the current PR-body request and keeps generated response files out of task discovery  474ms
+     ✓ permits only leased prepare/verify workers and blocks ungranted completion, changed review and source  840ms
+     ✓ matches random intent and prevents an unrecorded model invocation or repeated allocation  655ms
+     ✓ rejects raw publish-task.ts before credentials, allocation or accepting evidence  569ms
+     ✓ rejects raw finish-task.ts before credentials, allocation or accepting evidence  654ms
+     ✓ rejects raw validate.ts before credentials, allocation or accepting evidence  419ms
+     ✓ rejects raw experiment-cli.ts before credentials, allocation or accepting evidence  304ms
+
+ Test Files  1 failed | 58 passed (59)
+      Tests  1 failed | 458 passed (459)
+   Start at  05:21:24
+   Duration  7.32s (transform 3.75s, setup 0ms, import 11.71s, tests 56.27s, environment 6ms)
+
+ ELIFECYCLE  Test failed. See above for more details.
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ scripts/forest-experience-replay.test.ts:27:3
+     25|
+     26| describe('experience replay retains actual operation inputs', () => {
+     27|   it('reconstructs a resource-alias sample across a segment boundary w…
+       |   ^
+     28|     const root = mkdtempSync(resolve(tmpdir(), 'experience-operation-r…
+     29|     try {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+⎯⎯⎯⎯⎯⎯ Unhandled Error ⎯⎯⎯⎯⎯⎯⎯
+Error: Full unit suite required: 1 skipped, focused, expected-failure, or incomplete tests; 0 unhandled errors. experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ ❯ UnitReporter.onTestRunEnd scripts/unit-reporter.ts:24:13
+
+ ❯ node_modules/.pnpm/vitest@4.1.12_@types+node@24.19.2_vite@8.3.6_@types+node@24.19.2_esbuild@0.28.2_tsx@4.23.15_/node_modules/vitest/dist/chunks/cli-api.B0Pz1_R7.js:14051:56
+ ❯ Vitest.report node_modules/.pnpm/vitest@4.1.12_@types+node@24.19.2_vite@8.3.6_@types+node@24.19.2_esbuild@0.28.2_tsx@4.23.15_/node_modules/vitest/dist/chunks/cli-api.B0Pz1_R7.js:14051:36
+ ❯ TestRun.end node_modules/.pnpm/vitest@4.1.12_@types+node@24.19.2_vite@8.3.6_@types+node@24.19.2_esbuild@0.28.2_tsx@4.23.15_/node_modules/vitest/dist/chunks/cli-api.B0Pz1_R7.js:12674:21
+ ❯ node_modules/.pnpm/vitest@4.1.12_@types+node@24.19.2_vite@8.3.6_@types+node@24.19.2_esbuild@0.28.2_tsx@4.23.15_/node_modules/vitest/dist/chunks/cli-api.B0Pz1_R7.js:13674:26
+ ❯ node_modules/.pnpm/vitest@4.1.12_@types+node@24.19.2_vite@8.3.6_@types+node@24.19.2_esbuild@0.28.2_tsx@4.23.15_/node_modules/vitest/dist/chunks/cli-api.B0Pz1_R7.js:13684:11
+ ❯ node_modules/.pnpm/vitest@4.1.12_@types+node@24.19.2_vite@8.3.6_@types+node@24.19.2_esbuild@0.28.2_tsx@4.23.15_/node_modules/vitest/dist/chunks/cli-api.B0Pz1_R7.js:13546:19
+ ❯ startVitest node_modules/.pnpm/vitest@4.1.12_@types+node@24.19.2_vite@8.3.6_@types+node@24.19.2_esbuild@0.28.2_tsx@4.23.15_/node_modules/vitest/dist/chunks/cli-api.B0Pz1_R7.js:14621:8
+ ❯ start node_modules/.pnpm/vitest@4.1.12_@types+node@24.19.2_vite@8.3.6_@types+node@24.19.2_esbuild@0.28.2_tsx@4.23.15_/node_modules/vitest/dist/chunks/cac.DzDtg8hz.js:2340:15
+
+
+
+
+

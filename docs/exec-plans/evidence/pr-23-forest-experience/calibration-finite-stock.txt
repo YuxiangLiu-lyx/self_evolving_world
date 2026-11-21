@@ -1,0 +1,15 @@
+/Users/liuyuxiang/developer/self_evolving_world/scripts/forest-experience-preflight.ts:62
+      if ((actor.life?.deaths ?? 0) > 0) throw new Error(`Isolated baseline lost a life: ${actor.id} at ${String(world.tick)}; ${JSON.stringify({ minima, actions, failures })}`);
+                                         ^
+
+Error: Isolated baseline lost a life: sol at 792; {"minima":{"lin":{"health":86.15780134,"satiety":0},"moss":{"health":100,"satiety":0},"sol":{"health":4.86817443,"satiety":7}},"actions":{"learn":3,"wait":978,"navigate":219,"gather":146,"eat":146,"rest":488,"active-warming":396},"failures":{}}
+    at forestExperiencePreflight (/Users/liuyuxiang/developer/self_evolving_world/scripts/forest-experience-preflight.ts:62:48)
+    at [eval]:3:76
+    at runScriptInThisContext (node:internal/vm:219:10)
+    at node:internal/process/execution:451:12
+    at [eval]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:449:60)
+    at evalFunction (node:internal/process/execution:283:30)
+    at asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:11)
+
+Node.js v24.22.2

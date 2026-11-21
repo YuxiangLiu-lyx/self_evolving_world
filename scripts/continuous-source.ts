@@ -372,7 +372,15 @@ export function validateContinuousDevelopment(
     if (
       typeof ability !== 'string' ||
       !world.abilities.some(
-        (a) => a.id === ability && a.learning === review.learning,
+        (a) =>
+          a.id === ability &&
+          (a.learning === review.learning ||
+            (state.world.actors
+              .find((actor) => actor.id === review.actor)
+              ?.mastered.includes(a.id) &&
+              state.world.abilities.some(
+                (old) => old.id === a.id && old.learning === a.learning,
+              ))),
       )
     )
       throw new Error(

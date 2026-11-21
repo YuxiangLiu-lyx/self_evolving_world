@@ -47,3 +47,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-21](completed/pr-21-forest-lives.md): complete forest ecology/lives/experience iteration and the budget-paused real ex8 observation.
 
 - [PR-22](completed/pr-22-scoped-validation.md): dependency-scoped acceptance, reconstruction reuse and CI delivery efficiency.
+
+- [PR-23](completed/pr-23-forest-experience.md): consistent execution, diet and sustained experience with a new real observation.

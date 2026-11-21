@@ -1,3 +1,5 @@
+import { forestResolveReference } from './forest-references.js';
+import { forestMeal, forestRestFactor } from './forest-experience.js';
 import { foodTenths } from './forest-food-accounting.js';
 import type {
   V7Ability,
@@ -75,6 +77,8 @@ export function v7Owned(
   actor: V7Actor,
   target: string,
 ): V7Stack {
+  if (world.config.experience)
+    target = forestResolveReference(world, actor, target, 'owned');
   const stack = world.stacks.find(
     (s) =>
       !s.reservedFor &&
@@ -268,13 +272,20 @@ export const V7_BASE: V7Package = {
       const before = actor.vitals.energy;
       actor.vitals.energy = Math.min(
         world.config.energyCap,
-        before + world.config.restRecovery + bonus,
+        before +
+          (world.config.restRecovery + bonus) * forestRestFactor(world, actor),
       );
       emit(
         'rested',
         `Recovered ${String(v7RoundNumber(actor.vitals.energy - before))} energy.`,
         {
           recovered: actor.vitals.energy - before,
+          ...(world.config.experience
+            ? {
+                mentalFactor: forestRestFactor(world, actor),
+                nominal: world.config.restRecovery + bonus,
+              }
+            : {}),
           bonus: Math.max(
             0,
             actor.vitals.energy - before - world.config.restRecovery,
@@ -315,7 +326,28 @@ export const V7_BASE: V7Package = {
         );
       const resource = world.resources.find((r) => r.id === stack.resource);
       if (!resource) throw new Error('Unknown material.');
+      if ((stack.mantle || stack.frictionKit) && n !== 1)
+        throw new Error('Equipment is one indivisible persistent item.');
       v7Spend(actor, 1 + n * resource.mass * 0.2);
+      if (stack.mantle || stack.frictionKit) {
+        stack.owner = actor.id;
+        stack.position = { ...actor.position };
+        if (stack.mantle) stack.mantle.equipped = false;
+        emit(
+          'picked-up',
+          stack.mantle
+            ? 'Collected the same persistent mantle.'
+            : 'Collected the same persistent friction kit.',
+          {
+            quantity: 1,
+            resource: stack.resource,
+            item: stack.id,
+            origin: stack.origin,
+          },
+          stack.id,
+        );
+        return done([stack.id]);
+      }
       stack.quantity -= n;
       const id = v7Id(world, 'item');
       world.stacks.push({
@@ -346,7 +378,7 @@ export const V7_BASE: V7Package = {
           'Requested owned food quantity is unavailable or inedible.',
         );
       const before = actor.vitals.satiety;
-      v7FoodEffect(actor, resource, n);
+      v7FoodEffect(actor, resource, n, world, stack);
       stack.quantity -= n;
       emit(
         'ate',
@@ -378,6 +410,8 @@ export const V7_BASE: V7Package = {
         );
       v7Spend(actor, 2 * n);
       object.data.stock -= n;
+      if (world.config.experience)
+        object.data.depletion = Number(object.data.depletion ?? 0) + n;
       const id = v7Id(world, 'item');
       world.stacks.push({
         id,
@@ -424,7 +458,15 @@ export const V7_BASE: V7Package = {
       emit(
         'message',
         v7String(action.args.text, 'message'),
-        { recipient: id },
+        {
+          recipient: id,
+          ...(world.config.experience
+            ? {
+                urgency: action.args.urgency ?? 'ordinary',
+                subject: action.args.subject ?? '',
+              }
+            : {}),
+        },
         id,
       );
       return done();
@@ -480,6 +522,8 @@ function transfer(
     );
   if (world.state.foodAssessment === 1) foodTenths(n);
   if (stack.quantity < n) throw new Error('Insufficient owned quantity.');
+  if ((stack.mantle || stack.frictionKit) && n !== 1)
+    throw new Error('Equipment is one indivisible persistent item.');
   const recipient = give
     ? world.actors.find(
         (a) =>
@@ -496,6 +540,32 @@ function transfer(
   )
     throw new Error('Recipient is outside actual handoff reach.');
   v7Spend(actor, 0.5);
+  if (stack.mantle || stack.frictionKit) {
+    if (stack.mantle?.equipped)
+      emit(
+        'insulation-unequipped',
+        'Transfer removes the worn mantle before handoff.',
+        { item: stack.id },
+        stack.id,
+      );
+    if (stack.mantle) stack.mantle.equipped = false;
+    stack.owner = recipient?.id ?? null;
+    stack.position = { ...(recipient?.position ?? actor.position) };
+    emit(
+      give ? 'given' : 'dropped',
+      stack.mantle
+        ? 'Transferred the same persistent mantle.'
+        : 'Transferred the same persistent friction kit.',
+      {
+        quantity: 1,
+        resource: stack.resource,
+        item: stack.id,
+        recipient: recipient?.id ?? null,
+      },
+      stack.id,
+    );
+    return done([stack.id]);
+  }
   stack.quantity -= n;
   const id = v7Id(world, 'item');
   world.stacks.push({
@@ -524,11 +594,20 @@ export function v7FoodEffect(
   actor: V7Actor,
   resource: V7Resource,
   quantity: number,
+  world?: V7World,
+  stack?: V7Stack,
 ): void {
   v7Number(quantity, 'consumed food quantity', 0.1);
   if (resource.nutrition <= 0)
     throw new Error('The actual material is not edible.');
-  v7Spend(actor, 1);
+  const before = actor.vitals.satiety;
+  const mealEffort = world?.config.experience
+    ? 1 / forestRestFactor(world, actor)
+    : 1;
+  // Basic ingestion remains possible at zero energy; mood changes effort, never food nutrition.
+  if (world?.config.experience)
+    actor.vitals.energy = Math.max(0, actor.vitals.energy - mealEffort);
+  else v7Spend(actor, 1);
   actor.vitals.satiety = Math.min(
     100,
     actor.vitals.satiety + quantity * resource.nutrition,
@@ -537,4 +616,13 @@ export function v7FoodEffect(
     0,
     actor.vitals.health - quantity * resource.toxicity,
   );
+  if (world)
+    forestMeal(
+      world,
+      actor,
+      resource,
+      quantity,
+      actor.vitals.satiety - before,
+      stack,
+    );
 }

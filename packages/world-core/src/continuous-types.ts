@@ -45,6 +45,12 @@ export interface V7Resource {
   nutrition: number;
   toxicity: number;
   color: string;
+  /** Reviewed actual food composition; labels never define dietary diversity. */
+  food?: {
+    ingredients: { resource: string; share: number }[];
+    method: string;
+    quality: number;
+  };
   properties?: {
     hardness: number;
     flexibility: number;
@@ -68,6 +74,26 @@ export interface V7Stack {
   reservedFor?: string;
   harvestedAt?: number;
   decay?: number;
+  /** A single persistent manufactured item; never divisible into fractional equipment. */
+  frictionKit?: { durability: number; inputs: V7Data[] };
+  fuelMoisture?: number;
+  processing?: V7Data;
+  canopyDrying?: {
+    tick: number;
+    canopy: string;
+    before: number;
+    after: number;
+    rain: number;
+    ambientRain: number;
+  };
+  mantle?: {
+    equipped: boolean;
+    condition: number;
+    moisture: number;
+    lastTick: number;
+    inputs: V7Data[];
+    repairs: V7Data[];
+  };
 }
 export interface V7Vital {
   health: number;
@@ -82,6 +108,8 @@ export interface V7Satisfaction {
   lastTick: number;
   expires: number;
   exposures: number;
+  sustained?: number;
+  transient?: number;
   layers?: { value: number; expires: number }[];
 }
 export interface V7Wellbeing {
@@ -116,6 +144,38 @@ export interface V7Actor {
   extensionState: V7Data;
   bornAt: number;
   parents: string[];
+  experience?: {
+    mental: number;
+    meals: {
+      tick: number;
+      nutrition: number;
+      composition: Record<string, number>;
+      methods: string[];
+      quality: number;
+    }[];
+    pendingMeal: {
+      tick: number;
+      nutrition: number;
+      composition: Record<string, number>;
+      methods: string[];
+      quality: number;
+    } | null;
+    monotony: number;
+    pleasure: number;
+    pleasureUntil: number;
+    lastMealReward: number;
+    recent: {
+      tick: number;
+      health: number;
+      satiety: number;
+      energy: number;
+      effort: number;
+      recovery: number;
+      action: string;
+      failed: string | null;
+      benefit: number;
+    }[];
+  };
   life?: {
     total: number;
     deaths: number;
@@ -155,6 +215,12 @@ export interface V7Cursor {
   startedAt: number;
   navigation: { goal: V7Point; path: V7Point[]; obstacleKey: string } | null;
   reason: string | null;
+  operation?: {
+    action: V7Action;
+    elapsed: number;
+    remaining: number | null;
+    startedAt: number;
+  } | null;
 }
 export interface V7Event {
   id: string;
@@ -202,7 +268,16 @@ export interface V7Ability {
   handler: string;
   revision: string;
   authored: boolean;
+  /** Reference parameters are resolved before any handler, including generated ones. */
+  references?: Record<string, V7ReferenceScope>;
+  execution?: {
+    duration: number | null;
+    interruption: 'cancel';
+    progress: string;
+  };
 }
+export type V7ReferenceScope =
+  'owned' | 'ground' | 'object' | 'known' | 'visible';
 export interface V7SatisfactionRule {
   id: string;
   name: string;
@@ -212,6 +287,15 @@ export interface V7SatisfactionRule {
   conditions: V7Condition[];
   /** Reviewed alternative evidence routes share this exact source and reward history. */
   alternativeTriggers?: { event: string; interface: string }[];
+  maintenance?: {
+    alternativeTriggers?: { event: string; interface: string }[];
+    event: string;
+    interface: string;
+    gain: number;
+    decay: number;
+    roundsField?: string;
+    maxRounds?: number;
+  };
   amount: number;
   cap: number;
   duration: number;
@@ -247,6 +331,20 @@ export interface V7Configuration {
     year: number;
     respawnSatiety: number;
     lives: number;
+  };
+  experience?: {
+    version: 1;
+    targetRounds: number;
+    mealWindow: number;
+    substantialNutrition: number;
+    mentalRate: number;
+    mentalDecay: number;
+    restMin: number;
+    restMax: number;
+    remoteStockScale: number;
+    growthScale: number;
+    exposure: number;
+    carryingScale: number;
   };
 }
 export interface V7World {
@@ -284,6 +382,12 @@ export interface V7Work {
   spend(amount?: number): void;
 }
 export interface V7ActionContext {
+  operation?: {
+    first: boolean;
+    elapsed: number;
+    startedAt: number;
+    request?: V7Action;
+  };
   world: V7World;
   actor: V7Actor;
   action: V7Action;
@@ -298,6 +402,8 @@ export interface V7ActionContext {
 export interface V7HandlerResult {
   complete: boolean;
   writes: string[];
+  /** Required for new continuing actions; null means remaining work is not predictable. */
+  remaining?: number | null;
 }
 export interface V7Package {
   id: string;
@@ -315,6 +421,12 @@ export interface V7Package {
   visualComponents: string[];
   events?: string[];
   /** Release pending work/escrow at the death position before respawn, without refunding effort. */
+  beforeAction?: (
+    world: V7World,
+    actor: V7Actor,
+    action: V7Action,
+    continuing: boolean,
+  ) => void;
   onDeath?: (world: V7World, actor: V7Actor) => void;
   stateSchemas?: Record<string, V7Schema>;
   /** Only private observations enter a learned actor-selected memory adapter. */

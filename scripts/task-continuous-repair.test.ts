@@ -1,3 +1,5 @@
+import { resolveContinuousDevelopment } from '../apps/simulator/src/continuous-run.js';
+import { worldContinuousInput } from '../apps/simulator/src/continuous-input.js';
 import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
 import { v7Clone } from '@self-evolving-world/world-core';
@@ -41,4 +43,72 @@ it('permits only the retained unsettled computation pause and refuses ambiguous 
       assertContinuousTechnicalRepair(changed);
     }).toThrow('Only a durable');
   }
+});
+
+it('recovers the actual pre-inference context pause without advancing a round, manufacturing reviews or bypassing budgets', () => {
+  const state = JSON.parse(
+    readFileSync(
+      'experiment/ex9/technical-pauses/round-451/execution.json',
+      'utf8',
+    ),
+  ) as V7Execution;
+  expect(() => {
+    assertContinuousTechnicalRepair(state);
+  }).not.toThrow();
+  for (const role of ['ordinary', 'world'] as const) {
+    const exhausted = v7Clone(state);
+    exhausted.world.config.budgets[role] = exhausted.attempts.filter(
+      (a) => a.role === role,
+    ).length;
+    expect(() => {
+      assertContinuousTechnicalRepair(exhausted);
+    }).toThrow('Only a durable');
+  }
+  const pending = v7Clone(state);
+  const first = pending.attempts[0];
+  if (first) first.status = 'started';
+  expect(() => {
+    assertContinuousTechnicalRepair(pending);
+  }).toThrow('Only a durable');
+  const saved = v7Clone(state);
+  saved.phase = 'development';
+  saved.barrier = {
+    technicalReason: state.reason ?? '',
+    id: 'isolated-context',
+    tick: state.world.tick,
+    actions: {},
+    requests: {},
+    reviews: [],
+    worldAttempts: 0,
+    errors: [],
+    input: worldContinuousInput(state.world, {}),
+    developmentAttempt: 'isolated-development',
+  };
+  saved.developments.push({
+    id: 'isolated-development',
+    tick: state.world.tick,
+    status: 'started',
+    startedAt: '2026-11-21T00:00:00.000Z',
+    finishedAt: null,
+    reason: null,
+    internalModelCalls: null,
+    inputTokens: null,
+    outputTokens: null,
+  });
+  const resolved = resolveContinuousDevelopment(
+    saved,
+    [],
+    {},
+    'Isolated context codec recovery review',
+  );
+  expect(resolved.world).toEqual(state.world);
+  expect(resolved.attempts).toEqual(state.attempts);
+  expect(resolved.cursors).toEqual(state.cursors);
+  expect(resolved.barrier).toBeNull();
+  expect(resolved.phase).toBe('running');
+  const bad = v7Clone(saved);
+  if (bad.barrier) bad.barrier.actions.lin = { interface: 'wait', args: {} };
+  expect(() =>
+    resolveContinuousDevelopment(bad, [], {}, 'No invented actor action'),
+  ).toThrow('Context-only recovery');
 });

@@ -1,0 +1,65 @@
+
+> self-evolving-world@0.0.0 build /Users/liuyuxiang/developer/self_evolving_world
+> pnpm -r build
+
+Scope: 3 of 4 workspace projects
+packages/world-core build$ tsc -p tsconfig.json
+packages/world-core build: Done
+apps/simulator build$ tsc -p tsconfig.json
+apps/viewer build$ tsc --noEmit && vite build
+apps/simulator build: Done
+apps/viewer build: vite v8.3.6 building client environment for production...
+apps/viewer build: transforming...
+apps/viewer build: ✓ 86 modules transformed.
+apps/viewer build: rendering chunks...
+apps/viewer build: computing gzip size...
+apps/viewer build: dist/forest-lab.html                                     0.58 kB │ gzip:   0.32 kB
+apps/viewer build: dist/index.html                                          0.74 kB │ gzip:   0.35 kB
+apps/viewer build: dist/observatory.html                                    0.74 kB │ gzip:   0.35 kB
+apps/viewer build: dist/experiments/ex8/replay.json                         1.39 kB │ gzip:   0.63 kB
+apps/viewer build: dist/experiments/ex7/replay.json                         1.54 kB │ gzip:   0.69 kB
+apps/viewer build: dist/experiments/ex4/overview.svg                        1.72 kB │ gzip:   0.65 kB
+apps/viewer build: dist/experiments/index.json                              2.82 kB │ gzip:   1.07 kB
+apps/viewer build: dist/experiments/ex3/overview.svg                        4.14 kB │ gzip:   1.48 kB
+apps/viewer build: dist/experiments/ex3/replay.json                         4.91 kB │ gzip:   1.09 kB
+apps/viewer build: dist/experiments/ex5/overview.svg                        5.80 kB │ gzip:   1.22 kB
+apps/viewer build: dist/experiments/ex2/overview.svg                        6.87 kB │ gzip:   1.76 kB
+apps/viewer build: dist/classic.html                                       14.12 kB │ gzip:   3.49 kB
+apps/viewer build: dist/experiments/ex1/overview.svg                       14.69 kB │ gzip:   1.89 kB
+apps/viewer build: dist/experiments/ex6/overview.svg                       24.14 kB │ gzip:   3.34 kB
+apps/viewer build: dist/experiments/ex4/replay.json                        36.08 kB │ gzip:   4.31 kB
+apps/viewer build: dist/experiments/ex8/overview.svg                       39.91 kB │ gzip:  14.64 kB
+apps/viewer build: dist/experiments/ex1/replay.json                        42.25 kB │ gzip:   1.40 kB
+apps/viewer build: dist/experiments/ex7/overview.svg                       44.25 kB │ gzip:  13.94 kB
+apps/viewer build: dist/experiments/ex2/replay.json                        49.36 kB │ gzip:   1.21 kB
+apps/viewer build: dist/experiments/ex5/replay.json                       191.65 kB │ gzip:  22.73 kB
+apps/viewer build: dist/experiments/ex6/replay.json                       213.78 kB │ gzip:  24.13 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000900-001000.json    695.34 kB │ gzip:  38.84 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000600-000700.json    730.99 kB │ gzip:  40.93 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000800-000900.json    731.41 kB │ gzip:  42.68 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000100-000200.json    740.54 kB │ gzip:  42.15 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000700-000800.json    748.80 kB │ gzip:  43.46 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000200-000300.json    751.98 kB │ gzip:  43.64 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000500-000600.json    773.42 kB │ gzip:  44.74 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000000-000100.json    773.77 kB │ gzip:  49.94 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000400-000500.json    786.06 kB │ gzip:  46.49 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000300-000400.json    898.19 kB │ gzip:  52.83 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000800-000897.json  1,111.90 kB │ gzip: 101.01 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000700-000800.json  1,125.42 kB │ gzip: 102.94 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000600-000700.json  1,176.15 kB │ gzip: 116.03 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000000-000100.json  1,399.16 kB │ gzip:  74.33 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000500-000600.json  1,774.75 kB │ gzip: 146.78 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000300-000400.json  2,184.52 kB │ gzip: 122.76 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000200-000300.json  2,232.20 kB │ gzip: 120.30 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000100-000200.json  2,279.24 kB │ gzip: 111.35 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000400-000500.json  2,282.68 kB │ gzip: 143.69 kB
+apps/viewer build: dist/assets/observatory-n1yR4nWg.css                     7.12 kB │ gzip:   2.38 kB
+apps/viewer build: dist/assets/classic-CkITEJCO.css                        16.01 kB │ gzip:   4.83 kB
+apps/viewer build: dist/assets/forestLab-CvFSb9nY.js                        4.51 kB │ gzip:   1.93 kB
+apps/viewer build: dist/assets/timeline-B1oj2RO9.js                         4.86 kB │ gzip:   1.54 kB
+apps/viewer build: dist/assets/observatory-7MhjiUrZ.js                     23.59 kB │ gzip:   8.61 kB
+apps/viewer build: dist/assets/observatory-DKr6A27S.js                     29.56 kB │ gzip:  10.58 kB
+apps/viewer build: dist/assets/classic-pN-Mo_NJ.js                         35.70 kB │ gzip:  11.91 kB
+apps/viewer build: dist/assets/dist-Z90fjoZM.js                           269.16 kB │ gzip:  77.73 kB
+apps/viewer build: ✓ built in 182ms
+apps/viewer build: Done

@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "controller": "isolated-experience-feasibility",
+  "modelCalls": 0,
+  "rounds": 1200,
+  "seed": 20261121,
+  "configuration": {
+    "protocol": "continuous-v1",
+    "seed": 20261121,
+    "width": 48,
+    "height": 36,
+    "dt": 1,
+    "speed": 0.8,
+    "vision": 5,
+    "interaction": 0.65,
+    "hunger": 0.9,
+    "starvation": 8,
+    "energyCap": 40,
+    "restRecovery": 4,
+    "physicalCap": 10,
+    "mentalCap": 90,
+    "budgets": {
+      "ordinary": 650,
+      "world": 60,
+      "development": 20
+    },
+    "computation": {
+      "workPerRound": 2000000,
+      "inputBytes": 120000,
+      "stateBytes": 32000000
+    },
+    "forest": {
+      "version": 1,
+      "day": 80,
+      "year": 800,
+      "respawnSatiety": 80,
+      "lives": 3
+    },
+    "experience": {
+      "version": 1,
+      "targetRounds": 1200,
+      "mealWindow": 10,
+      "substantialNutrition": 8,
+      "mentalRate": 0.025,
+      "mentalDecay": 0.003,
+      "restMin": 0.85,
+      "restMax": 1.1,
+      "remoteStockScale": 3,
+      "growthScale": 0.85,
+      "exposure": 0.6,
+      "carryingScale": 1.2
+    }
+  },
+  "firstFoodRound": {
+    "sol": 5,
+    "lin": 6,
+    "moss": 6
+  },
+  "initialSafeNutrition": 4374,
+  "nearestFoodDistances": [
+    {
+      "actor": "lin",
+      "distance": 2.1931712199461306
+    },
+    {
+      "actor": "moss",
+      "distance": 2.193171219946132
+    },
+    {
+      "actor": "sol",
+      "distance": 1.5264337522473757
+    }
+  ],
+  "minima": {
+    "lin": {
+      "health": 99.01034984,
+      "satiety": 26.9
+    },
+    "moss": {
+      "health": 92.81948779,
+      "satiety": 20.7
+    },
+    "sol": {
+      "health": 93.60643742,
+      "satiety": 23.4
+    }
+  },
+  "actions": {
+    "learn": 3,
+    "wait": 1829,
+    "navigate": 178,
+    "gather": 248,
+    "eat": 248,
+    "rest": 618,
+    "active-warming": 476
+  },
+  "failures": {},
+  "optionalRounds": 1829,
+  "optionalShare": 0.5080555555555556,
+  "final": [
+    {
+      "id": "lin",
+      "vitals": {
+        "health": 99.01034984,
+        "satiety": 88,
+        "energy": 38.0981391,
+        "temperature": 13.98705749
+      },
+      "lives": {
+        "total": 3,
+        "deaths": 0,
+        "spawn": {
+          "x": 8.5,
+          "y": 10.5
+        },
+        "lastDeath": null
+      },
+      "mental": -0.03141853
+    },
+    {
+      "id": "moss",
+      "vitals": {
+        "health": 92.81948779,
+        "satiety": 82,
+        "energy": 38.65334135,
+        "temperature": 14.98705685
+      },
+      "lives": {
+        "total": 3,
+        "deaths": 0,
+        "spawn": {
+          "x": 18.5,
+          "y": 12.5
+        },
+        "lastDeath": null
+      },
+      "mental": -0.05826819
+    },
+    {
+      "id": "sol",
+      "vitals": {
+        "health": 93.60643742,
+        "satiety": 79,
+        "energy": 36.79539751,
+        "temperature": 13.98009281
+      },
+      "lives": {
+        "total": 3,
+        "deaths": 0,
+        "spawn": {
+          "x": 14.5,
+          "y": 22.5
+        },
+        "lastDeath": null
+      },
+      "mental": 0.01062201
+    }
+  ],
+  "limitation": "Authored offline feasibility only; no autonomous discovery or causal guarantee. Oracle uses actual safe definitions, which are excluded from ordinary inputs."
+}

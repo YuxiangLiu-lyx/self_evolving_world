@@ -1,3 +1,19 @@
+import { recuperationAfterRound } from './forest-recuperation.js';
+import { canopyAfterRound } from './forest-canopy.js';
+import { canopyEnvironment } from './forest-canopy-environment.js';
+import {
+  forestBoundOperation,
+  forestSaveOperation,
+} from './forest-operations.js';
+import { willowAfterRound } from './forest-willow.js';
+import { fireEnvironment } from './forest-fire-environment.js';
+import { fireAfterRound } from './forest-fire.js';
+import { forestExperienceAfterRound } from './forest-experience.js';
+import { insulationAfterRound } from './forest-insulation.js';
+import {
+  forestResolveAction,
+  ForestReferenceError,
+} from './forest-references.js';
 import { v7NavigationTarget } from './continuous-navigation-target.js';
 import {
   ForestRouteFailure,
@@ -195,7 +211,13 @@ function navigation(
       'Movement blocked by an actual obstacle; update the route from current observations.',
     );
   const load = v7Load(world, actor),
-    effort = traveled.distance * 2 * (1 + Math.max(0, load - 3) * 0.15);
+    effort =
+      traveled.distance *
+      2 *
+      (1 +
+        Math.max(0, load - 3) *
+          0.15 *
+          (world.config.experience?.carryingScale ?? 1));
   v7Spend(actor, effort);
   actor.angle = Math.atan2(
     traveled.position.y - actor.position.y,
@@ -237,6 +259,24 @@ export function v7AssertWorld(world: V7World, registry?: V7Registry): void {
       ids.add(entity.id);
     }
   for (const actor of world.actors) {
+    if (world.config.experience) {
+      const state = actor.experience;
+      if (
+        !state ||
+        ![state.mental, state.pleasure, state.monotony].every(
+          Number.isFinite,
+        ) ||
+        state.mental < -1 ||
+        state.mental > 1 ||
+        state.pleasure < 0 ||
+        state.pleasure > 1 ||
+        state.monotony < 0 ||
+        state.monotony > 1 + 1e-8 ||
+        state.meals.length > world.config.experience.mealWindow ||
+        state.recent.length > 40
+      )
+        throw new Error('Invalid bounded experience state.');
+    }
     if (
       !v7Inside(world, actor.position, actor.radius) ||
       !Object.values(actor.vitals).every(Number.isFinite) ||
@@ -346,10 +386,11 @@ export function v7Step(
   try {
     for (const original of world.actors.filter((a) => a.vitals.health > 0)) {
       work.spend();
-      const actorId = original.id,
-        action = actions[actorId];
-      if (!action)
+      const actorId = original.id;
+      const submitted = actions[actorId];
+      if (!submitted)
         throw new Error(`Missing simultaneous action for ${actorId}.`);
+      let action: V7Action = submitted;
       const trial = v7Clone(world);
       trial.tick += 1;
       trial.time += world.config.dt;
@@ -381,6 +422,13 @@ export function v7Step(
       };
       try {
         let result: V7HandlerResult;
+        const bound = forestBoundOperation(world, original, action);
+        if (trial.state.operationContinuity === 1) {
+          if (cursor) cursor.operation = bound;
+          for (const pkg of registry.packages)
+            if (trial.revisions.includes(`${pkg.id}@${String(pkg.version)}`))
+              pkg.beforeAction?.(trial, actor, action, !!bound);
+        }
         if (actor.learning) {
           actor.learning.remaining -= 1;
           const ability = actor.learning.ability;
@@ -409,6 +457,22 @@ export function v7Step(
             throw new Error(
               'Interface exists, but this actor has not mastered it.',
             );
+          if (world.config.experience) {
+            if (
+              cursor?.operation &&
+              v7Signature(action) !==
+                v7Signature(cursor.plan.steps[cursor.step]?.action ?? null)
+            )
+              cursor.operation = null;
+            action =
+              cursor?.operation?.action ??
+              bound?.action ??
+              forestResolveAction(
+                trial.state.operationContinuity === 1 ? trial : world,
+                trial.state.operationContinuity === 1 ? actor : original,
+                action,
+              );
+          }
           v7Validate(ability.parameters, action.args);
           if (ability.handler === 'kernel.navigate')
             result = navigation(trial, actor, action, cursor, work, emit);
@@ -482,19 +546,47 @@ export function v7Step(
           } else {
             const handler = registry.handlers[ability.handler];
             if (!handler) throw new Error('Missing versioned implementation.');
-            result = handler({ world: trial, actor, action, work, emit });
+            result = handler({
+              world: trial,
+              actor,
+              action,
+              work,
+              emit,
+              ...(world.config.experience
+                ? {
+                    operation: {
+                      first: !(cursor?.operation ?? bound),
+                      ...(trial.state.operationContinuity === 1
+                        ? { request: submitted }
+                        : {}),
+                      elapsed:
+                        cursor?.operation?.elapsed ?? bound?.elapsed ?? 0,
+                      startedAt:
+                        cursor?.operation?.startedAt ??
+                        bound?.startedAt ??
+                        trial.tick,
+                    },
+                  }
+                : {}),
+            });
             for (const old of world.actors) {
               const after = trial.actors.find((a) => a.id === old.id);
               if (
                 !after ||
                 v7Signature({
                   wellbeing: after.wellbeing,
+                  ...(world.config.experience
+                    ? { mental: after.experience?.mental }
+                    : {}),
                   life: after.life ?? null,
                   mastered: after.mastered,
                   learning: after.learning,
                 }) !==
                   v7Signature({
                     wellbeing: old.wellbeing,
+                    ...(world.config.experience
+                      ? { mental: old.experience?.mental }
+                      : {}),
                     life: old.life ?? null,
                     mastered: old.mastered,
                     learning: old.learning,
@@ -505,6 +597,52 @@ export function v7Step(
                 );
             }
           }
+        }
+        if (
+          world.config.experience &&
+          (cursor || trial.state.operationContinuity === 1) &&
+          !original.learning &&
+          !actor.learning
+        ) {
+          const ability = trial.abilities.find(
+            (a) => a.id === action.interface,
+          );
+          const elapsed =
+            (cursor?.operation?.elapsed ?? bound?.elapsed ?? 0) + 1;
+          const remaining =
+            result.remaining ??
+            (ability?.execution?.duration == null
+              ? null
+              : Math.max(0, ability.execution.duration - elapsed));
+          if (
+            remaining !== null &&
+            (!Number.isSafeInteger(remaining) || remaining < 0)
+          )
+            throw new Error('Invalid remaining work.');
+          if (
+            ability?.execution?.duration != null &&
+            result.complete !== elapsed >= ability.execution.duration
+          )
+            throw new Error(
+              'Completion disagrees with the declared operation duration.',
+            );
+          if (!result.complete && !ability?.execution)
+            throw new Error(
+              'Continuing interfaces require an execution/progress contract.',
+            );
+          const operation = result.complete
+            ? null
+            : {
+                action,
+                elapsed,
+                remaining,
+                startedAt:
+                  cursor?.operation?.startedAt ??
+                  bound?.startedAt ??
+                  trial.tick,
+              };
+          if (cursor) cursor.operation = operation;
+          forestSaveOperation(trial, actor, submitted, operation);
         }
         for (const field of [
           'config',
@@ -548,7 +686,14 @@ export function v7Step(
           error: error instanceof Error ? error.message : 'Execution failed.',
           ...(error instanceof ForestRouteFailure
             ? { diagnostic: forestRouteData(error.evidence) }
-            : {}),
+            : error instanceof ForestReferenceError
+              ? {
+                  diagnostic: {
+                    reasonCode: `reference-${error.code}`,
+                    candidates: error.candidates,
+                  },
+                }
+              : {}),
           moved: false,
           cursor: null,
         });
@@ -710,6 +855,7 @@ export function v7Step(
         mastered: a.mastered,
         learning: a.learning,
         wellbeing: a.wellbeing,
+        ...(world.config.experience ? { mental: a.experience?.mental } : {}),
         life: a.life ?? null,
       })),
     });
@@ -735,6 +881,7 @@ export function v7Step(
           mastered: a.mastered,
           learning: a.learning,
           wellbeing: a.wellbeing,
+          ...(world.config.experience ? { mental: a.experience?.mental } : {}),
           life: a.life ?? null,
         })),
       })
@@ -743,20 +890,37 @@ export function v7Step(
         'Processes cannot rewrite protected rules, learning or wellbeing accounts.',
       );
     forestEnvironment(next);
+    fireEnvironment(next);
+    canopyEnvironment(next);
     for (const actor of next.actors) v7Physiology(next, actor);
     warmingAfterPhysiology(next);
     forestLives(world, next, cursors, registry);
     foodAssessmentAfterRound(world, next);
     shelterAfterRound(world, next);
+    insulationAfterRound(world, next);
+    fireAfterRound(world, next);
+    willowAfterRound(world, next);
+    canopyAfterRound(world, next);
+    recuperationAfterRound(next, outcomes);
     routeInspectionAfterRound(next);
     normalizeFoodAccounting(next);
     forestPerception(world, next);
     v7Wellbeing(next);
+    forestExperienceAfterRound(world, next);
     v7Remember(next);
     v7AssertWorld(next, registry);
     for (const p of proposals)
-      if (!p.error && !conflicts.has(p.actor) && p.cursor && cursors[p.actor])
+      if (!p.error && !conflicts.has(p.actor) && p.cursor && cursors[p.actor]) {
+        if (
+          next.state.recuperation === 1 &&
+          p.cursor.operation?.action.interface === 'recuperate' &&
+          !next.actors.find((a) => a.id === p.actor)?.extensionState[
+            'recuperation:pending'
+          ]
+        )
+          p.cursor.operation = null;
         cursors[p.actor] = p.cursor;
+      }
     return {
       world: v7Freeze(v7CanonicalNumbers(next)),
       outcomes,

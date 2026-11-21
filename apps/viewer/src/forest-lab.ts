@@ -42,11 +42,29 @@ function render() {
   );
   text(
     'fixture-state',
-    `${a.name} · Lives ${String((a.life?.total ?? 0) - (a.life?.deaths ?? 0))} / ${String(a.life?.total ?? 0)} · Health ${a.vitals.health.toFixed(1)} · Satiety ${a.vitals.satiety.toFixed(1)}`,
+    `${a.name} · Lives ${String((a.life?.total ?? 0) - (a.life?.deaths ?? 0))} / ${String(a.life?.total ?? 0)} · Health ${a.vitals.health.toFixed(1)} · Satiety ${a.vitals.satiety.toFixed(1)}${w.stacks
+      .filter((s) => s.owner === a.id && s.mantle)
+      .map(
+        (s) =>
+          ` · ${s.id}: ${s.mantle?.equipped ? 'worn' : 'unequipped'}, condition ${String(s.mantle?.condition)}, moisture ${((s.mantle?.moisture ?? 0) * 100).toFixed(0)}%`,
+      )
+      .join('')}${w.stacks
+      .filter((s) => s.owner === a.id && s.processing)
+      .map((s) => ` · ${String(s.quantity)} ${s.resource} from ${s.origin}`)
+      .join('')}${w.objects
+      .filter((o) => o.data.resource === 'willow')
+      .map((o) => ` · ${o.id}: stock ${String(Number(o.data.stock))}`)
+      .join('')}`,
   );
+  const recovery = a.extensionState['recuperation:lastRound'];
+  if (recovery && typeof recovery === 'object' && !Array.isArray(recovery)) {
+    const state = document.getElementById('fixture-state');
+    if (state)
+      state.textContent += ` · Recovery: paid ${String(Number(recovery.energyCost))} energy + ${String(Number(recovery.satietyCost))} satiety; restored ${String(Number(recovery.recoveredEnergy))} energy; healed ${String(Number(recovery.healing))} health; ${String(Number(recovery.remaining))} work rounds left`;
+  }
   text(
     'fixture-happiness',
-    `Happiness ${a.wellbeing.total.toFixed(1)} · Physical ${a.wellbeing.physical.toFixed(1)} / 10 · Experience ${a.wellbeing.mental.toFixed(1)}`,
+    `Happiness ${a.wellbeing.total.toFixed(1)} · Physical ${a.wellbeing.physical.toFixed(1)} / 10 · Experience ${a.wellbeing.mental.toFixed(1)}${a.experience ? ` · Sustained mood ${a.experience.mental.toFixed(2)} · Meal pleasure ${a.experience.pleasure.toFixed(2)} · Diet monotony ${(100 * a.experience.monotony).toFixed(0)}%` : ''}`,
   );
   text(
     'fixture-events',

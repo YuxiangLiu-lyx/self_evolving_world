@@ -66,7 +66,8 @@ export function reviewBody(root: string, c: TaskContext): string {
     '```',
     'Screenshot bytes and complete logs are retained in local validation evidence and the CI artifact; this review retains findings and content hashes. No independent reviewer or model service was invoked.',
   ].join('\n\n');
-  if (body.length > 60000)
+  // Retain full large-experiment coverage below GitHub's 65,536-character cap.
+  if (body.length > 65000)
     throw new Error(
       'Self-review exceeds the GitHub review body budget; summarize actual findings without removing required coverage.',
     );
