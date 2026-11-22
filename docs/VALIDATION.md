@@ -118,6 +118,17 @@ Fix every selected automated, visual, or behavior failure and rerun the affected
 
 CI runs the same automated validation on the [canonical repository](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions) and produces pending review. Each run uploads available reports, screenshots, and traces with 14-day retention, including failed runs. Download the complete artifact to preserve the report's relative evidence paths. There is no remote visual or semantic review service. GitHub protection is configured and verified separately under the [PR contract](PULL_REQUESTS.md#github-checks-and-merge-restrictions). The task executor performs actual visual and behavior review and references the plan and findings in the PR.
 
+The quality job has a fifteen-minute total limit, including environment setup
+and evidence upload. Individual test deadlines and all selected assertions stay
+unchanged. This margin follows measured removal of repeated compilation, eager
+segment reconstruction and redundant entity serialization: the complete
+761-test/75-browser-case run passed in 9m39s, while another runner reached the old
+ten-minute limit near the last browser cases. See the
+[retained measurements](exec-plans/completed/pr-27-ci-audit-headroom.md).
+Use the existing `workflow_dispatch` full audit to verify all archives and
+scenes; an expired job or missing check remains a failure, regardless of its
+earlier successful steps.
+
 ## Learning protocol evidence
 
 Version-4 [learning experiments](SKILL_LEARNING_EXPERIMENT.md) require complete recorded call/input/output correspondence, bounded attempts, the exact round barrier, persisted executable registry and resource-backed survival reconstruction. Development is a task handoff before validation, not approval to bypass it. Tests include exact starvation timing, one-to-four-round learning, functional/same-batch reuse, generated execution, food/toxicity, tool costs/wear, reachable food, private observations, plan interruption and paused resumption. Every completed run receives the existing retained per-agent analysis and selected screenshot/semantic review with authenticated reuse where inputs match. The all-wait control is explicitly offline and is not a causal estimate.
