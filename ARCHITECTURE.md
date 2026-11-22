@@ -2,11 +2,11 @@
 
 This document owns current modules, interfaces, and dependency boundaries. Feature status belongs to [PRODUCT](docs/PRODUCT.md); context is in the [project overview](docs/PROJECT_OVERVIEW.md). The pure core exposes independently versioned protocols through one public package entry point. The fixed founding rules remain in world.ts; their grid and skill limits do not constrain the separate continuous protocol.
 
-| Area                     | Scope                                                                                                         | Entry                                                              |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| Current Continuous World | Continuous-v1 / ex7–ex9: deterministic physics, reviewed mechanisms, persistent memory and recorded wellbeing | [Current protocol and game observatory](#current-continuous-world) |
-| Legacy Foundation        | Fixed grid and three base skills; retained histories and separately versioned grid extensions                 | [Founding contracts](#legacy-foundation)                           |
-| Development Harness      | Repository-only task routing, conversation handoffs, evidence, PR and merge gates                             | [Coordinator boundary](#development-harness)                       |
+| Area                     | Scope                                                                                                          | Entry                                                              |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Current Continuous World | Continuous-v1 / ex7–ex10: deterministic physics, reviewed mechanisms, persistent memory and recorded wellbeing | [Current protocol and game observatory](#current-continuous-world) |
+| Legacy Foundation        | Fixed grid and three base skills; retained histories and separately versioned grid extensions                  | [Founding contracts](#legacy-foundation)                           |
+| Development Harness      | Repository-only task routing, conversation handoffs, evidence, PR and merge gates                              | [Coordinator boundary](#development-harness)                       |
 
 The main viewer opens the current game observatory; `/classic.html` retains the grid inspector. Both replay saved experiments without model calls. A historical run keeps its original protocol even when shown in the newer presentation.
 
@@ -212,3 +212,28 @@ Bounded World Agent review, versioned skill/mechanism extensions, persistent tas
 ## Scoped acceptance dependencies
 
 [ADR-0020](docs/decisions/0020-scoped-validation.md) separates task/diff identity from check dependencies. [Scope rules](scripts/validation-plan.ts), [input fingerprints](scripts/validation-inputs.ts), [authenticated receipts](scripts/validation-cache.ts) and [evidence verification](scripts/validation-evidence.ts) remain repository tooling under the existing coordinator. Completed archive metadata, integrity and deep reconstruction are separate APIs. Batched preservation covers complete historical trees. Runtime source continuity excludes acceptance tooling without modifying retained snapshots. CI uses fresh evidence, stable required check names and one quality run per PR commit.
+
+## Fresh development policy
+
+The [open development policy](docs/OPEN_DEVELOPMENT.md) composes the existing
+continuous kernel with immutable experiment scope. `continuousRegistry(world)`
+filters historical packages; `v7Install` independently enforces scope and
+personal learning remains a separate game transition. The fresh scenario installs
+only the explicit foundation allowlist. Historical handlers remain available for
+historical replay, with new behavior gated by `config.development`.
+
+`forest-climate` owns shared pure climate/event helpers; `open-physical` owns local
+forcing and material properties; `open-ecology` advances plants and animals.
+`open-processes` manages paid escrow, conditions, work, heat, wear and conserved
+outputs for reviewed capabilities. It supplies no mature recipes.
+`open-foundation` provides paid probes, record lookup and two-party evidence
+exchange. `open-projects` stores actor-authored intentions, while verified knowledge
+and actual events remain separate. `open-experience` grounds bounded practice and
+routine feedback. The simulator's `open-context` presents compact current records
+and discoverable current-world capabilities; raw journals and replay retain full
+history. The existing task barrier and source validation own development delivery.
+
+The 2D viewer reuses existing object components and adds local soil overlays,
+seedling/injury states, process progress and personal project/knowledge inspection.
+[ADR-0022](docs/decisions/0022-fresh-open-development.md) records isolation and
+context tradeoffs; [PRODUCT](docs/PRODUCT.md) owns acceptance status.

@@ -10,11 +10,11 @@ import {
   writeFileSync,
 } from 'node:fs';
 import { relative, resolve } from 'node:path';
+import { experimentIds } from './experiments.js';
 import {
-  experimentIds,
-  reconstructionMetrics,
-  validateExperiment,
-} from './experiments.js';
+  reconstructSelected,
+  reconstructionWorker,
+} from './validation-reconstruction.js';
 import { checkAnalyses } from './experiment-review.js';
 import { checkArchivePreservation, taskRoute } from './harness.js';
 import {
@@ -181,33 +181,33 @@ try {
           durationMs: 0,
           deepRebuilds: 0,
         });
-      for (const id of experimentIds(root)) {
-        if (plan.experiments.includes(id)) {
-          const attemptStarted = performance.now();
-          try {
-            validateExperiment(root, id);
-          } catch (error) {
-            report.checks?.push({
-              id: `experiment:${id}`,
-              reason: plan.reasons[`experiment:${id}`] ?? '',
-              status: 'failed',
-              durationMs: performance.now() - attemptStarted,
-              deepRebuilds: 1,
-            });
-            write(reportPath, report);
-            throw error;
-          }
-          const metric = reconstructionMetrics().at(-1);
-          if (!metric) throw new Error('Missing reconstruction measurement.');
-          const check = {
-            ...metric,
+      await reconstructSelected(plan.experiments, async (id) => {
+        const attemptStarted = performance.now();
+        let metric;
+        try {
+          metric = await reconstructionWorker(root, id, cache);
+        } catch (error) {
+          report.checks?.push({
             id: `experiment:${id}`,
             reason: plan.reasons[`experiment:${id}`] ?? '',
-          };
-          report.checks?.push(check);
-          console.log(JSON.stringify(check));
+            status: 'failed',
+            durationMs: performance.now() - attemptStarted,
+            deepRebuilds: 0,
+          });
           write(reportPath, report);
-        } else
+          throw error;
+        }
+        const check = {
+          ...metric,
+          id: `experiment:${id}`,
+          reason: plan.reasons[`experiment:${id}`] ?? '',
+        };
+        report.checks?.push(check);
+        console.log(JSON.stringify(check));
+        write(reportPath, report);
+      });
+      for (const id of experimentIds(root)) {
+        if (!plan.experiments.includes(id))
           report.checks?.push({
             id: `experiment:${id}`,
             reason:

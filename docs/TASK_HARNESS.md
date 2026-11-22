@@ -120,6 +120,12 @@ Logs and journals are saved before commands. New experiments reconcile the befor
 
 A captured continuous computation-budget pause may use `repair` only while the task's own newly allocated run is unpublished, below its original target and development limit, with no pending or uncertain model call or actor review. The coordinator retains the failed capture under `technical-pauses/round-N/`, opens a counted technical development barrier and retains the original pending actions, calls, source history, seed and limits. The conversation supplies no fabricated actor request or world approval. Source validation reconstructs every committed round before a repair can resume the same unsettled round. This is not a budget-exhaustion override or a replacement experiment.
 
+If that capture itself failed, the same guarded entry retains its incomplete
+status and diagnostic files. Stale screenshots and browser receipts are not
+accepted evidence. This permits repair of the capture failure without changing
+the recorded simulation; current source-prefix and selected browser validation
+must still pass before delivery.
+
 Changes require a current impact plan and renewed diff review. Dependency-bound check evidence remains reusable when its own inputs and output bytes match; missing or invalidated selected evidence reruns. Code changes retain all unit tests. Explicit audits select the full suite. There is no automatic repair loop. The existing publisher retains its bounded 90-attempt, ten-second CI polling and request timeouts. Fix failures in the conversation, then explicitly continue. Environment, authentication and service failures remain incomplete.
 
 After integrating newer main, a changed head or source uses the current base for review and PR file mapping. Only an exact published head/source retry retains its original base, including verification after merge. The original publication journal remains intact. Changed scope or invalid receipts return to validation; a new review cannot approve a stale plan.

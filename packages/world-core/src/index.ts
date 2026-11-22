@@ -208,3 +208,19 @@ export {
   canopyPosts,
   canopySpatial,
 } from './forest-canopy-geometry.js';
+
+export * from './open-foundation.js';
+export * from './open-physical.js';
+export * from './open-processes.js';
+export * from './open-projects.js';
+export { openPlants, openAnimals } from './open-ecology.js';
+
+export { refugeRay, refugePoint } from './open-shelter-geometry.js';
+
+export {
+  shortRay,
+  shortDimensions,
+  shortCapsules,
+} from './open-short-geometry.js';
+
+export { refugeExposure } from './open-shelter-exposure.js';

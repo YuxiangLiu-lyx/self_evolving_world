@@ -1,10 +1,15 @@
+import {
+  OPEN_GOAL,
+  openMemory,
+  openCatalogue,
+  openExtensionSummary,
+} from './open-context.js';
 import { forestExperienceSummary } from './forest-experience-context.js';
 import {
   V7_GOAL,
   forestClimate,
   v7Distance,
   v7Observe,
-  v7PublicCatalogue,
   v7Load,
   continuousRegistry,
   v7Work,
@@ -39,7 +44,7 @@ export function ordinaryContinuousInput(
     self = o.self;
   const harness: Record<string, V7Data> = {};
   const work = v7Work(world.config.computation.workPerRound);
-  for (const pkg of continuousRegistry().packages.filter((p) =>
+  for (const pkg of continuousRegistry(world).packages.filter((p) =>
     world.revisions.includes(`${p.id}@${String(p.version)}`),
   ))
     for (const [key, adapter] of Object.entries(pkg.harness ?? {})) {
@@ -60,9 +65,18 @@ export function ordinaryContinuousInput(
           execution: cursor?.operation ?? null,
         }
       : {}),
+    ...(world.config.development
+      ? {
+          development: {
+            inheritSkills: false,
+            scope: world.config.development.scope,
+            baseline: world.config.development.baseline,
+          },
+        }
+      : {}),
     harness: evidence.harness,
     protocol: world.protocol,
-    goal: V7_GOAL,
+    goal: world.config.development ? OPEN_GOAL : V7_GOAL,
     tick: world.tick,
     time: world.time,
     identity: { id, name: self.name },
@@ -75,7 +89,9 @@ export function ordinaryContinuousInput(
       learning: self.learning,
       mastered: self.mastered,
       relationships: self.relationships,
-      extensionState: evidence.extensionState,
+      extensionState: world.config.development
+        ? openExtensionSummary(self)
+        : evidence.extensionState,
       ...(self.life ? { life: self.life } : {}),
     },
     observation: {
@@ -89,6 +105,7 @@ export function ordinaryContinuousInput(
       ? { environment: forestClimate(world, self.position) }
       : {}),
     memory: {
+      ...openMemory(world, self),
       ...(world.config.forest
         ? {
             important: self.memory.important?.slice(-16),
@@ -127,7 +144,7 @@ export function ordinaryContinuousInput(
           reason: cursor.reason,
         }
       : null,
-    catalogue: v7PublicCatalogue(world, id),
+    catalogue: openCatalogue(world, self),
     rules: {
       dt: world.config.dt,
       ...(world.config.forest
@@ -162,7 +179,7 @@ export function worldContinuousInput(
   return {
     protocol: world.protocol,
     tick: world.tick,
-    catalogue: v7PublicCatalogue(world),
+    catalogue: openCatalogue(world),
     physicalRules: world.config,
     applicants: Object.entries(requests).map(([actor, action]) => {
       const o = v7Observe(world, actor);
@@ -175,6 +192,9 @@ export function worldContinuousInput(
           mastered: o.self.mastered,
           learning: o.self.learning,
         },
+        ...(world.config.development
+          ? { personalRecords: openMemory(world, o.self) }
+          : {}),
         observedObjects: o.objects.map(objectFact),
         ownedItems: o.stacks.filter((s) => s.owner === actor),
         recentEvents: o.events,

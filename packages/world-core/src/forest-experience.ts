@@ -1,3 +1,4 @@
+import { openRoutine } from './open-experience.js';
 import type {
   V7Actor,
   V7Resource,
@@ -149,7 +150,8 @@ export function forestExperienceAfterRound(
     );
     const negative = Math.min(
       1,
-      events.filter((e) => e.type === 'injured').length * 0.3 +
+      openRoutine(world, actor) +
+        events.filter((e) => e.type === 'injured').length * 0.3 +
         (meal ? Number(meal.data.monotony ?? 0) * 0.15 : 0),
     );
     const previous = state.mental;

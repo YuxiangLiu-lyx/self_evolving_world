@@ -29,6 +29,8 @@ export interface V7Visual {
 }
 export interface V7Object {
   id: string;
+  /** A solid component anchored inside a non-solid reserved assembly footprint. */
+  assemblyParent?: string;
   kind: string;
   name: string;
   spatial: V7Spatial;
@@ -76,7 +78,13 @@ export interface V7Stack {
   decay?: number;
   /** A single persistent manufactured item; never divisible into fractional equipment. */
   frictionKit?: { durability: number; inputs: V7Data[] };
+  /** An indivisible, source-bound unfired vessel; contents and wall wear affect real mass. */
+  waterCup?: V7Data;
   fuelMoisture?: number;
+  /** Per-original-unit physical mass; splitting preserves nutrition units and intensive values. */
+  physical?: { unitMass: number; unitWater: number; unitSolids: number };
+  /** Actual per-unit layer evidence, absent until a reviewed physical representation exists. */
+  materialLayer?: V7Data;
   processing?: V7Data;
   canopyDrying?: {
     tick: number;
@@ -128,6 +136,37 @@ export interface V7Memory {
   intention?: string;
   important?: { tick: number; event: string; type: string; summary: string }[];
   discoveries?: Record<string, V7Data>;
+  projects?: Record<string, V7Project>;
+  knowledge?: Record<string, V7Knowledge>;
+  abilityDetails?: string[];
+}
+/** Actor-authored plans are beliefs/intentions; evidence references are checked separately. */
+export interface V7Project {
+  id: string;
+  status: 'active' | 'paused' | 'completed' | 'abandoned';
+  question: string;
+  evidence: string[];
+  uncertainty: string;
+  goal: string;
+  completedSteps: string[];
+  outputs: string[];
+  missing: string;
+  next: string;
+  pauseReason: string;
+  benefit: string;
+  updatedAt?: number;
+}
+export interface V7Knowledge {
+  key: string;
+  subject: string;
+  property: string;
+  value: V7Json;
+  method: string;
+  condition: string;
+  evidence: string;
+  tick: number;
+  verified: boolean;
+  receivedFrom?: string;
 }
 export interface V7Actor {
   id: string;
@@ -206,6 +245,7 @@ export interface V7Plan {
   interrupts: string[];
   notes: string[];
   preferences: string[];
+  projects?: V7Project[];
 }
 export interface V7Cursor {
   plan: V7Plan;
@@ -268,8 +308,15 @@ export interface V7Ability {
   handler: string;
   revision: string;
   authored: boolean;
+  dependencies?: {
+    abilities: string[];
+    resources: string[];
+    knowledge: string[];
+  };
   /** Reference parameters are resolved before any handler, including generated ones. */
   references?: Record<string, V7ReferenceScope>;
+  /** A reviewed extension may restrict practice to its declared qualified event; absent keeps historical behavior. */
+  practiceEvidence?: string;
   execution?: {
     duration: number | null;
     interruption: 'cancel';
@@ -277,7 +324,14 @@ export interface V7Ability {
   };
 }
 export type V7ReferenceScope =
-  'owned' | 'ground' | 'object' | 'known' | 'visible';
+  | 'owned'
+  | 'optional-owned'
+  | 'optional-exact-visible'
+  | 'optional-exact-surface'
+  | 'ground'
+  | 'object'
+  | 'known'
+  | 'visible';
 export interface V7SatisfactionRule {
   id: string;
   name: string;
@@ -292,6 +346,9 @@ export interface V7SatisfactionRule {
     event: string;
     interface: string;
     gain: number;
+    /** Optional reviewed maintained ceiling; absent preserves historical cap. */
+    cap?: number;
+    decayOnGain?: boolean;
     decay: number;
     roundsField?: string;
     maxRounds?: number;
@@ -325,6 +382,27 @@ export interface V7Configuration {
   mentalCap: number;
   budgets: { ordinary: number; world: number; development: number };
   computation: { workPerRound: number; inputBytes: number; stateBytes: number };
+  development?: {
+    version: 1;
+    inheritSkills: false;
+    scope: string;
+    baseline: string[];
+    detailLimit: number;
+    projectLimit: number;
+    knowledgeLimit: number;
+    climateOffset: number;
+    hazards: {
+      id: string;
+      kind: 'drought' | 'waterlogging';
+      x: number;
+      y: number;
+      radius: number;
+      start: number;
+      duration: number;
+      recovery: number;
+      severity: number;
+    }[];
+  };
   forest?: {
     version: 1;
     day: number;
@@ -410,6 +488,9 @@ export interface V7Package {
   version: number;
   description: string;
   dependencies: string[];
+  /** Fresh worlds accept only their own reviewed namespace and explicit foundation. */
+  scope?: string;
+  reuse?: { experiment: string; source: string; description: string };
   abilities: V7Ability[];
   satisfaction: V7SatisfactionRule[];
   resources: V7Resource[];
@@ -428,6 +509,8 @@ export interface V7Package {
     continuing: boolean,
   ) => void;
   onDeath?: (world: V7World, actor: V7Actor) => void;
+  /** Installed-package physical responses after environmental events, before death/drop processing. */
+  afterEnvironment?: (world: V7World) => void;
   stateSchemas?: Record<string, V7Schema>;
   /** Only private observations enter a learned actor-selected memory adapter. */
   harness?: Record<

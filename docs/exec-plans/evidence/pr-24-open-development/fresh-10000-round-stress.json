@@ -1,0 +1,15 @@
+{
+  "kind": "isolated-fresh-baseline-engine-stress",
+  "status": "failed",
+  "targetRounds": 10000,
+  "stoppedRound": 3967,
+  "modelCalls": 0,
+  "ordinaryContextInjection": false,
+  "controller": "scripts/open-preflight.ts: openPreflight(10000)",
+  "failure": "Isolated baseline lost a life: moss at 3967",
+  "elapsedMs": null,
+  "elapsedLimitation": "The diagnostic threw before its result/timer was persisted; elapsed duration is unmeasured.",
+  "rawLog": "fresh-10000-round-stress.log",
+  "rawLogSha256": "b1746039eb2d11a6b6e5046c291b948ef8b45736d24b79fc3db47c969d5c6d8f",
+  "interpretation": "A deterministic omniscient feasibility controller on the exact fresh authored baseline. This retained failure is not formal ex10, autonomous behavior, model-context scalability or evidence that long-horizon survival is impossible. No policy was changed and the test was not rerun to select a success."
+}

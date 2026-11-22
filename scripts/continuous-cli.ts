@@ -1,10 +1,11 @@
+import { OPEN_OBJECTIVE } from './open-analysis.js';
 import { renewableAccessToken } from '../apps/simulator/src/chatgpt-renewal.js';
 import { prepareContinuousWindow } from './continuous-window.js';
 import { resolve } from 'node:path';
 import { writeFileSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { initialForestExperienceWorld } from '../apps/simulator/src/forest-experience-scenario.js';
-import { forestExperiencePreflight } from './forest-experience-preflight.js';
+import { initialOpenWorld } from '../apps/simulator/src/open-scenario.js';
+import { openPreflight } from './open-preflight.js';
 import type { V7World } from '@self-evolving-world/world-core';
 import { selectModel } from '../apps/simulator/src/responses.js';
 import { continuousProvider } from '../apps/simulator/src/continuous-provider.js';
@@ -16,7 +17,6 @@ import {
 import type { V7Execution } from '../apps/simulator/src/continuous-run.js';
 import { requireTaskWorker } from './task-worker.js';
 import { allocateExperiment, checkExperiments } from './experiments.js';
-import { forestPreflight } from './forest-preflight.js';
 import {
   continuousAtomic,
   continuousRead,
@@ -35,7 +35,6 @@ import {
   measureContinuous,
   continuousChart,
   continuousReport,
-  EXPERIENCE_OBJECTIVE,
 } from './continuous-analysis.js';
 
 const root = process.cwd();
@@ -53,8 +52,7 @@ try {
   if (!id) {
     checkExperiments(root);
     const preflight = {
-      baseline: forestExperiencePreflight(),
-      respawn: forestPreflight(120, true),
+      baseline: openPreflight(),
     };
     token = await renewableAccessToken();
     const model = await selectModel(token, 'gpt-6.1-sol');
@@ -70,13 +68,13 @@ try {
     state = newContinuousExecution(
       model,
       'chatgpt-plan',
-      initialForestExperienceWorld(),
+      initialOpenWorld(`open-${id}`),
     );
     continuousAtomic(resolve(directory, 'manifest.json'), {
       format: 'self-evolving-world/experiment',
       version: 7,
       id,
-      objective: EXPERIENCE_OBJECTIVE,
+      objective: OPEN_OBJECTIVE,
       schedule: 'continuous-v1',
       controller: 'chatgpt-plan',
       steps: 0,
@@ -103,7 +101,7 @@ try {
       root,
       id,
       state,
-      'Initial forest-experience-v1 policy, with existing ex8 capabilities available for individual study and no granted mastery. Offline policies and fixtures are excluded from ordinary inputs.',
+      'Initial open-development-v1 fresh policy, inheritSkills=false, with only the explicit authored baseline. No historical generated skills, objects, rewards or mastery. Offline policies and composition fixtures are excluded from ordinary inputs.',
     );
   } else {
     const previous = continuousRead<Record<string, unknown>>(

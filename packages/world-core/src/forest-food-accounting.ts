@@ -19,7 +19,16 @@ export function foodSetQuantity(stack: V7Stack, tenths: number): void {
 }
 /** Lazy lossless encoding adds no material during installation and normalizes whole-unit legacy handlers. */
 export function normalizeFoodAccounting(world: V7World): void {
-  if (world.state.foodAssessment !== 1) return;
+  if (world.state.foodAssessment !== 1 && !world.config.development) return;
   for (const stack of world.stacks)
     foodSetQuantity(stack, foodTenths(stack.quantity));
+}
+
+/** Moisture removal changes burden, not the original food-unit nutrient/toxin totals. */
+export function foodUnitMass(world: V7World, stack: V7Stack): number {
+  return (
+    stack.physical?.unitMass ??
+    world.resources.find((r) => r.id === stack.resource)?.mass ??
+    1
+  );
 }

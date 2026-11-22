@@ -1,5 +1,43 @@
+import { openEmbeddedJson, openJsonWire } from './open-input-json.js';
+import { openKeyWire } from './open-input-keys.js';
+import { openPhraseWire } from './open-input-phrases.js';
+import { openTupleWire } from './open-input-tuples.js';
+import { openShortWire } from './open-input-markers.js';
+import {
+  openTextFragments,
+  openWireInput,
+  literalJoin,
+} from './open-input-text.js';
 /** Lossless wire representation only. No observation fact, goal, interface or cost is removed. */
 export function continuousInputText(input: unknown): string {
+  const original = encodeInput(input);
+  if (!openWireInput(input) || JSON.stringify(input).length * 2 <= 100_000)
+    return original;
+  if (literalJoin(input)) return JSON.stringify(input);
+  const compact = encodeInput(input, true, 8, 18),
+    structured = openShortWire(compact);
+  const embedded = openShortWire(
+    encodeInput(openEmbeddedJson(input), true, 8, 18),
+  );
+  const embeddedWire = openJsonWire(openKeyWire(embedded));
+  const best = [
+    original,
+    compact,
+    structured,
+    openKeyWire(structured),
+    ...(embeddedWire ? [embeddedWire] : []),
+    ...(embeddedWire ? [openPhraseWire(embeddedWire)] : []),
+  ].reduce((best, candidate) =>
+    candidate.length < best.length ? candidate : best,
+  );
+  return openTupleWire(best);
+}
+function encodeInput(
+  input: unknown,
+  fragments = false,
+  sharing = 18,
+  recordsOverhead = 25,
+): string {
   const plain = JSON.stringify(input);
   if (
     !input ||
@@ -15,12 +53,14 @@ export function continuousInputText(input: unknown): string {
   )
     return plain;
   // Normalize exactly as the original JSON transport, including omitted undefined fields.
-  const value: unknown = JSON.parse(plain);
+  const normalized: unknown = JSON.parse(plain);
+  const value = fragments ? openTextFragments(normalized) : normalized;
   const counts = new Map<string, number>();
   const state = { collision: false };
   const count = (item: unknown): void => {
     const text = JSON.stringify(item);
-    if (text.length >= 20) counts.set(text, (counts.get(text) ?? 0) + 1);
+    if (text.length >= (fragments ? 12 : 20))
+      counts.set(text, (counts.get(text) ?? 0) + 1);
     if (Array.isArray(item)) item.forEach(count);
     else if (item && typeof item === 'object') {
       if (
@@ -40,8 +80,9 @@ export function continuousInputText(input: unknown): string {
     const text = JSON.stringify(item);
     if (
       !definition &&
-      text.length >= 20 &&
-      (counts.get(text) ?? 0) * (text.length - 18) > text.length + 2
+      text.length >= (fragments ? 12 : 20) &&
+      (counts.get(text) ?? 0) * (text.length - (fragments ? sharing : 18)) >
+        text.length + 2
     ) {
       const previous = indexes.get(text);
       if (previous !== undefined) return { $shared: previous };
@@ -64,10 +105,15 @@ export function continuousInputText(input: unknown): string {
     shared: live.shared.map(compactTables),
     payload: compactTables(live.payload),
   };
-  const records = compactRecords(tables);
+  const records = compactRecords(tables, fragments ? recordsOverhead : 25);
   const compact = JSON.stringify({
-    encoding: 'lossless-shared-values-v3',
+    encoding: fragments
+      ? 'lossless-shared-values-v4'
+      : 'lossless-shared-values-v3',
     meaning:
+      (fragments
+        ? 'Expand {$join:[parts]} by recursively expanding each part and concatenating the resulting strings exactly, without inserting or removing characters. '
+        : '') +
       'Expand {$shared:n} as shared[n] recursively. Expand {$table:{columns,rows}} as an array of objects: each row supplies values for the named columns in order. Expand {$record:[n,values]} as one object whose keys are recordColumns[n] and whose values are the supplied cells in order. Expand all nested cells recursively. These lossless encodings preserve every observation fact and interface field. Encoding markers are never action arguments.',
     recordColumns: records.columns,
     shared: records.shared,
@@ -121,7 +167,10 @@ function inlineSingleReferences(
 }
 
 /** Repeated record shapes share only field names, never drop optional fields or cells. */
-function compactRecords(input: { shared: unknown[]; payload: unknown }): {
+function compactRecords(
+  input: { shared: unknown[]; payload: unknown },
+  overhead = 25,
+): {
   columns: string[][];
   shared: unknown[];
   payload: unknown;
@@ -143,7 +192,7 @@ function compactRecords(input: { shared: unknown[]; payload: unknown }): {
     indexes = new Map<string, number>();
   for (const [shape, count] of counts) {
     // Conservative byte savings include the shared definition and marker overhead.
-    if (count >= 2 && (shape.length - 25) * count > shape.length) {
+    if (count >= 2 && (shape.length - overhead) * count > shape.length) {
       indexes.set(shape, columns.length);
       columns.push(JSON.parse(shape) as string[]);
     }
@@ -151,6 +200,15 @@ function compactRecords(input: { shared: unknown[]; payload: unknown }): {
   const visit = (value: unknown): unknown => {
     if (Array.isArray(value)) return value.map(visit);
     if (value && typeof value === 'object') {
+      if (Object.keys(value).length === 1 && '$table' in value) {
+        const table = value.$table as { columns: string[]; rows: unknown[][] };
+        return {
+          $table: {
+            columns: table.columns,
+            rows: table.rows.map((row) => row.map(visit)),
+          },
+        };
+      }
       const index = indexes.get(JSON.stringify(Object.keys(value)));
       if (index !== undefined)
         return { $record: [index, Object.values(value).map(visit)] };
@@ -180,6 +238,8 @@ function compactTables(value: unknown): unknown {
       if (
         !columns.includes('$shared') &&
         !columns.includes('$table') &&
+        !columns.includes('$join') &&
+        !columns.includes('$json') &&
         rows.every(
           (row) =>
             JSON.stringify(Object.keys(row as object)) ===

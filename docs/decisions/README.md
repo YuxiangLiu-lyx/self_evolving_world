@@ -47,3 +47,5 @@ For a material change to an accepted decision, create a new ADR and mark the old
 - [0020](0020-scoped-validation.md): dependency-scoped checks, authenticated reuse, batched archive preservation and nonduplicated CI.
 
 - [0021](0021-forest-execution-and-experience.md): versioned shared reference/execution contracts, diet and slowly maintained mental state.
+
+- [0022](0022-fresh-open-development.md): experiment-scoped capabilities, grounded projects and knowledge, causal ecology and conserved persistent processes.

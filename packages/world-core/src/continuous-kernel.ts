@@ -1,3 +1,5 @@
+import { openPractice } from './open-experience.js';
+import { openConditions } from './open-physical.js';
 import { recuperationAfterRound } from './forest-recuperation.js';
 import { canopyAfterRound } from './forest-canopy.js';
 import { canopyEnvironment } from './forest-canopy-environment.js';
@@ -58,6 +60,7 @@ import {
 import {
   v7Reach,
   v7Distance,
+  v7ShapeDistance,
   v7Inside,
   v7Obstacles,
   v7Route,
@@ -90,6 +93,24 @@ interface Proposal {
   diagnostic?: V7Data;
   moved: boolean;
   cursor: V7Cursor | null;
+}
+function protectedProcessAccounts(state: V7World): string {
+  return v7Signature({
+    config: state.config,
+    terrain: state.terrain,
+    abilities: state.abilities,
+    resources: state.resources,
+    satisfaction: state.satisfaction,
+    revisions: state.revisions,
+    accounts: state.actors.map((a) => ({
+      id: a.id,
+      mastered: a.mastered,
+      learning: a.learning,
+      wellbeing: a.wellbeing,
+      ...(state.config.experience ? { mental: a.experience?.mental } : {}),
+      life: a.life ?? null,
+    })),
+  });
 }
 const collections = ['actors', 'objects', 'stacks', 'processes'] as const;
 function changes(before: V7World, after: V7World): string[] {
@@ -195,7 +216,10 @@ function navigation(
   const traveled = v7Travel(
     actor.position,
     [waypoint],
-    world.config.speed * world.config.dt,
+    (world.config.speed * world.config.dt) /
+      (world.config.development
+        ? openConditions(world, actor.position).travelFactor
+        : 1),
   );
   if (
     !v7Inside(world, traveled.position, actor.radius) ||
@@ -213,6 +237,9 @@ function navigation(
   const load = v7Load(world, actor),
     effort =
       traveled.distance *
+      (world.config.development
+        ? openConditions(world, actor.position).travelFactor
+        : 1) *
       2 *
       (1 +
         Math.max(0, load - 3) *
@@ -306,6 +333,20 @@ export function v7AssertWorld(world: V7World, registry?: V7Registry): void {
     }
   for (const object of world.objects) {
     v7Json(object.data);
+    if (object.assemblyParent) {
+      const parent = world.objects.find((p) => p.id === object.assemblyParent);
+      if (
+        !parent ||
+        parent.spatial.solid ||
+        !parent.spatial.reserved ||
+        !object.spatial.solid ||
+        parent.assemblyParent ||
+        v7ShapeDistance(object.spatial, parent.spatial) > 1e-8
+      )
+        throw new Error(
+          'A physical component needs an actual non-solid reserved parent footprint containing its anchor.',
+        );
+    }
     for (const pkg of registry?.packages.filter((p) =>
       world.revisions.includes(`${p.id}@${String(p.version)}`),
     ) ?? []) {
@@ -346,12 +387,24 @@ export function v7AssertWorld(world: V7World, registry?: V7Registry): void {
   for (let i = 0; i < solids.length; i++)
     for (const other of solids.slice(i + 1)) {
       const object = solids[i];
-      if (object && v7ShapesOverlap(object.spatial, other.spatial))
+      if (
+        object &&
+        object.assemblyParent !== other.id &&
+        other.assemblyParent !== object.id &&
+        !(
+          world.state.shortRefuge === 1 &&
+          object.kind === 'short-pole' &&
+          other.kind === 'short-pole' &&
+          !!object.assemblyParent &&
+          object.assemblyParent === other.assemblyParent
+        ) &&
+        v7ShapesOverlap(object.spatial, other.spatial)
+      )
         throw new Error('Solid object footprints overlap.');
     }
   for (const stack of world.stacks)
     if (
-      (world.state.foodAssessment === 1
+      (world.state.foodAssessment === 1 || !!world.config.development
         ? stack.quantity <= 0 ||
           foodTenths(stack.quantity) < 1 ||
           (stack.quantityTenths !== undefined &&
@@ -375,7 +428,7 @@ export function v7Step(
   reviews: V7Review[] = [],
 ): V7RoundResult {
   const savedWorld = world;
-  if (world.state.foodAssessment === 1) {
+  if (world.state.foodAssessment === 1 || !!world.config.development) {
     const encoded = v7Clone(world);
     normalizeFoodAccounting(encoded);
     world = v7Freeze(encoded);
@@ -544,6 +597,19 @@ export function v7Step(
               );
             result = { complete: true, writes: [] };
           } else {
+            if (
+              trial.config.development &&
+              ability.dependencies &&
+              (ability.dependencies.abilities.some(
+                (id) => !actor.mastered.includes(id),
+              ) ||
+                ability.dependencies.knowledge.some(
+                  (key) => !actor.memory.knowledge?.[key]?.verified,
+                ))
+            )
+              throw new Error(
+                'Missing actual personal capability or verified knowledge dependency.',
+              );
             const handler = registry.handlers[ability.handler];
             if (!handler) throw new Error('Missing versioned implementation.');
             result = handler({
@@ -569,6 +635,7 @@ export function v7Step(
                   }
                 : {}),
             });
+            openPractice(world, trial, actor, ability, result.complete, emit);
             for (const old of world.actors) {
               const after = trial.actors.find((a) => a.id === old.id);
               if (
@@ -691,6 +758,7 @@ export function v7Step(
                   diagnostic: {
                     reasonCode: `reference-${error.code}`,
                     candidates: error.candidates,
+                    ...(error.details ?? {}),
                   },
                 }
               : {}),
@@ -842,23 +910,25 @@ export function v7Step(
         mergeProposal(next, p.world, p.writes);
         next.events.push(...p.events);
       }
+      if (error && p.diagnostic?.contract === 'shelter-reference-diagnostics@1')
+        next.events.push({
+          id: v7Id(next, 'event'),
+          tick: next.tick,
+          actor: p.actor,
+          type: 'shelter-reference-diagnostic',
+          interface: actions[p.actor]?.interface ?? null,
+          success: false,
+          description: error,
+          position:
+            world.actors.find((a) => a.id === p.actor)?.position ?? null,
+          target:
+            typeof p.diagnostic.resolvedId === 'string'
+              ? p.diagnostic.resolvedId
+              : null,
+          data: p.diagnostic,
+        });
     }
-    const protectedProcessState = v7Signature({
-      config: next.config,
-      terrain: next.terrain,
-      abilities: next.abilities,
-      resources: next.resources,
-      satisfaction: next.satisfaction,
-      revisions: next.revisions,
-      accounts: next.actors.map((a) => ({
-        id: a.id,
-        mastered: a.mastered,
-        learning: a.learning,
-        wellbeing: a.wellbeing,
-        ...(world.config.experience ? { mental: a.experience?.mental } : {}),
-        life: a.life ?? null,
-      })),
-    });
+    const protectedProcessState = protectedProcessAccounts(next);
     for (const process of [...next.processes])
       if (next.tick >= process.next) {
         work.spend();
@@ -867,29 +937,27 @@ export function v7Step(
           throw new Error('Missing registered process implementation.');
         handler(next, process, work);
       }
-    if (
-      protectedProcessState !==
-      v7Signature({
-        config: next.config,
-        terrain: next.terrain,
-        abilities: next.abilities,
-        resources: next.resources,
-        satisfaction: next.satisfaction,
-        revisions: next.revisions,
-        accounts: next.actors.map((a) => ({
-          id: a.id,
-          mastered: a.mastered,
-          learning: a.learning,
-          wellbeing: a.wellbeing,
-          ...(world.config.experience ? { mental: a.experience?.mental } : {}),
-          life: a.life ?? null,
-        })),
-      })
-    )
+    if (protectedProcessState !== protectedProcessAccounts(next))
       throw new Error(
         'Processes cannot rewrite protected rules, learning or wellbeing accounts.',
       );
     forestEnvironment(next);
+    const responses = registry.packages.filter(
+      (pkg) =>
+        pkg.afterEnvironment &&
+        next.revisions.includes(`${pkg.id}@${String(pkg.version)}`),
+    );
+    if (responses.length) {
+      const protectedEnvironmentState = protectedProcessAccounts(next);
+      for (const pkg of responses) {
+        work.spend();
+        pkg.afterEnvironment?.(next);
+      }
+      if (protectedEnvironmentState !== protectedProcessAccounts(next))
+        throw new Error(
+          'Environmental responses cannot rewrite protected rules, learning or wellbeing accounts.',
+        );
+    }
     fireEnvironment(next);
     canopyEnvironment(next);
     for (const actor of next.actors) v7Physiology(next, actor);

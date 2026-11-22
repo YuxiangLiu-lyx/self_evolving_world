@@ -73,7 +73,9 @@ export function continuousSources(root: string): Record<string, string> {
     visit(resolve(root, 'apps/viewer/public'));
   for (const file of readdirSync(resolve(root, 'scripts')).filter(
     (p) =>
-      (p.startsWith('continuous-') || p.startsWith('forest-')) &&
+      (p.startsWith('continuous-') ||
+        p.startsWith('forest-') ||
+        p.startsWith('open-')) &&
       p.endsWith('.ts'),
   ))
     files[`scripts/${file}`] = readFileSync(
@@ -352,7 +354,7 @@ export function validateContinuousDevelopment(
     'Every saved round reconstructed with identical world and event hashes.\n';
   writeFileSync(resolve(directory, log), output);
   let world = state.world;
-  const registry = continuousRegistry();
+  const registry = continuousRegistry(state.world);
   for (const key of packages as string[]) {
     const pkg = registry.packages.find(
       (p) => `${p.id}@${String(p.version)}` === key,

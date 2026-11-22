@@ -35,7 +35,9 @@ export async function requestContinuousTechnicalRepair(
   const state = continuousCheckpoint(root, id);
   assertContinuousTechnicalRepair(state);
   const reason = state.reason;
-  const record = readExperiment(root, id);
+  // A failed browser capture must not prevent repairing its durable paused world.
+  // This metadata read is not acceptance; source-prefix and selected browser gates remain mandatory.
+  const record = readExperiment(root, id, true);
   const directory = resolve(root, 'experiment', id);
   const prefix = `technical-pauses/round-${String(state.world.tick)}`;
   if (existsSync(resolve(directory, prefix)))
@@ -64,6 +66,9 @@ export async function requestContinuousTechnicalRepair(
   }
   continuousAtomic(resolve(directory, prefix, 'recovery.json'), {
     kind: 'technical-computation-recovery',
+    captureStatus: record.manifest.status,
+    captureNote:
+      'Retained files can include an interrupted or stale browser capture. No current PASS is asserted; full source-prefix and selected browser verification remain mandatory.',
     reason,
     tick: state.world.tick,
     retained,

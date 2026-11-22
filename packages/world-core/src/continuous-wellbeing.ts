@@ -184,7 +184,21 @@ export function v7Wellbeing(world: V7World): void {
         const evidence = executed.find(
           (e) =>
             e.success &&
-            e.actor === actor.id &&
+            (world.config.development && rule.participants === 'participants'
+              ? Array.isArray(e.data.participants) &&
+                e.data.participants.includes(actor.id)
+              : e.actor === actor.id) &&
+            (!world.config.development ||
+              rule.conditions.every((c) =>
+                v7Condition(c, {
+                  ...e.data,
+                  self: {
+                    ...actor.vitals,
+                    relationships: actor.relationships,
+                    preferences: actor.memory.preferences,
+                  },
+                }),
+              )) &&
             [
               { event: m.event, interface: m.interface },
               ...(m.alternativeTriggers ?? []),
@@ -207,21 +221,22 @@ export function v7Wellbeing(world: V7World): void {
         if (source) {
           source.transient = source.value;
           source.sustained = Math.min(
-            rule.cap,
+            m.cap ?? rule.cap,
             Math.max(
               0,
               (source.sustained ?? 0) +
                 (evidence && actor.vitals.health > 0
                   ? m.gain *
-                    (m.roundsField
-                      ? Math.max(
-                          0,
-                          Math.min(
-                            m.maxRounds ?? 1,
-                            Number(evidence.data[m.roundsField] ?? 0),
-                          ),
-                        )
-                      : 1)
+                      (m.roundsField
+                        ? Math.max(
+                            0,
+                            Math.min(
+                              m.maxRounds ?? 1,
+                              Number(evidence.data[m.roundsField] ?? 0),
+                            ),
+                          )
+                        : 1) -
+                    (m.decayOnGain ? m.decay : 0)
                   : -m.decay),
             ),
           );

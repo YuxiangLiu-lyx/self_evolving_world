@@ -1,3 +1,4 @@
+import { OPEN_OBJECTIVE, measureOpen } from './open-analysis.js';
 import { readFileSync, lstatSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { v7Signature } from '@self-evolving-world/world-core';
@@ -80,6 +81,9 @@ export function measureContinuous(
     };
   });
   return {
+    ...(final.config.development
+      ? { openDevelopment: measureOpen(state, frames, records) }
+      : {}),
     version: 7,
     observedRounds: final.tick,
     targetWindow: state.windowTarget,
@@ -368,7 +372,7 @@ export function continuousReport(
   const forestSummary = state.world.config.forest
     ? `## Forest lifecycle and environment\n\nModel: ${state.model}. Seed: ${String(state.world.config.seed)}. Observed seasons: ${results.forest?.seasons.map((s) => (typeof s === 'string' ? s : 'unknown')).join(', ') ?? 'unknown'}. Deaths and respawns are retained with exact evidence and prior plans in results.json. Full-state replay remains independent of rendering. Monetary cost and internal developer usage are unknown; recorded role-specific tokens below are measured. These formal events are distinct from isolated forest-lab fixtures.\n\n${state.world.actors.map((a) => `${a.name}: ${String(a.life?.deaths ?? 0)} deaths, ${String((a.life?.total ?? 0) - (a.life?.deaths ?? 0))} remaining lives.`).join('\n\n')}\n\n`
     : '';
-  return `# ${id}: Continuous World and Persistent Wellbeing\n\n## Scope and observation window\n\n${state.world.config.experience ? EXPERIENCE_OBJECTIVE : CONTINUOUS_OBJECTIVE}\n\nObserved ${String(state.world.tick)} of ${String(state.windowTarget)} target rounds. State: ${state.phase}. ${state.reason ?? ''} This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.\n\n## Measured outcome\n\n| Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | ${state.world.config.experience ? 'Learned-interface successful rounds' : 'New-ability successful rounds'} |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n${results.actors.map((a) => `| ${a.id} | ${String(a.alive)} | ${String(a.finalVitals.health)} | ${String(a.finalVitals.satiety)} | ${a.meanWellbeing.toFixed(2)} | ${a.finalWellbeing.total.toFixed(2)} | ${String(a.newlyMastered.length)} | ${String(a.successfulNewAbilityUses)} |`).join('\n')}\n\nRequests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits.${state.world.config.experience ? ' In this policy the table includes personally learned baseline interfaces; results.experience separately lists newly developed interfaces, personal mastery, completed operations and pre-action reference invalidations. The initial ex8 catalogue is not new ex9 discovery.' : ''} Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.\n\n## Action distribution\n\n| Interface | Attempted | Successful rounds | Failed rounds |\n| --- | --- | --- | --- |\n${Object.entries(
+  return `# ${id}: Continuous World and Persistent Wellbeing\n\n## Scope and observation window\n\n${state.world.config.development ? OPEN_OBJECTIVE : state.world.config.experience ? EXPERIENCE_OBJECTIVE : CONTINUOUS_OBJECTIVE}\n\nObserved ${String(state.world.tick)} of ${String(state.windowTarget)} target rounds. State: ${state.phase}. ${state.reason ?? ''} This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.\n\n## Measured outcome\n\n| Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | ${state.world.config.experience ? 'Learned-interface successful rounds' : 'New-ability successful rounds'} |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n${results.actors.map((a) => `| ${a.id} | ${String(a.alive)} | ${String(a.finalVitals.health)} | ${String(a.finalVitals.satiety)} | ${a.meanWellbeing.toFixed(2)} | ${a.finalWellbeing.total.toFixed(2)} | ${String(a.newlyMastered.length)} | ${String(a.successfulNewAbilityUses)} |`).join('\n')}\n\nRequests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits.${state.world.config.development ? ' This fresh policy inherits no generated interfaces. The explicit authored allowlist, current-run package provenance, personal projects, verified knowledge, trials and persistent processes are retained separately in results.openDevelopment. Actor-written progress is a claim, not a physical outcome.' : state.world.config.experience ? ' In this policy the table includes personally learned baseline interfaces; results.experience separately lists newly developed interfaces, personal mastery, completed operations and pre-action reference invalidations. The initial ex8 catalogue is not new ex9 discovery.' : ''} Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.\n\n## Action distribution\n\n| Interface | Attempted | Successful rounds | Failed rounds |\n| --- | --- | --- | --- |\n${Object.entries(
     results.actions,
   )
     .map(
@@ -422,7 +426,9 @@ export function readContinuousExperiment(
   for (const part of index.segments) {
     const path = resolve(directory, part.path);
     if (
-      !/^replay\/(?:part|execution)-\d+(?:-\d+)?\.json$/.test(part.path) ||
+      !/^replay\/(?:part|execution|precision)-\d+(?:-\d+)?\.json$/.test(
+        part.path,
+      ) ||
       continuousHash(readFileSync(path, 'utf8')) !== part.sha256
     )
       throw new Error('Invalid continuous replay segment.');

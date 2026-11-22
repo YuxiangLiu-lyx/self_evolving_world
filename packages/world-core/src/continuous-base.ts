@@ -1,3 +1,8 @@
+import { preservationOnTray } from './open-preservation-physics.js';
+import { geometryGather, geometryTransfer } from './open-material-geometry.js';
+import { refugeExposure, refugeRest } from './open-shelter-exposure.js';
+import { barkGatherState } from './open-bark-accounting.js';
+import { foodUnitMass } from './forest-food-accounting.js';
 import { forestResolveReference } from './forest-references.js';
 import { forestMeal, forestRestFactor } from './forest-experience.js';
 import { foodTenths } from './forest-food-accounting.js';
@@ -53,14 +58,16 @@ function ability(
 }
 export function v7Load(world: V7World, actor: V7Actor): number {
   return world.stacks
-    .filter((s) => s.owner === actor.id)
-    .reduce(
-      (n, s) =>
-        n +
-        s.quantity *
-          (world.resources.find((r) => r.id === s.resource)?.mass ?? 1),
-      0,
-    );
+    .filter(
+      (s) =>
+        s.owner === actor.id &&
+        !preservationOnTray(s) &&
+        !(
+          world.state.shortRefuge === 1 &&
+          s.reservedFor?.startsWith('short:work:')
+        ),
+    )
+    .reduce((n, s) => n + s.quantity * foodUnitMass(world, s), 0);
 }
 export function v7Spend(actor: V7Actor, amount: number): void {
   v7Number(amount, 'effort', 0);
@@ -261,20 +268,24 @@ export const V7_BASE: V7Package = {
   ],
   handlers: {
     'base.rest': ({ world, actor, emit }) => {
-      const bonus = Math.max(
-        0,
-        ...world.objects
-          .filter((o) => v7Reach(actor, o.spatial))
-          .map((o) =>
-            typeof o.data.restBonus === 'number' ? o.data.restBonus : 0,
-          ),
-      );
+      const refuge = refugeExposure(world, actor);
+      const bonus =
+        (refuge?.bonus ?? 0) +
+        Math.max(
+          0,
+          ...world.objects
+            .filter((o) => v7Reach(actor, o.spatial))
+            .map((o) =>
+              typeof o.data.restBonus === 'number' ? o.data.restBonus : 0,
+            ),
+        );
       const before = actor.vitals.energy;
       actor.vitals.energy = Math.min(
         world.config.energyCap,
         before +
           (world.config.restRecovery + bonus) * forestRestFactor(world, actor),
       );
+      refugeRest(world, actor, refuge, actor.vitals.energy - before);
       emit(
         'rested',
         `Recovered ${String(v7RoundNumber(actor.vitals.energy - before))} energy.`,
@@ -304,9 +315,12 @@ export const V7_BASE: V7Package = {
         n = v7Number(
           action.args.quantity,
           'quantity',
-          world.state.foodAssessment === 1 ? 0.1 : 1,
+          world.state.foodAssessment === 1 || !!world.config.development
+            ? 0.1
+            : 1,
         );
-      if (world.state.foodAssessment === 1) foodTenths(n);
+      if (world.state.foodAssessment === 1 || !!world.config.development)
+        foodTenths(n);
       const stack = world.stacks
         .filter(
           (s) =>
@@ -326,10 +340,10 @@ export const V7_BASE: V7Package = {
         );
       const resource = world.resources.find((r) => r.id === stack.resource);
       if (!resource) throw new Error('Unknown material.');
-      if ((stack.mantle || stack.frictionKit) && n !== 1)
+      if ((stack.mantle || stack.frictionKit || stack.waterCup) && n !== 1)
         throw new Error('Equipment is one indivisible persistent item.');
-      v7Spend(actor, 1 + n * resource.mass * 0.2);
-      if (stack.mantle || stack.frictionKit) {
+      v7Spend(actor, 1 + n * foodUnitMass(world, stack) * 0.2);
+      if (stack.mantle || stack.frictionKit || stack.waterCup) {
         stack.owner = actor.id;
         stack.position = { ...actor.position };
         if (stack.mantle) stack.mantle.equipped = false;
@@ -337,7 +351,9 @@ export const V7_BASE: V7Package = {
           'picked-up',
           stack.mantle
             ? 'Collected the same persistent mantle.'
-            : 'Collected the same persistent friction kit.',
+            : stack.waterCup
+              ? 'Collected the same persistent unfired cup.'
+              : 'Collected the same persistent friction kit.',
           {
             quantity: 1,
             resource: stack.resource,
@@ -357,6 +373,8 @@ export const V7_BASE: V7Package = {
         owner: actor.id,
         position: { ...actor.position },
       });
+      const picked = world.stacks.find((s) => s.id === id);
+      if (picked) geometryTransfer(world, stack, picked);
       emit(
         'picked-up',
         `Collected ${String(n)} ${resource.name}; pickup does not nourish.`,
@@ -371,7 +389,12 @@ export const V7_BASE: V7Package = {
           actor,
           v7String(action.args.target, 'target'),
         ),
-        n = v7Number(action.args.quantity, 'quantity', 1);
+        n = v7Number(
+          action.args.quantity,
+          'quantity',
+          world.state.foodPreservation === 1 ? 0.1 : 1,
+        );
+      if (world.state.foodPreservation === 1) foodTenths(n);
       const resource = world.resources.find((r) => r.id === stack.resource);
       if (!resource || resource.nutrition <= 0 || stack.quantity < n)
         throw new Error(
@@ -420,7 +443,10 @@ export const V7_BASE: V7Package = {
         position: { ...actor.position },
         owner: actor.id,
         origin: object.id,
+        ...barkGatherState(object),
       });
+      const gathered = world.stacks.find((s) => s.id === id);
+      if (gathered) geometryGather(world, gathered);
       object.visual.state =
         object.data.stock > 0
           ? 'ready'
@@ -518,11 +544,12 @@ function transfer(
     n = v7Number(
       action.args.quantity,
       'quantity',
-      world.state.foodAssessment === 1 ? 0.1 : 1,
+      world.state.foodAssessment === 1 || !!world.config.development ? 0.1 : 1,
     );
-  if (world.state.foodAssessment === 1) foodTenths(n);
+  if (world.state.foodAssessment === 1 || !!world.config.development)
+    foodTenths(n);
   if (stack.quantity < n) throw new Error('Insufficient owned quantity.');
-  if ((stack.mantle || stack.frictionKit) && n !== 1)
+  if ((stack.mantle || stack.frictionKit || stack.waterCup) && n !== 1)
     throw new Error('Equipment is one indivisible persistent item.');
   const recipient = give
     ? world.actors.find(
@@ -540,7 +567,7 @@ function transfer(
   )
     throw new Error('Recipient is outside actual handoff reach.');
   v7Spend(actor, 0.5);
-  if (stack.mantle || stack.frictionKit) {
+  if (stack.mantle || stack.frictionKit || stack.waterCup) {
     if (stack.mantle?.equipped)
       emit(
         'insulation-unequipped',
@@ -555,7 +582,9 @@ function transfer(
       give ? 'given' : 'dropped',
       stack.mantle
         ? 'Transferred the same persistent mantle.'
-        : 'Transferred the same persistent friction kit.',
+        : stack.waterCup
+          ? 'Transferred the same persistent unfired cup.'
+          : 'Transferred the same persistent friction kit.',
       {
         quantity: 1,
         resource: stack.resource,
@@ -575,6 +604,8 @@ function transfer(
     owner: recipient?.id ?? null,
     position: { ...(recipient?.position ?? actor.position) },
   });
+  const transferred = world.stacks.find((s) => s.id === id);
+  if (transferred) geometryTransfer(world, stack, transferred);
   emit(
     give ? 'given' : 'dropped',
     `Transferred ${String(n)} ${stack.resource}${recipient ? ` to ${recipient.name}` : ' onto the ground'}.`,

@@ -167,3 +167,87 @@ function present<T>(value: T | null | undefined): T {
     throw new Error('Required fixture value is missing.');
   return value;
 }
+
+it('binds fresh checkpoint scope and baseline, preserves projects through real replay records, and rejects cross-experiment recovery', async () => {
+  const { initialOpenWorld } =
+    await import('../apps/simulator/src/open-scenario.js');
+  const root = mkdtempSync(resolve(tmpdir(), 'open-checkpoint-'));
+  try {
+    const state = newContinuousExecution(
+      'fixture',
+      'isolated-fixture',
+      initialOpenWorld('open-ex1'),
+    );
+    const path = resolve(root, 'experiment/ex1/execution.json');
+    continuousAtomic(path, state);
+    expect(readContinuousExecution(root, 'ex1')).toEqual(state);
+    const altered = v7Clone(state);
+    if (!altered.world.config.development)
+      throw new Error('Missing fresh config');
+    altered.world.config.development.scope = 'open-ex2';
+    continuousAtomic(path, altered);
+    expect(() => readContinuousExecution(root, 'ex1')).toThrow(
+      /protected run configuration/,
+    );
+    const project = {
+      id: 'question',
+      status: 'active',
+      question: 'A test question',
+      evidence: [],
+      uncertainty: 'Unknown',
+      goal: 'Test continuity',
+      completedSteps: [],
+      outputs: [],
+      missing: 'Evidence',
+      next: 'Observe',
+      pauseReason: '',
+      benefit: '',
+    };
+    const provider: V7Provider = () =>
+      Promise.resolve({
+        text: JSON.stringify({
+          intention: 'fixture',
+          steps: [
+            {
+              action: { interface: 'wait', args: {} },
+              repeat: 3,
+              until: null,
+              guard: null,
+            },
+          ],
+          repeat: 1,
+          until: null,
+          interrupts: [],
+          notes: [],
+          preferences: [],
+          projects: [project],
+        }),
+        responseId: 'fixture',
+        usage: { inputTokens: 1, outputTokens: 1 },
+        http: { status: 200, requestId: null, contentType: 'application/json' },
+        evidence: 'isolated fixture only',
+      });
+    state.windowTarget = 3;
+    const final = await continueContinuousExecution(
+      state,
+      provider,
+      continuousSink(root, 'ex1'),
+    );
+    const index = buildContinuousReplay(root, 'ex1', state.world, final);
+    const part = index.segments[0];
+    if (!part) throw new Error('Missing segment');
+    const frames = reconstructContinuousSegment(
+      continuousRead<V7ReplaySegment>(
+        resolve(root, 'experiment/ex1', part.path),
+      ),
+    );
+    expect(frames.at(-1)?.actors[0]?.memory.projects?.question).toMatchObject(
+      project,
+    );
+    expect(frames.at(-1)).toEqual(final.world);
+    expect(final.attempts).toHaveLength(3);
+    expect(final.attempts.every((a) => (a.contextBytes ?? 0) > 0)).toBe(true);
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

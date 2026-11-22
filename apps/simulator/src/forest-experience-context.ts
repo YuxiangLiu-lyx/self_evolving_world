@@ -16,6 +16,12 @@ export function forestExperienceSummary(actor: V7Actor) {
   return {
     window: recent.length,
     mentalState: state.mental,
+    ...(actor.extensionState['open:routineBurden'] !== undefined
+      ? {
+          sustainedRoutineBurden: actor.extensionState['open:routineBurden'],
+          routineWindow: 160,
+        }
+      : {}),
     temporaryMealPleasure: state.pleasure,
     monotony: state.monotony,
     substantialMeals: state.meals.map((meal) => ({

@@ -569,3 +569,30 @@ details summary {
   opacity: 0;
   position: relative;
 }
+
+#fixture-events {
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+.trial-diagnostic {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.trial-diagnostic table {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+.trial-diagnostic caption {
+  text-align: left;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.trial-diagnostic td,
+.trial-diagnostic th {
+  padding: 5px 3px;
+  border-bottom: 1px solid #455549;
+  text-align: left;
+  vertical-align: top;
+}

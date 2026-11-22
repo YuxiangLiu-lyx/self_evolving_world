@@ -112,3 +112,21 @@ it('recovers the actual pre-inference context pause without advancing a round, m
     resolveContinuousDevelopment(bad, [], {}, 'No invented actor action'),
   ).toThrow('Context-only recovery');
 });
+
+it('keeps the actual round-123 browser-capture failure eligible only as an unsettled technical pause', () => {
+  const state = JSON.parse(
+    readFileSync(
+      'experiment/ex10/technical-pauses/round-123/execution.json',
+      'utf8',
+    ),
+  ) as V7Execution;
+  expect(() => {
+    assertContinuousTechnicalRepair(state);
+  }).not.toThrow();
+  expect(state.pendingCall).toBeNull();
+  const settled = v7Clone(state);
+  settled.phase = 'window-complete';
+  expect(() => {
+    assertContinuousTechnicalRepair(settled);
+  }).toThrow('Only a durable');
+});

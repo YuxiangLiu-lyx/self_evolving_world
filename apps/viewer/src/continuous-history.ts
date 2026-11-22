@@ -1,5 +1,7 @@
 import {
   continuousRegistry,
+  v7CanonicalNumbers,
+  openSaveProjects,
   v7Install,
   v7Clone,
   v7Step,
@@ -9,11 +11,13 @@ import {
 } from '@self-evolving-world/world-core';
 import type {
   V7World,
+  V7Project,
   V7Cursor,
   V7Action,
   V7Review,
 } from '@self-evolving-world/world-core';
 export interface SceneRound {
+  registrationPrecisionHash?: string;
   tick: number;
   before: string;
   after: string;
@@ -22,7 +26,12 @@ export interface SceneRound {
   registrations: string[];
   memory: Record<
     string,
-    { notes: string[]; preferences: string[]; intention?: string }
+    {
+      notes: string[];
+      preferences: string[];
+      intention?: string;
+      projects?: V7Project[];
+    }
   >;
   events: V7World['events'];
   tasks: Record<string, V7Cursor>;
@@ -53,22 +62,34 @@ export async function browserDigest(text: string): Promise<string> {
 export async function replaySceneSegment(
   segment: SceneSegment,
 ): Promise<V7World[]> {
-  const registry = continuousRegistry();
+  const registry = continuousRegistry(segment.initial);
   let world = segment.initial;
   const frames = [world];
   const cursors = v7Clone(segment.initialCursors ?? {});
   for (const record of segment.rounds) {
     for (const key of record.registrations)
       world = v7Install(world, registry, key);
+    const rawPrefixMatches =
+      (await browserDigest(v7Signature(world))) === record.before;
+    const precisionBound =
+      record.registrations.includes('material-geometry@1') &&
+      typeof record.registrationPrecisionHash === 'string' &&
+      (await browserDigest(v7Signature(v7CanonicalNumbers(world)))) ===
+        record.registrationPrecisionHash;
+    if (record.registrationPrecisionHash !== undefined && !precisionBound)
+      throw new Error('Invalid registration precision evidence.');
+    // Only this recorded native-cbrt migration can use its independently bound model-precision proof.
+    // Every ensuing world, event and task hash still matches the original record exactly.
     if (
       record.tick !== world.tick + 1 ||
-      (await browserDigest(v7Signature(world))) !== record.before
+      (!rawPrefixMatches && !precisionBound)
     )
       throw new Error('Replay prefix verification failed.');
     const input = v7Clone(world);
     for (const actor of input.actors) {
       const m = record.memory[actor.id];
       if (m) {
+        if (m.projects) openSaveProjects(actor, m.projects, world.tick);
         actor.memory.notes = m.notes;
         actor.memory.preferences = m.preferences;
         if (m.intention !== undefined) actor.memory.intention = m.intention;
