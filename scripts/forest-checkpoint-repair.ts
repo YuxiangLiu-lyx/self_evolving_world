@@ -39,6 +39,43 @@ export function forestCheckpointRepair(
   after: string,
   declaration: unknown,
 ): boolean {
+  // Ex12 round 56: clear only the explicitly reviewed feedback-repair barrier.
+  // No scheduler, budget, prompt, goal, parameter or previously executed action changes.
+  if (declaration === 'collective-reviewed-bark-feedback-v1')
+    return (
+      path === 'apps/simulator/src/continuous-run.ts' &&
+      before ===
+        'e6e0059bf8d416d195075be152f4118c792fb8b691936e604a5d71e91eb523b6' &&
+      after ===
+        'f2a3a756b6615f41a8090dc7cf091f1f9915e60b1b3afacd4dad42ed30ba1a26'
+    );
+  // Ex11 round 1: retain three decoder failures and one explicitly abandoned unknown
+  // transport. Only collective response decoding accepts a bounded multi-member text;
+  // prompts, output token cap, policy, world state and attempted-call ledgers are unchanged.
+  if (declaration === 'collective-batched-response-reader-v1') {
+    const pairs: Record<string, { before: string; after: string }> = {
+      'apps/simulator/src/responses.ts': {
+        before:
+          '1d9e79e628104849cc509c78ab02c1992cd90acdab9df3468e45d3bd07e90763',
+        after:
+          '300b8189a667ad4f16882ee9e921258f69804d1802d3bf36d2ef3a48bc05f5e2',
+      },
+      'apps/simulator/src/continuous-provider.ts': {
+        before:
+          '840c45cd73373d81106174a6619379dc7784c015a24adfc99787cb7bc3b3a7dc',
+        after:
+          '60b3c688778109680caa774a406aa1859bd4fcf771ede787cc590b15f12a441f',
+      },
+      'apps/simulator/src/continuous-run.ts': {
+        before:
+          '761b5dc9abb7f7faf82a85ee57d04b8676c95564b98d6f397834d3827f7e3537',
+        after:
+          'e6e0059bf8d416d195075be152f4118c792fb8b691936e604a5d71e91eb523b6',
+      },
+    };
+    const pair = pairs[path];
+    return pair?.before === before && pair.after === after;
+  }
   // Ex10 round 123: preserve the raw native migration hash and add a separately verified
   // model-precision browser proof. Original records remain immutable; every later hash is exact.
   if (declaration === 'open-registration-replay-and-context-v1')

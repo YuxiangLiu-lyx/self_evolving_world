@@ -1,3 +1,5 @@
+import { collectiveSettle } from '@self-evolving-world/world-core';
+import { initialCollectiveWorld } from '../apps/simulator/src/collective-scenario.js';
 import { OPEN_CONFIG } from '../apps/simulator/src/open-scenario.js';
 import { FOREST_EXPERIENCE_CONFIG } from '../apps/simulator/src/forest-experience-scenario.js';
 import { FOREST_CONFIG } from '../apps/simulator/src/forest-scenario.js';
@@ -98,16 +100,24 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
     !Array.isArray(state.developments) ||
     v7Signature(state.world.config) !==
       v7Signature(
-        state.world.config.development
-          ? {
-              ...OPEN_CONFIG,
-              development: { ...OPEN_CONFIG.development, scope: `open-${id}` },
-            }
-          : state.world.config.experience
-            ? FOREST_EXPERIENCE_CONFIG
-            : state.world.config.forest
-              ? FOREST_CONFIG
-              : V7_CONFIG,
+        state.world.config.collective
+          ? initialCollectiveWorld(
+              `collective-${id}`,
+              state.world.config.collective.arm,
+            ).config
+          : state.world.config.development
+            ? {
+                ...OPEN_CONFIG,
+                development: {
+                  ...OPEN_CONFIG.development,
+                  scope: `open-${id}`,
+                },
+              }
+            : state.world.config.experience
+              ? FOREST_EXPERIENCE_CONFIG
+              : state.world.config.forest
+                ? FOREST_CONFIG
+                : V7_CONFIG,
       )
   )
     throw new Error(
@@ -147,6 +157,106 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
     throw new Error(
       'Recorded development handoffs exceed their fixed shared budget.',
     );
+  const policy = state.world.config.collective;
+  const boundary = state.collectiveContinuation;
+  if (
+    boundary &&
+    (!policy ||
+      policy.arm !== 'B' ||
+      state.windowTarget !== 1600 ||
+      !Number.isSafeInteger(boundary.round) ||
+      boundary.round < 0 ||
+      boundary.round > policy.shortRounds ||
+      boundary.round > state.world.tick ||
+      !Number.isSafeInteger(boundary.attempts) ||
+      boundary.attempts < 0 ||
+      boundary.attempts > state.attempts.length ||
+      !Number.isSafeInteger(boundary.developments) ||
+      boundary.developments < 0 ||
+      boundary.developments > state.developments.length)
+  )
+    throw new Error('Invalid retained collective continuation boundary.');
+  if (policy && !boundary && state.world.tick > policy.shortRounds)
+    throw new Error(
+      'Short collective observation advanced without its preserved continuation boundary.',
+    );
+  if (boundary && policy) {
+    const preserved = continuousRead<V7Execution>(
+      resolve(
+        root,
+        'experiment',
+        id,
+        'windows',
+        `through-${String(policy.shortRounds)}`,
+        'execution.json',
+      ),
+    );
+    if (
+      preserved.collectiveContinuation ||
+      preserved.world.tick !== boundary.round ||
+      preserved.attempts.length !== boundary.attempts ||
+      preserved.developments.length !== boundary.developments ||
+      continuousHash(preserved.attempts) !==
+        continuousHash(state.attempts.slice(0, boundary.attempts)) ||
+      continuousHash(preserved.developments) !==
+        continuousHash(state.developments.slice(0, boundary.developments))
+    )
+      throw new Error(
+        'Continuation counters do not match the preserved short checkpoint.',
+      );
+  }
+  if (policy)
+    for (const short of [true, false]) {
+      const split = boundary?.attempts ?? state.attempts.length;
+      const attempts = short
+        ? state.attempts.slice(0, split)
+        : state.attempts.slice(split);
+      for (const role of ['ordinary', 'world', 'development'] as const) {
+        const count =
+          role === 'development'
+            ? short
+              ? (boundary?.developments ?? state.developments.length)
+              : state.developments.length -
+                (boundary?.developments ?? state.developments.length)
+            : attempts.filter((a) => a.role === role).length;
+        const limit = short
+          ? policy.shortBudgets[role]
+          : state.world.config.budgets[role] - policy.shortBudgets[role];
+        if (count > limit)
+          throw new Error(
+            'A collective phase exceeded its frozen call allocation.',
+          );
+      }
+      let charged = 0;
+      for (const attempt of attempts) {
+        if (
+          !Number.isSafeInteger(attempt.reservedTokens) ||
+          (attempt.reservedTokens ?? 0) <= 0
+        )
+          throw new Error(
+            'Every collective attempt requires a positive durable token reservation.',
+          );
+        if (
+          attempt.usage &&
+          [attempt.usage.inputTokens, attempt.usage.outputTokens].some(
+            (n) => !Number.isSafeInteger(n) || n < 0,
+          )
+        )
+          throw new Error('Invalid measured token usage.');
+        charged += attempt.usage
+          ? attempt.usage.inputTokens + attempt.usage.outputTokens
+          : (attempt.reservedTokens ?? 0);
+      }
+      if (
+        charged >
+        (short
+          ? policy.tokens.short
+          : policy.tokens.total - policy.tokens.short)
+      )
+        throw new Error(
+          'A collective phase exceeded its measured/reserved token allocation.',
+        );
+    }
   return state;
 }
 export function continuousSink(root: string, id: string): V7Sink {
@@ -441,6 +551,13 @@ export function reconstructContinuousSegment(
     for (const actor of input.actors) {
       const memory = round.memory[actor.id];
       if (memory) {
+        if (memory.collectiveIntent) {
+          if (!actor.collective)
+            throw new Error(
+              'Personal collective intention requires an actual member.',
+            );
+          actor.collective.intent = v7Clone(memory.collectiveIntent);
+        }
         if (memory.projects)
           openSaveProjects(actor, memory.projects, world.tick);
         actor.memory.notes = memory.notes;
@@ -459,6 +576,7 @@ export function reconstructContinuousSegment(
       round.reviews,
     );
     if (segment.initialCursors) v7FinishTasks(world, result, cursors);
+    result.world = collectiveSettle(result.world, round.coordination ?? []);
     if (
       result.paused ||
       continuousHash(result.world) !== round.after ||

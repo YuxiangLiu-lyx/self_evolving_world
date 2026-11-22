@@ -4,7 +4,7 @@ This document owns current modules, interfaces, and dependency boundaries. Featu
 
 | Area                     | Scope                                                                                                          | Entry                                                              |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| Current Continuous World | Continuous-v1 / ex7–ex10: deterministic physics, reviewed mechanisms, persistent memory and recorded wellbeing | [Current protocol and game observatory](#current-continuous-world) |
+| Current Continuous World | Continuous-v1 / ex7–ex12: deterministic physics, reviewed mechanisms, persistent memory and recorded wellbeing | [Current protocol and game observatory](#current-continuous-world) |
 | Legacy Foundation        | Fixed grid and three base skills; retained histories and separately versioned grid extensions                  | [Founding contracts](#legacy-foundation)                           |
 | Development Harness      | Repository-only task routing, conversation handoffs, evidence, PR and merge gates                              | [Coordinator boundary](#development-harness)                       |
 
@@ -237,3 +237,61 @@ The 2D viewer reuses existing object components and adds local soil overlays,
 seedling/injury states, process progress and personal project/knowledge inspection.
 [ADR-0022](docs/decisions/0022-fresh-open-development.md) records isolation and
 context tradeoffs; [PRODUCT](docs/PRODUCT.md) owns acceptance status.
+
+## Collective life extension
+
+The optional [collective policy](docs/COLLECTIVE_LIFE.md) retains individual physical actors and the continuous round barrier. Per-group attention constructs either personal observations or actual shared reports; public proposals cannot write individual tasks. Local reporting and teaching are core transactions. The existing task coordinator allocates isolated A/B archives and preserves B's short checkpoint before continuation. The policy is absent from historical worlds, whose semantics remain unchanged. See [ADR-0023](docs/decisions/0023-collective-life.md).
+
+`collective-policy` and `collective-types` define optional group identity,
+tendencies, commitments and persistent personal intent on each physical actor.
+`collective-social` implements local reports, voluntary responses, two-part
+teaching and event-grounded risk/trust updates. The wellbeing engine applies
+its preference-dependent experience scale to actual qualifying events. The ordinary task cursor
+continues to own paid execution; a public proposal cannot replace it.
+
+`collective-input` constructs three separate packet shapes: A's observed group
+union, B's one-member private packet, and B's report-only coordination packet.
+`collective-controller` selects attention slots, tracks waiting and preserves phase
+counters. Provider requests are fresh and bounded; the group endpoint is not a
+shared secret-bearing conversation. The normal runner settles physical actions
+before accepting public proposals at the same-round barrier. Retained request
+builders validate historical packets against their source revision, including
+same-round technical boundaries, without replaying model inference.
+
+The generated collective packages remain scope-bound to their originating arm.
+`collective-work` reuses conserved escrow and paid partial progress for actual
+material operations. Optional `material-lots` retains original component identity,
+physical properties, age and provenance through combination, splitting, transfers,
+consumption and per-component spoilage. A combined stock is not automatically one
+connected physical sheet. Fractional root work therefore assesses real surface
+geometry separately and requires additional personal learning. Private inventory
+inspection preserves complete bounded execution-time pages outside the compact
+summary; its reader exposes no other member's possessions or hidden chemistry.
+These runtime extensions enable requested actions, but installation alone creates
+no stock, personal mastery or benefit.
+
+The human viewer can inspect the full recorded world and select personal state,
+intentions, known facts, work progress and dated inventory pages. That inspection
+is explicitly separate from the model's packet. Existing geometry and process
+renderers display real outputs; authored fixture scenes remain labeled as tests.
+
+The scoped `collective-small-drying` package separates requirement assessment,
+physical site/component checks and paid work from its public interface. It reuses
+the existing per-lot moisture/age kernel with a conditional underside-exposure
+multiplier; historical trays take the unchanged path. The completed sheet remains
+non-solid, while its ballast is an actual solid assembly component. Passive
+conditions do not require model scoring, and a missing support never becomes
+a free-standing preservation bonus. Personal before/after inspection is separate
+from passive physics and uses the existing deduplicated understanding source.
+
+The B-only `collective-tray-placement` evaluator preserves the original root
+worksite predicates for construction. `collective-tray-clearance` projects a paid
+personal diagnostic through current observation and stores dated results; its
+package adds separate learning and the canonical understanding trigger. The
+viewer draws those recorded nonphysical outlines, never a fabricated facility.
+
+The B-only `collective-tool-assessment` module reuses the unchanged pure
+`collective-tool-predicate` used by fractional preparation. It provides paid
+personal tool-only records, while generic contact representation runs on a copy
+and cannot mutate material. The viewer separates provenance-backed hardness from
+experimental evidence and renders only a brief inspection indicator.

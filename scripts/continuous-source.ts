@@ -75,7 +75,8 @@ export function continuousSources(root: string): Record<string, string> {
     (p) =>
       (p.startsWith('continuous-') ||
         p.startsWith('forest-') ||
-        p.startsWith('open-')) &&
+        p.startsWith('open-') ||
+        p.startsWith('collective-')) &&
       p.endsWith('.ts'),
   ))
     files[`scripts/${file}`] = readFileSync(

@@ -1,3 +1,5 @@
+import { collectiveFoodProfile } from './collective-food-profile.js';
+import { v7Json } from './continuous-data.js';
 import type { V7Package, V7Resource } from './continuous-types.js';
 import { v7Number, v7String } from './continuous-data.js';
 import { V7_BASE, v7FoodEffect } from './continuous-base.js';
@@ -225,15 +227,28 @@ export const FOREST_BASE: V7Package = {
             stack.harvestedAt = context.world.tick;
         if (context.action.interface === 'eat') {
           const event = context.world.events.find((e) => e.type === 'ate');
-          const resource = context.world.resources.find(
-            (r) => r.id === event?.data.resource,
+          const consumed = context.world.stacks.find(
+            (s) => s.id === event?.target,
           );
+          const resource = consumed
+            ? collectiveFoodProfile(context.world, consumed)
+            : context.world.resources.find(
+                (r) => r.id === event?.data.resource,
+              );
           if (resource) {
             context.actor.memory.discoveries ??= {};
             context.actor.memory.discoveries[resource.id] = {
               nutrition: resource.nutrition,
               toxicity: resource.toxicity,
               observedAt: context.world.tick,
+              ...(resource.id === 'hand-mashed-food' && consumed
+                ? {
+                    itemId: consumed.id,
+                    composition: v7Json(resource.food ?? null),
+                    appliesTo:
+                      'This consumed lot only; other prepared batches may differ.',
+                  }
+                : {}),
             };
           }
         }

@@ -132,6 +132,30 @@ Version6 adds `coevolution-browser` and `coevolution-mobile`: inspect energy/loa
 
 ## Forest extension evidence
 
-The 45 explicitly labeled forest-lab scenes remain registered in `REVIEW_SCENES` and are selected when forest behavior or presentation is affected, or during an explicit full audit. They cover cave exterior/interior and collision overlays, paid building geometry, attention, food examination/sampling, event-grounded experience, respawn and the third death, requested shelter construction/refuge/expiry/maintenance, requested exercise/progress/relief/cancellation reachable/moved/blocked/unknown route evidence, neutral mood and actual meals, paid insulation and identity, finite fire, willow processing, and actual canopy drying/expiry, and paid health recuperation/progress/relief/cancellation. With ten numbered archives, the current comprehensive selection contains 108 screenshots; unrelated changes do not select all of them. Inspect each newly selected image, especially doorway alignment, roof visibility, life counters and overlapping event labels. Unchanged images may reuse authenticated review with matching dependencies and pixel hashes. These authored fixtures do not establish autonomous adoption. Forest regressions include conserved inventory identities, persistent world and mastery, important memory, invalid ex7 event aliases, stale action references, locally alterable seasonal growth and the complete current-conversation development/reuse chain. Formal forest runs retain the existing full archive, call, source and behavioral analysis requirements and an explicit round-200 technical checkpoint.
+The 45 explicitly labeled forest-lab scenes remain registered in `REVIEW_SCENES` and are selected when forest behavior or presentation is affected, or during an explicit full audit. They cover cave exterior/interior and collision overlays, paid building geometry, attention, food examination/sampling, event-grounded experience, respawn and the third death, requested shelter construction/refuge/expiry/maintenance, requested exercise/progress/relief/cancellation reachable/moved/blocked/unknown route evidence, neutral mood and actual meals, paid insulation and identity, finite fire, willow processing, and actual canopy drying/expiry, and paid health recuperation/progress/relief/cancellation. The validation report lists the complete current scene selection; unrelated changes do not select every scene. Inspect each newly selected image, especially doorway alignment, roof visibility, life counters and overlapping event labels. Unchanged images may reuse authenticated review with matching dependencies and pixel hashes. These authored fixtures do not establish autonomous adoption. Forest regressions include conserved inventory identities, persistent world and mastery, important memory, invalid ex7 event aliases, stale action references, locally alterable seasonal growth and the complete current-conversation development/reuse chain. Formal forest runs retain the existing full archive, call, source and behavioral analysis requirements and an explicit round-200 technical checkpoint.
 
 Fresh [open-development](OPEN_DEVELOPMENT.md) adds isolated A/B/A-resume registry checks, physical probes, reciprocal knowledge exchange, conserved persistent processes, scoped extension installation and exact input transport round trips. Additional browser fixtures exercise local hazards and requested material trials, apparatus, water handling and extraction. Their captured development evidence is retained beside the execution plan and reviewed at each counted handoff; it is distinct from the registered historical scene set and from formal agent behavior. A valid budget-paused archive does not establish completion of its target horizon or bounded context growth.
+
+[Collective life](COLLECTIVE_LIFE.md) adds `isolated-collective-ash-members` and
+`isolated-collective-birch-member`: inspect group colors, all eighteen selectable
+members, local meeting markers, personal records and readable task/intent state.
+These are authored mechanism fixtures. Actual A/B archives receive their own
+selected replay checks and behavioral analysis; fixture success is not evidence
+of voluntary coordination or autonomous development.
+
+The collective generated-capability fixtures additionally cover paid food work,
+shared shelter use, bark extraction, drying apparatus, non-ingestive samples,
+conserved material aggregation, fractional preparation surfaces and complete
+private inventory pages. Inspect real quantity/progress, component provenance,
+modeled-versus-measured geometry, stop/release behavior and dated read results.
+Neither a fixture's preset mastery nor its output counts as formal behavior.
+
+### Pending archive capture
+
+Capture reconstructs the saved simulation before launching Chromium and reuses
+an authenticated exact-input `experiment-capture` receipt inside the browser
+check. This keeps CPU reconstruction outside the browser interaction deadline.
+The pending receipt cannot satisfy completed-archive acceptance: final manifest,
+images and browser evidence require the separate `experiment` receipt and full
+integrity checks. Changed input or invalid provenance recomputes validation; the
+browser timeout and all assertions remain unchanged.

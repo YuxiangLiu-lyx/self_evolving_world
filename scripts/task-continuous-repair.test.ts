@@ -2,9 +2,14 @@ import { resolveContinuousDevelopment } from '../apps/simulator/src/continuous-r
 import { worldContinuousInput } from '../apps/simulator/src/continuous-input.js';
 import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
-import { v7Clone } from '@self-evolving-world/world-core';
+import { v7Clone, v7Signature } from '@self-evolving-world/world-core';
 import type { V7Execution } from '../apps/simulator/src/continuous-run.js';
-import { assertContinuousTechnicalRepair } from './task-continuous-repair.js';
+import {
+  BARK_FEEDBACK_REPAIR,
+  assertContinuousTechnicalRepair,
+  abandonedCollectiveTransport,
+} from './task-continuous-repair.js';
+import { collectiveTokenBudget } from '../apps/simulator/src/collective-controller.js';
 
 it('permits only the retained unsettled computation pause and refuses ambiguous calls, completed targets and exhausted development budgets', () => {
   const state = JSON.parse(
@@ -129,4 +134,155 @@ it('keeps the actual round-123 browser-capture failure eligible only as an unset
   expect(() => {
     assertContinuousTechnicalRepair(settled);
   }).toThrow('Only a durable');
+});
+
+it('retains the terminated invocation as unknown and charged without replacing prior results or advancing time', () => {
+  const original = JSON.parse(
+    readFileSync(
+      'experiment/ex11/technical-pauses/round-1/execution.json',
+      'utf8',
+    ),
+  ) as V7Execution;
+  const { state, record } = abandonedCollectiveTransport(
+    original,
+    'pnpm experiment:continuous failed (143). Actual terminated-command fixture.',
+  );
+  expect(v7Signature(state.world)).toBe(v7Signature(original.world));
+  expect(state.attempts.slice(0, -1)).toEqual(original.attempts.slice(0, -1));
+  expect(state.attempts).toHaveLength(original.attempts.length);
+  expect(record.response).toBeNull();
+  expect(record.attempt.usage).toBeNull();
+  expect(record.attempt.elapsedMs).toBeNull();
+  expect(record.attempt.reservedTokens).toBe(
+    original.attempts.at(-1)?.reservedTokens,
+  );
+  expect(collectiveTokenBudget(state)?.used).toBe(
+    collectiveTokenBudget(original)?.used,
+  );
+  expect(() => {
+    assertContinuousTechnicalRepair(state);
+  }).not.toThrow();
+  expect(() =>
+    abandonedCollectiveTransport(
+      state,
+      'pnpm experiment:continuous failed (143)',
+    ),
+  ).toThrow();
+  expect(() =>
+    abandonedCollectiveTransport(original, 'An unverified operator claim.'),
+  ).toThrow();
+});
+
+it('charges the actual ex12 interrupted call and limits feedback recovery to its preserved empty technical boundary', () => {
+  const original = JSON.parse(
+    readFileSync(
+      'experiment/ex12/technical-pauses/round-56/execution.json',
+      'utf8',
+    ),
+  ) as V7Execution;
+  const { state, record } = abandonedCollectiveTransport(
+    original,
+    'pnpm experiment:continuous failed (143)',
+    true,
+  );
+  expect(state.reason).toBe(BARK_FEEDBACK_REPAIR);
+  expect(state.world).toEqual(original.world);
+  expect(state.attempts.slice(0, -1)).toEqual(original.attempts.slice(0, -1));
+  expect(record.response).toBeNull();
+  expect(record.attempt.usage).toBeNull();
+  expect(record.attempt.reservedTokens).toBe(61425);
+  expect(collectiveTokenBudget(state)?.used).toBe(
+    collectiveTokenBudget(original)?.used,
+  );
+  expect(() => {
+    assertContinuousTechnicalRepair(state);
+  }).not.toThrow();
+  for (const change of [
+    (s: V7Execution) => {
+      if (s.world.config.development)
+        s.world.config.development.scope = 'collective-ex11';
+    },
+    (s: V7Execution) => {
+      s.world.revisions.push('bark-feedback@1');
+    },
+    (s: V7Execution) => {
+      s.phase = 'window-complete';
+    },
+    (s: V7Execution) => {
+      if (s.attempts[0]) s.attempts[0].status = 'started';
+    },
+  ]) {
+    const invalid = v7Clone(original);
+    change(invalid);
+    expect(() =>
+      abandonedCollectiveTransport(
+        invalid,
+        'pnpm experiment:continuous failed (143)',
+        true,
+      ),
+    ).toThrow();
+  }
+  expect(() =>
+    abandonedCollectiveTransport(original, 'Unverified interruption', true),
+  ).toThrow();
+  const saved = v7Clone(state);
+  saved.phase = 'development';
+  saved.barrier = {
+    technicalReason: BARK_FEEDBACK_REPAIR,
+    id: 'isolated-feedback',
+    tick: state.world.tick,
+    actions: {},
+    requests: {},
+    reviews: [],
+    worldAttempts: 0,
+    errors: [],
+    input: worldContinuousInput(state.world, {}),
+    developmentAttempt: 'isolated-development',
+  };
+  saved.developments.push({
+    id: 'isolated-development',
+    tick: state.world.tick,
+    status: 'started',
+    startedAt: '2026-11-22T00:00:00.000Z',
+    finishedAt: null,
+    reason: null,
+    internalModelCalls: null,
+    inputTokens: null,
+    outputTokens: null,
+  });
+  const result = resolveContinuousDevelopment(
+    saved,
+    ['bark-feedback@1'],
+    {},
+    'Actual contract repair fixture',
+  );
+  expect(result.world.actors).toEqual(state.world.actors);
+  expect(result.world.stacks).toEqual(state.world.stacks);
+  expect(result.world.tick).toBe(56);
+  expect(result.attempts).toEqual(state.attempts);
+  expect(result.cursors).toEqual(state.cursors);
+  expect(result.barrier).toBeNull();
+  expect(result.registrations).toContain('bark-feedback@1');
+  expect(() =>
+    resolveContinuousDevelopment(saved, [], {}, 'Missing corrective package'),
+  ).toThrow();
+  expect(() =>
+    resolveContinuousDevelopment(
+      saved,
+      ['bark-feedback@1'],
+      { 'ash-1': 'bark-extraction' },
+      'Invented mastery',
+    ),
+  ).toThrow();
+  const invented = v7Clone(saved);
+  if (invented.barrier)
+    invented.barrier.actions['ash-1'] = { interface: 'wait', args: {} };
+  expect(() =>
+    resolveContinuousDevelopment(
+      invented,
+      ['bark-feedback@1'],
+      {},
+      'Invented actor action',
+    ),
+  ).toThrow();
 });

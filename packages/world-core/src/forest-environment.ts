@@ -1,3 +1,10 @@
+import { materialRefresh } from './material-lots.js';
+import { rootWater, rootAge } from './collective-root-physics.js';
+import {
+  leanPhysiology,
+  leanAfterPhysiology,
+} from './collective-shelter-exposure.js';
+import { collectiveFoodProfile } from './collective-food-profile.js';
 import {
   preservationAge,
   preservationExchange,
@@ -246,43 +253,61 @@ export function forestEnvironment(world: V7World): void {
       }
     }
   }
-  for (const stack of world.stacks) {
-    if (world.state.foodPreservation === 1) preservationExchange(world, stack);
-    const resource = world.resources.find((r) => r.id === stack.resource),
-      lifetime = resource?.properties?.decay ?? 0;
-    if (!lifetime) continue;
-    const owner = world.actors.find((a) => a.id === stack.owner),
-      position = preservationOnTray(stack)
-        ? stack.position
-        : (owner?.position ?? stack.position);
-    const temperature = forestClimate(world, position).temperature;
-    const preservation = world.config.experience
-      ? Math.min(
-          1,
-          ...world.objects
-            .filter((o) => v7Interior(position, o.spatial))
-            .map((o) => Math.max(0.1, Number(o.data.preservation ?? 1))),
-        )
-      : 1;
-    stack.decay =
-      (stack.decay ?? 0) +
-      preservationAge(
-        stack,
-        Math.max(0.15, (temperature + 4) / 24) * preservation,
-      );
-    if (stack.decay >= lifetime) {
-      forestEvent(
-        world,
-        'spoiled',
-        `${String(stack.quantity)} ${resource?.name ?? stack.resource} spoiled.`,
-        position,
-        stack.owner,
-        { quantity: stack.quantity, resource: stack.resource },
-        stack.id,
-      );
-      preservationReleaseSurface(world, stack);
-      stack.quantity = 0;
+  for (const item of world.stacks) {
+    for (const stack of item.componentLots ?? [item]) {
+      const originalLocation = { owner: stack.owner, position: stack.position };
+      if (item.componentLots) {
+        stack.owner = item.owner;
+        stack.position = item.position;
+      }
+      rootWater(world, stack);
+      if (world.state.foodPreservation === 1)
+        preservationExchange(world, stack);
+      const resource = collectiveFoodProfile(world, stack),
+        lifetime = resource?.properties?.decay ?? 0;
+      if (!lifetime) {
+        if (item.componentLots) Object.assign(stack, originalLocation);
+        continue;
+      }
+      const owner = world.actors.find((a) => a.id === stack.owner),
+        position = preservationOnTray(stack)
+          ? stack.position
+          : (owner?.position ?? stack.position);
+      const temperature = forestClimate(world, position).temperature;
+      const preservation = world.config.experience
+        ? Math.min(
+            1,
+            ...world.objects
+              .filter((o) => v7Interior(position, o.spatial))
+              .map((o) => Math.max(0.1, Number(o.data.preservation ?? 1))),
+          )
+        : 1;
+      stack.decay =
+        (stack.decay ?? 0) +
+        rootAge(
+          world,
+          stack,
+          preservationAge(
+            stack,
+            Math.max(0.15, (temperature + 4) / 24) * preservation,
+          ),
+        );
+      if (stack.decay >= lifetime) {
+        forestEvent(
+          world,
+          'spoiled',
+          `${String(stack.quantity)} ${resource?.name ?? stack.resource} spoiled.`,
+          position,
+          stack.owner,
+          { quantity: stack.quantity, resource: stack.resource },
+          stack.id,
+        );
+        preservationReleaseSurface(world, stack);
+        stack.quantity = 0;
+      }
+      if (item.componentLots) Object.assign(stack, originalLocation);
     }
+    materialRefresh(item);
   }
   world.stacks = world.stacks.filter((s) => s.quantity > 0);
   if (world.config.development) openAnimals(world);
@@ -311,7 +336,11 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
       : undefined;
   const exposure = shelterTemperature(
     before.temperature,
-    refugePhysiology(world, actor, climate.temperature),
+    leanPhysiology(
+      world,
+      actor,
+      refugePhysiology(world, actor, climate.temperature),
+    ),
     insulation,
     !!shelter,
   );
@@ -416,5 +445,6 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
         temperature: actor.vitals.temperature,
       },
     );
+  leanAfterPhysiology(world, actor);
 }
 import { insulationExposure } from './forest-insulation-exposure.js';

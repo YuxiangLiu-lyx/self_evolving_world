@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 import { git } from './delivery-git.js';
-import { digest, type TaskContext } from './task-context.js';
+import { digest, text, type TaskContext } from './task-context.js';
 import { completionErrors, hashFile, object, readJson } from './validation.js';
 import { REPOSITORY, type GithubRequest } from './publication.js';
 
@@ -13,6 +13,33 @@ export interface RemoteReview {
   bodyHash: string;
   kind: 'current-conversation-self-review';
   independent: false;
+}
+
+/** Lossless directory factoring keeps complete large-archive reviews readable. */
+export function reviewFileGroups(files: readonly string[]) {
+  const groups: Record<string, string[]> = {};
+  for (const path of files) {
+    const split = path.lastIndexOf('/') + 1,
+      directory = path.slice(0, split);
+    (groups[directory] ??= []).push(path.slice(split));
+  }
+  return groups;
+}
+export function reviewImageGroups(images: readonly Record<string, unknown>[]) {
+  const groups: Record<string, string[][]> = {};
+  for (const image of images) {
+    const path = text(image.path, 'screenshot path'),
+      split = path.lastIndexOf('/') + 1,
+      directory = path.slice(0, split);
+    (groups[directory] ??= []).push([
+      text(image.id, 'screenshot ID'),
+      path.slice(split),
+      text(image.sha256, 'screenshot hash'),
+      text(image.verdict, 'visual verdict'),
+      text(image.notes, 'visual judgment'),
+    ]);
+  }
+  return groups;
 }
 
 export function reviewBody(root: string, c: TaskContext): string {
@@ -54,15 +81,28 @@ export function reviewBody(root: string, c: TaskContext): string {
     `Source SHA-256: ${c.review.sourceHash}`,
     `Review SHA-256: ${c.review.evidenceHash}`,
     '### Complete changed-file coverage',
-    ...c.review.files.map((file) => `- ${file}`),
+    'Every original path is the directory key followed by one listed filename; the empty key denotes the repository root. No file is omitted.',
+    '```json',
+    `{\n${Object.entries(reviewFileGroups(c.review.files))
+      .map(
+        ([directory, files]) =>
+          `${JSON.stringify(directory)}:${JSON.stringify(files)}`,
+      )
+      .join(',\n')}\n}`,
+    '```',
     '### Actual recorded findings',
     '```json',
     JSON.stringify(findings, null, 2),
     '```',
     '### Screenshot judgments and provenance',
-    'Each record retains the actual judgment and original screenshot path/hash once; no evidence or finding is omitted.',
+    'Directory keys preserve the original path prefix. Each row is [scene ID, filename, SHA-256, verdict, actual judgment]. Concatenate the directory and filename for the exact original screenshot path. No evidence or finding is omitted.',
     '```json',
-    `[\n${images.map((entry) => JSON.stringify(entry)).join(',\n')}\n]`,
+    `{\n${Object.entries(reviewImageGroups(images))
+      .map(
+        ([directory, rows]) =>
+          `${JSON.stringify(directory)}:[\n${rows.map((row) => JSON.stringify(row)).join(',\n')}\n]`,
+      )
+      .join(',\n')}\n}`,
     '```',
     'Screenshot bytes and complete logs are retained in local validation evidence and the CI artifact; this review retains findings and content hashes. No independent reviewer or model service was invoked.',
   ].join('\n\n');

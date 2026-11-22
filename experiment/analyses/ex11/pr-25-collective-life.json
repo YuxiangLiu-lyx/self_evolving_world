@@ -1,0 +1,272 @@
+{
+  "version": 1,
+  "experiment": "ex11",
+  "taskId": "pr-25-collective-life",
+  "reviewer": "Current Codex conversation; source-bound self-review, not independent approval",
+  "artifacts": {
+    "experiment/ex11/manifest.json": "b4f2bfa3a9a5f7767f33259405756fdb9bd5b710d0539d766155aa1367ea8d74",
+    "experiment/ex11/browser.json": "256614da5f77266fdf07ecf879e9c29d4c41868a5ec11ce1b2f153fa649d65b0",
+    "experiment/ex11/calls/ordinary-1.json": "d2775566de0270f09ad75c490b9d5d2cc7055f18b41d379464d368755c84a245",
+    "experiment/ex11/calls/ordinary-10.json": "d7a8b77da7d119e62e846ea7107f79c89c711f9ddc1598e83cd3589318d33adc",
+    "experiment/ex11/calls/ordinary-12.json": "e2634cd5c6b098cdd922f6b7c57715b4c15b0b6ac7fca84fdd6d21552949d67c",
+    "experiment/ex11/calls/ordinary-13.json": "02ef7ee2e28bba74f9288cfccbc01f483d2c602481ba52a8ee23857a01763e67",
+    "experiment/ex11/calls/ordinary-14.json": "2bbcefe6d43f473e15c7216a06f157103277ed8c6f2bc4497f053fd96637a019",
+    "experiment/ex11/calls/ordinary-15.json": "9a3cab6b98d8f5fbd15c81a339e8526f51c11681269f2a4248761a73d0e5156d",
+    "experiment/ex11/calls/ordinary-2.json": "8c6637ab229fbf666c466c86f978611ad17901af5e039a1a341551b5817923dd",
+    "experiment/ex11/calls/ordinary-3.json": "beaa09edc7fd0d7af215b09a300c8e470f5865d6e4f5f8bef70f161565a62663",
+    "experiment/ex11/calls/ordinary-4.json": "5557089be6bb6bef7a329c2f7736129618e181c2f1a42263794ec141018f2ba7",
+    "experiment/ex11/calls/ordinary-5.json": "8923309f1507e970380124206078529e27623dfe69b93315d7cc21e47a45971a",
+    "experiment/ex11/calls/ordinary-6.json": "8c58bff9ecb8abe528489ce4e60152c3a5b50593c302506a52a5724cfb6e99aa",
+    "experiment/ex11/calls/ordinary-7.json": "87e18e83ab27080f2dc8f2a79308acebda1dc165f0a06e9213be75926b7eb5ec",
+    "experiment/ex11/calls/ordinary-9.json": "7e7ef5e10ad41ddd00d2de6f3d42ca426710fc5f9fe4543d42baadf5c8e4f1ab",
+    "experiment/ex11/calls/world-11.json": "66470c91c4d57cfd7611c120fe8a2428ff6310a2d3b070597b2decd5174e0de6",
+    "experiment/ex11/calls/world-16.json": "a183fb50e855a6edb8550ab8d31346fbcbf103fa80b36486c5542b0d93071efc",
+    "experiment/ex11/calls/world-17.json": "c82e282480c4feaea6f55b0946e10df78023d9bd36362486c463c69f5f25564f",
+    "experiment/ex11/calls/world-8.json": "fa7782d43cdd7a2030b2a4ebf40c0ed6828b20a22f713189a4d077bb001506c3",
+    "experiment/ex11/checkpoints/development-000001-4-1.json": "bae24152cb30fc4e98e93109968713ac7ff663f6ead75443aee6aa7e7574ed34",
+    "experiment/ex11/checkpoints/development-000001-4-2.json": "f46ac4b8807dfde3368840d068f38c338a28bff40fe05878816165689e0364da",
+    "experiment/ex11/checkpoints/development-000004-8-3.json": "74eb0ca0af74daba63bdacdbd060ae16acb4e520dd84db83fa03282cf9054d59",
+    "experiment/ex11/checkpoints/development-000007-14-4.json": "9728edfc2e7b5ce01200d9cc2aba0e8856726b09e7a1c2c28326e72eab571b34",
+    "experiment/ex11/checkpoints/paused-000007-14-3.json": "0af07d9d679615b3517c3d87afa7eb453538cc8ed22d4bd61ccb7e976a2e76f1",
+    "experiment/ex11/checkpoints/paused-000007-17-4.json": "f7b65c9caae135128ebb1f162c7491ea22dd941aca6e99914f8ebedf71b9c1a1",
+    "experiment/ex11/configuration.json": "bcca2772224b1a93f1aefbf741d8fd6b5b298aa8ccf0847971ab54dceaf73f63",
+    "experiment/ex11/development/development-1-validation.txt": "96dc1d390ff0ff906a77611789dc25cc45e90f099610916f3730521df12cce75",
+    "experiment/ex11/development/development-2-declaration.json": "879ff2d93e9fbfb353a459cbb0a51a95b6ddb77554eb641d10714c59b3e303d7",
+    "experiment/ex11/development/development-2-validation.txt": "35ba16f4d0baf931c96cf639a3c6dac7c0a93fb54a267722c6b4ef9a45ab4996",
+    "experiment/ex11/development/development-3-declaration.json": "d1349b0736eaf7f8f9c27302abea8d8d5362a8e725c05d0e73f08c9607ec4e88",
+    "experiment/ex11/development/development-3-validation.txt": "d066b1b03bc0e4c1edd994fe076c7c682283faeb13b9d75b479dcbc23a09f43a",
+    "experiment/ex11/development/development-4-declaration.json": "4edeae868a7d2150f5c97a16431ef8745e77a710281177369074ebb81b88afdb",
+    "experiment/ex11/development/development-4-validation.txt": "89a9df6a7d2f3229800e34672c46d55faab5d87a33d48407410f9163f9111f8f",
+    "experiment/ex11/execution.json": "f0801331244d29dbcde595cbf38e70f7604511e103dd827cdeefe7f4aa36cf66",
+    "experiment/ex11/final.png": "34c115c0fd82740549560a91a2a6dd6840e274accba42234a79ee85bc18a507c",
+    "experiment/ex11/initial.json": "69e63ce345953af48e0d0fd8a85aa462babde620eedac5b8a9d92adc5a9dfc6a",
+    "experiment/ex11/initial.png": "77935c1d6764cb3e1e64c8c7cef8d272ab1c1a52f3c44ddd053206ccac6405e4",
+    "experiment/ex11/midpoint.png": "37000a297cb33b4f04b7436a68cdf28db235e8e68a6d7fc3ed62367a34dea617",
+    "experiment/ex11/overview.png": "71e146e8f3a832cb6118558979d642a7ce281d3433ba7f03332912137c90e7a3",
+    "experiment/ex11/overview.svg": "2d1652c4b258b975feb04b94ef48ec39bc517a3a9cd525b016fe9dde6714ed40",
+    "experiment/ex11/preflight.json": "77f206f2076b7256be3707f484050523f15b56fccbeef55e484a2490dba04785",
+    "experiment/ex11/replay.json": "135298307fd5d02889151df49bb6ef4489ffd0cabb92de4996a03596356c43c5",
+    "experiment/ex11/replay/execution-000000-000001.json": "5c0a87d57f899cd9db3d9a3ebb3fb4675e254d80c81cca619cba8a88d04f2547",
+    "experiment/ex11/replay/execution-000000-000004.json": "9925ebb3da6bdadea820802e3927a7fcd3d024d651c311eb576a05b67f459a8a",
+    "experiment/ex11/replay/execution-000000-000007.json": "19ee23290ea0009cbbbd61da700ab3bebcae1c973c422e5f92f2ae3c7a5e4a24",
+    "experiment/ex11/report.md": "385fbd80b89eb25c0a15b90f0f29e9b2debd6942eefe21a507040cbeb2dd1b1d",
+    "experiment/ex11/results.json": "05bcf2319e5d09b1f7ba18a26b7006d247bff823692858356239adaf7e9ffe37",
+    "experiment/ex11/source-history.json": "46190b23cd3e1bd199a2c82bb2a51abe0af74e3331fcb9e16e23967857c23f93",
+    "experiment/ex11/sources/revision-1.json": "300e803fb00e0256851ddaa39d640069a8136d1d6bfa842a549035c0997f7774",
+    "experiment/ex11/sources/revision-2.json": "0cf9603adf3cd73eae84861cdf7db7dfd71899004d77f50e06f6c12afa83708c",
+    "experiment/ex11/sources/revision-3.json": "2b4d055beb35a2a8b893edf1acd7ede1df64cb57f308ae328085772866d9a4e4",
+    "experiment/ex11/sources/revision-4.json": "61c2e42cc87f2e9a0fe8f737f3aa31472fdc0dbadc4a44ae441ea6d4f87cb07d",
+    "experiment/ex11/technical-pauses/round-1/execution.json": "167b206e89e6b4bdcc744069e48e18c32ced0aa4c1e0625eecb14928aa8f5964",
+    "experiment/ex11/technical-pauses/round-1/manifest.json": "f88ee59f4d4d244e63874744c177f30c7a3bb86111fb0b52bc81ab7b7fc63a9a",
+    "experiment/ex11/technical-pauses/round-1/recovery.json": "022fb956b094a683bbe9f32fd36a21148712d7497694a01843bcc65ad1d1e6b9",
+    "experiment/ex11/technical-pauses/round-7/browser.json": "256614da5f77266fdf07ecf879e9c29d4c41868a5ec11ce1b2f153fa649d65b0",
+    "experiment/ex11/technical-pauses/round-7/execution.json": "1db473e8771cbeb0d1aacbeab098ba5ba3792e92b0d8b40977b059f5377ff30a",
+    "experiment/ex11/technical-pauses/round-7/final.png": "34c115c0fd82740549560a91a2a6dd6840e274accba42234a79ee85bc18a507c",
+    "experiment/ex11/technical-pauses/round-7/initial.png": "77935c1d6764cb3e1e64c8c7cef8d272ab1c1a52f3c44ddd053206ccac6405e4",
+    "experiment/ex11/technical-pauses/round-7/manifest.json": "eb2db6c83daac0fe130f75756e51a01cad768aeb3ef312e61810a88edea2787e",
+    "experiment/ex11/technical-pauses/round-7/midpoint.png": "37000a297cb33b4f04b7436a68cdf28db235e8e68a6d7fc3ed62367a34dea617",
+    "experiment/ex11/technical-pauses/round-7/overview.png": "71e146e8f3a832cb6118558979d642a7ce281d3433ba7f03332912137c90e7a3",
+    "experiment/ex11/technical-pauses/round-7/overview.svg": "2d1652c4b258b975feb04b94ef48ec39bc517a3a9cd525b016fe9dde6714ed40",
+    "experiment/ex11/technical-pauses/round-7/recovery.json": "41e37a8b85cc914d2cea70eb7963de5e066d56c93f0fa005263c9fed784824e8",
+    "experiment/ex11/technical-pauses/round-7/replay.json": "135298307fd5d02889151df49bb6ef4489ffd0cabb92de4996a03596356c43c5",
+    "experiment/ex11/technical-pauses/round-7/report.txt": "4269ac5110fb3e9d6efaf33a97cd251689b1c31efc9cb3c0fe7e90def047f157",
+    "experiment/ex11/technical-pauses/round-7/results.json": "1c8346b0e40664fd499c9f664e676e739e714dd87d82cccf5190d58826f6645e"
+  },
+  "summary": "A retained seven completed environment rounds out of the target 200. All eighteen members survived with full health and no lost life. Thirteen ordinary attempts (nine accepted) and four world attempts (two accepted) used 241731 known provider tokens; three attempts have unknown usage with 214036 conservative reserved tokens. All four short-arm development slots were consumed, including three technical/failed-validation interventions and one genuine capability implementation handoff. Two scoped capabilities were implemented, one member mastered preparation and completed one real food transformation; no sustained productivity or built facility was observed. The unfinished seven-request barrier and every failure are retained. This short, technically disrupted window cannot establish the intended short-arm architectural comparison.",
+  "agents": [
+    {
+      "id": "ash-1",
+      "observations": "Gathered and ate roots, with navigation and two recovery rounds. The controller selected catalogue discovery as a next goal.",
+      "assessment": "Only basic subsistence executed. A shared-controller assignment is not evidence of an independently chosen personal occupation.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/ash-1",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "ash-2",
+      "observations": "Gathered and ate roots, then recovered. The assigned goal concerned local food renewal.",
+      "assessment": "The physical action sequence matches every other Ash member through round 7. Distinct goal text did not yet produce a distinct outcome.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/ash-2",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "ash-3",
+      "observations": "Completed the same subsistence sequence as the other Ash members. Its food-preparation request is retained at the unfinished round-7 barrier.",
+      "assessment": "The pending request was never settled, approved or learned for this member. An equivalent A capability exists, but no successful review of this batch occurred.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/ash-3",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "ash-4",
+      "observations": "Completed the shared subsistence sequence. A weather-protection request is retained at the unfinished round-7 barrier.",
+      "assessment": "No personal mastery, material allocation or shelter construction occurred. Existing implementation elsewhere in A is not mastery for Ash 4.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/ash-4",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "ash-5",
+      "observations": "Completed subsistence and retained a pending request to assess or support renewable food plants.",
+      "assessment": "The renewal objective remains a request. No cultivation action or plant-care benefit was implemented for this pending batch.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/ash-5",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "ash-6",
+      "observations": "Completed subsistence and retained a pending request about assessing and preserving actual food reserves.",
+      "assessment": "No preservation mechanism or shelf-life improvement followed. The barrier and unknown review usage remain saved.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/ash-6",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "birch-1",
+      "observations": "Gathered food, navigated for three rounds and rested twice; it had not eaten by the boundary. Satiety was 73.7, health 100.",
+      "assessment": "Moving toward catalogue discovery is observable; acquiring a new capability or transmitting knowledge is not.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/birch-1",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "birch-2",
+      "observations": "Gathered food, navigated, rested and used one observation trial on the nearby branch source. A later plan proposed a paid material test.",
+      "assessment": "The observed source state is a fact. The proposed pressing test was not completed before the pending barrier, so material-performance discovery is unproven.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/birch-2",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "birch-3",
+      "observations": "Harvested, observed the root plant, ate and saved a project with dated stock/growth/moisture evidence. A cultivation request is pending at round 7.",
+      "assessment": "This is an evidence-bearing question and persistent project, but no tested replenishment hypothesis or cultivation benefit.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/birch-3",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "birch-4",
+      "observations": "Requested weather protection at round 5; world-11 reused the same A weather-lean-to function rather than developing a duplicate. Learning was still in progress at the boundary.",
+      "assessment": "Same-experiment functional reuse occurred. It did not grant instant mastery or create a facility.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/birch-4",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "birch-5",
+      "observations": "Harvested roots, corrected an ambiguous category reference, observed the owned lot and recorded rising decay. Its preservation project and request persist.",
+      "assessment": "The reference failure prompted another ordinary decision. Actual observations support the problem, but preservation remained unreviewed at the pending barrier.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/birch-5",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "birch-6",
+      "observations": "Gathered a reserve, navigated for three rounds and rested twice, aiming toward the nearby eastern edge.",
+      "assessment": "Short movement is observable; seven rounds cannot establish a persistent exploration role or subsequent shared benefit.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/birch-6",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "cedar-1",
+      "observations": "Gathered and ate roots, then spent four rounds navigating toward capability discovery.",
+      "assessment": "No catalogue consultation or skill learning had completed. Its remaining energy was 28.2, without injury or death.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/cedar-1",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "cedar-2",
+      "observations": "Requested practical preparation; world-8 approved a minimal paid physical transformation. It completed individual learning and one prepare-food execution at round 7, turning one real root into ten proportional hand-mashed portions.",
+      "assessment": "This is the complete request-review-development-learning-use chain. Nutrients and mass were conserved; no preservation, free nutrition, fixture output or skill-registration reward was granted. No portion was yet consumed and no sustained savings or cross-member benefit was demonstrated.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/cedar-2",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "cedar-3",
+      "observations": "Observed a branch source, gathered two branch units and retained a material-investigation project. A category-only trial reference was ambiguous; ordinary-15 selected an exact owned identity.",
+      "assessment": "The revised material trial and proposed shelter consultation remain behind the unfinished barrier. Gathering is real; successful testing and construction are not.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/cedar-3",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "cedar-4",
+      "observations": "Harvested, ate and observed the actual root plant, then saved its stock, growth and moisture in a food-replenishment project. It requested practical assessment or care at the pending barrier.",
+      "assessment": "A problem and grounded uncertainty exist. No later replenishment, care effectiveness or compound capability was observed.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/cedar-4",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "cedar-5",
+      "observations": "Requested a physically usable weather refuge. World-8 approved weather-lean-to; the scoped package was implemented, and the member was studying it.",
+      "assessment": "The formal record contains no completed shelter. Cross-person shelter use, wear, repair and dismantling are isolated fixture evidence only.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/cedar-5",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    },
+    {
+      "id": "cedar-6",
+      "observations": "Gathered, ate, recovered and navigated twice, with a plan for a small local survey.",
+      "assessment": "Actual movement differs from the preparation member, but durable division of labor, cooperation and discovery are not established.",
+      "evidence": [
+        "experiment/ex11/results.json#collective.short.members/cedar-6",
+        "experiment/ex11/execution.json#barrier",
+        "experiment/ex11/replay/execution-000000-000007.json#rounds"
+      ]
+    }
+  ],
+  "findings": {
+    "isolation": "A began with sixteen explicitly authored survival/interaction interfaces and safe root/berry knowledge, inheritSkills=false. New prepare-food and weather-lean-to packages are scoped only to collective-ex11. Historical implementations were not registered, retrieved or mastered. Generic escrow, references, ecology and geometry were reused as engine infrastructure; source history and declarations record that reuse. The physical baseline was separately calibrated without model calls; fixture routes and skills were excluded from formal inputs.",
+    "individuality": "The six Ash members executed identical subsistence prefixes despite different assigned goal text. Other groups selected short surveys, observations, preparation and weather-protection requests. These are choices of A shared controllers, not six private model deliberations per group. A uses neutral 0.5 tendencies and shared observed group information. There is no reported trust change, disagreement, accepted public proposal or true teaching event in the seven completed rounds.",
+    "behavior": "Of 126 settled member actions, 28 were waits, 28 navigation, 28 rest, 19 gathering, 14 eating, five observations/trials, three settled requests and one prepare-food operation. Seven additional requests at the pending round-7 barrier are not included as settled actions. World-8 approved two distinct functions; world-11 reused shelter for another member. Cedar 2 completed preparation with a persistent physical output; its planned consumption and report did not execute. Zero report/board/teaching events and zero completed shelters are observed. Five grounded project records exist, but their proposed outcomes are not benefits. Two ambiguous references caused replanning before action settlement, so the action-failure column alone undercounts execution friction.",
+    "causes": "Three initial provider responses exceeded the inherited reader limit; one stopped in-flight invocation has unknown outcome and was never resent. The bounded collective reader was repaired under two counted development attempts, one of which failed architecture validation. A later packet exceeded the unchanged context guard; the existing lossless encoder was activated for collective shapes under the final A development slot. At round 7, two world-review calls timed out and the next necessary handoff could not fit the frozen allocation. No agent was rescued and no resource, incentive or limit was retuned. These engineering costs truncate observation; they are not evidence that shared coordination prevents development.",
+    "limitations": "The target was 200 rounds, but only seven completed. No season transition, durable role specialization, meaningful lifetime survival, long-term savings, facility use, knowledge diffusion or intergroup interaction can be inferred. Eighteen survivors at full health primarily reflect the initial exploration margin and short duration. B begins after generic technical repairs, which confounds any numerical comparison with A. Known API tokens exclude three unknown invocations and all unmetered preparation/current-conversation development/review costs. The archival request validator was corrected to use retained source revisions; no historical request or reservation was rewritten. The observatory screenshot is a global human view, never proof that a model saw the global map."
+  },
+  "recommendations": [
+    {
+      "proposal": "In a separately authorized future campaign, test whether bounded attention and review overhead permit a longer stable observation before studying behavioral differences.",
+      "rationale": "The present A window was dominated by transport/context repairs and a review timeout; it cannot answer the intended social-development question.",
+      "verification": "Freeze a matched request-size and timeout fixture derived from these retained failures before new inference, then report both arms at matched actual horizons and all technical costs without copying recipes into ordinary context."
+    }
+  ]
+}

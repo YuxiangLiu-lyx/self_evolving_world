@@ -1,4 +1,9 @@
 import { OPEN_OBJECTIVE } from './open-analysis.js';
+import {
+  initialCollectiveWorld,
+  collectivePhysicalGenesis,
+  COLLECTIVE_OBJECTIVE,
+} from '../apps/simulator/src/collective-scenario.js';
 import { renewableAccessToken } from '../apps/simulator/src/chatgpt-renewal.js';
 import { prepareContinuousWindow } from './continuous-window.js';
 import { resolve } from 'node:path';
@@ -24,6 +29,7 @@ import {
   buildContinuousReplay,
   reconstructContinuousSegment,
   continuousArchivePaths,
+  continuousHash,
 } from './continuous-store.js';
 import type { V7ReplaySegment } from './continuous-store.js';
 import { continuousCheckpoint } from './continuous-files.js';
@@ -51,9 +57,43 @@ try {
     token: string | undefined;
   if (!id) {
     checkExperiments(root);
-    const preflight = {
-      baseline: openPreflight(),
+    const comparison =
+      context.intent.experiment.mode === 'continuous' &&
+      context.intent.experiment.comparison;
+    const arm = context.comparison?.stage === 'A' ? 'A' : 'B';
+    const genesis = comparison
+      ? initialCollectiveWorld('collective-preflight', arm)
+      : initialOpenWorld();
+    const physicalHash = comparison
+      ? continuousHash(collectivePhysicalGenesis(genesis))
+      : null;
+    let preflight: {
+      baseline: ReturnType<typeof openPreflight>;
+      physicalHash?: string;
+      reusedFrom?: string;
     };
+    if (comparison && arm === 'B' && context.comparison?.a) {
+      const prior = continuousRead<typeof preflight>(
+        resolve(root, 'experiment', context.comparison.a, 'preflight.json'),
+      );
+      const priorWorld = continuousRead<V7World>(
+        resolve(root, 'experiment', context.comparison.a, 'initial.json'),
+      );
+      if (
+        prior.physicalHash !== physicalHash ||
+        continuousHash(collectivePhysicalGenesis(priorWorld)) !==
+          physicalHash ||
+        prior.baseline.rounds !== 1600
+      )
+        throw new Error(
+          'The second arm must preserve the actually preflighted physical baseline.',
+        );
+      preflight = { ...prior, reusedFrom: context.comparison.a };
+    } else
+      preflight = {
+        baseline: openPreflight(1600, genesis),
+        ...(physicalHash ? { physicalHash } : {}),
+      };
     token = await renewableAccessToken();
     const model = await selectModel(token, 'gpt-6.1-sol');
     id = allocateExperiment(root);
@@ -68,13 +108,16 @@ try {
     state = newContinuousExecution(
       model,
       'chatgpt-plan',
-      initialOpenWorld(`open-${id}`),
+      comparison
+        ? initialCollectiveWorld(`collective-${id}`, arm)
+        : initialOpenWorld(`open-${id}`),
     );
+    if (comparison) state.windowTarget = 200;
     continuousAtomic(resolve(directory, 'manifest.json'), {
       format: 'self-evolving-world/experiment',
       version: 7,
       id,
-      objective: OPEN_OBJECTIVE,
+      objective: comparison ? COLLECTIVE_OBJECTIVE : OPEN_OBJECTIVE,
       schedule: 'continuous-v1',
       controller: 'chatgpt-plan',
       steps: 0,

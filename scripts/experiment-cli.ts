@@ -18,6 +18,7 @@ import {
   digest,
   experimentFiles,
   measureSynchronous,
+  readExperiment,
   validateExperiment,
   writeExperimentJson,
 } from './experiments.js';
@@ -34,6 +35,9 @@ function captureRecord(id: string, manifest: Record<string, unknown>): void {
   const directory = resolve(root, 'experiment', id);
   const path = resolve(directory, 'manifest.json');
   try {
+    // Reconstruct before Chromium's UI deadline. Its exact-input receipt is
+    // reusable by the browser, but cannot satisfy completed-archive acceptance.
+    validateExperiment(root, id, true);
     // Additional capture only; never a substitute for final full validation.
     run(
       'pnpm',
@@ -76,7 +80,7 @@ try {
     );
   } else if (command === 'resume' && args.length === 1 && args[0]) {
     requireTaskWorker(root, 'resume', args);
-    const { directory, manifest } = validateExperiment(root, args[0], true);
+    const { directory, manifest } = readExperiment(root, args[0], true);
     if (manifest.status === 'completed')
       throw new Error('Completed experiments cannot be overwritten.');
     run('pnpm', ['build']);

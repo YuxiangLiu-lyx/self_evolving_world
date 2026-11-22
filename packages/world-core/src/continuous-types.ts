@@ -1,3 +1,7 @@
+import type {
+  CollectiveMember,
+  CollectivePolicy,
+} from './collective-policy.js';
 /** Serializable contracts for continuous-v1. Historical protocols do not use these types. */
 export type V7Json =
   null | boolean | number | string | V7Json[] | { [key: string]: V7Json };
@@ -72,6 +76,8 @@ export interface V7Stack {
   origin: string;
   /** Canonical fixed-point accounting after food-assessment installation; quantity remains public resource units. */
   quantityTenths?: number;
+  /** Flat conserved original lots, present only after a scoped reviewed combination. */
+  componentLots?: V7Stack[];
   /** Owned material reserved by a real ongoing operation, still counted as carried mass. */
   reservedFor?: string;
   harvestedAt?: number;
@@ -169,6 +175,7 @@ export interface V7Knowledge {
   receivedFrom?: string;
 }
 export interface V7Actor {
+  collective?: CollectiveMember;
   id: string;
   name: string;
   position: V7Point;
@@ -366,6 +373,7 @@ export interface V7SatisfactionRule {
   repeatWindow?: { rounds: number; amount: number };
 }
 export interface V7Configuration {
+  collective?: CollectivePolicy;
   protocol: 'continuous-v1';
   seed: number;
   width: number;

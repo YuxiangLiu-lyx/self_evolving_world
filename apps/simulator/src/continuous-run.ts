@@ -1,4 +1,13 @@
 import { forestPlanArguments } from './forest-plan-arguments.js';
+import {
+  collectiveAttention,
+  collectiveDecisions,
+  collectiveLimit,
+  collectivePhaseUsed,
+  collectiveTokenBudget,
+  parseCollectiveDecision,
+  canContinueCollective,
+} from './collective-controller.js';
 import { continuousInputText } from './forest-input-encoding.js';
 import {
   V7_WINDOW,
@@ -18,11 +27,10 @@ import {
   v7Number,
   v7Install,
   V7ComputePause,
+  collectiveSettle,
 } from '@self-evolving-world/world-core';
 import type {
   V7World,
-  V7Project,
-  V7Cursor,
   V7Action,
   V7Review,
   V7Registry,
@@ -32,101 +40,31 @@ import {
   ordinaryContinuousInput,
   worldContinuousInput,
 } from './continuous-input.js';
+import { V7TransportError, continuousRequest } from './continuous-provider.js';
 import type {
-  OrdinaryContinuousInput,
-  WorldContinuousInput,
-} from './continuous-input.js';
-import { V7TransportError } from './continuous-provider.js';
-import type { V7Provider, V7ProviderResult } from './continuous-provider.js';
+  V7Provider,
+  V7ProviderResult,
+  ContinuousModelInput,
+} from './continuous-provider.js';
 
-export interface V7Attempt {
-  id: string;
-  role: 'ordinary' | 'world';
-  actor: string;
-  tick: number;
-  reason: string;
-  status: 'started' | 'accepted' | 'rejected' | 'failed';
-  startedAt: string;
-  elapsedMs: number | null;
-  contextBytes?: number;
-  contextCodeUnits?: number;
-  usage: V7ProviderResult['usage'];
-  error: string | null;
-}
-export interface V7CallRecord {
-  attempt: V7Attempt;
-  input: OrdinaryContinuousInput | WorldContinuousInput;
-  response: V7ProviderResult | null;
-  failureEvidence: string;
-}
-export interface V7DevelopmentAttempt {
-  id: string;
-  tick: number;
-  status: 'started' | 'accepted' | 'failed';
-  startedAt: string;
-  finishedAt: string | null;
-  reason: string | null;
-  internalModelCalls: null;
-  inputTokens: null;
-  outputTokens: null;
-}
-export interface V7Barrier {
-  technicalReason?: string;
-  id: string;
-  tick: number;
-  actions: Record<string, V7Action>;
-  requests: Record<string, V7Action>;
-  reviews: V7Review[];
-  worldAttempts: number;
-  errors: string[];
-  input: WorldContinuousInput;
-  developmentAttempt: string | null;
-}
-export interface V7Execution {
-  version: 7;
-  controller: 'chatgpt-plan' | 'isolated-fixture';
-  model: string;
-  world: V7World;
-  cursors: Record<string, V7Cursor>;
-  attempts: V7Attempt[];
-  developments: V7DevelopmentAttempt[];
-  phase: 'running' | 'development' | 'paused' | 'window-complete';
-  reason: string | null;
-  windowTarget: number;
-  barrier: V7Barrier | null;
-  pendingCall: {
-    id: string;
-    input: OrdinaryContinuousInput | WorldContinuousInput;
-  } | null;
-  registrations: string[];
-  stages: number[];
-}
-export interface V7RoundRecord {
-  tick: number;
-  before: string;
-  after: string;
-  actions: Record<string, V7Action>;
-  reviews: V7Review[];
-  registrations: string[];
-  memory: Record<
-    string,
-    {
-      notes: string[];
-      preferences: string[];
-      intention?: string;
-      projects?: V7Project[];
-    }
-  >;
-  events: V7World['events'];
-  tasks: Record<string, V7Cursor>;
-}
-export interface V7Sink {
-  save(state: V7Execution): Promise<void>;
-  call(record: V7CallRecord): Promise<void>;
-  findCall(id: string): Promise<V7CallRecord | null>;
-  round(record: V7RoundRecord, state: V7Execution): Promise<void>;
-  checkpoint(state: V7Execution, reason: string): Promise<void>;
-}
+export type {
+  V7Attempt,
+  V7CallRecord,
+  V7DevelopmentAttempt,
+  V7Barrier,
+  V7Execution,
+  V7RoundRecord,
+  V7Sink,
+} from './continuous-run-types.js';
+import type {
+  V7Attempt,
+  V7CallRecord,
+  V7DevelopmentAttempt,
+  V7Barrier,
+  V7Execution,
+  V7RoundRecord,
+  V7Sink,
+} from './continuous-run-types.js';
 export function newContinuousExecution(
   model: string,
   controller: V7Execution['controller'] = 'chatgpt-plan',
@@ -243,6 +181,35 @@ function acceptCall(state: V7Execution, record: V7CallRecord): void {
     );
   state.attempts[index] = record.attempt;
   state.pendingCall = null;
+  if ('collective' in record.input) {
+    const attention = collectiveAttention(state);
+    for (const id of record.input.collective.eligible)
+      attention.lastDecision[id] = state.world.tick;
+    if (record.attempt.status === 'accepted' && record.response) {
+      const decision = parseCollectiveDecision(
+        record.response.text,
+        record.input,
+        (text) => parsePlan(text, state),
+      );
+      Object.assign(attention.intents, decision.intents);
+      for (const [id, plan] of Object.entries(decision.plans)) {
+        state.cursors[id] = v7Cursor(plan, state.world.tick);
+        attention.lastDecision[id] = state.world.tick;
+        attention.needsSince = Object.fromEntries(
+          Object.entries(attention.needsSince).filter(([key]) => key !== id),
+        );
+      }
+      if (decision.coordination) attention.pending.push(decision.coordination);
+    }
+    if (record.input.collective.mode === 'coordination') {
+      attention.lastPublicAttempt[record.input.collective.group] =
+        state.world.tick;
+      if (record.attempt.status === 'accepted')
+        attention.lastCoordination[record.input.collective.group] =
+          state.world.tick;
+    }
+    return;
+  }
   if (record.attempt.role === 'ordinary') {
     if (record.attempt.status === 'accepted' && record.response)
       state.cursors[record.attempt.actor] = v7Cursor(
@@ -291,22 +258,43 @@ async function invoke(
   state: V7Execution,
   role: 'ordinary' | 'world',
   actor: string,
-  input: OrdinaryContinuousInput | WorldContinuousInput,
+  input: ContinuousModelInput,
   reason: string,
   provider: V7Provider,
   sink: V7Sink,
 ): Promise<void> {
-  const used = state.attempts.filter((a) => a.role === role).length;
-  if (used >= state.world.config.budgets[role]) {
+  const used = collectivePhaseUsed(state, role);
+  if (used >= collectiveLimit(state, role)) {
     state.phase = 'paused';
     state.reason = `${role} attempted-call budget exhausted.`;
     await sink.save(state);
     await sink.checkpoint(state, state.reason);
     return;
   }
+  const tokenBudget = collectiveTokenBudget(state);
+  // Conservative reservation includes the complete serialized request and bounded output,
+  // with room for protocol framing. Unknown usage retains its reservation rather than zero.
+  const reservation = tokenBudget
+    ? new TextEncoder().encode(
+        JSON.stringify(continuousRequest(state.model, role, input)),
+      ).length +
+      (state.world.config.collective?.tokens.output ?? 0) +
+      4096
+    : 0;
+  if (tokenBudget && tokenBudget.used + reservation > tokenBudget.limit) {
+    state.phase = 'paused';
+    state.reason =
+      'Phase token budget cannot reserve the next complete attempt; world paused.';
+    await sink.save(state);
+    await sink.checkpoint(state, state.reason);
+    return;
+  }
   if (
     continuousInputText(input).length * 2 >
-    state.world.config.computation.inputBytes
+      state.world.config.computation.inputBytes ||
+    (state.world.config.collective &&
+      continuousInputText(input).length >
+        state.world.config.collective.contextCharacters)
   ) {
     state.phase = 'paused';
     state.reason =
@@ -330,10 +318,14 @@ async function invoke(
           contextCodeUnits: continuousInputText(input).length,
         }
       : {}),
+    ...(tokenBudget ? { reservedTokens: reservation } : {}),
     elapsedMs: null,
     usage: null,
     error: null,
   };
+  if ('collective' in input)
+    collectiveAttention(state).lastSlot[input.collective.group] =
+      state.world.tick;
   state.attempts.push(v7Clone(attempt));
   state.pendingCall = { id: attempt.id, input };
   await sink.save(state);
@@ -343,7 +335,30 @@ async function invoke(
   try {
     response = await provider(role, input);
     attempt.usage = response.usage;
-    if (role === 'ordinary') {
+    if (
+      tokenBudget &&
+      response.usage &&
+      ([response.usage.inputTokens, response.usage.outputTokens].some(
+        (n) => !Number.isSafeInteger(n) || n < 0,
+      ) ||
+        response.usage.inputTokens + response.usage.outputTokens >
+          reservation ||
+        response.usage.outputTokens >
+          (state.world.config.collective?.tokens.output ?? 0))
+    )
+      throw new V7ComputePause(
+        'Provider usage violated the frozen reservation or output limit; retained for audit without advancing the world.',
+      );
+    if ('collective' in input) {
+      const decision = parseCollectiveDecision(response.text, input, (text) =>
+        parsePlan(text, state),
+      );
+      for (const [id, plan] of Object.entries(decision.plans))
+        if (!v7TaskAction(state.world, id, v7Cursor(plan, state.world.tick)))
+          throw new Error(
+            'A selected member plan has no current executable action.',
+          );
+    } else if (role === 'ordinary') {
       const plan = parsePlan(response.text, state),
         cursor = v7Cursor(plan, state.world.tick);
       if (!v7TaskAction(state.world, actor, cursor))
@@ -392,7 +407,10 @@ export async function issueContinuousDevelopment(
     state.phase = 'development';
     return;
   }
-  if (state.developments.length >= state.world.config.budgets.development) {
+  if (
+    collectivePhaseUsed(state, 'development') >=
+    collectiveLimit(state, 'development')
+  ) {
     state.phase = 'paused';
     state.reason = 'Conversation development-handoff budget exhausted.';
     await sink.save(state);
@@ -447,45 +465,78 @@ export async function continueContinuousExecution(
     }
     try {
       if (!state.barrier) {
-        for (const actor of state.world.actors.filter(
-          (a) => a.vitals.health > 0,
-        )) {
-          if (actor.learning) continue;
-          let cursor = state.cursors[actor.id];
-          if (!cursor || !v7TaskAction(state.world, actor.id, cursor)) {
-            const reason =
-              cursor?.reason ??
-              'Initial decision for this persistent identity.';
+        if (state.world.config.collective) {
+          const decisions = collectiveDecisions(state);
+          // All packets are constructed from one round-start world before any response.
+          for (const decision of decisions) {
             await invoke(
               state,
               'ordinary',
-              actor.id,
-              ordinaryContinuousInput(
-                state.world,
-                actor.id,
-                cursor,
-                state.world.config.budgets.ordinary -
-                  state.attempts.filter((a) => a.role === 'ordinary').length,
-              ),
-              reason,
+              decision.actor,
+              decision.input,
+              decision.reason,
               provider,
               sink,
             );
             if (!isRunning(state)) return state;
-            cursor = state.cursors[actor.id];
           }
-          if (!cursor) throw new Error('Missing persisted actor task.');
-        }
+        } else
+          for (const actor of state.world.actors.filter(
+            (a) => a.vitals.health > 0,
+          )) {
+            if (actor.learning) continue;
+            let cursor = state.cursors[actor.id];
+            if (!cursor || !v7TaskAction(state.world, actor.id, cursor)) {
+              const reason =
+                cursor?.reason ??
+                'Initial decision for this persistent identity.';
+              await invoke(
+                state,
+                'ordinary',
+                actor.id,
+                ordinaryContinuousInput(
+                  state.world,
+                  actor.id,
+                  cursor,
+                  state.world.config.budgets.ordinary -
+                    state.attempts.filter((a) => a.role === 'ordinary').length,
+                ),
+                reason,
+                provider,
+                sink,
+              );
+              if (!isRunning(state)) return state;
+              cursor = state.cursors[actor.id];
+            }
+            if (!cursor) throw new Error('Missing persisted actor task.');
+          }
         const actions: Record<string, V7Action> = {};
         for (const actor of state.world.actors.filter(
           (a) => a.vitals.health > 0,
         )) {
           const cursor = state.cursors[actor.id];
-          const action = actor.learning
+          let action = actor.learning
             ? { interface: 'wait', args: {} }
             : cursor
               ? v7TaskAction(state.world, actor.id, cursor)
               : null;
+          if (!action && state.world.config.collective) {
+            const attention = collectiveAttention(state);
+            const waiting =
+              state.world.tick -
+              (attention.needsSince[actor.id] ?? state.world.tick);
+            if (waiting >= state.world.config.collective.maxDecisionWait) {
+              state.phase = 'paused';
+              state.reason =
+                'Maximum member decision wait exceeded; world paused for diagnosis.';
+              await sink.save(state);
+              await sink.checkpoint(state, state.reason);
+              return state;
+            }
+            attention.queuedRounds[actor.id] =
+              (attention.queuedRounds[actor.id] ?? 0) + 1;
+            action = { interface: 'wait', args: {} };
+          }
           if (!action)
             throw new Error('Missing executable simultaneous intent.');
           actions[actor.id] = action;
@@ -544,6 +595,9 @@ export async function continueContinuousExecution(
           memory[actor.id] = {
             notes: plan.notes,
             preferences: plan.preferences,
+            ...(state.attention?.intents[actor.id]
+              ? { collectiveIntent: v7Clone(state.attention.intents[actor.id]) }
+              : {}),
             ...(input.config.forest ? { intention: plan.intention } : {}),
             ...(input.config.development &&
             state.cursors[actor.id]?.startedAt === input.tick &&
@@ -552,6 +606,9 @@ export async function continueContinuousExecution(
               : {}),
           };
           const projects = memory[actor.id]?.projects;
+          const intent = memory[actor.id]?.collectiveIntent;
+          if (intent && actor.collective)
+            actor.collective.intent = v7Clone(intent);
           if (projects) openSaveProjects(actor, projects, input.tick);
           actor.memory.notes = plan.notes;
           actor.memory.preferences = plan.preferences;
@@ -573,19 +630,27 @@ export async function continueContinuousExecution(
         return state;
       }
       v7FinishTasks(before, result, state.cursors);
-      state.world = result.world;
+      const coordination = state.attention?.pending ?? [];
+      state.world = collectiveSettle(result.world, coordination);
       const record: V7RoundRecord = {
         tick: result.world.tick,
         before: v7Signature(before),
-        after: v7Signature(result.world),
+        after: v7Signature(state.world),
         actions: barrier.actions,
         reviews: barrier.reviews,
         registrations: [...state.registrations],
         memory,
-        events: result.world.events,
+        events: state.world.events,
+        ...(state.world.config.collective
+          ? { coordination: v7Clone(coordination) }
+          : {}),
         tasks: v7Clone(state.cursors),
       };
       state.barrier = null;
+      if (state.attention) {
+        state.attention.pending = [];
+        state.attention.intents = {};
+      }
       state.registrations = [];
       if (state.world.tick % V7_STAGE_INTERVAL === 0)
         state.stages.push(state.world.tick);
@@ -638,6 +703,8 @@ export function resolveContinuousDevelopment(
         [
           'Simulation computation budget exhausted; checkpoint the entire world.',
           'Observation input exceeds computational context protection; no hidden truncation or inference.',
+          'A bounded collective response reader failed; the stopped transport attempt remains charged and will not be repeated.',
+          'Reviewed bark feedback and personal inspection retention are incomplete; repair the preserved implementation without changing experimental policy.',
         ].includes(barrier.technicalReason ?? '') &&
         Object.keys(barrier.requests).length === 0
       ))
@@ -672,7 +739,28 @@ export function resolveContinuousDevelopment(
   });
   if (
     barrier.technicalReason ===
-    'Observation input exceeds computational context protection; no hidden truncation or inference.'
+    'Reviewed bark feedback and personal inspection retention are incomplete; repair the preserved implementation without changing experimental policy.'
+  ) {
+    if (
+      Object.keys(barrier.actions).length ||
+      barrier.reviews.length ||
+      Object.keys(barrier.requests).length ||
+      Object.keys(assignments).length ||
+      packages.length !== 1 ||
+      packages[0] !== 'bark-feedback@1' ||
+      saved.world.config.development?.scope !== 'collective-ex12' ||
+      !saved.world.revisions.includes('bark-extraction@1')
+    )
+      throw new Error(
+        'Reviewed feedback repair may only install its exact corrective package, without actor actions or assignments.',
+      );
+    state.barrier = null;
+  }
+  if (
+    [
+      'Observation input exceeds computational context protection; no hidden truncation or inference.',
+      'A bounded collective response reader failed; the stopped transport attempt remains charged and will not be repeated.',
+    ].includes(barrier.technicalReason ?? '')
   ) {
     if (
       Object.keys(barrier.actions).length ||
@@ -699,7 +787,7 @@ export function extendContinuousWindow(
   target: number,
 ): V7Execution {
   if (
-    saved.phase !== 'window-complete' ||
+    (saved.phase !== 'window-complete' && !canContinueCollective(saved)) ||
     !Number.isSafeInteger(target) ||
     target <= saved.windowTarget
   )
@@ -707,6 +795,17 @@ export function extendContinuousWindow(
       'Only a completed observation window can extend to a later explicit target.',
     );
   const state = v7Clone(saved);
+  if (saved.world.config.collective) {
+    if (!canContinueCollective(saved) || target !== 1600)
+      throw new Error(
+        'Only the frozen B continuation can extend this collective checkpoint.',
+      );
+    state.collectiveContinuation = {
+      round: saved.world.tick,
+      attempts: saved.attempts.length,
+      developments: saved.developments.length,
+    };
+  }
   state.windowTarget = target;
   state.phase = 'running';
   state.reason = null;

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { findRemoteReview } from './task-review.js';
+import {
+  findRemoteReview,
+  reviewFileGroups,
+  reviewImageGroups,
+} from './task-review.js';
 import type { GithubRequest } from './publication.js';
 
 const body = 'Actual version-bound current-conversation self-review fixture';
@@ -14,6 +18,49 @@ const record = {
   body,
 };
 describe('remote self-review provenance', () => {
+  it('losslessly factors complete file coverage and image judgments without truncation', () => {
+    const files = [
+      'README.md',
+      ...Array.from(
+        { length: 1000 },
+        (_, i) => `experiment/ex12/calls/ordinary-${String(i)}.json`,
+      ),
+      'docs/a b.md',
+    ];
+    const grouped = JSON.parse(
+      JSON.stringify(reviewFileGroups(files)),
+    ) as Record<string, string[]>;
+    expect(
+      Object.entries(grouped).flatMap(([directory, names]) =>
+        names.map((name) => directory + name),
+      ),
+    ).toEqual(files);
+    const images = Array.from({ length: 200 }, (_, i) => ({
+      id: `scene-${String(i)}`,
+      path: `validation-results/evidence/current/scene-${String(i)}.png`,
+      sha256: 'a'.repeat(64),
+      verdict: 'pass',
+      notes: 'Actual observed progress remains distinct from completion.',
+    }));
+    const packed = JSON.parse(
+      JSON.stringify(reviewImageGroups(images)),
+    ) as Record<string, string[][]>;
+    expect(
+      Object.entries(packed).flatMap(([directory, rows]) =>
+        rows.map(([id, file, sha256, verdict, notes]) => ({
+          id,
+          path: directory + String(file),
+          sha256,
+          verdict,
+          notes,
+        })),
+      ),
+    ).toEqual(images);
+    expect(
+      JSON.stringify(grouped).length + JSON.stringify(packed).length,
+    ).toBeLessThan(65000);
+    expect(() => reviewImageGroups([{ ...images[0], notes: '' }])).toThrow();
+  });
   it('verifies actual head/body/comment provenance using read-only GitHub requests', async () => {
     const calls: string[] = [];
     const request: GithubRequest = (path, method) => {

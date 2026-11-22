@@ -13,8 +13,12 @@ import type { V7Action } from '@self-evolving-world/world-core';
 import { initialOpenWorld } from '../apps/simulator/src/open-scenario.js';
 
 /** Isolated feasibility oracle. This file and its policy are never sent to the ordinary model. */
-export function openPreflight(rounds = 1600) {
-  let world = initialOpenWorld();
+export function openPreflight(
+  rounds = 1600,
+  genesis = initialOpenWorld(),
+  onStage?: (tick: number) => void,
+) {
+  let world = genesis;
   const registry = continuousRegistry(world),
     initial = world;
   const actions: Record<string, number> = {},
@@ -26,10 +30,11 @@ export function openPreflight(rounds = 1600) {
       (r) => r.id === id && r.nutrition > 0 && r.toxicity === 0,
     );
   const blocked = new Map<string, Set<string>>();
+  let optionalActivityRounds = 0;
   for (let tick = 0; tick < rounds; tick++) {
     // This omniscient feasibility oracle is deliberately separate from private formal observations.
     world = v7Clone(world);
-    for (const a of world.actors) {
+    for (const a of world.config.collective ? [] : world.actors) {
       a.memory.objects = world.objects.map((object) => ({
         object: v7Clone(object),
         seenAt: world.tick,
@@ -42,7 +47,14 @@ export function openPreflight(rounds = 1600) {
       );
     }
     const intents: Record<string, V7Action> = {};
-    for (const actor of world.actors) {
+    const reservedSources = new Set<string>();
+    const movingGroups = new Set<string>();
+    for (const actor of world.config.collective
+      ? [...world.actors].sort(
+          (a, b) =>
+            a.vitals.satiety - b.vitals.satiety || a.id.localeCompare(b.id),
+        )
+      : world.actors) {
       const o = v7Observe(world, actor.id);
       const owned = world.stacks.find(
         (s) => s.owner === actor.id && !s.reservedFor && food(s.resource),
@@ -58,13 +70,15 @@ export function openPreflight(rounds = 1600) {
             food(x.data.resource) &&
             Number(x.data.stock) > 0 &&
             !blocked.get(actor.id)?.has(x.id) &&
-            initial.actors
-              .slice()
-              .sort(
-                (a, b) =>
-                  v7Distance(a.position, x.spatial) -
-                  v7Distance(b.position, x.spatial),
-              )[0]?.id === actor.id,
+            !reservedSources.has(x.id) &&
+            (world.config.collective ||
+              initial.actors
+                .slice()
+                .sort(
+                  (a, b) =>
+                    v7Distance(a.position, x.spatial) -
+                    v7Distance(b.position, x.spatial),
+                )[0]?.id === actor.id),
         )
         .sort(
           (a, b) =>
@@ -80,13 +94,15 @@ export function openPreflight(rounds = 1600) {
               food(x.data.resource) &&
               Number(x.data.stock) > 0 &&
               !blocked.get(actor.id)?.has(x.id) &&
-              initial.actors
-                .slice()
-                .sort(
-                  (a, b) =>
-                    v7Distance(a.position, x.spatial) -
-                    v7Distance(b.position, x.spatial),
-                )[0]?.id === actor.id,
+              !reservedSources.has(x.id) &&
+              (world.config.collective ||
+                initial.actors
+                  .slice()
+                  .sort(
+                    (a, b) =>
+                      v7Distance(a.position, x.spatial) -
+                      v7Distance(b.position, x.spatial),
+                  )[0]?.id === actor.id),
           )
           .sort(
             (a, b) =>
@@ -102,12 +118,18 @@ export function openPreflight(rounds = 1600) {
       else if (actor.vitals.energy < 8)
         intents[actor.id] = { interface: 'rest', args: {} };
       else if (actor.vitals.satiety < 78 && visibleSource) {
+        if (world.config.collective) reservedSources.add(visibleSource.id);
         if (v7Reach(actor, visibleSource.spatial))
           intents[actor.id] = {
             interface: 'gather',
             args: { target: visibleSource.id, quantity: 1 },
           };
         else {
+          const group = actor.collective?.group;
+          if (group && movingGroups.has(group)) {
+            intents[actor.id] = { interface: 'wait', args: {} };
+            continue;
+          }
           // The isolated oracle may search real interaction points; it still pays continuous movement and collision costs.
           const center = visibleSource.spatial;
           const points = [
@@ -126,23 +148,27 @@ export function openPreflight(rounds = 1600) {
                 v7Work(world.config.computation.workPerRound),
               ).path.length > 0,
           );
-          if (point)
+          if (point) {
+            if (group) movingGroups.add(group);
             intents[actor.id] = {
               interface: 'navigate',
               args: { target: '', x: point.x, y: point.y },
             };
-          else {
+          } else {
             const set = blocked.get(actor.id) ?? new Set<string>();
             set.add(visibleSource.id);
             blocked.set(actor.id, set);
             intents[actor.id] = { interface: 'wait', args: {} };
           }
         }
-      } else
+      } else {
+        if (actor.vitals.satiety >= 78 && actor.vitals.energy >= 35)
+          optionalActivityRounds++;
         intents[actor.id] = {
           interface: actor.vitals.energy < 35 ? 'rest' : 'wait',
           args: {},
         };
+      }
     }
     const result = v7Step(world, intents, registry);
     if (result.paused) throw new Error(result.paused);
@@ -177,9 +203,12 @@ export function openPreflight(rounds = 1600) {
         );
     }
     if (tick % 80 === 79) blocked.clear();
+    if (world.tick % 200 === 0) onStage?.(world.tick);
   }
-  const spare = actions.wait ?? 0;
-  if (spare < rounds * 3 * 0.15)
+  const spare = world.config.collective
+    ? optionalActivityRounds
+    : (actions.wait ?? 0);
+  if (spare < rounds * initial.actors.length * 0.15)
     throw new Error('Baseline leaves less than 15% optional activity time.');
   return {
     version: 1,
@@ -206,7 +235,7 @@ export function openPreflight(rounds = 1600) {
     actions,
     failures,
     optionalRounds: spare,
-    optionalShare: spare / (rounds * 3),
+    optionalShare: spare / (rounds * initial.actors.length),
     final: world.actors.map((a) => ({
       id: a.id,
       vitals: a.vitals,

@@ -1,3 +1,10 @@
+import { appendToolAssessment } from './collective-tool-assessment-view.js';
+import { appendTrayClearance } from './collective-tray-clearance-view.js';
+import { appendSmallDrying } from './collective-small-drying-view.js';
+import { appendSurfaceDiagnostics } from './collective-surface-diagnostics-view.js';
+import { appendInventoryInspection } from './collective-inventory-view.js';
+import { appendMaterialLots } from './collective-material-view.js';
+import { collectiveMemberText } from './collective-view.js';
 import { renderExtraction } from './open-extraction-view.js';
 import { forestClimate } from '@self-evolving-world/world-core';
 import { drawForestCanvas } from './forest-canvas.js';
@@ -23,6 +30,11 @@ function el(id: string): HTMLElement {
   if (!e) throw new Error(`Missing observatory element: ${id}`);
   return e;
 }
+const collectivePanel = document.createElement('pre');
+collectivePanel.id = 'collective-member';
+collectivePanel.className = 'object-state';
+collectivePanel.hidden = true;
+el('learning').after(collectivePanel);
 const trialPanel = document.createElement('div');
 trialPanel.id = 'trial-diagnostic';
 el('object-state').before(trialPanel);
@@ -147,6 +159,11 @@ function render(): void {
   select('actor').value = actor;
   if (self) {
     el('actor-name').textContent = self.name;
+    collectivePanel.hidden = !self.collective;
+    collectivePanel.textContent = current.continuous
+      ? collectiveMemberText(self, current.continuous, privateView)
+      : '';
+
     el('coordinates').textContent =
       `Position ${self.position.x.toFixed(3)} · ${self.position.y.toFixed(3)}${self.vitals.health <= 0 ? ' · Deceased' : ''}${self.life ? ` · Lives ${String(self.life.total - self.life.deaths)} / ${String(self.life.total)}` : ''}`;
     el('vitals').innerHTML = [
@@ -184,6 +201,21 @@ function render(): void {
     el('carried').textContent = inventory.length
       ? inventory.join(' · ')
       : 'Nothing carried';
+    if (current.continuous)
+      appendMaterialLots(
+        el('carried'),
+        current.continuous.stacks.filter((s) => s.owner === actor),
+      );
+    if (current.continuous) {
+      const member = current.continuous.actors.find((a) => a.id === actor);
+      if (member) {
+        appendInventoryInspection(el('carried'), current.continuous, member);
+        appendSurfaceDiagnostics(el('carried'), member);
+        appendTrayClearance(el('carried'), member);
+        appendToolAssessment(el('carried'), member);
+        appendSmallDrying(el('carried'), current.continuous, member);
+      }
+    }
     el('projects').innerHTML = Object.values(self.memory.projects ?? {})
       .map(
         (p) =>

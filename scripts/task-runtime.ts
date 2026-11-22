@@ -1,3 +1,5 @@
+import { prepareContinuousWindow } from './continuous-window.js';
+import { canContinueCollective } from '../apps/simulator/src/collective-controller.js';
 import {
   continuousCheckpoint,
   submitContinuousDevelopment,
@@ -161,6 +163,54 @@ export class LocalTaskEffects implements TaskEffects {
     };
   }
   async experiment(
+    c: TaskContext,
+    save: () => void,
+  ): Promise<
+    undefined | { experiment: string; barrier: unknown; schema: string }
+  > {
+    const intent = c.intent.experiment;
+    if (intent.mode === 'none' || !intent.comparison)
+      return this.singleExperiment(c, save);
+    c.comparison ??= { stage: 'A' };
+    save();
+    while (c.comparison.stage !== 'complete') {
+      const handoff = await this.singleExperiment(c, save);
+      if (handoff || c.experiment?.phase !== 'recorded') return handoff;
+      const id = text(c.experiment.id, 'comparison experiment');
+      const observed = continuousCheckpoint(this.root, id);
+      if (
+        observed.phase === 'paused' &&
+        ![
+          'ordinary attempted-call budget exhausted.',
+          'world attempted-call budget exhausted.',
+          'Conversation development-handoff budget exhausted.',
+          'Phase token budget cannot reserve the next complete attempt; world paused.',
+        ].includes(observed.reason ?? '')
+      )
+        throw new Error(
+          `Collective arm ${id} has an unresolved technical pause; retain this arm and use pnpm task -- repair ${c.intent.id} before advancing the comparison.`,
+        );
+      if (c.comparison.stage === 'A') {
+        c.comparison.a = id;
+        c.comparison.stage = 'B-short';
+        delete c.experiment;
+      } else if (c.comparison.stage === 'B-short') {
+        c.comparison.b = id;
+        const checkpoint = continuousCheckpoint(this.root, id);
+        if (canContinueCollective(checkpoint)) {
+          prepareContinuousWindow(this.root, id, 1600);
+          c.experiment.phase = 'started';
+          c.comparison.stage = 'B-long';
+        } else c.comparison.stage = 'complete';
+      } else c.comparison.stage = 'complete';
+      c.history.push({
+        step: 'experiment',
+        detail: `Collective comparison advanced to ${c.comparison.stage}; preserved ${id}.`,
+      });
+      save();
+    }
+  }
+  async singleExperiment(
     c: TaskContext,
     save: () => void,
   ): Promise<

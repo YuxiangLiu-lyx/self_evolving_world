@@ -1,0 +1,14 @@
+{ tick: 200, elapsedMs: 94321.540667 }
+{ tick: 400, elapsedMs: 199049.151792 }
+{ tick: 600, elapsedMs: 308482.207125 }
+{ tick: 800, elapsedMs: 435828.768333 }
+{ tick: 1000, elapsedMs: 587892.2660000001 }
+{ tick: 1200, elapsedMs: 735686.7456670001 }
+{ tick: 1400, elapsedMs: 889595.01875 }
+{ tick: 1600, elapsedMs: 1055650.965875 }
+{
+  rounds: 1600,
+  optionalShare: 0.6827430555555556,
+  failures: {},
+  elapsedMs: 1055657.437583
+}

@@ -300,9 +300,18 @@ describe('existing gates behind the task runtime', () => {
     expect(body).toContain(plan);
     const imageSection =
       body.split('### Screenshot judgments and provenance').at(1) ?? '';
-    const records = JSON.parse(
+    const grouped = JSON.parse(
       imageSection.split('```json\n').at(1)?.split('\n```').at(0) ?? '',
-    ) as unknown[];
+    ) as Record<string, string[][]>;
+    const records = Object.entries(grouped).flatMap(([directory, rows]) =>
+      rows.map(([id, filename, sha256, verdict, notes]) => ({
+        id,
+        path: directory + String(filename),
+        sha256,
+        verdict,
+        notes,
+      })),
+    );
     const originalReport = readJson(
       resolve(root, 'validation-results/report.json'),
     );
@@ -314,7 +323,9 @@ describe('existing gates behind the task runtime', () => {
     for (const judgment of object(originalReview).visual as unknown[])
       expect(records).toContainEqual(expect.objectContaining(object(judgment)));
     expect(records).toHaveLength(REVIEW_SCENES.length);
-    expect(body.split('test-results/desktop.png')).toHaveLength(2);
+    expect(
+      grouped['test-results/']?.filter(([id]) => id === 'desktop'),
+    ).toHaveLength(1);
     c.body.head = 'old-head';
     expect(() => reviewBody(root, c)).toThrow('current reviewed head');
     c.body.head = snapshot.head;

@@ -51,3 +51,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-23](completed/pr-23-forest-experience.md): consistent execution, diet and sustained experience with a new real observation.
 
 - [PR-24](active/pr-24-open-development.md): fresh skill isolation and cumulative open development with a fixed real observation.
+
+- [PR-25](completed/pr-25-collective-life.md): eighteen-member collective life, private knowledge and bounded ex11/ex12 observations with preserved budget pauses.

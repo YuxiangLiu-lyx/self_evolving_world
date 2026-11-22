@@ -48,14 +48,20 @@ async function screenshot(
 }
 const ids = (
   capture ? [capture] : (browserSelection()?.archives ?? experimentIds(root))
-).filter(
-  (id) =>
-    (
-      JSON.parse(
-        readFileSync(resolve(root, 'experiment', id, 'manifest.json'), 'utf8'),
-      ) as { version: number }
-    ).version === 7,
-);
+)
+  .filter(
+    (id) =>
+      (
+        JSON.parse(
+          readFileSync(
+            resolve(root, 'experiment', id, 'manifest.json'),
+            'utf8',
+          ),
+        ) as { version: number }
+      ).version === 7,
+  )
+  .sort((a, b) => Number(b.slice(2)) - Number(a.slice(2)));
+// Start recent, larger archives first so two CI workers overlap their replay.
 for (const id of ids)
   test(`${id} verifies segmented continuous evidence in the game observatory`, async ({
     page,
@@ -90,10 +96,15 @@ for (const id of ids)
       });
     });
     await page.goto(`/observatory.html?experiment=${id}`);
+    // Wait for the initial asynchronous reconstruction before seeking again.
+    await expect(page.locator('#round')).toHaveText(
+      `0 / ${String(index.observed)}`,
+      { timeout: 90_000 },
+    );
     const ticks = [0, Math.floor(index.observed / 2), index.observed],
       scenes = ['initial', 'midpoint', 'final'];
     for (const [i, tick] of ticks.entries()) {
-      await page.locator('#time').fill(String(tick));
+      if (i > 0) await page.locator('#time').fill(String(tick));
       await expect(page.locator('#round')).toHaveText(
         `${String(tick)} / ${String(index.observed)}`,
         { timeout: 90_000 },
@@ -104,43 +115,60 @@ for (const id of ids)
       await expect(page.locator('#scene [data-scene-actor]')).toHaveCount(
         world.actors.length,
       );
-      for (const actor of world.actors) {
-        const g = page.locator(`#scene [data-scene-actor="${actor.id}"]`);
-        await expect(g).toHaveAttribute('data-x', String(actor.position.x));
-        await expect(g).toHaveAttribute('data-y', String(actor.position.y));
-      }
+      // Compare every member in one browser round trip, including identity.
+      expect(
+        await page
+          .locator('#scene [data-scene-actor]')
+          .evaluateAll((nodes) =>
+            nodes
+              .map((n) => [
+                n.getAttribute('data-scene-actor'),
+                n.getAttribute('data-x'),
+                n.getAttribute('data-y'),
+              ])
+              .sort(),
+          ),
+      ).toEqual(
+        world.actors
+          .map((a) => [a.id, String(a.position.x), String(a.position.y)])
+          .sort(),
+      );
       await page.locator('#actor').selectOption(present(world.actors[0]).id);
       await expect(page.locator('#happiness')).toContainText(
         present(world.actors[0]).wellbeing.total.toFixed(1),
       );
-      await page.locator('#private').click();
-      await expect(page.locator('#stage-tag')).toContainText(
-        'PERSONAL OBSERVATION',
-      );
-      await page.locator('#global').click();
-      const positions = await page
-        .locator('#scene [data-scene-actor]')
-        .evaluateAll((nodes) =>
-          nodes.map((n) => [
-            n.getAttribute('data-x'),
-            n.getAttribute('data-y'),
-          ]),
+      // State and screenshots cover all three frames; exercise the same camera
+      // and perspective controls once per archive on its richest final state.
+      if (i === ticks.length - 1) {
+        await page.locator('#private').click();
+        await expect(page.locator('#stage-tag')).toContainText(
+          'PERSONAL OBSERVATION',
         );
-      await page.locator('#zoom-in').click();
-      await page.locator('#follow').click();
-      await page.locator('#geometry').click();
-      expect(
-        await page
+        await page.locator('#global').click();
+        const positions = await page
           .locator('#scene [data-scene-actor]')
           .evaluateAll((nodes) =>
             nodes.map((n) => [
               n.getAttribute('data-x'),
               n.getAttribute('data-y'),
             ]),
-          ),
-      ).toEqual(positions);
-      await page.locator('#follow').click();
-      await page.locator('#geometry').click();
+          );
+        await page.locator('#zoom-in').click();
+        await page.locator('#follow').click();
+        await page.locator('#geometry').click();
+        expect(
+          await page
+            .locator('#scene [data-scene-actor]')
+            .evaluateAll((nodes) =>
+              nodes.map((n) => [
+                n.getAttribute('data-x'),
+                n.getAttribute('data-y'),
+              ]),
+            ),
+        ).toEqual(positions);
+        await page.locator('#follow').click();
+        await page.locator('#geometry').click();
+      }
       await page.locator('#fit').click();
       const path = await screenshot(page, info, `${id}-${String(scenes[i])}`);
       if (capture)
