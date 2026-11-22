@@ -95,11 +95,19 @@ for (const id of ids)
         body: readFileSync(resolve(directory, path), 'utf8'),
       });
     });
+    const opened = performance.now();
     await page.goto(`/observatory.html?experiment=${id}`);
     // Wait for the initial asynchronous reconstruction before seeking again.
     await expect(page.locator('#round')).toHaveText(
       `0 / ${String(index.observed)}`,
       { timeout: 90_000 },
+    );
+    console.log(
+      JSON.stringify({
+        check: 'archive-initial-frame',
+        id,
+        durationMs: Math.round(performance.now() - opened),
+      }),
     );
     const ticks = [0, Math.floor(index.observed / 2), index.observed],
       scenes = ['initial', 'midpoint', 'final'];
@@ -416,4 +424,92 @@ if (!capture)
     await page.locator('#scene [data-scene-object="tree-1"]').click();
     await expect(page.locator('#object-title')).toHaveText('Broadleaf tree');
     await screenshot(page, info, 'continuous-initial-world-fixture');
+  });
+
+if (!capture)
+  test('concurrent segment loads are shared and an obsolete archive cannot replace the current selection', async ({
+    page,
+  }) => {
+    const { recordedSegment } =
+      await import('../test/fixtures/continuous-history.js');
+    const { continuousHash } =
+      await import('../../../scripts/continuous-store.js');
+    const old = await recordedSegment(7),
+      current = await recordedSegment(7, 7);
+    const path = 'replay/part-000000-000007.json';
+    const sources: Record<string, string> = {
+      ex99: JSON.stringify(old.segment),
+      ex98: JSON.stringify(current.segment),
+    };
+    let release: (() => void) | undefined;
+    const hold = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    let started: (() => void) | undefined;
+    const arrived = new Promise<void>((resolve) => {
+      started = resolve;
+    });
+    let oldLoads = 0;
+    await page.route('**/experiments/index.json', (route) =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          version: 1,
+          experiments: [
+            { id: 'ex99', steps: 7 },
+            { id: 'ex98', steps: 7 },
+          ],
+        }),
+      }),
+    );
+    await page.route(/\/experiments\/ex9[89]\//, async (route) => {
+      const url = new URL(route.request().url());
+      const archive = url.pathname.includes('/ex99/') ? 'ex99' : 'ex98';
+      const source = present(sources[archive]);
+      if (url.pathname.endsWith('/replay.json')) {
+        await route.fulfill({
+          contentType: 'application/json',
+          body: JSON.stringify({
+            version: 7,
+            observed: 7,
+            target: 7,
+            phase: 'isolated-fixture',
+            segments: [
+              { path, start: 0, end: 7, sha256: continuousHash(source) },
+            ],
+          }),
+        });
+      } else {
+        if (archive === 'ex99') {
+          oldLoads += 1;
+          started?.();
+          await hold;
+        }
+        await route.fulfill({ contentType: 'application/json', body: source });
+      }
+    });
+    try {
+      await page.goto('/observatory.html?experiment=ex99');
+      await arrived;
+      await page.locator('#time').fill('2');
+      await page.locator('#time').fill('3');
+      await page.locator('#archive').selectOption('ex98');
+      await expect(page.locator('#round')).toHaveText('0 / 7');
+      await expect(
+        page.locator('#scene [data-scene-actor="a"]'),
+      ).toHaveAttribute('data-x', '9');
+      release?.();
+      await page.waitForLoadState('networkidle');
+      await expect(page.locator('#archive')).toHaveValue('ex98');
+      await expect(
+        page.locator('#scene [data-scene-actor="a"]'),
+      ).toHaveAttribute('data-x', '9');
+      expect(oldLoads).toBe(1);
+      await page.locator('#time').fill('5');
+      await expect(page.locator('#round')).toHaveText('5 / 7');
+      await page.locator('#time').fill('1');
+      await expect(page.locator('#round')).toHaveText('1 / 7');
+    } finally {
+      release?.();
+    }
   });

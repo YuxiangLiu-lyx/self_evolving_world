@@ -8,7 +8,7 @@ import { collectiveMemberText } from './collective-view.js';
 import { renderExtraction } from './open-extraction-view.js';
 import { forestClimate } from '@self-evolving-world/world-core';
 import { drawForestCanvas } from './forest-canvas.js';
-import type { V7World, V7Cursor } from '@self-evolving-world/world-core';
+import type { V7Cursor } from '@self-evolving-world/world-core';
 import {
   continuousScene,
   historicalScene,
@@ -16,7 +16,7 @@ import {
 } from './continuous-scene.js';
 import type { SceneFrame } from './continuous-scene.js';
 import { svgText } from './continuous-visuals.js';
-import { replaySceneSegment, browserDigest } from './continuous-history.js';
+import { incrementalSceneReplay, browserDigest } from './continuous-history.js';
 import type { SceneIndex, SceneSegment } from './continuous-history.js';
 import { parseReplay } from './timeline.js';
 import type { Timeline } from './timeline.js';
@@ -64,7 +64,13 @@ let id = '',
   geometry = false,
   compare = false;
 let camera = { x: 0, y: 0, size: 24 };
-const cache = new Map<string, { segment: SceneSegment; frames: V7World[] }>();
+const cache = new Map<
+  string,
+  Promise<{
+    segment: SceneSegment;
+    replay: ReturnType<typeof incrementalSceneReplay>;
+  }>
+>();
 function status(text: string, error = false): void {
   el('status').textContent = text;
   el('status').classList.toggle('error', error);
@@ -426,22 +432,33 @@ async function seek(requested: number): Promise<void> {
     } else if (index) {
       const part = index.segments.find((p) => p.start <= at && p.end >= at);
       if (!part) throw new Error('Missing indexed segment.');
-      let value = cache.get(part.path);
-      if (!value) {
+      let loading = cache.get(part.path);
+      if (!loading) {
         status(
-          `Verifying saved rounds ${String(part.start)}–${String(part.end)}…`,
+          `Loading saved rounds ${String(part.start)}–${String(part.end)}…`,
         );
-        const source = await asset(part.path);
-        if ((await browserDigest(source)) !== part.sha256)
-          throw new Error('Segment integrity check failed.');
-        const segment = JSON.parse(source) as SceneSegment;
-        value = { segment, frames: await replaySceneSegment(segment) };
-        if (token !== sequence) return;
-        cache.set(part.path, value);
+        // Store the in-flight load before awaiting it: overlapping selections
+        // share bytes and verified progress, without another full reconstruction.
+        loading = (async () => {
+          const source = await asset(part.path);
+          if ((await browserDigest(source)) !== part.sha256)
+            throw new Error('Segment integrity check failed.');
+          const segment = JSON.parse(source) as SceneSegment;
+          if (
+            segment.start !== part.start ||
+            segment.start + segment.rounds.length !== part.end
+          )
+            throw new Error('Replay segment bounds differ from its index.');
+          return { segment, replay: incrementalSceneReplay(segment) };
+        })();
+        cache.set(part.path, loading);
         if (cache.size > 3) cache.delete(cache.keys().next().value ?? '');
       }
-      const world = value.frames[at - part.start];
-      if (!world) throw new Error('Missing reconstructed frame.');
+      const value = await loading;
+      if (token !== sequence) return;
+      status(`Verifying saved state through round ${String(at)}…`);
+      const world = await value.replay.frame(at);
+      if (token !== sequence) return;
       priorFrame = frame ?? undefined;
       frame = continuousScene(world, privateView ? actor : null);
       tasks = value.segment.rounds.find((r) => r.tick === at)?.tasks ?? {};

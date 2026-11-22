@@ -66,70 +66,124 @@ export async function browserDigest(text: string): Promise<string> {
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 }
-export async function replaySceneSegment(
-  segment: SceneSegment,
-): Promise<V7World[]> {
+/** A segment-local verified prefix. Concurrent seeks share one ordered replay;
+ * a failed round poisons this reader instead of reusing partially changed cursors. */
+export function incrementalSceneReplay(segment: SceneSegment) {
+  if (segment.initial.tick !== segment.start)
+    throw new Error('Replay initial tick differs from its segment boundary.');
   const registry = continuousRegistry(segment.initial);
   let world = segment.initial;
   const frames = [world];
   const cursors = v7Clone(segment.initialCursors ?? {});
-  for (const record of segment.rounds) {
-    for (const key of record.registrations)
-      world = v7Install(world, registry, key);
-    const rawPrefixMatches =
-      (await browserDigest(v7Signature(world))) === record.before;
-    const precisionBound =
-      record.registrations.includes('material-geometry@1') &&
-      typeof record.registrationPrecisionHash === 'string' &&
-      (await browserDigest(v7Signature(v7CanonicalNumbers(world)))) ===
-        record.registrationPrecisionHash;
-    if (record.registrationPrecisionHash !== undefined && !precisionBound)
-      throw new Error('Invalid registration precision evidence.');
-    // Only this recorded native-cbrt migration can use its independently bound model-precision proof.
-    // Every ensuing world, event and task hash still matches the original record exactly.
+  let pending: Promise<void> = Promise.resolve();
+  let failure: Error | undefined;
+  function frame(tick: number): Promise<V7World> {
     if (
-      record.tick !== world.tick + 1 ||
-      (!rawPrefixMatches && !precisionBound)
+      !Number.isInteger(tick) ||
+      tick < segment.start ||
+      tick > segment.start + segment.rounds.length
     )
-      throw new Error('Replay prefix verification failed.');
-    const input = v7Clone(world);
-    for (const actor of input.actors) {
-      const m = record.memory[actor.id];
-      if (m) {
-        if (m.collectiveIntent) {
-          if (!actor.collective)
-            throw new Error(
-              'Personal collective intention requires an actual member.',
-            );
-          actor.collective.intent = v7Clone(m.collectiveIntent);
+      return Promise.reject(
+        new Error('Requested replay tick is outside the segment.'),
+      );
+    const offset = tick - segment.start;
+    const result = pending.then(async () => {
+      if (failure) throw failure;
+      try {
+        while (frames.length <= offset) {
+          const record = segment.rounds[frames.length - 1];
+          if (!record) throw new Error('Missing requested replay round.');
+          for (const key of record.registrations)
+            world = v7Install(world, registry, key);
+          const rawPrefixMatches =
+            (await browserDigest(v7Signature(world))) === record.before;
+          const precisionBound =
+            record.registrations.includes('material-geometry@1') &&
+            typeof record.registrationPrecisionHash === 'string' &&
+            (await browserDigest(v7Signature(v7CanonicalNumbers(world)))) ===
+              record.registrationPrecisionHash;
+          if (record.registrationPrecisionHash !== undefined && !precisionBound)
+            throw new Error('Invalid registration precision evidence.');
+          // Only this recorded native-cbrt migration can use its independently bound model-precision proof.
+          // Every ensuing world, event and task hash still matches the original record exactly.
+          if (
+            record.tick !== world.tick + 1 ||
+            (!rawPrefixMatches && !precisionBound)
+          )
+            throw new Error('Replay prefix verification failed.');
+          const input = v7Clone(world);
+          for (const actor of input.actors) {
+            const m = record.memory[actor.id];
+            if (m) {
+              if (m.collectiveIntent) {
+                if (!actor.collective)
+                  throw new Error(
+                    'Personal collective intention requires an actual member.',
+                  );
+                actor.collective.intent = v7Clone(m.collectiveIntent);
+              }
+              if (m.projects) openSaveProjects(actor, m.projects, world.tick);
+              actor.memory.notes = m.notes;
+              actor.memory.preferences = m.preferences;
+              if (m.intention !== undefined)
+                actor.memory.intention = m.intention;
+            }
+          }
+          if (segment.initialCursors)
+            v7PrepareReplayCursors(world, record.tasks, cursors);
+          const result = v7Step(
+            input,
+            record.actions,
+            registry,
+            cursors,
+            record.reviews,
+          );
+          if (segment.initialCursors) v7FinishTasks(world, result, cursors);
+          result.world = collectiveSettle(
+            result.world,
+            record.coordination ?? [],
+          );
+          if (
+            result.paused ||
+            (await browserDigest(v7Signature(result.world))) !== record.after ||
+            v7Signature(result.world.events) !== v7Signature(record.events) ||
+            (segment.initialCursors &&
+              v7Signature(cursors) !== v7Signature(record.tasks))
+          )
+            throw new Error(`Replay mismatch at ${String(record.tick)}.`);
+          world = result.world;
+          frames.push(world);
         }
-        if (m.projects) openSaveProjects(actor, m.projects, world.tick);
-        actor.memory.notes = m.notes;
-        actor.memory.preferences = m.preferences;
-        if (m.intention !== undefined) actor.memory.intention = m.intention;
+        const value = frames[offset];
+        if (!value) throw new Error('Missing verified replay frame.');
+        return value;
+      } catch (error) {
+        failure = error instanceof Error ? error : new Error('Replay failed.');
+        throw failure;
       }
-    }
-    if (segment.initialCursors)
-      v7PrepareReplayCursors(world, record.tasks, cursors);
-    const result = v7Step(
-      input,
-      record.actions,
-      registry,
-      cursors,
-      record.reviews,
+    });
+    pending = result.then(
+      () => undefined,
+      () => undefined,
     );
-    if (segment.initialCursors) v7FinishTasks(world, result, cursors);
-    result.world = collectiveSettle(result.world, record.coordination ?? []);
-    if (
-      result.paused ||
-      (await browserDigest(v7Signature(result.world))) !== record.after ||
-      v7Signature(result.world.events) !== v7Signature(record.events) ||
-      (segment.initialCursors &&
-        v7Signature(cursors) !== v7Signature(record.tasks))
-    )
-      throw new Error(`Replay mismatch at ${String(record.tick)}.`);
-    world = result.world;
-    frames.push(world);
+    return result;
   }
-  return frames;
+  return {
+    frame,
+    get reconstructedRounds(): number {
+      return frames.length - 1;
+    },
+    get frames(): readonly V7World[] {
+      return frames;
+    },
+  };
+}
+
+/** Full-audit compatibility entry; every round still passes the same checks. */
+export async function replaySceneSegment(
+  segment: SceneSegment,
+): Promise<V7World[]> {
+  const replay = incrementalSceneReplay(segment);
+  await replay.frame(segment.start + segment.rounds.length);
+  return [...replay.frames];
 }
