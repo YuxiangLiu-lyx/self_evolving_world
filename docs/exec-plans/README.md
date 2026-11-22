@@ -3,6 +3,7 @@
 Plans help humans and agents track tasks, scope, progress, and evidence. Every PR needs a requirement summary recorded before implementation; small tasks may use a concise plan. PRODUCT remains the only feature status authority.
 
 - [Active plans](active/README.md): work that has not completed acceptance.
+- [PR-27](completed/pr-27-ci-audit-headroom.md): measured CI headroom after replay optimization, preserving every check and an explicit full main audit.
 - [PR-00](completed/pr-00-bootstrap.md): project bootstrap and documentation system.
 - [PR-01](completed/pr-01-world-foundation.md): fixed world core, visualization, and replay.
 - [PR-02](completed/pr-02-validation.md): real browser validation, behavior checks, and completion gate.
