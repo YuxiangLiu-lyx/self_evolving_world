@@ -262,3 +262,35 @@ reservation and corrupt-prefix assertions remain. The three-test diagnostic
 passed locally in 749 ms, including 738 ms for the previously failing case.
 The timeout, inference records, runtime source fingerprint and frozen policy are
 unchanged. Current full acceptance and a new remote CI are still required.
+
+## Second remote CI failure and archive browser coverage
+
+[CI run 45067553699](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/runs/45067553699)
+passed all 752 unit tests in 76.09 seconds; the three retained-request audit tests
+now took 3.17 seconds. All twelve archive validations also passed. The job reached
+its unchanged ten-minute deadline during browser acceptance, after 24 of 74 tests.
+Ex11's seven-round browser case took approximately 72 seconds. No failed check was
+waived, and the two failed CI attempts remain part of the delivery record.
+
+The existing local reconstruction ledger confirms that browser oracle reads reuse
+authenticated archive receipts rather than rebuilding them. A diagnostic trace of
+ex11 instead showed repeated perspective/camera interactions at each of three
+frames and a seek while initial asynchronous loading was still active. Browser
+acceptance now waits for that initial state, checks every member's identity and
+coordinates in one browser read, and exercises perspective, zoom, follow and
+geometry once per archive at its final state. Initial, midpoint and final states
+still each receive all-member position, happiness, layout and screenshot checks.
+Recent archives start first to overlap their longer browser replay on CI's two
+workers. Playback and chart checks, runtime-error observation and all 168 visual
+artifacts remain selected. Browser replay still verifies the saved segment and
+round hashes independently; the server-side oracle remains source-bound.
+
+This changes acceptance only. No world rule, agent input, source snapshot,
+experiment policy, historical archive, browser deadline or CI timeout is changed.
+The current full local gate and a fresh exact-head CI must establish acceptance.
+
+The first batched-coordinate diagnostic correctly failed because scene depth
+ordering differs from actor-array ordering. The comparison now sorts the complete
+identity/coordinate tuples on both sides; it still requires the exact count and
+all values, without requiring a presentation-layer ordering. The failed diagnostic
+is retained locally, and current acceptance reruns the corrected assertion.
