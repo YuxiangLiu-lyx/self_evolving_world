@@ -11,7 +11,9 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    maxWorkers: 4,
+    // CPU-heavy retained-world fixtures must not contend across four workers.
+    // Keep the same bounded scheduling locally and on shared CI runners.
+    maxWorkers: 2,
     include: [
       'packages/*/test/**/*.test.ts',
       'apps/*/test/**/*.test.ts',

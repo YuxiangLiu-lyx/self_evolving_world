@@ -20,6 +20,8 @@ failed checks, ex11/ex12 checkpoints and all prior archives remain retained.
 No simulation rules, agent prompts, recipes, rewards, budgets, generated skills,
 archive mutations, model execution, infrastructure services or framework rewrite.
 No timeout increase, skipped browser check or fabricated acceptance evidence.
+The acceptance repair also bounds unit-test worker concurrency; this changes
+scheduling only, with the complete suite and all existing deadlines retained.
 
 ## Acceptance criteria
 
@@ -58,3 +60,13 @@ the task history. Current remote CI, version-bound self-review and integration
 remain unexecuted until the coordinator records them. Known high-zoom legacy
 label clipping is unchanged. Future large archives may still make a long forward
 seek expensive; only verified progress is reused, never unverified future state.
+
+PR CI run 45073798737 failed five CPU-heavy unit cases by timeout before reaching
+browser validation, including the 30-second collective scheduling fixture.
+Its four-worker suite took 121.83 seconds, with 754 tests passing and five timing
+out; no assertion mismatch was reported. Bound the suite to two workers locally
+and in CI to reduce contention between retained-world fixtures. Keep every test,
+the 5/30-second case deadlines and the ten-minute job deadline. This is a resource
+scheduling correction, not evidence that the failed run passed. The existing
+planner conservatively expands compatibility coverage for the changed test
+configuration; fresh selected checks and remote CI remain required.
