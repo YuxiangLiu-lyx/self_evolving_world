@@ -3,7 +3,8 @@ import { COLLECTIVE_OBJECTIVE } from '../apps/simulator/src/collective-scenario.
 import { measureCollective } from './collective-analysis.js';
 import {
   requestRevisionBoundaries,
-  retainedRequestBuilder,
+  type retainedRequestBuilder,
+  retainedRequestCompiler,
 } from './continuous-request-audit.js';
 import { readFileSync, lstatSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -474,6 +475,7 @@ export function readContinuousExperiment(
     ? requestRevisionBoundaries(history, state.attempts)
     : [];
   const builders = new Map<number, ReturnType<typeof retainedRequestBuilder>>();
+  const compiler = retainedRequestCompiler();
   for (const [position, attempt] of state.attempts.entries()) {
     if (
       !existsSync(resolve(directory, 'calls', `${attempt.id}.json`)) &&
@@ -493,7 +495,7 @@ export function readContinuousExperiment(
       );
       const files = sources[revision];
       if (!files) throw new Error('Call has no retained source revision.');
-      const builder = builders.get(revision) ?? retainedRequestBuilder(files);
+      const builder = builders.get(revision) ?? compiler.build(files);
       builders.set(revision, builder);
       const expected =
         new TextEncoder().encode(

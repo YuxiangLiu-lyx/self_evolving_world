@@ -34,6 +34,24 @@ export function requestRevisionBoundaries(
 export function retainedRequestBuilder(
   files: Record<string, string>,
 ): typeof continuousRequest {
+  return retainedRequestCompiler().build(files);
+}
+
+/** Reuse only transpiled bytes within one audit; module state is always fresh. */
+export function retainedRequestCompiler() {
+  const compiled = new Map<string, string>();
+  return {
+    build: (files: Record<string, string>) => requestBuilder(files, compiled),
+    get compiledSources() {
+      return compiled.size;
+    },
+  };
+}
+
+function requestBuilder(
+  files: Record<string, string>,
+  compiled: Map<string, string>,
+): typeof continuousRequest {
   const modules = new Map<string, { exports: Record<string, unknown> }>();
   const load = (path: string): Record<string, unknown> => {
     const existing = modules.get(path);
@@ -43,12 +61,16 @@ export function retainedRequestBuilder(
       throw new Error(`Missing retained request dependency: ${path}`);
     const module = { exports: {} as Record<string, unknown> };
     modules.set(path, module);
-    const output = ts.transpileModule(source, {
-      compilerOptions: {
-        module: ts.ModuleKind.CommonJS,
-        target: ts.ScriptTarget.ES2023,
-      },
-    }).outputText;
+    let output = compiled.get(source);
+    if (output === undefined) {
+      output = ts.transpileModule(source, {
+        compilerOptions: {
+          module: ts.ModuleKind.CommonJS,
+          target: ts.ScriptTarget.ES2023,
+        },
+      }).outputText;
+      compiled.set(source, output);
+    }
     runInNewContext(
       output,
       {

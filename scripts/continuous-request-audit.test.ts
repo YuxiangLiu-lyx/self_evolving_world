@@ -9,6 +9,7 @@ import { continuousHash } from './continuous-store.js';
 import {
   requestRevisionBoundaries,
   retainedRequestBuilder,
+  retainedRequestCompiler,
 } from './continuous-request-audit.js';
 
 it('reconstructs actual pre/post repair reservations from their source and exact attempt boundary without inference', () => {
@@ -20,6 +21,7 @@ it('reconstructs actual pre/post repair reservations from their source and exact
   ) as ContinuousSourceRevision[];
   const boundaries = requestRevisionBoundaries(history, state.attempts);
   expect(boundaries.slice(0, 4)).toEqual([0, 4, 8, 14]);
+  const compiler = retainedRequestCompiler();
   const builders = history.map((revision) => {
     const files = JSON.parse(
       readFileSync(
@@ -28,7 +30,7 @@ it('reconstructs actual pre/post repair reservations from their source and exact
       ),
     ) as Record<string, string>;
     expect(continuousHash(files)).toBe(revision.sourceHash);
-    return retainedRequestBuilder(files);
+    return compiler.build(files);
   });
   for (const [index, attempt] of state.attempts.entries()) {
     const call = JSON.parse(
@@ -51,6 +53,31 @@ it('reconstructs actual pre/post repair reservations from their source and exact
   expect(() => requestRevisionBoundaries(altered, state.attempts)).toThrow(
     'attempt prefix',
   );
+});
+
+it('compiles identical source once while isolating revision state and changed dependencies', () => {
+  const compiler = retainedRequestCompiler();
+  const files = {
+    'apps/simulator/src/continuous-provider.ts':
+      'import { value } from "./fixture.js"; let calls = 0; export function continuousRequest() { return [value, ++calls]; }',
+    'apps/simulator/src/fixture.ts': 'export const value = "first";',
+  };
+  const first = compiler.build(files);
+  const same = compiler.build(files);
+  expect(compiler.compiledSources).toBe(2);
+  const changed = compiler.build({
+    ...files,
+    'apps/simulator/src/fixture.ts': 'export const value = "changed";',
+  });
+  expect(compiler.compiledSources).toBe(3);
+  expect(Reflect.apply(first, null, [])).toEqual(['first', 1]);
+  expect(Reflect.apply(first, null, [])).toEqual(['first', 2]);
+  expect(Reflect.apply(same, null, [])).toEqual(['first', 1]);
+  expect(Reflect.apply(changed, null, [])).toEqual(['changed', 1]);
+  expect(() =>
+    compiler.build({ ...files, 'apps/simulator/src/fixture.ts': '' }),
+  ).toThrow('Missing retained');
+  expect(retainedRequestCompiler().compiledSources).toBe(0);
 });
 
 it('rejects absent and external imports rather than loading the current tree or a network service', () => {

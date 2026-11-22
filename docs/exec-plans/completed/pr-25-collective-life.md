@@ -99,7 +99,8 @@ local reporting and teaching, durable intentions, event-grounded tendencies/trus
 bounded attention, token reservations, phase-preserving campaign continuation and
 2D member/process inspection. The final development gate passed 749 unfiltered
 tests in 100 files, type/dependency/build checks and identical reconstruction of
-all 132 prior B rounds before source revision 12. The final local acceptance run passed 751 unfiltered tests in 100 files,
+all 132 prior B rounds before source revision 12. The recorded local acceptance run `431302b1-9896-45f4-bb33-17b8a9c20a5e`
+passed 751 unfiltered tests in 100 files,
 all selected checks and archive preservation. Its 12 archive validations and
 74 browser tests (168 images) reused authenticated unchanged receipts with zero
 new deep rebuilds. All selected images were personally inspected. Remote delivery

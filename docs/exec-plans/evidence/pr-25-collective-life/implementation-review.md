@@ -239,3 +239,26 @@ compares all original image judgments and hashes; it does not omit coverage.
 Current source review includes this test, pending-capture cache separation and
 the complete requirement/file mapping. The current PR COMMENT remains a
 current-conversation self-review, never independent approval.
+
+## First remote CI failure and bounded compiler reuse
+
+[CI run 45066061636](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/runs/45066061636)
+rejected commit `fa783c8adfbcd49ce8764d4805895197d9a96b06`: 750 tests passed,
+but the real retained-request regression took 5,609 ms and exceeded the unchanged
+5,000 ms test deadline. The full unit stage took 78.54 seconds; PR policy passed.
+This failed check blocked delivery and was not waived or retried unchanged.
+
+The audit had repeatedly transpiled identical dependency text for every retained
+source revision. One audit-local compiler now caches output by exact source text,
+while every builder creates fresh module instances and resolves imports from its
+own integrity-checked revision. No global state, persisted PASS result or external
+cache can supply code. Changed dependencies compile independently; missing or
+external imports still fail. The same reuse applies to archive validation.
+
+A regression verifies exactly two compilations across identical two-module
+builders, a third for changed dependency text, independent mutable module state,
+missing-dependency failure and an empty new compiler. All original real-request
+reservation and corrupt-prefix assertions remain. The three-test diagnostic
+passed locally in 749 ms, including 738 ms for the previously failing case.
+The timeout, inference records, runtime source fingerprint and frozen policy are
+unchanged. Current full acceptance and a new remote CI are still required.
