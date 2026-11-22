@@ -468,3 +468,26 @@ reported as autonomous long-term productivity. Documentation-only final review
 updates require a renewed impact plan and diff binding; unchanged world and
 browser evidence may be authenticated and reused. Remote review, CI and verified
 integration are still required before delivery completion.
+
+## Remote acceptance timeout and scheduling correction
+
+The first published head, `cb2d8ee72317f02f00fab131f8d2e343f9c4a254`,
+passed `pr-policy` but its [quality job](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/runs/45011612582/job/137174955562)
+was cancelled at the unchanged ten-minute job limit. The retained CI log reports
+636 passing unit tests and all ten successful archive reconstructions. Browser
+acceptance had completed only five of sixty scenarios, so this is an incomplete
+acceptance run, not a passing check. Ex8 and ex9 reconstruction took 81.036 and
+188.495 seconds respectively; the serialized archive phase took approximately
+352.8 seconds. Validation began at 10:17:04 UTC and browser execution began at
+10:25:28 UTC on 2026-11-22. The raw log remains available through the linked job
+and its retained validation artifact; an ignored local copy is
+`validation-results/pr24-ci-failed.log`.
+
+The delivery correction changes only acceptance scheduling: at most two archive
+readers, one per selected ID, authenticated current-input receipts, fail-closed
+metrics and failure draining. Six targeted regressions cover bounded concurrency,
+duplicate rejection, failure propagation, truthful reuse and rejection of stale,
+unsigned or false metrics. All selected checks and the job timeout remain intact.
+The formal ex10 state, source snapshots, budgets and terminal pause are unchanged;
+no model call or historical inference is rerun. Current-head full unit validation,
+actual diff review and new remote CI are required before merge.

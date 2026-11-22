@@ -30,6 +30,16 @@ Archive preservation uses one recursive Git tree inventory and in-process blob c
 
 `readExperiment` reads metadata without semantic acceptance. `checkExperimentIntegrity` checks the complete file set and artifact hashes. `validateExperiment` performs deep reconstruction or returns an authenticated result for identical inputs. Viewer builds and behavioral-analysis identity/binding checks never implicitly reconstruct. Completion checks verify the plan, receipts, dependency fingerprints and actual review; they never replay experiments again.
 
+Selected archive reconstructions run in at most two isolated local Node processes,
+starting with the newest archives. Each selected ID runs once; workers share this
+validation run's authenticated receipts and append-only reconstruction ledger.
+The parent verifies the current input and receipt before accepting a worker metric.
+A failure stops new scheduling, drains active work and fails acceptance. Browser
+checks then reuse matching reconstruction receipts while still loading and checking
+the selected scenes. This changes scheduling, not check coverage or CI timeouts;
+it performs no model calls. Failed worker checks record zero successful rebuilds;
+completed reconstruction counts remain auditable in the ledger.
+
 ## Visual review
 
 The game observatory is the primary page; `classic.html` preserves the original controls and protocol views. The planner selects relevant scenes from the catalogue below. Shared presentation changes cover affected historical adapters and mobile views; new archives add initial, midpoint, final and overview scenes. Unaffected scenes are not applicable or explicitly reused, never claimed as freshly captured. When adding pages or major interactions, extend the [scene list](../scripts/validation.ts) and browser tests instead of continuing to review only old pages.
