@@ -39,6 +39,16 @@ export function forestCheckpointRepair(
   after: string,
   declaration: unknown,
 ): boolean {
+  // Ex10 round 123: preserve the raw native migration hash and add a separately verified
+  // model-precision browser proof. Original records remain immutable; every later hash is exact.
+  if (declaration === 'open-registration-replay-and-context-v1')
+    return (
+      path === 'scripts/continuous-store.ts' &&
+      before ===
+        '2862d3b9b0f49844c70999a360626a54d4a2cafc67219055a0dba9ae22a1ae7c' &&
+      after ===
+        '46448669fed33b25528ed2018a56863a5ba56e9b6eacf1d510a09556dcc1e8c2'
+    );
   // Ex9 development-1 exposed missing operation cursors in replay at round 86.
   // This exact store revision only adds cursor-bearing segments and replay verification;
   // the original cursor-free parts remain retained and no live action/controller policy changes.

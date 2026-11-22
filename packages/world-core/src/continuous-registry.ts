@@ -38,6 +38,15 @@ export function v7Install(
     (p) => `${p.id}@${String(p.version)}` === key,
   );
   if (
+    world.config.development &&
+    pkg &&
+    !['foundation-forest', 'foundation-open'].includes(pkg.id) &&
+    pkg.scope !== world.config.development.scope
+  )
+    throw new Error(
+      'This package is not approved for the current experiment scope.',
+    );
+  if (
     !pkg ||
     world.revisions.includes(key) ||
     pkg.dependencies.some((d) => !world.revisions.includes(d))
@@ -104,12 +113,34 @@ export function v7Install(
     );
   for (const ability of pkg.abilities) {
     if (
-      !['foundation-v7', 'foundation-forest'].includes(pkg.id) &&
+      ability.practiceEvidence &&
+      !(pkg.events ?? []).includes(ability.practiceEvidence)
+    )
+      throw new Error('Practice evidence must use a declared extension event.');
+    if (
+      !['foundation-v7', 'foundation-forest', 'foundation-open'].includes(
+        pkg.id,
+      ) &&
       ability.authored
     )
       throw new Error(
         'A new capability cannot claim authored baseline status.',
       );
+    if (world.config.development && ability.dependencies) {
+      if (
+        ability.dependencies.abilities.some(
+          (id) => !next.abilities.some((a) => a.id === id),
+        ) ||
+        ability.dependencies.resources.some(
+          (id) =>
+            !next.resources.some((r) => r.id === id) &&
+            !pkg.resources.some((r) => r.id === id),
+        )
+      )
+        throw new Error(
+          'Capability dependencies must exist in this experiment.',
+        );
+    }
     if (
       next.abilities.some(
         (a) => a.id === ability.id || a.equivalence === ability.equivalence,
@@ -149,6 +180,30 @@ export function v7Install(
         throw new Error('Reference contracts must name declared parameters.');
     }
     next.abilities.push(v7Clone(ability));
+    if (next.config.development && !ability.authored)
+      next.satisfaction.push({
+        id: `practice:${ability.id}`,
+        name: 'Grounded capability progress',
+        equivalence: `open:practice:${ability.equivalence}`,
+        event: 'practice-confirmed',
+        interface: ability.id,
+        conditions: [{ path: 'qualified', comparison: 'eq', value: true }],
+        amount: 0.4,
+        cap: 0.5,
+        duration: 8,
+        mode: 'hold',
+        repetition: 'refresh',
+        cooldown: 12,
+        rationale:
+          'Limited milestones from paid complete practice with real changed outputs; no reward for mastery.',
+        revision: ability.revision,
+        maintenance: {
+          event: 'practice-confirmed',
+          interface: ability.id,
+          gain: 0.02,
+          decay: 0.001,
+        },
+      });
   }
   for (const resource of pkg.resources) {
     if (next.resources.some((r) => r.id === resource.id))
@@ -210,6 +265,10 @@ export function v7Install(
           source.repeatWindow.rounds < source.cooldown ||
           source.repeatWindow.amount <= 0 ||
           source.repeatWindow.amount > source.amount)) ||
+      (source.maintenance?.cap !== undefined &&
+        (!Number.isFinite(source.maintenance.cap) ||
+          source.maintenance.cap < 0 ||
+          source.maintenance.cap > source.cap)) ||
       source.amount <= 0 ||
       source.cap > next.config.mentalCap ||
       source.amount > source.cap ||

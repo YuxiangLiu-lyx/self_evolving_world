@@ -4,6 +4,7 @@ import {
   V7_WINDOW,
   V7_STAGE_INTERVAL,
   continuousRegistry,
+  openSaveProjects,
   v7Clone,
   v7Cursor,
   v7ParsePlan,
@@ -20,6 +21,7 @@ import {
 } from '@self-evolving-world/world-core';
 import type {
   V7World,
+  V7Project,
   V7Cursor,
   V7Action,
   V7Review,
@@ -46,6 +48,8 @@ export interface V7Attempt {
   status: 'started' | 'accepted' | 'rejected' | 'failed';
   startedAt: string;
   elapsedMs: number | null;
+  contextBytes?: number;
+  contextCodeUnits?: number;
   usage: V7ProviderResult['usage'];
   error: string | null;
 }
@@ -106,7 +110,12 @@ export interface V7RoundRecord {
   registrations: string[];
   memory: Record<
     string,
-    { notes: string[]; preferences: string[]; intention?: string }
+    {
+      notes: string[];
+      preferences: string[];
+      intention?: string;
+      projects?: V7Project[];
+    }
   >;
   events: V7World['events'];
   tasks: Record<string, V7Cursor>;
@@ -200,7 +209,11 @@ export function parseContinuousReviews(
   return result;
 }
 function parsePlan(text: string, state: V7Execution) {
-  const plan = v7ParsePlan(JSON.parse(text) as unknown, state.world.eventTypes);
+  const plan = v7ParsePlan(
+    JSON.parse(text) as unknown,
+    state.world.eventTypes,
+    !!state.world.config.development,
+  );
   if (text.length * 2 > state.world.config.computation.inputBytes)
     throw new V7ComputePause(
       'Plan input exceeds parsing protection; world paused.',
@@ -310,6 +323,13 @@ async function invoke(
     reason,
     status: 'started',
     startedAt: new Date().toISOString(),
+    ...(state.world.config.development
+      ? {
+          contextBytes: new TextEncoder().encode(continuousInputText(input))
+            .length,
+          contextCodeUnits: continuousInputText(input).length,
+        }
+      : {}),
     elapsedMs: null,
     usage: null,
     error: null,
@@ -402,7 +422,7 @@ export async function continueContinuousExecution(
   saved: V7Execution,
   provider: V7Provider,
   sink: V7Sink,
-  registry: V7Registry = continuousRegistry(),
+  registry: V7Registry = continuousRegistry(saved.world),
 ): Promise<V7Execution> {
   const state = v7Clone(saved);
   if (state.pendingCall) {
@@ -525,7 +545,14 @@ export async function continueContinuousExecution(
             notes: plan.notes,
             preferences: plan.preferences,
             ...(input.config.forest ? { intention: plan.intention } : {}),
+            ...(input.config.development &&
+            state.cursors[actor.id]?.startedAt === input.tick &&
+            plan.projects
+              ? { projects: plan.projects }
+              : {}),
           };
+          const projects = memory[actor.id]?.projects;
+          if (projects) openSaveProjects(actor, projects, input.tick);
           actor.memory.notes = plan.notes;
           actor.memory.preferences = plan.preferences;
           if (input.config.forest) actor.memory.intention = plan.intention;
@@ -594,7 +621,7 @@ export function resolveContinuousDevelopment(
   packages: string[],
   assignments: Record<string, string>,
   review: string,
-  registry: V7Registry = continuousRegistry(),
+  registry: V7Registry = continuousRegistry(saved.world),
 ): V7Execution {
   const state = v7Clone(saved),
     barrier = state.barrier;

@@ -1,3 +1,4 @@
+import { OPEN_CONFIG } from '../apps/simulator/src/open-scenario.js';
 import { FOREST_EXPERIENCE_CONFIG } from '../apps/simulator/src/forest-experience-scenario.js';
 import { FOREST_CONFIG } from '../apps/simulator/src/forest-scenario.js';
 import { createHash } from 'node:crypto';
@@ -12,12 +13,14 @@ import {
 import { dirname, resolve } from 'node:path';
 import {
   v7AssertWorld,
+  v7CanonicalNumbers,
   v7Signature,
   v7Clone,
   V7_CONFIG,
   v7Install,
   v7Step,
   continuousRegistry,
+  openSaveProjects,
   v7PrepareReplayCursors,
   v7FinishTasks,
 } from '@self-evolving-world/world-core';
@@ -56,6 +59,8 @@ function immutable(path: string, value: unknown): void {
   writeFileSync(path, JSON.stringify(value) + '\n', { flag: 'wx' });
 }
 export interface V7StoredRound extends V7RoundRecord {
+  /** Additional canonical-precision proof for a retained pre-round shape migration; raw before remains authoritative. */
+  registrationPrecisionHash?: string;
   before: string;
   after: string;
 }
@@ -93,11 +98,16 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
     !Array.isArray(state.developments) ||
     v7Signature(state.world.config) !==
       v7Signature(
-        state.world.config.experience
-          ? FOREST_EXPERIENCE_CONFIG
-          : state.world.config.forest
-            ? FOREST_CONFIG
-            : V7_CONFIG,
+        state.world.config.development
+          ? {
+              ...OPEN_CONFIG,
+              development: { ...OPEN_CONFIG.development, scope: `open-${id}` },
+            }
+          : state.world.config.experience
+            ? FOREST_EXPERIENCE_CONFIG
+            : state.world.config.forest
+              ? FOREST_CONFIG
+              : V7_CONFIG,
       )
   )
     throw new Error(
@@ -186,7 +196,7 @@ export function continuousSink(root: string, id: string): V7Sink {
         state.world.tick === 200 &&
         reason.startsWith('Scheduled')
       ) {
-        v7AssertWorld(state.world, continuousRegistry());
+        v7AssertWorld(state.world, continuousRegistry(state.world));
         if (
           state.pendingCall ||
           state.barrier ||
@@ -340,7 +350,7 @@ export function buildContinuousReplay(
           ? { record: cached.record, state: { world: cached.world } }
           : null;
       if (!commit) throw new Error('No authoritative record for this round.');
-      rounds.push(commit.record);
+      rounds.push(bindRegistrationPrecision(last, commit.record));
       last = commit.state.world;
     }
     const segment: V7ReplaySegment = {
@@ -352,7 +362,7 @@ export function buildContinuousReplay(
         ? { initialCursors: v7Clone(initialCursors) }
         : {}),
     };
-    const path = `replay/${initial.config.experience ? 'execution' : 'part'}-${String(first - 1).padStart(6, '0')}-${String(rounds.at(-1)?.tick ?? first - 1).padStart(6, '0')}.json`;
+    const path = `replay/${rounds.some((r) => r.registrationPrecisionHash) ? 'precision' : initial.config.experience ? 'execution' : 'part'}-${String(first - 1).padStart(6, '0')}-${String(rounds.at(-1)?.tick ?? first - 1).padStart(6, '0')}.json`;
     immutable(resolve(directory, path), segment);
     index.segments.push({
       path,
@@ -385,12 +395,30 @@ export function buildContinuousReplay(
   continuousAtomic(resolve(directory, 'replay.json'), index);
   return index;
 }
+/** Add portable model-precision evidence only after verifying the complete original raw migration hash. */
+export function bindRegistrationPrecision(
+  before: V7World,
+  record: V7StoredRound,
+): V7StoredRound {
+  if (!record.registrations.includes('material-geometry@1')) return record;
+  let registered = before;
+  for (const key of record.registrations)
+    registered = v7Install(registered, continuousRegistry(registered), key);
+  if (continuousHash(registered) !== record.before)
+    throw new Error(
+      'Cannot bind registration precision evidence to a different original prefix.',
+    );
+  return {
+    ...record,
+    registrationPrecisionHash: continuousHash(v7CanonicalNumbers(registered)),
+  };
+}
 export function reconstructContinuousSegment(
   segment: V7ReplaySegment,
 ): V7World[] {
   let world = segment.initial;
   const frames = [world],
-    registry = continuousRegistry();
+    registry = continuousRegistry(segment.initial);
   const cursors = v7Clone(segment.initialCursors ?? {});
   v7AssertWorld(world);
   for (const round of segment.rounds) {
@@ -402,10 +430,19 @@ export function reconstructContinuousSegment(
       throw new Error(
         `Continuous prefix mismatch before round ${String(round.tick)}.`,
       );
+    if (
+      round.registrationPrecisionHash !== undefined &&
+      (!round.registrations.includes('material-geometry@1') ||
+        continuousHash(v7CanonicalNumbers(world)) !==
+          round.registrationPrecisionHash)
+    )
+      throw new Error('Invalid supplementary registration precision evidence.');
     const input = v7Clone(world);
     for (const actor of input.actors) {
       const memory = round.memory[actor.id];
       if (memory) {
+        if (memory.projects)
+          openSaveProjects(actor, memory.projects, world.tick);
         actor.memory.notes = memory.notes;
         actor.memory.preferences = memory.preferences;
         if (memory.intention !== undefined)

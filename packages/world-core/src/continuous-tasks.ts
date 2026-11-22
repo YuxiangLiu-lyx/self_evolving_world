@@ -1,3 +1,4 @@
+import { openProjects } from './open-projects.js';
 import { forestBoundOperation } from './forest-operations.js';
 import { forestResolveAction } from './forest-references.js';
 import type {
@@ -55,11 +56,14 @@ function repeat(value: unknown): number {
 export function v7ParsePlan(
   value: unknown,
   eventTypes?: readonly string[],
+  allowProjects = false,
 ): V7Plan {
   const p = v7Record(value);
   if (
     Object.keys(p).sort().join(',') !==
-    'intention,interrupts,notes,preferences,repeat,steps,until'
+    (allowProjects && 'projects' in p
+      ? 'intention,interrupts,notes,preferences,projects,repeat,steps,until'
+      : 'intention,interrupts,notes,preferences,repeat,steps,until')
   )
     throw new Error('Expected the registered task plan shape.');
   if (!Array.isArray(p.steps) || !p.steps.length)
@@ -94,6 +98,9 @@ export function v7ParsePlan(
     interrupts: strings(p.interrupts),
     notes: strings(p.notes),
     preferences: strings(p.preferences),
+    ...(allowProjects && p.projects !== undefined
+      ? { projects: openProjects(p.projects) }
+      : {}),
   };
 }
 export function v7Cursor(plan: V7Plan, tick: number): V7Cursor {

@@ -38,6 +38,15 @@ export const ORDINARY_EXPERIENCE_PROMPT =
 export const WORLD_EXPERIENCE_PROMPT =
   WORLD_FOREST_PROMPT +
   '\nThis policy separates transient pleasure from slow sustained mental state. Evaluate event-grounded maintained sources where appropriate: gradual accumulation, bounded saturation, decay and actual continued participation. Actual experiments establishing new observed information may qualify; mastery alone never does. Unknown requested methods or costs are your review responsibility, not grounds to reject a reasonable effect. Every generated ability declares shared reference parameters and complete-execution/progress/cancellation contracts, including escrow ownership and actual remaining work. Implement new physical mechanisms when needed. Food composition and processing provenance must trace real consumed inputs, with no label-only diversity. Review temporary pleasure and maintained satisfaction separately; never alter protected mental accounts or suppress basic nutrition. Describe observable paid effects and their replay representation, and require actual separate participant actions for social consent.';
+export const ORDINARY_OPEN_PROMPT =
+  ORDINARY_EXPERIENCE_PROMPT.replace(
+    'Do not invent a project or private inner monologue.',
+    'You may initiate, change, pause or abandon your own questions and projects. Never invent completed work, physical resources, evidence or benefits. No private inner monologue is requested.',
+  ) +
+  '\nMaintain health with tolerable risk, understand unknowns, develop reusable capabilities, and improve personal and shared living. Optional structured project updates record observed evidence, uncertainty, goals, completed steps, actual outputs, missing conditions, next steps, pause reasons and observed benefits. Omitted projects remain saved. Claims do not change physical facts. Actual informative failed trials can preserve knowledge; names, requests, registration and mastery earn nothing. Familiar practice and sustained interests remain legitimate. Capability index entries are discoverable but only detailed schemas are executable in this decision; consult details when needed. This fresh experiment inherits no earlier generated capability. Communication or accepting a finding does not verify its physical truth or grant mastery.';
+export const WORLD_OPEN_PROMPT =
+  WORLD_EXPERIENCE_PROMPT +
+  '\nThis is a fresh experiment: only its supplied current registry and physical facts are available for functional reuse. No historical skill catalogue or recipes are available. Prefer the smallest feasible executable version, with actual material, energy, process, knowledge and capability dependencies and measurable subsequent benefit or newly feasible behavior. Existing same-world functions require individual learning. Persistent processes must specify conserved inputs and outputs, conditions, progress, pause, cancellation, maintenance and provenance. Code reuse must be recorded separately from an independently proposed function. No era gate or time-based unlock applies. Registered rules already settle repeated observations and experiences in code; do not require repeated model review of established mechanisms.';
 const string = { type: 'string' };
 const object = (properties: Record<string, unknown>) => ({
   type: 'object',
@@ -70,6 +79,7 @@ function outputSchema(schema: V7Schema): unknown {
 export function continuousPlanSchema(
   abilities: V7Ability[],
   events?: string[],
+  projects = false,
 ) {
   const condition = nullable(
     object({
@@ -85,6 +95,29 @@ export function continuousPlanSchema(
   );
   const count = { type: 'integer', minimum: 1 };
   return object({
+    ...(projects
+      ? {
+          projects: array(
+            object({
+              id: string,
+              status: {
+                type: 'string',
+                enum: ['active', 'paused', 'completed', 'abandoned'],
+              },
+              question: string,
+              evidence: array(string),
+              uncertainty: string,
+              goal: string,
+              completedSteps: array(string),
+              outputs: array(string),
+              missing: string,
+              next: string,
+              pauseReason: string,
+              benefit: string,
+            }),
+          ),
+        }
+      : {}),
     intention: string,
     steps: array(
       object({
@@ -143,15 +176,19 @@ export function continuousRequest(
     stream: true,
     instructions:
       role === 'ordinary'
-        ? 'environment' in input
-          ? 'experience' in input
-            ? ORDINARY_EXPERIENCE_PROMPT
-            : ORDINARY_FOREST_PROMPT
-          : ORDINARY_CONTINUOUS_PROMPT
+        ? 'development' in input
+          ? ORDINARY_OPEN_PROMPT
+          : 'environment' in input
+            ? 'experience' in input
+              ? ORDINARY_EXPERIENCE_PROMPT
+              : ORDINARY_FOREST_PROMPT
+            : ORDINARY_CONTINUOUS_PROMPT
         : 'physicalRules' in input && input.physicalRules.forest
-          ? input.physicalRules.experience
-            ? WORLD_EXPERIENCE_PROMPT
-            : WORLD_FOREST_PROMPT
+          ? input.physicalRules.development
+            ? WORLD_OPEN_PROMPT
+            : input.physicalRules.experience
+              ? WORLD_EXPERIENCE_PROMPT
+              : WORLD_FOREST_PROMPT
           : WORLD_CONTINUOUS_PROMPT,
     input: [{ role: 'user', content: continuousInputText(input) }],
     text: {
@@ -164,6 +201,7 @@ export function continuousRequest(
             ? continuousPlanSchema(
                 input.catalogue.interfaces,
                 input.catalogue.events,
+                'development' in input,
               )
             : object({
                 reviews: array(

@@ -1,12 +1,17 @@
+import {
+  preservationAge,
+  preservationExchange,
+  preservationOnTray,
+  preservationReleaseSurface,
+} from './open-preservation-physics.js';
+import { refugePhysiology } from './open-shelter-exposure.js';
+import { openConditions } from './open-physical.js';
+import { forestEvent, forestClimate, forestGrowth } from './forest-climate.js';
+export { forestEvent, forestClimate, forestGrowth } from './forest-climate.js';
+import { openPlants, openAnimals } from './open-ecology.js';
 import { fireExposure } from './forest-fire-exposure.js';
-import type {
-  V7Actor,
-  V7Data,
-  V7Object,
-  V7Point,
-  V7World,
-} from './continuous-types.js';
-import { v7Id, v7RoundNumber } from './continuous-data.js';
+import type { V7Actor, V7World } from './continuous-types.js';
+import { v7RoundNumber } from './continuous-data.js';
 import { shelterTemperature } from './forest-thermal.js';
 import {
   v7Distance,
@@ -48,124 +53,6 @@ export const FOREST_EVENTS = [
   'target-changed',
   'actor-seen',
 ];
-
-export function forestEvent(
-  world: V7World,
-  type: string,
-  description: string,
-  position: V7Point,
-  actor: string | null = null,
-  data: V7Data = {},
-  target: string | null = null,
-): void {
-  world.events.push({
-    id: v7Id(world, 'event'),
-    tick: world.tick,
-    type,
-    description,
-    position: { ...position },
-    actor,
-    target,
-    data,
-    interface: null,
-    success: true,
-  });
-}
-/** One round is one simulation time unit. Time is deliberately accelerated relative to ecology. */
-export function forestClimate(world: V7World, position: V7Point) {
-  const settings = world.config.forest;
-  if (!settings)
-    throw new Error(
-      'Forest climate requires a versioned forest configuration.',
-    );
-  const phase =
-    (((world.time % settings.year) + settings.year) % settings.year) /
-    settings.year;
-  const daylight = Math.max(
-    0,
-    Math.sin(2 * Math.PI * (world.time / settings.day + 0.05)),
-  );
-  const ground =
-    world.terrain[Math.floor(position.y)]?.[Math.floor(position.x)] ?? '.';
-  const seasonal = 11 * Math.sin(2 * Math.PI * phase);
-  const weather =
-    2 * Math.sin((world.time * Math.PI) / 113 + (world.config.seed % 19));
-  const region =
-    ground === ':' ? -3 : ground === ',' ? -1.5 : ground === 'f' ? 0.5 : 1.5;
-  let temperature = 14 + seasonal + weather + region + 4 * (daylight - 0.4);
-  let light = daylight * (0.65 + Math.max(-0.35, seasonal / 30));
-  let moisture =
-    ground === ',' || ground === '=' ? 0.9 : ground === ':' ? 0.25 : 0.65;
-  let indoor = false;
-  for (const object of world.objects) {
-    if (!v7Interior(position, object.spatial)) continue;
-    indoor = true;
-    // This reviewed windbreak changes bodily cold exposure, not ambient heat or growth conditions.
-    if (object.kind === 'insulating-shelter') continue;
-    const buffering =
-      object.kind === 'cave' ? 0.72 : Number(object.data.buffering ?? 0.35);
-    temperature += (12 - temperature) * buffering;
-    temperature += Number(object.data.heating ?? 0);
-    light = Math.max(light * 0.15, Number(object.data.light ?? 0));
-    moisture = Number(object.data.moisture ?? moisture);
-  }
-  const rain = Math.max(
-    0,
-    Math.sin(world.time / 37 + (world.config.seed % 11)),
-  );
-  const wind = 0.5 + 0.5 * Math.sin(world.time / 53 + (world.config.seed % 7));
-  if (world.config.experience && !indoor)
-    temperature -= world.config.experience.exposure * (rain + wind);
-  return {
-    ...(world.config.experience
-      ? {
-          rain: v7RoundNumber(rain),
-          wind: v7RoundNumber(wind),
-          exposure: indoor ? 'buffered' : 'outdoors',
-        }
-      : {}),
-    temperature: v7RoundNumber(temperature),
-    light: v7RoundNumber(light),
-    moisture,
-    indoor,
-    phase,
-    season:
-      ['spring', 'summer', 'autumn', 'winter'][Math.floor(phase * 4)] ??
-      'spring',
-    daylight: v7RoundNumber(daylight),
-    trend:
-      Math.cos(2 * Math.PI * phase) >= 0
-        ? 'gradually warming'
-        : 'gradually cooling',
-  };
-}
-
-/** Temperature/light/water constraints remain locally alterable by reviewed physical mechanisms. */
-export function forestGrowth(world: V7World, object: V7Object): number {
-  const resource = world.resources.find((r) => r.id === object.data.resource),
-    p = resource?.properties;
-  if (!p) return 0;
-  const climate = forestClimate(world, object.spatial);
-  const temperature = climate.temperature + Number(object.data.warming ?? 0);
-  const light = Math.max(climate.light, Number(object.data.light ?? 0));
-  const moisture = Number(object.data.moisture ?? climate.moisture);
-  return (
-    (world.config.experience
-      ? world.config.experience.growthScale /
-        (1 + Number(object.data.depletion ?? 0) / 20)
-      : 1) *
-    Math.max(
-      0,
-      Math.min(
-        1,
-        (temperature - p.minGrowth) /
-          Math.max(1, p.optimalGrowth - p.minGrowth),
-      ),
-    ) *
-    light *
-    Math.min(1, moisture / Math.max(0.1, p.moisture))
-  );
-}
 
 function animals(world: V7World): void {
   const obstacles = v7Obstacles(world);
@@ -306,8 +193,32 @@ export function forestEnvironment(world: V7World): void {
         actor.id,
         { season: climate.season },
       );
+  if (world.config.development) {
+    openPlants(world);
+    for (const actor of world.actors) {
+      const local = openConditions(world, actor.position),
+        key = `open:local:${actor.id}`;
+      if (world.state[key] !== undefined && world.state[key] !== local.regime)
+        forestEvent(
+          world,
+          'local-hazard',
+          `Visible local soil changed to ${local.regime}.`,
+          actor.position,
+          actor.id,
+          {
+            regime: local.regime,
+            moisture: local.moisture,
+            drought: local.drought,
+            waterlogging: local.waterlogging,
+          },
+        );
+      world.state[key] = local.regime;
+    }
+  }
   for (const object of world.objects.filter(
-    (o) => Number(o.data.interval) > 0,
+    (o) =>
+      Number(o.data.interval) > 0 &&
+      (!world.config.development || o.data.resource === 'fish'),
   )) {
     if (world.config.experience)
       object.data.depletion = Math.max(
@@ -336,11 +247,14 @@ export function forestEnvironment(world: V7World): void {
     }
   }
   for (const stack of world.stacks) {
+    if (world.state.foodPreservation === 1) preservationExchange(world, stack);
     const resource = world.resources.find((r) => r.id === stack.resource),
       lifetime = resource?.properties?.decay ?? 0;
     if (!lifetime) continue;
     const owner = world.actors.find((a) => a.id === stack.owner),
-      position = owner?.position ?? stack.position;
+      position = preservationOnTray(stack)
+        ? stack.position
+        : (owner?.position ?? stack.position);
     const temperature = forestClimate(world, position).temperature;
     const preservation = world.config.experience
       ? Math.min(
@@ -352,7 +266,10 @@ export function forestEnvironment(world: V7World): void {
       : 1;
     stack.decay =
       (stack.decay ?? 0) +
-      Math.max(0.15, (temperature + 4) / 24) * preservation;
+      preservationAge(
+        stack,
+        Math.max(0.15, (temperature + 4) / 24) * preservation,
+      );
     if (stack.decay >= lifetime) {
       forestEvent(
         world,
@@ -363,11 +280,13 @@ export function forestEnvironment(world: V7World): void {
         { quantity: stack.quantity, resource: stack.resource },
         stack.id,
       );
+      preservationReleaseSurface(world, stack);
       stack.quantity = 0;
     }
   }
   world.stacks = world.stacks.filter((s) => s.quantity > 0);
-  animals(world);
+  if (world.config.development) openAnimals(world);
+  else animals(world);
 }
 
 export function forestPhysiology(world: V7World, actor: V7Actor): void {
@@ -392,7 +311,7 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
       : undefined;
   const exposure = shelterTemperature(
     before.temperature,
-    climate.temperature,
+    refugePhysiology(world, actor, climate.temperature),
     insulation,
     !!shelter,
   );

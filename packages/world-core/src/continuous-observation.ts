@@ -1,3 +1,7 @@
+import {
+  shortPublicObject,
+  shortPublicStack,
+} from './open-short-observation.js';
 import type {
   V7Actor,
   V7Condition,
@@ -67,12 +71,32 @@ export function v7Observe(world: V7World, id: string): V7Observation {
                       'heating',
                       'insulation',
                       'light',
-                    ].includes(key) || o.createdBy !== null,
+                    ].includes(key) ||
+                    (o.kind === 'water-spill' &&
+                      [
+                        'cell',
+                        'waterMl',
+                        'clayMass',
+                        'interpretation',
+                      ].includes(key)) ||
+                    (world.config.development &&
+                      [
+                        'stage',
+                        'soil',
+                        'health',
+                        'group',
+                        'offspring',
+                        'fear',
+                        'establishment',
+                      ].includes(key)) ||
+                    o.createdBy !== null,
                 ),
               ),
             }
           : o,
-      ),
+      )
+      .map(preservationPublicObject)
+      .map(shortPublicObject),
     stacks: world.stacks
       .filter(
         (s) =>
@@ -82,20 +106,31 @@ export function v7Observe(world: V7World, id: string): V7Observation {
             v7Visible(world, actor.position, s.position)),
       )
       .map((s) =>
-        world.state.foodAssessment === 1 && s.owner === id
+        (world.state.foodAssessment === 1 && s.owner === id) ||
+        (world.state.riverWater === 1 && s.owner === id && !s.reservedFor)
           ? { ...s, position: { ...actor.position } }
           : s,
-      ),
+      )
+      .map((s) => {
+        if (!s.physical && !s.materialLayer) return s;
+        const visible = { ...s };
+        delete visible.physical;
+        delete visible.materialLayer;
+        return preservationPublicStack(visible);
+      })
+      .map(shortPublicStack),
     terrain,
-    events: world.events.filter(
-      (e) =>
-        e.actor === id ||
-        (e.type === 'message' && e.target === id) ||
-        (e.position &&
-          v7Distance(actor.position, e.position) <= radius &&
-          e.type !== 'message' &&
-          v7Visible(world, actor.position, e.position)),
-    ),
+    events: world.events
+      .filter(
+        (e) =>
+          e.actor === id ||
+          (e.type === 'message' && e.target === id) ||
+          (e.position &&
+            v7Distance(actor.position, e.position) <= radius &&
+            e.type !== 'message' &&
+            v7Visible(world, actor.position, e.position)),
+      )
+      .map(preservationPublicEvent),
   });
 }
 export function v7Remember(world: V7World): void {
@@ -230,3 +265,8 @@ export function v7ConditionContext(world: V7World, actor: V7Actor): V7Data {
     tick: world.tick,
   };
 }
+import {
+  preservationPublicObject,
+  preservationPublicStack,
+  preservationPublicEvent,
+} from './open-preservation-observation.js';

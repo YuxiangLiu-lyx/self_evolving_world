@@ -3,6 +3,7 @@ import type {
   V7Actor,
   V7ReferenceScope,
   V7World,
+  V7Data,
 } from './continuous-types.js';
 import { v7Observe } from './continuous-observation.js';
 
@@ -11,6 +12,7 @@ export class ForestReferenceError extends Error {
     readonly code: string,
     readonly candidates: string[],
     detail: string,
+    readonly details?: V7Data,
   ) {
     super(
       `Reference ${code}: ${detail}. Observable candidates: ${candidates.join(', ') || 'none'}.`,
@@ -27,6 +29,26 @@ export function forestResolveReference(
   quantity = 0,
 ): string {
   const o = v7Observe(world, actor.id);
+  if (scope === 'optional-exact-surface') {
+    const cell = /^river:([0-9]+):([0-9]+)$/.exec(reference);
+    if (cell && world.state.riverWater === 1) {
+      if (
+        !o.terrain.some(
+          (t) =>
+            t.x === Number(cell[1]) &&
+            t.y === Number(cell[2]) &&
+            ['~', '='].includes(t.kind),
+        )
+      )
+        throw new ForestReferenceError(
+          'unavailable',
+          [],
+          'no personally visible represented river surface',
+        );
+      return reference;
+    }
+    scope = 'optional-exact-visible';
+  }
   const stacks =
     scope === 'known'
       ? [
@@ -45,7 +67,14 @@ export function forestResolveReference(
             .map((m) => m.object),
         ]
       : o.objects;
-  const prefix = /^(item|object|resource):/.exec(reference)?.[1];
+  const prefix =
+    scope === 'optional-exact-visible' &&
+    world.state.refugeDiagnostics !== 1 &&
+    world.state.foodPreservation !== 1 &&
+    world.state.shortRefuge !== 1 &&
+    world.state.riverWater !== 1
+      ? undefined
+      : /^(item|object|resource):/.exec(reference)?.[1];
   const value = prefix ? reference.slice(prefix.length + 1) : reference;
   const observed = [
     ...stacks.map((s) => ({
@@ -70,11 +99,12 @@ export function forestResolveReference(
     (x) => x.id === value && (!prefix || prefix === x.kind),
   );
   const matched =
-    prefix === 'resource' || (!prefix && !exact.length)
+    scope !== 'optional-exact-visible' &&
+    (prefix === 'resource' || (!prefix && !exact.length))
       ? observed.filter((x) => x.resource === value)
       : exact;
   const permitted = matched.filter((x) =>
-    scope === 'owned'
+    scope === 'owned' || scope === 'optional-owned'
       ? x.kind === 'item' && x.owner === actor.id
       : scope === 'ground'
         ? x.kind === 'item' && x.owner === null
@@ -85,6 +115,56 @@ export function forestResolveReference(
             : true,
   );
   const candidates = permitted.map((x) => `${x.kind}:${x.id}`);
+  if (
+    scope === 'optional-exact-visible' &&
+    (world.state.refugeDiagnostics === 1 ||
+      world.state.foodPreservation === 1 ||
+      world.state.shortRefuge === 1 ||
+      world.state.riverWater === 1)
+  ) {
+    const malformed =
+      prefix === 'resource' || /^(item|object|resource):/.test(value);
+    const code = malformed
+      ? 'malformed-reference'
+      : !permitted.length
+        ? 'absent-or-inaccessible-identity'
+        : permitted.length > 1
+          ? 'ambiguous-identity'
+          : permitted[0]?.reserved
+            ? 'reserved-material'
+            : quantity > (permitted[0]?.quantity ?? 0) + 1e-8
+              ? 'insufficient-quantity'
+              : null;
+    const accessibleCandidates = candidates.length
+      ? candidates
+      : observed
+          .filter((x) => x.kind === 'item' && x.owner === actor.id)
+          .slice(0, 12)
+          .map((x) => `item:${x.id}`);
+    if (code)
+      throw new ForestReferenceError(
+        code,
+        accessibleCandidates,
+        'Reference resolution failed independently of material suitability.',
+        {
+          contract:
+            world.state.refugeDiagnostics === 1
+              ? 'shelter-reference-diagnostics@1'
+              : 'exact-preservation-identity',
+          reasonCode: code,
+          suppliedReference: reference,
+          resolvedId:
+            permitted.length === 1 ? (permitted[0]?.id ?? null) : null,
+          requiredCondition:
+            'One exact personally accessible persistent identity; resource aliases are not identities.',
+          observedObstruction: code,
+          candidates: accessibleCandidates,
+          paidEnergy: 0,
+          remainingWork: 1,
+          operationId: `shelter-inspection:${actor.id}:${String(world.tick)}`,
+        },
+      );
+  }
   if (!permitted.length)
     throw new ForestReferenceError(
       matched.length ? 'wrong-kind-or-ownership' : 'unavailable',
@@ -183,7 +263,14 @@ export function forestResolveAction(
         [],
         `${parameter} must be a reference string`,
       );
-    if (!value && scope === 'known') continue;
+    if (
+      !value &&
+      (scope === 'known' ||
+        scope === 'optional-owned' ||
+        scope === 'optional-exact-surface' ||
+        scope === 'optional-exact-visible')
+    )
+      continue;
     args[parameter] = forestResolveReference(
       world,
       actor,

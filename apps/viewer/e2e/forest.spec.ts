@@ -1,3 +1,4 @@
+import type { V7ReplaySegment } from '../../../scripts/continuous-store.js';
 import { recuperationFrames } from '../../simulator/test/fixtures/recuperation.js';
 import { canopyFrames } from '../../simulator/test/fixtures/canopy.js';
 import {
@@ -773,4 +774,538 @@ test('isolated recuperation shows paid stationary progress, qualified relief and
     'recuperation-cancelled',
   );
   await screenshot(page, info, 'isolated-recuperation-cancelled');
+});
+
+test('fresh development scenes show local hazards, seedlings, injured animals and persistent work', async ({
+  page,
+}, info) => {
+  const { initialOpenWorld } =
+    await import('../../simulator/src/open-scenario.js');
+  const base = v7Clone(initialOpenWorld());
+  const a = base.actors[0];
+  if (!a) throw new Error('Missing observer');
+  a.position = { x: 9, y: 10 };
+  const drought = v7Clone(base);
+  drought.tick = 300;
+  drought.time = 300;
+  const seedling = drought.objects.find((o) => o.data.resource === 'berry');
+  if (seedling) {
+    seedling.data.stage = 'seedling';
+    seedling.data.stock = 0;
+    seedling.visual.state = 'seedling';
+  }
+  const animal = drought.objects.find((o) => o.data.species === 'deer');
+  if (animal) {
+    animal.spatial.x = 10;
+    animal.spatial.y = 9;
+    animal.data.health = 55;
+    animal.data.mode = 'fleeing';
+  }
+  const wet = v7Clone(base);
+  wet.tick = 560;
+  wet.time = 560;
+  const observer = wet.actors[0];
+  if (observer) observer.position = { x: 22, y: 22 };
+  const station = wet.objects.find((o) => o.data.resource === 'tuber');
+  if (station) {
+    station.spatial.x = 22.8;
+    station.spatial.y = 22;
+    station.spatial.solid = false;
+    station.data.progress = 0.5;
+    station.visual.state = 'working';
+    wet.processes.push({
+      id: 'visual-fixture-process',
+      handler: 'open.process',
+      owner: 'lin',
+      object: station.id,
+      next: 561,
+      revision: 'foundation-open@1',
+      data: { progress: 3, status: 'conditions unmet' },
+    });
+  }
+  await load(page, [base, drought, wet]);
+  await seek(page, 1);
+  await screenshot(page, info, 'fresh-local-drought-and-life');
+  await seek(page, 2);
+  await screenshot(page, info, 'fresh-waterlogging-and-persistent-work');
+});
+
+test('isolated internal food examination shows paid stages and retained uncertainty without a safety badge', async ({
+  page,
+}, info) => {
+  const { examinationFrames } =
+    await import('../../simulator/test/fixtures/open-food-examination.js');
+  await load(page, examinationFrames());
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await seek(page, 1);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'food-sample-opened',
+  );
+  await expect(page.locator('#fixture-state')).toContainText(
+    'do not establish safety',
+  );
+  await screenshot(page, info, 'isolated-food-examination-opened');
+  await seek(page, 2);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'food-examination-completed',
+  );
+  await expect(page.locator('#fixture-state')).toContainText('integrity');
+  await screenshot(page, info, 'isolated-food-examination-completed');
+});
+
+test('isolated assay apparatus and drying show real construction, readings and uncertainty', async ({
+  page,
+}, info) => {
+  const { assayEquipmentFrames, assayMeasurement, assayStep } =
+    await import('../../simulator/test/fixtures/open-food-assay.js');
+  const built = assayEquipmentFrames();
+  let w = built.at(-1);
+  if (!w) throw new Error('Missing actual apparatus');
+  const frames = [built[2] ?? w, built[9] ?? w, w];
+  const action = assayMeasurement(w);
+  const a = w.actors[0];
+  if (a) a.vitals.satiety = 100;
+  for (let i = 0; i < 120; i++) {
+    const r = assayStep(w, action);
+    expect(r.outcomes.lin?.success).toBe(true);
+    w = v7Clone(r.world);
+    if (w.events.some((e) => e.type === 'assay-reading')) frames.push(w);
+    if (r.outcomes.lin?.complete) break;
+  }
+  expect(w.events.some((e) => e.type === 'food-assay-completed')).toBe(true);
+  frames.push(w);
+  await load(page, frames);
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await seek(page, 1);
+  await expect(page.locator('#fixture-state')).toContainText('calibrated');
+  await screenshot(page, info, 'isolated-assay-calibrated-balance');
+  await seek(page, 3);
+  await expect(page.locator('#fixture-events')).toContainText('assay-reading');
+  await screenshot(page, info, 'isolated-assay-real-relative-reading');
+  await seek(page, frames.length - 1);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'food-assay-completed',
+  );
+  await screenshot(page, info, 'isolated-assay-retained-residue');
+});
+
+test('isolated bark inspection distinguishes unknown composition from paid conserved extraction', async ({
+  page,
+}, info) => {
+  const { barkFrames } =
+    await import('../../simulator/test/fixtures/open-bark.js');
+  await load(page, barkFrames());
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await expect(page.locator('#fixture-events')).toContainText('unresolved');
+  await screenshot(page, info, 'isolated-bark-unresolved');
+  await seek(page, 2);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'bark-strip-progress',
+  );
+  await expect(page.locator('#fixture-state')).toContainText('bark-fragments');
+  await screenshot(page, info, 'isolated-bark-partial-layer');
+  await seek(page, 3);
+  await expect(page.locator('#fixture-events')).toContainText('bark-stripped');
+  await expect(page.locator('#fixture-state')).toContainText('0.4 bark');
+  await screenshot(page, info, 'isolated-bark-conserved-sheets');
+});
+
+test('isolated woven apparatus shows paid partial components, calibrated baskets and conserved escaped sample', async ({
+  page,
+}, info) => {
+  const { wovenFrames, conditionedWoven, wovenStep } =
+    await import('../../simulator/test/fixtures/open-woven.js');
+  const { assayAction } =
+    await import('../../simulator/test/fixtures/open-food-assay.js');
+  const built = wovenFrames();
+  let w = conditionedWoven();
+  const b = w.objects.find((o) => o.kind === 'comparison-balance'),
+    weight = w.stacks.find((s) => s.processing?.comparisonWeight);
+  if (!b || !weight) throw new Error('Missing fixture equipment');
+  const action = assayAction('dry-mass', 'sample', b.id, [weight.id], 1);
+  w = v7Clone(wovenStep(w, action).world);
+  const mesh = w.objects.find((o) => o.kind === 'drying-tray');
+  if (!mesh) throw new Error('Missing fixture mesh');
+  mesh.data.aperture = 1;
+  w = v7Clone(wovenStep(w, action).world);
+  const partial = built[5],
+    ready = built.at(-1);
+  if (!partial || !ready) throw new Error('Missing paid fixtures');
+  await load(page, [partial, ready, w]);
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await expect(page.locator('#fixture-events')).toContainText(
+    'woven-support-progress',
+  );
+  await screenshot(page, info, 'isolated-woven-partial-components');
+  await seek(page, 1);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'woven-support-completed',
+  );
+  await screenshot(page, info, 'isolated-woven-calibrated-baskets');
+  await seek(page, 2);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'assay-invalidated',
+  );
+  await screenshot(page, info, 'isolated-woven-escaped-sample');
+});
+
+test('isolated scratch comparison shows paid contacts and unresolved absolute hardness', async ({
+  page,
+}, info) => {
+  const { hardnessFrames } =
+    await import('../../simulator/test/fixtures/open-hardness.js');
+  await load(page, hardnessFrames());
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await seek(page, 1);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'hardness-test-progress',
+  );
+  await screenshot(page, info, 'isolated-hardness-paid-contact');
+  await seek(page, 2);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'hardness-comparison-completed',
+  );
+  await screenshot(page, info, 'isolated-hardness-relative-result');
+  await seek(page, 3);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'absolute hardness remains unresolved',
+  );
+  await screenshot(page, info, 'isolated-hardness-unresolved-threshold');
+});
+
+test('isolated contact sweep distinguishes achieved contacts from unresolved absolute calibration', async ({
+  page,
+}, info) => {
+  const { contactFrames } =
+    await import('../../simulator/test/fixtures/open-contact.js');
+  await load(page, contactFrames());
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await seek(page, 2);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'contact-calibration-progress',
+  );
+  await screenshot(page, info, 'isolated-contact-response-sweep');
+  await seek(page, 5);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'paid assessment remains',
+  );
+  await screenshot(page, info, 'isolated-contact-assessment-pending');
+  await seek(page, 6);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'Absolute bounds remain unresolved',
+  );
+  await screenshot(page, info, 'isolated-contact-unresolved-bounds');
+});
+
+test('isolated shade construction shows installed poles, actual porous roof and beneficial occupied rest', async ({
+  page,
+}, info) => {
+  const { refugeFrames, refugeStep } =
+    await import('../../simulator/test/fixtures/open-shelter.js');
+  const frames = refugeFrames(),
+    last = frames.at(-1);
+  if (!last) throw new Error('Missing fixture frame');
+  const occupied = v7Clone(last),
+    a = occupied.actors[0];
+  if (!a) throw new Error('Missing fixture actor');
+  a.vitals.temperature = 32;
+  a.vitals.energy = 10;
+  occupied.time = 180;
+  occupied.tick = 180;
+  frames.push(
+    v7Clone(refugeStep(occupied, { interface: 'rest', args: {} }).world),
+  );
+  await load(page, frames);
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await seek(page, 0);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'shelter-progress',
+  );
+  await screenshot(page, info, 'isolated-shade-installed-poles');
+  await seek(page, 9);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'shelter-completed',
+  );
+  await screenshot(page, info, 'isolated-shade-proven-roof');
+  await seek(page, 10);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'shelter-rest-experience',
+  );
+  await screenshot(page, info, 'isolated-shade-occupied-relief');
+});
+
+test('isolated shelter diagnostics distinguish unresolved identity, unknown geometry and measured specimens', async ({
+  page,
+}, info) => {
+  const { diagnosticFrames } =
+    await import('../../simulator/test/fixtures/open-shelter-diagnostics.js');
+  await load(page, diagnosticFrames());
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await seek(page, 0);
+  await expect(page.locator('#fixture-diagnostic')).toContainText(
+    'malformed-reference',
+  );
+  await screenshot(page, info, 'isolated-shelter-reference-failure');
+  await seek(page, 1);
+  await expect(page.locator('#fixture-diagnostic')).toContainText(
+    'item-112-moss-648',
+  );
+  await expect(page.locator('#fixture-diagnostic')).toContainText(
+    'geometry-unavailable',
+  );
+  await screenshot(page, info, 'isolated-shelter-unknown-dimensions');
+  await seek(page, 4);
+  await expect(page.locator('#fixture-diagnostic')).toContainText('resolved');
+  await expect(page.locator('#fixture-events')).toContainText(
+    'measured existing geometry',
+  );
+  await screenshot(page, info, 'isolated-shelter-measured-identity');
+});
+
+test('isolated metrology distinguishes physical model shape, measured intervals and actual loaded specimen', async ({
+  page,
+}, info) => {
+  const { metrologyFrames } =
+    await import('../../simulator/test/fixtures/open-metrology.js');
+  await load(page, metrologyFrames());
+  for (let i = 0; i < 3; i++)
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+  await seek(page, 1);
+  await expect(page.locator('#fixture-state')).toContainText(
+    'not yet measured',
+  );
+  await screenshot(page, info, 'isolated-metrology-model-shape');
+  await seek(page, 2);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'metrology-measured',
+  );
+  await screenshot(page, info, 'isolated-metrology-measured-intervals');
+  await seek(page, 4);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'metrology-load-tested',
+  );
+  await screenshot(page, info, 'isolated-metrology-actual-load');
+});
+
+test('retained round-123 replay verifies native migration precision and still rejects an invalid supplementary proof', async ({
+  page,
+}, info) => {
+  // Reproduce a queued animation timestamp preceding a slow synchronous seek.
+  await page.addInitScript(() => {
+    const original = window.requestAnimationFrame.bind(window);
+    window.requestAnimationFrame = (callback) =>
+      original((time) => {
+        callback(time - 500);
+      });
+  });
+  const { readFileSync } = await import('node:fs');
+  const { createHash } = await import('node:crypto');
+  const { reconstructContinuousSegment, bindRegistrationPrecision } =
+    await import('../../../scripts/continuous-store.js');
+  const index = JSON.parse(
+    readFileSync(
+      'experiment/ex10/technical-pauses/round-123/replay.json',
+      'utf8',
+    ),
+  ) as {
+    observed: number;
+    segments: { path: string; sha256: string }[];
+  };
+  const sources = new Map<string, string>();
+  let guardedPath = '';
+  for (const entry of index.segments) {
+    const text = readFileSync(`experiment/ex10/${entry.path}`, 'utf8');
+    const segment = JSON.parse(text) as V7ReplaySegment;
+    const frames = reconstructContinuousSegment(segment);
+    segment.rounds = segment.rounds.map((r, i) => {
+      const before = frames[i];
+      if (!before) throw new Error('Missing actual replay prefix');
+      return bindRegistrationPrecision(before, r);
+    });
+    const source = JSON.stringify(segment);
+    entry.sha256 = createHash('sha256').update(source).digest('hex');
+    sources.set(entry.path, source);
+    if (segment.rounds.some((r) => r.registrationPrecisionHash))
+      guardedPath = entry.path;
+  }
+  await page.route('**/experiments/index.json', (r) =>
+    r.fulfill({
+      contentType: 'application/json',
+      body: JSON.stringify({
+        version: 1,
+        experiments: [{ id: 'ex10', steps: 123 }],
+      }),
+    }),
+  );
+  await page.route('**/experiments/ex10/**', (r) => {
+    const path = new URL(r.request().url()).pathname.split('/ex10/')[1];
+    const body =
+      path === 'replay.json' ? JSON.stringify(index) : sources.get(path ?? '');
+    if (!body) throw new Error('Unexpected replay request');
+    return r.fulfill({ contentType: 'application/json', body });
+  });
+  await page.goto('/observatory.html?experiment=ex10');
+  await expect(page.locator('#round')).toHaveText('0 / 123');
+  await page.locator('#time').fill('123');
+  await expect(page.locator('#round')).toHaveText('123 / 123');
+  await expect(page.locator('#status')).not.toHaveClass(/error/);
+  await screenshot(page, info, 'retained-ex10-round-123-precision-replay');
+  const guarded = sources.get(guardedPath);
+  if (!guarded) throw new Error('Missing retained registration');
+  const bad = JSON.parse(guarded) as V7ReplaySegment;
+  const registration = bad.rounds.find((r) => r.registrationPrecisionHash);
+  if (!registration) throw new Error('Missing precision record');
+  registration.registrationPrecisionHash = 'invalid';
+  const changed = JSON.stringify(bad),
+    entry = index.segments.find((p) => p.path === guardedPath);
+  if (!entry) throw new Error('Missing indexed part');
+  entry.sha256 = createHash('sha256').update(changed).digest('hex');
+  sources.set(guardedPath, changed);
+  await page.reload();
+  await expect(page.locator('#round')).toHaveText('0 / 123');
+  await page.locator('#time').fill('123');
+  await expect(page.locator('#status')).toHaveText(
+    'Invalid registration precision evidence.',
+  );
+});
+
+test('isolated preservation shows actual tray food, paid preparation, reduced mass and retained removal', async ({
+  page,
+}, info) => {
+  const { preservationFrames } =
+    await import('../../simulator/test/fixtures/open-preservation.js');
+  await load(page, preservationFrames());
+  await page.locator('#fixture-zoom-in').click({ clickCount: 3 });
+  await seek(page, 1);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'preservation-progress',
+  );
+  await screenshot(page, info, 'isolated-preservation-preparing');
+  await seek(page, 3);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'preservation-completed',
+  );
+  await screenshot(page, info, 'isolated-preservation-measured-benefit');
+  await seek(page, 4);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'preservation-stopped',
+  );
+  await screenshot(page, info, 'isolated-preservation-retained-food');
+});
+
+test('isolated short refuge shows proposed bounds, paid partial poles, real apertures and bounded proof', async ({
+  page,
+}, info) => {
+  const { shortFrames } =
+    await import('../../simulator/test/fixtures/open-short-refuge.js');
+  await load(page, shortFrames());
+  await page.locator('#fixture-zoom-in').click({ clickCount: 3 });
+  await seek(page, 1);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'short-refuge-assessed',
+  );
+  await screenshot(page, info, 'isolated-short-refuge-assessment');
+  await seek(page, 2);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'short-refuge-progress',
+  );
+  await screenshot(page, info, 'isolated-short-refuge-partial');
+  await seek(page, 4);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'short-refuge-trial',
+  );
+  await screenshot(page, info, 'isolated-short-refuge-proof');
+});
+
+test('isolated water access shows finite observed reach, paid forming, actual fill and retained failure deposits', async ({
+  page,
+}, info) => {
+  const { waterFrames } =
+    await import('../../simulator/test/fixtures/open-water.js');
+  await load(page, waterFrames());
+  await page.locator('#fixture-zoom-in').click({ clickCount: 3 });
+  await seek(page, 1);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'water-access-inspected',
+  );
+  await screenshot(page, info, 'isolated-water-bank-access');
+  await seek(page, 2);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'water-cup-progress',
+  );
+  await screenshot(page, info, 'isolated-water-paid-forming');
+  await seek(page, 3);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'water-withdrawn',
+  );
+  await screenshot(page, info, 'isolated-water-finite-filled-cup');
+  await seek(page, 4);
+  await expect(page.locator('#fixture-events')).toContainText('picked-up');
+  await screenshot(page, info, 'isolated-water-carried-cup');
+  await seek(page, 5);
+  await expect(page.locator('#fixture-events')).toContainText(
+    'water-cup-failed',
+  );
+  await screenshot(page, info, 'isolated-water-retained-collapse');
+});
+test('isolated trial diagnostics distinguish original failed predicates from missing historical evidence', async ({
+  page,
+}, info) => {
+  const { diagnosticFrames } =
+    await import('../../simulator/test/fixtures/open-short-diagnostics.js');
+  await load(page, diagnosticFrames());
+  await page.locator('#fixture-time').fill('1');
+  await page.locator('#fixture-time').dispatchEvent('input');
+  await expect(page.locator('#fixture-trial-diagnostic')).toContainText(
+    'Original outcome: failed',
+  );
+  await expect(page.locator('#fixture-trial-diagnostic')).toContainText('0.02');
+  await expect(page.locator('#fixture-trial-diagnostic')).toContainText(
+    'No new trial',
+  );
+  await screenshot(page, info, 'isolated-trial-diagnostic-failed-predicate');
+  await page.locator('#fixture-time').fill('2');
+  await page.locator('#fixture-time').dispatchEvent('input');
+  await expect(page.locator('#fixture-trial-diagnostic')).toContainText(
+    'Missing historical evidence',
+  );
+  await expect(page.locator('#fixture-trial-diagnostic')).toContainText(
+    'unknown',
+  );
+  await screenshot(page, info, 'isolated-trial-diagnostic-unknown-history');
+});
+
+test('isolated extraction shows actual arm handling, disjoint residue regions and unresolved measurement limits', async ({
+  page,
+}, info) => {
+  const { extractionFrames } =
+    await import('../../simulator/test/fixtures/open-extraction.js');
+  await load(page, extractionFrames());
+  await page.locator('#fixture-zoom-in').click({ clickCount: 2 });
+  await seek(page, 1);
+  await expect(page.locator('#fixture-extraction')).toContainText(
+    'retained mixing',
+  );
+  await screenshot(page, info, 'isolated-extraction-paid-contact');
+  await seek(page, 2);
+  await expect(page.locator('#fixture-extraction')).toContainText(
+    'actual tray residue',
+  );
+  await screenshot(page, info, 'isolated-extraction-two-residues');
+  await seek(page, 3);
+  await expect(page.locator('#fixture-extraction')).toContainText(
+    'Not a safety or nutrition certificate',
+  );
+  await expect(page.locator('#fixture-extraction')).toContainText(
+    'residue interval',
+  );
+  await screenshot(page, info, 'isolated-extraction-inconclusive-reading');
 });

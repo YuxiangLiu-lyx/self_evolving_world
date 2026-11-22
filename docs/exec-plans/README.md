@@ -49,3 +49,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-22](completed/pr-22-scoped-validation.md): dependency-scoped acceptance, reconstruction reuse and CI delivery efficiency.
 
 - [PR-23](completed/pr-23-forest-experience.md): consistent execution, diet and sustained experience with a new real observation.
+
+- [PR-24](active/pr-24-open-development.md): fresh skill isolation and cumulative open development with a fixed real observation.

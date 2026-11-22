@@ -1,6 +1,18 @@
+import { drawExtraction } from './open-extraction-view.js';
+import {
+  drawWaterObject,
+  drawWaterItem,
+  drawWaterAccess,
+  drawCarriedWater,
+} from './open-water-visual.js';
+import { drawShortRefuge, drawShortProposal } from './open-short-visual.js';
+import { drawMetrology } from './open-metrology-visual.js';
+import { drawOpenRefuge } from './open-shelter-visual.js';
+import { drawAssayApparatus } from './open-assay-visual.js';
 import { drawWillowWork, drawWillowItem } from './forest-willow-visual.js';
 import {
   forestClimate,
+  openConditions,
   v7Interior,
   v7Walls,
   v7Visible,
@@ -104,10 +116,58 @@ function object(
   c: CanvasRenderingContext2D,
   o: V7Object,
   selected: V7Actor | undefined,
+  time: number,
+  day: number,
+  quietWater = false,
 ): void {
   const { x, y } = o.spatial;
+  if (drawWaterObject(c, o, quietWater)) return;
+  if (drawMetrology(c, o)) {
+    label(
+      c,
+      `${Number(o.data.span) > 0 ? 'Load trial' : o.data.measured === true ? 'Measured specimen' : 'Measurement pending'} · ${String(Number(o.data.stage))} / 2`,
+      x,
+      y + 0.5,
+    );
+    return;
+  }
+  if (drawShortRefuge(c, o, time, day) || drawOpenRefuge(c, o, time, day)) {
+    if (o.kind === 'open-refuge')
+      label(
+        c,
+        `${o.data.proven === true ? 'Proven shade' : o.visual.state === 'failed' ? 'Failed proof' : 'Partial frame'} · ${String(Number(o.data.stage))} / 10 · condition ${Number(o.data.condition).toFixed(2)}`,
+        x,
+        y - 1.6,
+      );
+    return;
+  }
+  if (drawAssayApparatus(c, o)) {
+    label(
+      c,
+      o.kind === 'comparison-balance'
+        ? o.data.calibrated === true
+          ? 'Calibrated balance'
+          : 'Uncalibrated balance'
+        : o.kind === 'drying-tray'
+          ? 'Actual drying tray'
+          : `Assembly · ${String(Number(o.data.progress))}`,
+      x,
+      o.kind === 'drying-tray' ? y + 1.4 : y - 1.8,
+    );
+    return;
+  }
   c.save();
   c.translate(x, y);
+  if (o.visual.state === 'partially-stripped') {
+    c.strokeStyle = '#e4d0a3';
+    c.lineWidth = 0.08;
+    c.beginPath();
+    c.moveTo(x - 0.18, y - 0.12);
+    c.lineTo(x + 0.18, y + 0.12);
+    c.stroke();
+  }
+  if (o.data.stage === 'seedling') c.scale(0.5, 0.5);
+  if (o.kind === 'animal' && o.data.mode === 'dead') c.globalAlpha = 0.45;
   if (o.kind === 'shelter-site') {
     c.rotate(o.spatial.angle);
     c.fillStyle = '#8b795744';
@@ -317,6 +377,18 @@ function object(
     }
   }
   c.restore();
+  if (o.data.stage === 'seedling') label(c, 'Seedling', x, y - 0.55);
+  if (
+    o.kind === 'animal' &&
+    typeof o.data.health === 'number' &&
+    o.data.health < 90
+  )
+    label(
+      c,
+      `${typeof o.data.mode === 'string' ? o.data.mode : 'unknown'} · ${o.data.health.toFixed(0)} health`,
+      x,
+      y - 0.55,
+    );
   if (o.data.resource === 'willow' && o.kind === 'tree')
     label(c, `Willow · stock ${String(Number(o.data.stock))}`, x, y - 1.75);
 }
@@ -400,9 +472,27 @@ function actor(
       c,
       recoveryCancelled
         ? 'recuperation cancelled'
-        : active.replaceAll('_', ' '),
+        : active === 'short-material-refuge'
+          ? 'Canopy work'
+          : active === 'access-water'
+            ? 'Water work'
+            : active === 'noningestive-extractability'
+              ? 'Extraction'
+              : active === 'short-refuge-trial-diagnostics'
+                ? 'Read trial'
+                : active.replaceAll('_', ' '),
       a.position.x,
-      a.position.y + 0.65,
+      a.position.y +
+        ([
+          'short-material-refuge',
+          'access-water',
+          'short-refuge-trial-diagnostics',
+          'noningestive-extractability',
+        ].includes(active)
+          ? 1.65
+          : active === 'shelter-material-metrology'
+            ? 1.65
+            : 0.65),
       '#dfd8ad',
     );
   if (recuperating) {
@@ -610,6 +700,19 @@ export function drawForestCanvas(
           : (terrainColors[cell] ?? '#77835c');
       c.fillRect(x, y, 1.02, 1.02);
       if (visible && !visible.has(`${String(x)},${String(y)}`)) continue;
+      if (frame.continuous?.config.development) {
+        const local = openConditions(frame.continuous, {
+          x: x + 0.5,
+          y: y + 0.5,
+        });
+        if (local.drought > 0.05 || local.waterlogging > 0.05) {
+          c.fillStyle =
+            local.drought > local.waterlogging
+              ? `rgba(188,139,65,${String(local.drought * 0.55)})`
+              : `rgba(75,151,183,${String(local.waterlogging * 0.6)})`;
+          c.fillRect(x, y, 1, 1);
+        }
+      }
       for (let n = 0; n < 3; n++) {
         const px = x + 0.5 + 0.42 * Math.sin(x * 17 + y * 31 + n * 13),
           py = y + 0.5 + 0.42 * Math.cos(x * 7 + y * 11 + n * 19);
@@ -632,7 +735,16 @@ export function drawForestCanvas(
         (!self || !v7Interior(self.position, o.spatial)),
     );
   for (const o of frame.objects.filter((o) => o.spatial.enclosure))
-    object(c, o, self);
+    object(
+      c,
+      o,
+      self,
+      frame.continuous?.time ?? frame.tick,
+      frame.continuous?.config.forest?.day ?? 80,
+      frame.continuous?.processes.some(
+        (p) => p.handler === 'open.extraction',
+      ) ?? false,
+    );
   const entities = [
     ...frame.objects
       .filter((o) => !o.spatial.enclosure && !beneathClosedRoof(o.spatial))
@@ -642,7 +754,17 @@ export function drawForestCanvas(
       .map((a) => ({ y: a.position.y, actor: a })),
   ].sort((a, b) => a.y - b.y);
   for (const e of entities) {
-    if ('object' in e) object(c, e.object, self);
+    if ('object' in e)
+      object(
+        c,
+        e.object,
+        self,
+        frame.continuous?.time ?? frame.tick,
+        frame.continuous?.config.forest?.day ?? 80,
+        frame.continuous?.processes.some(
+          (p) => p.handler === 'open.extraction',
+        ) ?? false,
+      );
     else {
       let a = e.actor;
       const old = previous?.actors.find((p) => p.id === a.id);
@@ -672,9 +794,140 @@ export function drawForestCanvas(
           (s) => s.owner === a.id && s.mantle?.equipped,
         )?.mantle,
       );
+      if (frame.visible === null || selected === a.id)
+        drawCarriedWater(
+          c,
+          frame.continuous?.stacks.filter(
+            (s) => s.owner === a.id && s.waterCup,
+          ) ?? [],
+          a,
+        );
     }
   }
+  for (const event of frame.events.filter(
+    (e) => e.type === 'short-refuge-assessed',
+  ))
+    drawShortProposal(c, event.data);
+  for (const event of frame.events)
+    drawWaterAccess(
+      c,
+      event,
+      frame.actors.find((a) => a.id === event.actor),
+    );
+  for (const process of frame.continuous?.processes ?? []) {
+    const station = frame.objects.find((o) => o.id === process.object);
+    if (station && process.handler === 'open.process')
+      label(
+        c,
+        `Process · ${String(Number(process.data.progress ?? 0))} work · ${typeof process.data.status === 'string' ? process.data.status : 'pending'}`,
+        station.spatial.x,
+        station.spatial.y - 1.25,
+      );
+  }
   for (const a of frame.actors.filter((a) => !beneathClosedRoof(a.position))) {
+    const examination = a.extensionState['open:food-examination'];
+    const examined = frame.events.find(
+      (e) => e.actor === a.id && e.type === 'food-examination-completed',
+    );
+    if (
+      (examination &&
+        typeof examination === 'object' &&
+        !Array.isArray(examination)) ||
+      examined
+    ) {
+      const sampleId =
+        examination &&
+        typeof examination === 'object' &&
+        !Array.isArray(examination)
+          ? examination.sample
+          : examined?.target;
+      const sample = frame.continuous?.stacks.find((s) => s.id === sampleId);
+      if (sample) {
+        const sx = a.position.x + 0.6,
+          sy = a.position.y + 0.2;
+        ellipse(c, sx - 0.07, sy, 0.1, 0.14, '#d8bb9a');
+        ellipse(c, sx + 0.12, sy, 0.1, 0.14, '#d8bb9a');
+        if (
+          examination &&
+          typeof examination === 'object' &&
+          !Array.isArray(examination) &&
+          typeof examination.tool === 'string' &&
+          frame.continuous?.stacks.some(
+            (s) => s.id === examination.tool && s.owner === a.id,
+          )
+        )
+          ellipse(c, sx + 0.3, sy, 0.1, 0.08, '#aaa8a0');
+        label(
+          c,
+          examined ? 'Examined · safety unknown' : 'Opened sample · 1 / 2',
+          a.position.x,
+          a.position.y - 1.65,
+        );
+      }
+    }
+    const scratch = [...frame.events]
+      .reverse()
+      .find(
+        (e) =>
+          e.actor === a.id &&
+          [
+            'hardness-test-progress',
+            'hardness-comparison-completed',
+            'hardness-assessment-completed',
+            'contact-calibration-progress',
+            'contact-calibration-completed',
+            'contact-calibration-stopped',
+            'contact-calibration-invalidated',
+          ].includes(e.type),
+      );
+    if (scratch) {
+      const sx = a.position.x + 0.65,
+        sy = a.position.y + 0.15;
+      const specimens = Array.isArray(scratch.data.specimens)
+        ? scratch.data.specimens
+        : typeof scratch.data.specimen === 'string'
+          ? [scratch.data.specimen]
+          : [];
+      if (
+        specimens.some((id) =>
+          frame.continuous?.stacks.some((s) => s.id === id && s.owner === a.id),
+        )
+      ) {
+        ellipse(c, sx - 0.13, sy, 0.1, 0.08, '#858b8e');
+        const contact = scratch.type.startsWith('contact-calibration');
+        if (scratch.type !== 'hardness-assessment-completed') {
+          ellipse(c, sx + 0.13, sy, 0.1, 0.08, '#505b68');
+          if (
+            !contact ||
+            (scratch.type === 'contact-calibration-progress' &&
+              Number(scratch.data.stage) <= 4)
+          ) {
+            c.strokeStyle = '#e1d8b2';
+            c.lineWidth = 0.025;
+            c.beginPath();
+            c.moveTo(sx - 0.16, sy - 0.05);
+            c.lineTo(sx + 0.12, sy + 0.04);
+            c.stroke();
+          }
+        }
+        label(
+          c,
+          contact
+            ? scratch.type === 'contact-calibration-progress'
+              ? Number(scratch.data.stage) <= 4
+                ? `Contact sweep · ${String(Number(scratch.data.stage))} / 4`
+                : 'Surface inspection · four contacts'
+              : scratch.type === 'contact-calibration-invalidated'
+                ? 'Surface evidence invalidated'
+                : 'Absolute bounds unresolved'
+            : scratch.type === 'hardness-test-progress'
+              ? `Scratch contact · ${String(Number(scratch.data.stage))} / 2`
+              : 'Relative evidence · absolute unresolved',
+          a.position.x,
+          a.position.y - 1.85,
+        );
+      }
+    }
     const warming = a.extensionState['warming:pending'];
     const warmingEvent = frame.events.find(
       (e) => e.actor === a.id && e.type === 'warming-round-completed',
@@ -779,7 +1032,43 @@ export function drawForestCanvas(
       animal.spatial.y - 1.65,
     );
   }
-  for (const s of frame.stacks.filter((s) => !beneathClosedRoof(s))) {
+  if (frame.continuous) drawExtraction(c, frame.continuous);
+  for (const s of frame.stacks
+    .filter((s) => !beneathClosedRoof(s))
+    .sort(
+      (a, b) =>
+        Number(
+          !!frame.continuous?.stacks.find((s) => s.id === a.id)?.waterCup,
+        ) -
+        Number(!!frame.continuous?.stacks.find((s) => s.id === b.id)?.waterCup),
+    )) {
+    const waterItem = frame.continuous?.stacks.find((item) => item.id === s.id);
+    if (waterItem?.resource === 'wet-clay-fragments') {
+      const group = (frame.continuous?.stacks ?? []).filter(
+        (item) =>
+          item.owner === null &&
+          item.resource === 'wet-clay-fragments' &&
+          item.position.x === s.x &&
+          item.position.y === s.y,
+      );
+      if (group[0]?.id === s.id)
+        drawWaterItem(
+          c,
+          waterItem,
+          `Retained clay · ${group.reduce((n, item) => n + (item.physical?.unitMass ?? 0) * item.quantity * 1000, 0).toFixed(1)} g · ${String(group.length)} stacks`,
+        );
+      continue;
+    }
+    if (waterItem?.resource === 'extraction-material') {
+      ellipse(c, s.x, s.y, 0.035, 0.025, '#c1af88');
+      continue;
+    }
+    const extractionCup = !!waterItem?.reservedFor?.startsWith('extraction:');
+    if (
+      waterItem &&
+      drawWaterItem(c, waterItem, extractionCup ? '' : undefined)
+    )
+      continue;
     const mantle = frame.continuous?.stacks.find(
       (item) => item.id === s.id,
     )?.mantle;
@@ -798,7 +1087,65 @@ export function drawForestCanvas(
     const processed = frame.continuous?.stacks.find(
       (item) => item.id === s.id,
     )?.processing;
-    label(c, s.label, s.x, s.y + (mantle ? 0.95 : processed ? 1.05 : 0.4));
+    if (processed?.shortRole) {
+      const group = frame.stacks.filter(
+        (other) =>
+          Math.abs(other.x - s.x) < 1e-8 &&
+          Math.abs(other.y - s.y) < 1e-8 &&
+          frame.continuous?.stacks.find((raw) => raw.id === other.id)
+            ?.processing?.shortRole,
+      );
+      if (group[0]?.id === s.id) {
+        c.save();
+        c.font = '0.14px system-ui';
+        c.textAlign = 'left';
+        c.fillStyle = '#e8dec3';
+        c.fillText(
+          `${String(group.length)} retained trial stacks`,
+          s.x + 0.55,
+          s.y + 0.35,
+        );
+        c.restore();
+      }
+    } else
+      label(c, s.label, s.x, s.y + (mantle ? 0.95 : processed ? 1.05 : 0.4));
+  }
+  for (const e of frame.events.filter((e) =>
+    ['bark-inspected', 'bark-strip-progress', 'bark-stripped'].includes(e.type),
+  )) {
+    const target = frame.objects.find((o) => o.id === e.target);
+    if (!target || beneathClosedRoof(target.spatial)) continue;
+    c.strokeStyle = e.data.status === 'unresolved' ? '#d0d0c4' : '#e1c798';
+    c.lineWidth = 0.04;
+    c.beginPath();
+    c.arc(target.spatial.x, target.spatial.y, 0.45, 0, Math.PI * 2);
+    c.stroke();
+    label(
+      c,
+      e.type === 'bark-inspected'
+        ? `Layer: ${e.data.status === 'unresolved' ? 'unknown' : 'measured'}`
+        : e.type === 'bark-stripped'
+          ? 'Actual layer removed'
+          : 'Stripping · 1 / 2',
+      target.spatial.x,
+      target.spatial.y - 1.8,
+    );
+    const performer = frame.actors.find((a) => a.id === e.actor);
+    if (
+      performer &&
+      typeof e.data.tool === 'string' &&
+      frame.continuous?.stacks.some(
+        (s) => s.id === e.data.tool && s.owner === performer.id,
+      )
+    )
+      ellipse(
+        c,
+        performer.position.x + 0.35,
+        performer.position.y,
+        0.09,
+        0.07,
+        '#95988d',
+      );
   }
   routeOverlay(c, frame, selected);
   for (const e of frame.events) {

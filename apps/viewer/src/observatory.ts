@@ -1,3 +1,4 @@
+import { renderExtraction } from './open-extraction-view.js';
 import { forestClimate } from '@self-evolving-world/world-core';
 import { drawForestCanvas } from './forest-canvas.js';
 import type { V7World, V7Cursor } from '@self-evolving-world/world-core';
@@ -16,12 +17,15 @@ import './observatory.css';
 
 const root = document.getElementById('observatory');
 if (!root) throw new Error('Missing observatory root.');
-root.innerHTML = `<header class="obs-header"><div class="brand"><div class="brand-mark" aria-hidden="true">♧</div><div><div class="eyebrow">Self-evolving world</div><h1>World Observatory</h1><p>A living record of choices and consequences</p></div></div><div class="header-controls"><a id="classic-link" href="./classic.html">Classic inspector ↗</a><select id="archive" aria-label="Saved experiment"></select></div></header><main class="obs-layout"><section class="world-column"><div class="world-toolbar"><div><div class="eyebrow" id="world-label">Loading archive</div><h2 id="world-title">Life, at its own pace</h2></div><div class="mode-controls"><button id="global" aria-pressed="true">Whole world</button><button id="private" aria-pressed="false">Personal view</button></div></div><div class="world-stage"><canvas id="forest-scene" aria-label="Recorded forest canvas" hidden></canvas><svg class="world-canvas" id="scene" role="img" aria-label="Recorded world scene" viewBox="0 0 24 24"></svg><div class="stage-tag" id="stage-tag">READ-ONLY OBSERVATION</div><div class="camera-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="fit">Fit</button><button id="follow" aria-pressed="false">Follow</button><button id="geometry" aria-pressed="false">Geometry</button></div><svg id="minimap" class="minimap" role="img" aria-label="World minimap"></svg><div class="stage-caption" id="spatial-caption">Drag to pan · Scroll to zoom · Select a character</div></div><div class="timeline-card"><div class="playback"><button id="previous" aria-label="Previous round">‹</button><button id="play">Play</button><button id="next" aria-label="Next round">›</button><input id="time" type="range" min="0" max="0" value="0" aria-label="Observation round"/><span class="round-value" id="round">0 / 0</span><button id="compare" aria-pressed="false">Before</button></div><p class="timeline-note" id="timeline-note">Playback reads saved state; it never advances the experiment.</p></div><div class="events-head"><h3>What happened here</h3><span class="badge" id="event-count">0 events</span></div><div class="event-list" id="events"></div></section><aside class="obs-aside"><section class="observer-card"><div class="eyebrow">Individual perspective</div><div class="actor-heading"><h3 id="actor-name">—</h3><select id="actor" aria-label="Observed actor"></select></div><div class="coordinates" id="coordinates"></div><div class="vitals" id="vitals"></div><div class="eyebrow inventory-heading">Carried items</div><div id="carried" class="carried-items"></div></section><section class="observer-card"><div class="eyebrow">Experienced wellbeing</div><h3>How life feels</h3><div class="wellbeing-number" id="happiness">—</div><div class="wellbeing-split"><div id="body-bar" class="wellbeing-body"></div><div id="mind-bar" class="wellbeing-mind"></div></div><div class="small-label" id="happiness-split">Physical comfort + other satisfaction</div><div id="sources"></div></section><section class="observer-card"><div class="eyebrow">Personal continuity</div><h3>Intent & memory</h3><p id="task">No saved task.</p><ul class="memory-list" id="memory"></ul><p id="learning"></p><details><summary>Important experience</summary><ul class="memory-list" id="important"></ul></details><details><summary>Past wildlife sightings</summary><ul class="memory-list" id="sightings"></ul></details><details><summary>Route inspection evidence</summary><p id="route-evidence"></p></details><details><summary>Food assessment evidence</summary><ul class="memory-list" id="assessments"></ul></details><details><summary>Recent experience</summary><ul class="memory-list" id="experiences"></ul></details></section><section class="observer-card"><div class="eyebrow">World state</div><h3 id="object-title">A closer look</h3><p id="object-description">Select a visible object to inspect its actual geometry, state and provenance.</p><pre class="object-state" id="object-state"></pre></section></aside></main><div id="status" class="obs-status" role="status">Loading recorded evidence…</div>`;
+root.innerHTML = `<header class="obs-header"><div class="brand"><div class="brand-mark" aria-hidden="true">♧</div><div><div class="eyebrow">Self-evolving world</div><h1>World Observatory</h1><p>A living record of choices and consequences</p></div></div><div class="header-controls"><a id="classic-link" href="./classic.html">Classic inspector ↗</a><select id="archive" aria-label="Saved experiment"></select></div></header><main class="obs-layout"><section class="world-column"><div class="world-toolbar"><div><div class="eyebrow" id="world-label">Loading archive</div><h2 id="world-title">Life, at its own pace</h2></div><div class="mode-controls"><button id="global" aria-pressed="true">Whole world</button><button id="private" aria-pressed="false">Personal view</button></div></div><div class="world-stage"><canvas id="forest-scene" aria-label="Recorded forest canvas" hidden></canvas><svg class="world-canvas" id="scene" role="img" aria-label="Recorded world scene" viewBox="0 0 24 24"></svg><div class="stage-tag" id="stage-tag">READ-ONLY OBSERVATION</div><div class="camera-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="fit">Fit</button><button id="follow" aria-pressed="false">Follow</button><button id="geometry" aria-pressed="false">Geometry</button></div><svg id="minimap" class="minimap" role="img" aria-label="World minimap"></svg><div class="stage-caption" id="spatial-caption">Drag to pan · Scroll to zoom · Select a character</div></div><div class="timeline-card"><div class="playback"><button id="previous" aria-label="Previous round">‹</button><button id="play">Play</button><button id="next" aria-label="Next round">›</button><input id="time" type="range" min="0" max="0" value="0" aria-label="Observation round"/><span class="round-value" id="round">0 / 0</span><button id="compare" aria-pressed="false">Before</button></div><p class="timeline-note" id="timeline-note">Playback reads saved state; it never advances the experiment.</p></div><div class="events-head"><h3>What happened here</h3><span class="badge" id="event-count">0 events</span></div><div class="event-list" id="events"></div></section><aside class="obs-aside"><section class="observer-card"><div class="eyebrow">Individual perspective</div><div class="actor-heading"><h3 id="actor-name">—</h3><select id="actor" aria-label="Observed actor"></select></div><div class="coordinates" id="coordinates"></div><div class="vitals" id="vitals"></div><div class="eyebrow inventory-heading">Carried items</div><div id="carried" class="carried-items"></div></section><section class="observer-card"><div class="eyebrow">Experienced wellbeing</div><h3>How life feels</h3><div class="wellbeing-number" id="happiness">—</div><div class="wellbeing-split"><div id="body-bar" class="wellbeing-body"></div><div id="mind-bar" class="wellbeing-mind"></div></div><div class="small-label" id="happiness-split">Physical comfort + other satisfaction</div><div id="sources"></div></section><section class="observer-card"><div class="eyebrow">Personal continuity</div><h3>Intent & memory</h3><p id="task">No saved task.</p><ul class="memory-list" id="memory"></ul><p id="learning"></p><details><summary>Questions, projects & knowledge</summary><ul class="memory-list" id="projects"></ul><ul class="memory-list" id="knowledge"></ul></details><details><summary>Important experience</summary><ul class="memory-list" id="important"></ul></details><details><summary>Past wildlife sightings</summary><ul class="memory-list" id="sightings"></ul></details><details><summary>Route inspection evidence</summary><p id="route-evidence"></p></details><details><summary>Food assessment evidence</summary><ul class="memory-list" id="assessments"></ul></details><details><summary>Recent experience</summary><ul class="memory-list" id="experiences"></ul></details></section><section class="observer-card"><div class="eyebrow">World state</div><h3 id="object-title">A closer look</h3><p id="object-description">Select a visible object to inspect its actual geometry, state and provenance.</p><pre class="object-state" id="object-state"></pre></section></aside></main><div id="status" class="obs-status" role="status">Loading recorded evidence…</div>`;
 function el(id: string): HTMLElement {
   const e = document.getElementById(id);
   if (!e) throw new Error(`Missing observatory element: ${id}`);
   return e;
 }
+const trialPanel = document.createElement('div');
+trialPanel.id = 'trial-diagnostic';
+el('object-state').before(trialPanel);
 function select(id: string): HTMLSelectElement {
   return el(id) as HTMLSelectElement;
 }
@@ -83,6 +87,7 @@ function focus(x: number, y: number): void {
   updateCamera();
 }
 function render(): void {
+  renderTrialDiagnostic(trialPanel);
   if (!frame) return;
   const current = frame,
     self = frame.actors.find((a) => a.id === actor);
@@ -94,7 +99,8 @@ function render(): void {
     cancelAnimationFrame(animation);
     const started = performance.now();
     const animate = (now: number): void => {
-      const progress = Math.min(1, (now - started) / 300);
+      // A queued frame timestamp can precede synchronous replay reconstruction.
+      const progress = Math.max(0, Math.min(1, (now - started) / 300));
       drawForestCanvas(
         forestCanvas,
         current,
@@ -129,7 +135,7 @@ function render(): void {
   if (current.continuous?.config.forest && self) {
     const climate = forestClimate(current.continuous, self.position);
     el('world-label').textContent =
-      `${id} / ${climate.season} · ${climate.temperature.toFixed(1)}° · ${climate.trend}`;
+      `${id} / ${climate.season} · ${climate.temperature.toFixed(1)}° · ${climate.trend}${climate.local ? ` · ${climate.local.regime}` : ''}`;
   }
   const allActors =
     current.continuous?.actors ??
@@ -170,7 +176,7 @@ function render(): void {
           .filter((s) => s.owner === actor)
           .map(
             (s) =>
-              `${String(s.quantity)} ${current.continuous?.resources.find((r) => r.id === s.resource)?.name ?? s.resource}${s.processing ? ` · ${s.id} · source ${s.origin} · moisture ${(100 * (s.fuelMoisture ?? 0)).toFixed(0)}%` : ''}${s.mantle ? ` · ${s.id} · ${s.mantle.equipped ? 'worn' : 'unequipped'} · condition ${String(s.mantle.condition)}/160 · moisture ${(100 * s.mantle.moisture).toFixed(0)}%` : ''}`,
+              `${String(s.quantity)} ${current.continuous?.resources.find((r) => r.id === s.resource)?.name ?? s.resource}${s.processing ? ` · ${s.id} · source ${s.origin} · moisture ${(100 * (s.fuelMoisture ?? 0)).toFixed(0)}%` : ''}${s.processing?.foodExamination ? ' · opened sample; food safety remains unknown' : ''}${s.mantle ? ` · ${s.id} · ${s.mantle.equipped ? 'worn' : 'unequipped'} · condition ${String(s.mantle.condition)}/160 · moisture ${(100 * s.mantle.moisture).toFixed(0)}%` : ''}`,
           )
       : (legacy?.frames[frame.tick]?.agents
           .find((a) => a.id === actor)
@@ -178,6 +184,18 @@ function render(): void {
     el('carried').textContent = inventory.length
       ? inventory.join(' · ')
       : 'Nothing carried';
+    el('projects').innerHTML = Object.values(self.memory.projects ?? {})
+      .map(
+        (p) =>
+          `<li><strong>${svgText(p.id)} · ${svgText(p.status)}</strong> ${svgText(p.question)}<br/>Goal: ${svgText(p.goal)}<br/>Evidence: ${svgText(p.evidence.join(', '))}<br/>Progress: ${svgText(p.completedSteps.join('; '))}<br/>Outputs: ${svgText(p.outputs.join('; '))}<br/>Uncertain: ${svgText(p.uncertainty)}<br/>Missing: ${svgText(p.missing)}<br/>Next: ${svgText(p.next)}<br/>Pause: ${svgText(p.pauseReason)}<br/>Claimed benefit: ${svgText(p.benefit)}</li>`,
+      )
+      .join('');
+    el('knowledge').innerHTML = Object.values(self.memory.knowledge ?? {})
+      .map(
+        (k) =>
+          `<li>${svgText(k.subject)} · ${svgText(k.property)} · ${k.verified ? 'Personally tested' : 'Observed or received claim'}<br/>${svgText(JSON.stringify(k.value))}<br/>Evidence: ${svgText(k.evidence)}</li>`,
+      )
+      .join('');
     el('important').innerHTML = (self.memory.important ?? [])
       .slice(-8)
       .map((e) => `<li>Round ${String(e.tick)} · ${svgText(e.summary)}</li>`)
@@ -308,7 +326,29 @@ function render(): void {
           camera.size = Math.min(camera.size, 10);
           focus(event.position.x, event.position.y);
         }
-        if (event?.target) inspect(event.target);
+        if (event?.type.startsWith('extraction-')) {
+          el('object-title').textContent = 'Extraction evidence';
+          el('object-description').textContent = event.description;
+          el('object-state').textContent = JSON.stringify(event.data, null, 2);
+          renderExtraction(trialPanel, event.data);
+        } else if (
+          event &&
+          [
+            'shelter-reference-diagnostic',
+            'shelter-inspected',
+            'short-refuge-trial-diagnosed',
+          ].includes(event.type)
+        ) {
+          el('object-title').textContent = 'Material inspection evidence';
+          el('object-description').textContent = event.description;
+          el('object-state').textContent = JSON.stringify(event.data, null, 2);
+          renderTrialDiagnostic(
+            trialPanel,
+            event.type === 'short-refuge-trial-diagnosed'
+              ? event.data
+              : undefined,
+          );
+        } else if (event?.target) inspect(event.target);
       });
     });
   scene.querySelectorAll<SVGGElement>('[data-scene-actor]').forEach((g) => {
@@ -329,6 +369,7 @@ function render(): void {
   });
 }
 function inspect(objectId: string): void {
+  renderTrialDiagnostic(trialPanel);
   const object = frame?.objects.find((o) => o.id === objectId);
   if (!object) return;
   el('object-title').textContent = object.name;
@@ -575,3 +616,4 @@ try {
 window.addEventListener('resize', updateCamera);
 
 window.addEventListener('forest-visual-ready', updateCamera);
+import { renderTrialDiagnostic } from './open-trial-diagnostic-view.js';

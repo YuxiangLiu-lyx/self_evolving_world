@@ -2,6 +2,7 @@
 
 Each numbered experiment is a retained, numbered record: `ex1`, `ex2`, `ex3`, and so on. Numbering is independent of the older optional model rounds in ignored `experiment-results/`. This directory is tracked and included in task fingerprints.
 
+- [ex10 report](ex10/report.md), [behavioral analysis](analyses/ex10/pr-24-open-development.md) and [measured evidence chains](../docs/exec-plans/evidence/pr-24-open-development/final-results.md): fresh skills, three living actors, 358 / 1,600 rounds before context protection with the original 20 development attempts exhausted. Interrupted material work resumed; personal learning enabled another actor to make and use a water cup. No full seasonal cycle or broad productivity improvement was observed.
 - [ex9 report](ex9/report.md) and [behavioral analysis](analyses/ex9/pr-23-forest-experience.md): one real 1,200-round observation; five new capabilities, three actually used by all actors, paid material/equipment/health benefits, and no deaths. Fire and canopy remained unused; all failed calls and technical pauses are retained.
 - [ex8 report](ex8/report.md) and [behavioral analysis](analyses/ex8/pr-21-forest-lives.md): real forest observation, 897 rounds before the original decision budget ended, five requested capability packages, three living actors and bounded mental feedback; no formal deaths.
 - [ex7 report](ex7/report.md): one real 1,000-round continuous world; three healthy survivors, two implemented activities and no mental satisfaction source.
@@ -14,7 +15,7 @@ Each numbered experiment is a retained, numbered record: `ex1`, `ex2`, `ex3`, an
 
 ## Browse saved history
 
-Run `pnpm dev` and open the printed local URL (normally `http://127.0.0.1:5173`). The main page is the game observatory; choose a completed archive or open `http://127.0.0.1:5173/?experiment=ex9`. Seek/play its saved timeline, select actors, switch between global and personal views, zoom/pan/follow, locate events and compare adjacent states. Vitals, tasks, memory and happiness panels show recorded data; unmeasured historical values remain unmeasured. Camera and playback never advance simulation or call models.
+Run `pnpm dev` and open the printed local URL (normally `http://127.0.0.1:5173`). The main page is the game observatory; choose a completed archive or open `http://127.0.0.1:5173/?experiment=ex10`. Seek/play its saved timeline, select actors, switch between global and personal views, zoom/pan/follow, locate events and compare adjacent states. Vitals, tasks, memory and happiness panels show recorded data; unmeasured historical values remain unmeasured. Camera and playback never advance simulation or call models.
 
 The original grid inspector remains at `/classic.html`, with its archive overview links, legacy import/export, URL back/forward behavior and manual demo controls. It redirects continuous archives to the game observatory. Local demos/imports remain available there through **Demo / local session**, **New world** and **Import history**.
 

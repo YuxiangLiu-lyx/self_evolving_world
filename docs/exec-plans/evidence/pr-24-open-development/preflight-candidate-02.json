@@ -1,0 +1,229 @@
+{
+  "version": 1,
+  "controller": "isolated-fresh-development-feasibility",
+  "modelCalls": 0,
+  "rounds": 1600,
+  "seed": 20261122,
+  "configuration": {
+    "protocol": "continuous-v1",
+    "seed": 20261122,
+    "width": 48,
+    "height": 36,
+    "dt": 1,
+    "speed": 0.8,
+    "vision": 5,
+    "interaction": 0.65,
+    "hunger": 0.9,
+    "starvation": 8,
+    "energyCap": 40,
+    "restRecovery": 4,
+    "physicalCap": 10,
+    "mentalCap": 90,
+    "budgets": {
+      "ordinary": 650,
+      "world": 60,
+      "development": 20
+    },
+    "computation": {
+      "workPerRound": 2000000,
+      "inputBytes": 120000,
+      "stateBytes": 32000000
+    },
+    "forest": {
+      "version": 1,
+      "day": 80,
+      "year": 800,
+      "respawnSatiety": 80,
+      "lives": 3
+    },
+    "experience": {
+      "version": 1,
+      "targetRounds": 1600,
+      "mealWindow": 10,
+      "substantialNutrition": 8,
+      "mentalRate": 0.025,
+      "mentalDecay": 0.003,
+      "restMin": 0.85,
+      "restMax": 1.1,
+      "remoteStockScale": 3,
+      "growthScale": 0.85,
+      "exposure": 0.6,
+      "carryingScale": 1.2
+    },
+    "development": {
+      "version": 1,
+      "inheritSkills": false,
+      "scope": "open-ex10",
+      "baseline": [
+        "navigate",
+        "rest",
+        "wait",
+        "pickup",
+        "gather",
+        "eat",
+        "drop",
+        "give",
+        "message",
+        "request",
+        "learn",
+        "probe",
+        "consult",
+        "exchange"
+      ],
+      "detailLimit": 4,
+      "projectLimit": 4,
+      "knowledgeLimit": 8,
+      "climateOffset": 5,
+      "hazards": [
+        {
+          "id": "west-drought-1",
+          "kind": "drought",
+          "x": 9,
+          "y": 10,
+          "radius": 6,
+          "start": 260,
+          "duration": 100,
+          "recovery": 80,
+          "severity": 0.65
+        },
+        {
+          "id": "river-waterlogging-1",
+          "kind": "waterlogging",
+          "x": 22,
+          "y": 22,
+          "radius": 5,
+          "start": 520,
+          "duration": 80,
+          "recovery": 60,
+          "severity": 0.8
+        },
+        {
+          "id": "west-drought-2",
+          "kind": "drought",
+          "x": 9,
+          "y": 10,
+          "radius": 6,
+          "start": 1060,
+          "duration": 100,
+          "recovery": 80,
+          "severity": 0.65
+        },
+        {
+          "id": "river-waterlogging-2",
+          "kind": "waterlogging",
+          "x": 22,
+          "y": 22,
+          "radius": 5,
+          "start": 1320,
+          "duration": 80,
+          "recovery": 60,
+          "severity": 0.8
+        }
+      ]
+    }
+  },
+  "firstFoodRound": {
+    "sol": 5,
+    "lin": 6,
+    "moss": 6
+  },
+  "initialSafeNutrition": 4374,
+  "nearestFoodDistances": [
+    {
+      "actor": "lin",
+      "distance": 2.1931712199461306
+    },
+    {
+      "actor": "moss",
+      "distance": 2.193171219946132
+    },
+    {
+      "actor": "sol",
+      "distance": 1.5264337522473757
+    }
+  ],
+  "minima": {
+    "lin": {
+      "health": 88.48668546,
+      "satiety": 70.2
+    },
+    "moss": {
+      "health": 96.6848045,
+      "satiety": 71.6
+    },
+    "sol": {
+      "health": 88.50750939,
+      "satiety": 61.3
+    }
+  },
+  "actions": {
+    "wait": 3615,
+    "navigate": 197,
+    "gather": 329,
+    "eat": 329,
+    "rest": 330
+  },
+  "failures": {},
+  "optionalRounds": 3615,
+  "optionalShare": 0.753125,
+  "final": [
+    {
+      "id": "lin",
+      "vitals": {
+        "health": 88.48668546,
+        "satiety": 82,
+        "energy": 35.63061359,
+        "temperature": 15.54159896
+      },
+      "lives": {
+        "total": 3,
+        "deaths": 0,
+        "spawn": {
+          "x": 8.5,
+          "y": 10.5
+        },
+        "lastDeath": null
+      },
+      "mental": -0.42310628
+    },
+    {
+      "id": "moss",
+      "vitals": {
+        "health": 96.6848045,
+        "satiety": 82,
+        "energy": 36.13123497,
+        "temperature": 16.54159896
+      },
+      "lives": {
+        "total": 3,
+        "deaths": 0,
+        "spawn": {
+          "x": 18.5,
+          "y": 12.5
+        },
+        "lastDeath": null
+      },
+      "mental": -0.37297892
+    },
+    {
+      "id": "sol",
+      "vitals": {
+        "health": 88.50750939,
+        "satiety": 74,
+        "energy": 29.67817142,
+        "temperature": 15.54160277
+      },
+      "lives": {
+        "total": 3,
+        "deaths": 0,
+        "spawn": {
+          "x": 14.5,
+          "y": 22.5
+        },
+        "lastDeath": null
+      },
+      "mental": -0.41496499
+    }
+  ],
+  "limitation": "Authored offline feasibility only; no autonomous discovery or causal guarantee. Oracle uses actual safe definitions, which are excluded from ordinary inputs."
+}
