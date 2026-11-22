@@ -16,6 +16,12 @@ The main viewer opens the current game observatory; `/classic.html` retains the 
 
 The independent [continuous-v1 protocol](docs/CONTINUOUS_WORLD.md) adds pure continuous-types/data/policy/geometry/observation/registry/base/kernel/tasks/wellbeing modules behind world-core's public entry point. WorldState and founding world.ts retain their historical semantics. Floating-point state, same-start transactions, swept collision, private navigation, persistent processes and event-grounded wellbeing share a deterministic time step. Reviewed code packages register typed interfaces and optional state schemas, migrations and personal observation adapters; individual mastery remains separate.
 
+Inferred write detection compares unchanged entity structure directly, with the
+original canonical-signature comparison as fallback. It has no mutable cache,
+numeric tolerance or omitted fields. Replay signatures, conflict keys and
+protected-account checks retain their original semantics; this avoids repeated
+serialization across eighteen simultaneous proposals without changing rules.
+
 Simulator continuous-scenario/input/provider/run modules own the independent initial world, minimal ordinary goal, dynamic JSON interface schema, exact-attempt journals and persistent conditional tasks. Repository continuous-cli/files/source/store/analysis/preflight modules adapt the existing coordinator and gates, retain versioned source and segmented deterministic evidence, and pause globally on budget exhaustion. Source review may inspect pure viewer visual registrations; core never imports the viewer or Node services.
 
 The separate observatory entry renders continuous-scene/visuals/history modules with a bounded segment cache, camera, event and state inspection. Its historical adapter preserves old grid positions and explicitly labels the different simulation. Camera time and animations never affect world time. See [ADR-0018](docs/decisions/0018-continuous-world-and-wellbeing.md).

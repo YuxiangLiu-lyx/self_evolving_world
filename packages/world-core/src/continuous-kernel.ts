@@ -55,6 +55,7 @@ import {
   v7Freeze,
   v7Id,
   v7Signature,
+  v7Equivalent,
   v7String,
   v7Validate,
   v7Work,
@@ -125,19 +126,14 @@ function changes(before: V7World, after: V7World): string[] {
       after[collection].map((x) => [x.id, x]),
     );
     for (const id of new Set([...old.keys(), ...next.keys()]))
-      if (
-        v7Signature(old.get(id) ?? null) !== v7Signature(next.get(id) ?? null)
-      )
+      if (!v7Equivalent(old.get(id) ?? null, next.get(id) ?? null))
         keys.push(`${collection}:${id}`);
   }
   for (const key of new Set([
     ...Object.keys(before.state),
     ...Object.keys(after.state),
   ]))
-    if (
-      v7Signature(before.state[key] ?? null) !==
-      v7Signature(after.state[key] ?? null)
-    )
+    if (!v7Equivalent(before.state[key] ?? null, after.state[key] ?? null))
       keys.push(`state:${key}`);
   return keys;
 }

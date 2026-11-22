@@ -14,6 +14,7 @@ failed checks, ex11/ex12 checkpoints and all prior archives remain retained.
 - R3: Serialize concurrent seeks within a segment, reject corrupt input, and isolate cached segment work across archive changes; obsolete asynchronous results cannot replace current state.
 - R4: Cover incremental/full equivalence, no repeated work, concurrent targets, corruption and archive switching with meaningful tests; retain actual browser state, interaction and visual checks without extending deadlines.
 - R5: Record actual failure and performance evidence; complete the existing task harness, current review, PR, required CI and authorized guarded merge.
+- R6: Eliminate repeated canonical serialization when comparing unchanged world entities, preserving canonical equality, inferred writes, conflicts and every historical replay hash; never cache mutable world results or alter experiment sources.
 
 ## Scope and exclusions
 
@@ -22,6 +23,8 @@ archive mutations, model execution, infrastructure services or framework rewrite
 No timeout increase, skipped browser check or fabricated acceptance evidence.
 The acceptance repair also bounds unit-test worker concurrency; this changes
 scheduling only, with the complete suite and all existing deadlines retained.
+Canonical comparison may be optimized without changing any simulation rule,
+serialized signature, historical source snapshot or formal run outcome.
 
 ## Acceptance criteria
 
@@ -70,3 +73,14 @@ the 5/30-second case deadlines and the ten-minute job deadline. This is a resour
 scheduling correction, not evidence that the failed run passed. The existing
 planner conservatively expands compatibility coverage for the changed test
 configuration; fresh selected checks and remote CI remain required.
+
+The next CI run, 45074723984, passed all 759 unit tests in 139.92 seconds
+and all twelve deep archive validations, but hit the unchanged ten-minute job
+limit as browser checks started. Ex12 took 249.13 seconds and ex9 202.74 seconds
+with two archive workers. An offline ex12 CPU profile (85.56 seconds locally)
+attributed 35.90 seconds to canonical string comparisons in inferred write
+detection. Replace serialization for structurally identical JSON with direct
+comparison, retaining canonical fallback for unequal structures and unusual
+signature aliases. This is post-run performance work: no inference, policy or
+retained experiment version changes. Differential tests and complete historical
+hash reconstruction must establish compatibility before delivery.

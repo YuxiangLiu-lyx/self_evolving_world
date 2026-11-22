@@ -125,6 +125,39 @@ export function v7Signature(value: unknown): string {
     .join(',')}}`;
 }
 
+/** Compare world data without serializing unchanged entities. No mutable cache.
+ * Canonical fallback preserves even legacy non-JSON signature aliases. */
+export function v7Equivalent(left: unknown, right: unknown): boolean {
+  return sameStructure(left, right) || v7Signature(left) === v7Signature(right);
+}
+function sameStructure(left: unknown, right: unknown): boolean {
+  if (
+    left === null ||
+    right === null ||
+    typeof left !== 'object' ||
+    typeof right !== 'object'
+  )
+    return typeof left !== 'bigint' && left === right;
+  if (Array.isArray(left) || Array.isArray(right)) {
+    if (
+      !Array.isArray(left) ||
+      !Array.isArray(right) ||
+      left.length !== right.length
+    )
+      return false;
+    for (let i = 0; i < left.length; i++)
+      if (!sameStructure(left[i], right[i])) return false;
+    return true;
+  }
+  const a = left as Record<string, unknown>,
+    b = right as Record<string, unknown>;
+  const keys = Object.keys(a);
+  if (keys.length !== Object.keys(b).length) return false;
+  return keys.every(
+    (key) => Object.hasOwn(b, key) && sameStructure(a[key], b[key]),
+  );
+}
+
 /** Persist finite noninteger numbers at the protocol's shared precision across JS engines. */
 export function v7CanonicalNumbers<T>(value: T): T {
   return JSON.parse(
