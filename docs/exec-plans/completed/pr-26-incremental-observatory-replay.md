@@ -1,6 +1,6 @@
 # Incremental verified observatory replay
 
-## Intent
+## Requirement summary
 
 Complete the collective-life delivery after PR 19's post-merge CI exposed a
 large-archive initial-load failure. This is a viewer and acceptance repair under
@@ -15,13 +15,13 @@ failed checks, ex11/ex12 checkpoints and all prior archives remain retained.
 - R4: Cover incremental/full equivalence, no repeated work, concurrent targets, corruption and archive switching with meaningful tests; retain actual browser state, interaction and visual checks without extending deadlines.
 - R5: Record actual failure and performance evidence; complete the existing task harness, current review, PR, required CI and authorized guarded merge.
 
-## Exclusions
+## Scope and exclusions
 
 No simulation rules, agent prompts, recipes, rewards, budgets, generated skills,
 archive mutations, model execution, infrastructure services or framework rewrite.
 No timeout increase, skipped browser check or fabricated acceptance evidence.
 
-## Acceptance
+## Acceptance criteria
 
 Run the unfiltered unit suite and programmatically selected viewer compatibility
 checks. Inspect new screenshots and reuse only matching reviewed evidence. Verify
@@ -39,3 +39,22 @@ and [passing PR CI](https://github.com/YuxiangLiu-lyx/self_evolving_world/action
 - Eight targeted tests passed, including the existing cross-segment operation regression. New browser concurrency/archive-switch coverage passed in 0.93 seconds; actual ex12 browser acceptance passed in 57.2 seconds locally, versus approximately 78 seconds in the prior full local run. These are observed timings, not a hardware-controlled benchmark.
 - The retained main trace confirms expected `0 / 136`, actual `0 / 0`, timeout 90,000 ms. No timeout, archive or simulation policy changed.
 - Implementation review found no remaining mismatch against R1-R5. Current full selected acceptance, screenshot review, remote CI and guarded integration are enforced by the task record; targeted diagnostics do not establish final completion.
+
+## Recorded acceptance and limitations
+
+Local run `97e6c5cf-d3ab-460b-bbd7-1ec204b4ea44` passed all 759 unit tests,
+54 selected browser tests and selected static/document checks. Its 87 images were
+reviewed: 14 changed images personally reinspected, 73 identical to previously
+inspected bytes. Browser checks took 67.91 seconds; ex12 round zero displayed in
+899 ms. Eight unchanged oracle receipts were authenticated, with zero additional
+local deep rebuilds. Ex2-ex5 compatibility was not applicable, while full archive
+preservation covered all twelve records. These are observed local timings, not
+hardware-controlled comparisons or remote CI success.
+
+The PR contract initially rejected the plan's abbreviated section names despite
+matching content; these headings now use the required schema. The format gate
+also required the edited PRODUCT table to be realigned. Both failures remain in
+the task history. Current remote CI, version-bound self-review and integration
+remain unexecuted until the coordinator records them. Known high-zoom legacy
+label clipping is unchanged. Future large archives may still make a long forward
+seek expensive; only verified progress is reused, never unverified future state.
