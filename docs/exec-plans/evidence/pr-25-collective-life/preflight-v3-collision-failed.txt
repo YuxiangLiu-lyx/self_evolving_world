@@ -1,0 +1,18 @@
+{ tick: 200, elapsedMs: 94397.889125 }
+{ tick: 400, elapsedMs: 199588.547625 }
+{ tick: 600, elapsedMs: 331440.480125 }
+/Users/liuyuxiang/developer/self_evolving_world/scripts/open-preflight.ts:183
+        firstFood[actor.id] = world.tick;
+        ^
+
+Error: Isolated baseline lost a life: cedar-4 at 636; {"minima":{"ash-1":{"health":100,"satiety":74.5},"ash-2":{"health":100,"satiety":71.7},"ash-3":{"health":100,"satiety":72.3},"ash-4":{"health":100,"satiety":71.8},"ash-5":{"health":100,"satiety":73.7},"ash-6":{"health":100,"satiety":71.3},"birch-1":{"health":100,"satiety":63},"birch-2":{"health":99.13584479,"satiety":66.4},"birch-3":{"health":100,"satiety":59.3},"birch-4":{"health":100,"satiety":72.6},"birch-5":{"health":100,"satiety":73.1},"birch-6":{"health":100,"satiety":60.4},"cedar-1":{"health":100,"satiety":70.7},"cedar-2":{"health":100,"satiety":73.5},"cedar-3":{"health":100,"satiety":73.1},"cedar-4":{"health":4,"satiety":0},"cedar-5":{"health":100,"satiety":73.4},"cedar-6":{"health":4,"satiety":0}},"actions":{"wait":8427,"gather":879,"eat":878,"rest":744,"navigate":518},"failures":{"Simultaneous resource or swept-body conflict; all conflicting actions were rejected.":229}}
+    at openPreflight (/Users/liuyuxiang/developer/self_evolving_world/scripts/open-preflight.ts:183:15)
+    at [eval]:5:51
+    at runScriptInThisContext (node:internal/vm:219:10)
+    at node:internal/process/execution:451:12
+    at [eval]-wrapper:6:24
+    at runScriptInContext (node:internal/process/execution:449:60)
+    at evalFunction (node:internal/process/execution:283:30)
+    at asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:11)
+
+Node.js v24.22.2

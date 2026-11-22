@@ -67,6 +67,7 @@ export function v7Install(
       vitals: a.vitals,
       wellbeing: a.wellbeing,
       ...(world.config.experience ? { experience: a.experience } : {}),
+      ...(world.config.collective ? { collective: a.collective } : {}),
       mastered: a.mastered,
       learning: a.learning,
       position: a.position,
@@ -97,6 +98,7 @@ export function v7Install(
         vitals: a.vitals,
         wellbeing: a.wellbeing,
         ...(world.config.experience ? { experience: a.experience } : {}),
+        ...(world.config.collective ? { collective: a.collective } : {}),
         mastered: a.mastered,
         learning: a.learning,
         position: a.position,
@@ -120,6 +122,12 @@ export function v7Install(
     if (
       !['foundation-v7', 'foundation-forest', 'foundation-open'].includes(
         pkg.id,
+      ) &&
+      !(
+        world.config.collective &&
+        world.tick === 0 &&
+        pkg.id === 'foundation-collective' &&
+        pkg.scope === world.config.development?.scope
       ) &&
       ability.authored
     )

@@ -8,6 +8,24 @@ The current focus is a stable, understandable foundation: base rules stay fixed 
 
 The main page now opens the [continuous-world game observatory](CONTINUOUS_WORLD.md). It renders saved continuous or historical worlds without advancing simulation. The founding-grid descriptions below apply to the original protocol and the manual inspector at `/classic.html`; they do not restrict the independently versioned continuous world.
 
+## Collective life observation
+
+The latest [collective protocol](COLLECTIVE_LIFE.md) keeps eighteen independent
+members in three groups. Each group shares a bounded scheduler and model entry,
+with separately constructed public coordination and personal contexts. A uses
+shared observed information; B retains private knowledge, mild seeded preferences
+and persistent intentions. Messages, reports, transfers and learning require
+real actions. Fresh skill scopes isolate both arms and every historical run.
+
+The [retained campaign](exec-plans/evidence/pr-25-collective-life/final-results.md)
+paused A at 7 rounds, B short at 37, and the same B checkpoint at 136 cumulative
+rounds. Bark extraction, material combination, sample opening, one stone transfer
+and an unfinished tray are observed outcomes. The intended matched 200-round
+comparison and 1,600-round continuation were not achieved within the frozen
+allocations; sustained collective productivity remains unproven. The viewer
+shows group identity, each member's actual knowledge, intent and task alongside
+physical state. Feature acceptance remains in [PRODUCT](PRODUCT.md).
+
 ## How the founding world runs
 
 The world is a bounded two-dimensional grid, 16×12 by default, with origin `(0, 0)` at the top left. Agents have names, positions, and inventories. Items start on the ground. World dimensions and vision radius are configured at creation and remain fixed.

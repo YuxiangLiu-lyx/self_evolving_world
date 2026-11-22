@@ -1,3 +1,5 @@
+import { materialReduce } from './material-lots.js';
+import { collectiveFoodProfile } from './collective-food-profile.js';
 import type { V7Stack, V7World } from './continuous-types.js';
 
 /** Exact integer-tenths arithmetic; integer interfaces continue to express whole resource units. */
@@ -14,6 +16,7 @@ export function foodTenths(quantity: number): number {
 export function foodSetQuantity(stack: V7Stack, tenths: number): void {
   if (!Number.isSafeInteger(tenths) || tenths < 0)
     throw new Error('Invalid fixed-point material quantity.');
+  materialReduce(stack, tenths);
   stack.quantityTenths = tenths;
   stack.quantity = tenths / 10;
 }
@@ -27,8 +30,6 @@ export function normalizeFoodAccounting(world: V7World): void {
 /** Moisture removal changes burden, not the original food-unit nutrient/toxin totals. */
 export function foodUnitMass(world: V7World, stack: V7Stack): number {
   return (
-    stack.physical?.unitMass ??
-    world.resources.find((r) => r.id === stack.resource)?.mass ??
-    1
+    stack.physical?.unitMass ?? collectiveFoodProfile(world, stack)?.mass ?? 1
   );
 }

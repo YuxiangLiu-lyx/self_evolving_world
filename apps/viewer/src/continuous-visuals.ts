@@ -21,7 +21,33 @@ const rock: ContinuousVisual = (o) =>
   `<path d="M-.5 .15L-.4-.25L-.04-.47L.41-.26L.51.12L.21.32L-.27.28Z" fill="${color(o.visual.color)}" stroke="#687b76" stroke-width=".03"/><path d="M-.4-.25L-.04-.47L.41-.26L.13-.13L-.15-.13Z" fill="#d4d6bd" opacity=".65"/>`;
 const source: ContinuousVisual = (o) =>
   `<ellipse cy=".16" rx=".5" ry=".26" fill="#274e34" opacity=".3"/><path d="M-.38 .05Q-.53-.35-.2-.32Q0-.59.18-.31Q.5-.37.36.08Z" fill="${color(o.visual.color)}" stroke="#365c3d" stroke-width=".035"/>${Array.from({ length: Math.min(6, Number(o.data.stock ?? 0)) }, (_, i) => `<circle cx="${String(Math.cos(i * 2.4) * 0.25)}" cy="${String(-0.1 + Math.sin(i * 2.4) * 0.17)}" r=".06" fill="${color(o.visual.accent)}"/>`).join('')}`;
+const rootSurface: ContinuousVisual = (o) => {
+  const f = o.data.food,
+    food = f && typeof f === 'object' && !Array.isArray(f) ? f : null;
+  const present = Array.isArray(f) ? f.length > 0 : !!food;
+  const scale = food
+    ? Math.sqrt(Math.max(0, Math.min(1, Number(food.massRatio ?? 1))))
+    : 1;
+  const fill =
+    food && Number(food.waterFraction) <= 0.1200001 ? '#b79b61' : '#d0b77d';
+  return `<ellipse rx=".38" ry=".28" fill="#b99e73" stroke="#ddd0aa" stroke-width=".025" ${o.visual.state === 'ready' ? '' : 'stroke-dasharray=".05 .04"'}/><ellipse cx="-.28" rx=".09" ry=".12" fill="#8c9790"/>${o.kind === 'root-drying-tray' ? '<ellipse cx=".28" rx=".09" ry=".12" fill="#8c9790"/>' : ''}${present ? `<path transform="scale(${String(scale)})" d="M-.16-.08L.14-.1L.18.09L-.12.12Z" fill="${fill}"/>` : ''}`;
+};
 export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
+  'root-work-surface': rootSurface,
+  'small-root-drying': (o) => {
+    const shape = o.spatial.shape;
+    if (shape.kind !== 'rectangle') return '';
+    const w = shape.width,
+      h = shape.height;
+    return `<rect x="${String(-w / 2)}" y="${String(-h / 2)}" width="${String(w)}" height="${String(h)}" fill="${o.kind === 'small-drying-ballast' ? '#728079' : '#c9af80'}" stroke="#5e4931" stroke-width=".012" ${o.visual.state === 'partial' ? 'stroke-dasharray=".02 .02"' : ''}/>`;
+  },
+  'weather-lean-to': (o) => {
+    const built = o.kind === 'weather-lean-to',
+      integrity = Number(o.data.integrity ?? 0);
+    return `<rect x="-1" y="-1" width="2" height="2" fill="#c5ad7a" fill-opacity="${built ? String(0.15 + 0.5 * integrity) : '.08'}" stroke="#d4be90" stroke-width=".035" ${built ? '' : 'stroke-dasharray=".08 .06"'}/>${built ? '<path d="M-1-.7L1-.7M-1-.3L1-.3M-1 .1L1 .1M-1 .5L1 .5" stroke="#766349" stroke-width=".06"/>' : ''}<path d="M-.4 1.02H.4M0 1.32V1.08" stroke="#d5e4c2" stroke-width=".04"/><text y="-1.2" text-anchor="middle" fill="#fff0cf" font-size=".2">${built ? `Cover ${String(Math.round(integrity * 100))}%` : `Work ${String(Number(o.data.completedWork ?? 0))} / 8`}</text>`;
+  },
+  'lean-to-post': () =>
+    '<circle r=".1" fill="#8d704e" stroke="#d6bd88" stroke-width=".02"/>',
   'stone-hearth': fireVisual,
   'rain-canopy': canopyVisual,
   'canopy-post': canopyPostVisual,

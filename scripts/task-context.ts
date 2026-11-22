@@ -27,6 +27,7 @@ export type ExperimentIntent =
       readonly id?: string;
       readonly seed?: number;
       readonly rounds?: number;
+      readonly comparison?: 'collective-life-v1';
     };
 export interface TaskIntent {
   readonly id: string;
@@ -96,6 +97,11 @@ export interface TaskContext {
     phase: 'started' | 'recorded';
     id?: string;
     error?: string;
+  };
+  comparison?: {
+    stage: 'A' | 'B-short' | 'B-long' | 'complete';
+    a?: string;
+    b?: string;
   };
   validation?: {
     runId: string;
@@ -204,11 +210,20 @@ export function parseIntent(value: unknown): TaskIntent {
     e,
     mode === 'none'
       ? ['mode']
-      : ['mode', 'allocation', 'basis', 'id', 'seed', 'rounds'],
+      : ['mode', 'allocation', 'basis', 'id', 'seed', 'rounds', 'comparison'],
   );
   let experiment: ExperimentIntent = { mode: 'none' };
   if (mode !== 'none') {
     const allocation = choice(e.allocation, ['new', 'reuse']);
+    if (
+      e.comparison !== undefined &&
+      (e.comparison !== 'collective-life-v1' ||
+        mode !== 'continuous' ||
+        allocation !== 'new')
+    )
+      throw new Error(
+        'The collective comparison requires two newly allocated continuous experiments.',
+      );
     if (allocation === 'new' && e.id !== undefined)
       throw new Error('New experiment IDs are allocated by the existing CLI.');
     if (
@@ -245,6 +260,9 @@ export function parseIntent(value: unknown): TaskIntent {
       ...(allocation === 'reuse' ? { id: experimentId(e.id) } : {}),
       ...(typeof e.seed === 'number' ? { seed: e.seed } : {}),
       ...(typeof e.rounds === 'number' ? { rounds: e.rounds } : {}),
+      ...(e.comparison === 'collective-life-v1'
+        ? ({ comparison: e.comparison } as const)
+        : {}),
     };
   }
   if (!Array.isArray(v.analyze))

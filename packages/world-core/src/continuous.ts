@@ -1,4 +1,22 @@
+import { TOOL_ASSESSMENT_PACKAGE } from './collective-tool-assessment.js';
+import { TRAY_CLEARANCE_PACKAGE } from './collective-tray-clearance-package.js';
+import { SMALL_DRYING_PACKAGE } from './collective-small-drying.js';
+import { SURFACE_DIAGNOSTIC_PACKAGE } from './collective-surface-diagnostics-package.js';
+import { COLLECTIVE_INVENTORY } from './collective-inventory.js';
+import { ROOT_SURFACE_PACKAGE } from './collective-root-surface-package.js';
+import { COLLECTIVE_MATERIAL_COMBINE } from './collective-material-combine.js';
+import { COLLECTIVE_FOOD_INSPECTION } from './collective-food-inspection.js';
+import { COLLECTIVE_BARK } from './collective-bark.js';
+import { COLLECTIVE_BARK_FEEDBACK } from './collective-bark-feedback.js';
+import {
+  ROOT_FOOD_MATRIX,
+  ROOT_PREPARATION,
+  ROOT_AIR_DRYING,
+} from './collective-roots.js';
+import { COLLECTIVE_FOOD } from './collective-food.js';
+import { COLLECTIVE_SHELTER } from './collective-shelter.js';
 import { OPEN_EXTRACTION } from './open-extraction.js';
+import { collectiveFoundation } from './collective-social.js';
 import { OPEN_WATER } from './open-water.js';
 import { OPEN_SHORT_DIAGNOSTICS } from './open-short-diagnostics.js';
 import { OPEN_SHORT_REFUGE } from './open-short.js';
@@ -39,6 +57,7 @@ export const V7_PACKAGES: V7Package[] = [
   V7_MOSAIC,
   FOREST_BASE,
   OPEN_FOUNDATION,
+  collectiveFoundation('collective-foundation'),
   FOREST_WILDLIFE,
   FOREST_PERCEPTION,
   FOREST_FOOD_ASSESSMENT,
@@ -66,15 +85,36 @@ export const V7_PACKAGES: V7Package[] = [
   OPEN_WATER,
   OPEN_SHORT_DIAGNOSTICS,
   OPEN_EXTRACTION,
+  COLLECTIVE_FOOD,
+  COLLECTIVE_SHELTER,
+  ROOT_FOOD_MATRIX,
+  ROOT_PREPARATION,
+  ROOT_AIR_DRYING,
+  TRAY_CLEARANCE_PACKAGE,
+  COLLECTIVE_BARK,
+  COLLECTIVE_BARK_FEEDBACK,
+  COLLECTIVE_FOOD_INSPECTION,
+  COLLECTIVE_MATERIAL_COMBINE,
+  ROOT_SURFACE_PACKAGE,
+  COLLECTIVE_INVENTORY,
+  SURFACE_DIAGNOSTIC_PACKAGE,
+  TOOL_ASSESSMENT_PACKAGE,
+  SMALL_DRYING_PACKAGE,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(
     world?.config.development
-      ? V7_PACKAGES.filter(
-          (p) =>
-            ['foundation-forest', 'foundation-open'].includes(p.id) ||
-            p.scope === world.config.development?.scope,
-        )
+      ? [
+          ...V7_PACKAGES.filter((p) =>
+            ['foundation-forest', 'foundation-open'].includes(p.id),
+          ),
+          ...(world.config.collective
+            ? [collectiveFoundation(world.config.development.scope)]
+            : []),
+          ...V7_PACKAGES.filter(
+            (p) => p.scope === world.config.development?.scope,
+          ),
+        ]
       : V7_PACKAGES,
   );
 export function v7PublicCatalogue(world: V7World, actorId?: string) {

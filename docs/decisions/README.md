@@ -49,3 +49,5 @@ For a material change to an accepted decision, create a new ADR and mark the old
 - [0021](0021-forest-execution-and-experience.md): versioned shared reference/execution contracts, diet and slowly maintained mental state.
 
 - [0022](0022-fresh-open-development.md): experiment-scoped capabilities, grounded projects and knowledge, causal ecology and conserved persistent processes.
+
+- [0023](0023-collective-life.md): private member contexts, real local coordination, fair collective attention and isolated A/B checkpoint continuation.

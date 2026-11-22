@@ -136,6 +136,22 @@ describe('numbered experiment artifacts', () => {
     write('results.json', { changed: true });
     expect(() => validateExperiment(root, 'ex1')).toThrow();
   });
+  it('reuses capture reconstruction without promoting it to final archive acceptance', () => {
+    const before = reconstructionMetrics().length;
+    validateExperiment(root, 'ex1', true);
+    validateExperiment(root, 'ex1', true);
+    validateExperiment(root, 'ex1');
+    expect(
+      reconstructionMetrics()
+        .slice(before)
+        .map((m) => m.deepRebuilds),
+    ).toEqual([1, 0, 1]);
+    write('browser.json', { status: 'failed' });
+    validateExperiment(root, 'ex1', true);
+    expect(() => validateExperiment(root, 'ex1')).toThrow();
+    write('results.json', { invalid: true });
+    expect(() => validateExperiment(root, 'ex1', true)).toThrow();
+  });
   it('validates reconstructed data and binds numbered visuals to task review and fingerprint', () => {
     expect(checkExperiments(root)).toEqual(['ex1']);
     expect(requiredScenes(root)).toContain('ex1-final');

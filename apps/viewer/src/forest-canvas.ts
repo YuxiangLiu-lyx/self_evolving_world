@@ -1,3 +1,11 @@
+import { drawToolAssessment } from './collective-tool-assessment-view.js';
+import { drawTrayClearance } from './collective-tray-clearance-view.js';
+import { drawSmallDrying } from './collective-small-drying-view.js';
+import { drawSurfaceDiagnostics } from './collective-surface-diagnostics-view.js';
+import { drawRootSurface } from './collective-root-surface-view.js';
+import { drawMaterialCombine } from './collective-material-view.js';
+import { drawFoodInspection } from './collective-food-inspection-view.js';
+import { drawCollectiveBark } from './collective-bark-view.js';
 import { drawExtraction } from './open-extraction-view.js';
 import {
   drawWaterObject,
@@ -19,6 +27,7 @@ import {
   v7Distance,
   v7SegmentClear,
   v7Obstacles,
+  collectiveGroups,
 } from '@self-evolving-world/world-core';
 import type {
   V7Actor,
@@ -28,6 +37,7 @@ import type {
 } from '@self-evolving-world/world-core';
 import type { SceneFrame } from './continuous-scene.js';
 import { CONTINUOUS_VISUALS } from './continuous-visuals.js';
+import { COLLECTIVE_COLORS } from './collective-view.js';
 
 const visualCache = new Map<string, HTMLImageElement>();
 function packageVisual(c: CanvasRenderingContext2D, o: V7Object): boolean {
@@ -289,6 +299,27 @@ function object(
     ellipse(c, 0.13, 0.12, 0.58, 0.22, '#1b302b40');
   if (packageVisual(c, o)) {
     c.restore();
+    if (['root-work', 'root-drying-tray'].includes(o.kind)) {
+      const f = o.data.food;
+      const food = f && typeof f === 'object' && !Array.isArray(f) ? f : null;
+      label(
+        c,
+        o.data.activeWork
+          ? `Work left ${String(Number(o.data.remainingWork))} · paid ${String(Number(o.data.paidEnergy ?? 0))} energy`
+          : food
+            ? `Water ${(Number(food.waterFraction) * 100).toFixed(1)}% · decay ×${Number(food.decayMultiplier).toFixed(2)}`
+            : 'Empty reusable tray',
+        x,
+        y - 1.35,
+      );
+      if (food)
+        label(
+          c,
+          `${typeof food.status === 'string' ? food.status : 'Actual exposure'} · ${Number(food.remainingWaterRemoval).toFixed(3)} water work left`,
+          x,
+          y - 1.75,
+        );
+    }
     return;
   }
   if (o.kind === 'tree') {
@@ -399,12 +430,14 @@ function actor(
   phase: number,
   active: string | null,
   mantle?: V7Stack['mantle'],
+  paidFood = false,
 ): void {
   c.save();
   c.translate(a.position.x, a.position.y);
   const dead = a.vitals.health <= 0,
     color =
-      a.id === 'lin' ? '#c5aa73' : a.id === 'moss' ? '#83a99e' : '#b89087';
+      (a.collective ? COLLECTIVE_COLORS[a.collective.group] : undefined) ??
+      (a.id === 'lin' ? '#c5aa73' : a.id === 'moss' ? '#83a99e' : '#b89087');
   ellipse(c, 0.02, 0.15, 0.28, 0.12, '#142b294d');
   if (a.id === selected) {
     c.strokeStyle = '#f5dba1';
@@ -465,6 +498,16 @@ function actor(
   );
   c.stroke();
   drawWillowWork(c, a, active, phase);
+  if (paidFood) {
+    ellipse(c, 0, 0.12, 0.18, 0.07, '#ba9764');
+    circle(
+      c,
+      0.05,
+      -0.04 + Math.sin(phase * Math.PI * 4) * 0.04,
+      0.055,
+      '#ddc2a0',
+    );
+  }
   c.restore();
   label(c, a.name, a.position.x, a.position.y - 0.86);
   if (active && active !== 'wait')
@@ -734,6 +777,28 @@ export function drawForestCanvas(
         v7Interior(point, o.spatial) &&
         (!self || !v7Interior(self.position, o.spatial)),
     );
+  if (frame.continuous?.config.collective) {
+    for (const group of collectiveGroups(frame.continuous)) {
+      if (frame.visible !== null && self?.collective?.group !== group.id)
+        continue;
+      const tint = COLLECTIVE_COLORS[group.id] ?? '#d8d5bf';
+      c.save();
+      c.strokeStyle = tint;
+      c.lineWidth = 0.035;
+      c.setLineDash([0.18, 0.16]);
+      c.beginPath();
+      c.arc(group.meeting.x, group.meeting.y, 3, 0, Math.PI * 2);
+      c.stroke();
+      c.restore();
+      label(
+        c,
+        `${group.name} meeting place`,
+        group.meeting.x,
+        group.meeting.y - 3.25,
+        tint,
+      );
+    }
+  }
   for (const o of frame.objects.filter((o) => o.spatial.enclosure))
     object(
       c,
@@ -793,7 +858,72 @@ export function drawForestCanvas(
         frame.continuous?.stacks.find(
           (s) => s.owner === a.id && s.mantle?.equipped,
         )?.mantle,
+        frame.events.some(
+          (ev) =>
+            ev.actor === a.id &&
+            ['prepare-food', 'root-preparation', 'root-air-drying'].includes(
+              ev.interface ?? '',
+            ) &&
+            ev.type === 'process-progress' &&
+            ev.success,
+        ),
       );
+      const crushed =
+        frame.continuous?.stacks
+          .filter((s) => s.owner === a.id && s.resource === 'crushed-root')
+          .reduce((n, s) => n + s.quantity, 0) ?? 0;
+      if (crushed > 0 && (frame.visible === null || selected === a.id)) {
+        ellipse(
+          c,
+          a.position.x + 0.35,
+          a.position.y + 0.15,
+          0.15,
+          0.09,
+          '#c0a77e',
+        );
+        label(
+          c,
+          `${String(crushed)} crushed root units`,
+          a.position.x,
+          a.position.y + 1.4,
+        );
+      }
+      const portions =
+        frame.continuous?.stacks
+          .filter((s) => s.owner === a.id && s.resource === 'hand-mashed-food')
+          .reduce((n, s) => n + s.quantity, 0) ?? 0;
+      if (portions > 0 && (frame.visible === null || selected === a.id)) {
+        ellipse(
+          c,
+          a.position.x + 0.35,
+          a.position.y + 0.15,
+          0.15,
+          0.09,
+          '#ba9764',
+        );
+        label(
+          c,
+          `${String(portions)} prepared portions`,
+          a.position.x,
+          a.position.y + 1.4,
+        );
+      }
+      const paid = frame.events.find(
+        (ev) =>
+          ev.actor === a.id &&
+          ['prepare-food', 'root-preparation', 'root-air-drying'].includes(
+            ev.interface ?? '',
+          ) &&
+          ev.type === 'process-progress' &&
+          ev.success,
+      );
+      if (paid)
+        label(
+          c,
+          `${String(Number(paid.data.completedWork))} / ${String(Number(paid.data.initialWork))} paid work`,
+          a.position.x,
+          a.position.y + 1.02,
+        );
       if (frame.visible === null || selected === a.id)
         drawCarriedWater(
           c,
@@ -1032,7 +1162,49 @@ export function drawForestCanvas(
       animal.spatial.y - 1.65,
     );
   }
-  if (frame.continuous) drawExtraction(c, frame.continuous);
+  if (frame.continuous) {
+    drawExtraction(c, frame.continuous);
+    drawFoodInspection(
+      c,
+      frame.continuous,
+      frame.visible === null ? null : selected,
+    );
+    drawMaterialCombine(
+      c,
+      frame.continuous,
+      frame.visible === null ? null : selected,
+    );
+    drawSurfaceDiagnostics(
+      c,
+      frame.continuous,
+      frame.visible === null ? null : selected,
+    );
+    drawTrayClearance(
+      c,
+      frame.continuous,
+      frame.visible === null ? null : selected,
+    );
+    drawToolAssessment(
+      c,
+      frame.continuous,
+      frame.visible === null ? null : selected,
+    );
+    drawSmallDrying(
+      c,
+      frame.continuous,
+      frame.visible === null ? null : selected,
+    );
+    drawRootSurface(
+      c,
+      frame.continuous,
+      frame.visible === null ? null : selected,
+    );
+    drawCollectiveBark(
+      c,
+      frame.continuous,
+      frame.visible === null ? null : selected,
+    );
+  }
   for (const s of frame.stacks
     .filter((s) => !beneathClosedRoof(s))
     .sort(
@@ -1059,8 +1231,66 @@ export function drawForestCanvas(
         );
       continue;
     }
+    if (waterItem?.processing?.collectiveWorkReleased) {
+      const group =
+        frame.continuous?.stacks.filter(
+          (item) =>
+            item.owner === null &&
+            item.processing?.collectiveWorkReleased ===
+              waterItem.processing?.collectiveWorkReleased &&
+            item.position.x === s.x &&
+            item.position.y === s.y,
+        ) ?? [];
+      if (group[0]?.id === s.id) {
+        c.fillStyle = '#b99e73';
+        c.fillRect(s.x - 0.22, s.y - 0.12, 0.44, 0.24);
+        ellipse(c, s.x - 0.08, s.y, 0.12, 0.09, '#8c9790');
+        label(
+          c,
+          group
+            .map((item) => `${String(item.quantity)} ${item.resource}`)
+            .join(' · '),
+          s.x,
+          s.y + 1.9,
+        );
+      }
+      continue;
+    }
     if (waterItem?.resource === 'extraction-material') {
       ellipse(c, s.x, s.y, 0.035, 0.025, '#c1af88');
+      continue;
+    }
+    if (
+      waterItem?.reservedFor &&
+      frame.continuous?.objects.some(
+        (o) =>
+          ['lean-to-work', 'root-work', 'root-drying-tray'].includes(o.kind) &&
+          (o.data.activeWork === waterItem.reservedFor ||
+            o.id === waterItem.reservedFor),
+      )
+    ) {
+      const group = frame.continuous.stacks.filter(
+        (item) => item.reservedFor === waterItem.reservedFor,
+      );
+      if (group[0]?.id === s.id) {
+        if (
+          !frame.continuous.objects.some(
+            (o) =>
+              ['root-work', 'root-drying-tray'].includes(o.kind) &&
+              (o.id === waterItem.reservedFor ||
+                o.data.activeWork === waterItem.reservedFor),
+          )
+        )
+          ellipse(c, s.x, s.y, 0.24, 0.14, '#ad9d76');
+        label(
+          c,
+          group
+            .map((item) => `${String(item.quantity)} ${item.resource}`)
+            .join(' · '),
+          s.x,
+          s.y + 1.85,
+        );
+      }
       continue;
     }
     const extractionCup = !!waterItem?.reservedFor?.startsWith('extraction:');
@@ -1081,7 +1311,11 @@ export function drawForestCanvas(
       c.restore();
     } else {
       const item = frame.continuous?.stacks.find((item) => item.id === s.id);
-      if (!item || !drawWillowItem(c, item))
+      if (item?.resource === 'hand-mashed-food') {
+        ellipse(c, s.x, s.y, 0.22, 0.13, '#ba9764');
+        for (const dx of [-0.1, 0, 0.1])
+          circle(c, s.x + dx, s.y - 0.02, 0.035, '#e0c89f');
+      } else if (!item || !drawWillowItem(c, item))
         ellipse(c, s.x, s.y, 0.16, 0.1, s.color);
     }
     const processed = frame.continuous?.stacks.find(

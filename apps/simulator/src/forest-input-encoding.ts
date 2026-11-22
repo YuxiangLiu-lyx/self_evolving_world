@@ -44,6 +44,7 @@ function encodeInput(
     typeof input !== 'object' ||
     !(
       'experience' in input ||
+      'collective' in input ||
       ('physicalRules' in input &&
         input.physicalRules &&
         typeof input.physicalRules === 'object' &&

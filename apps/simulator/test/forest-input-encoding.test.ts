@@ -1,3 +1,5 @@
+import { collectiveDecisions } from '../src/collective-controller.js';
+import { v7Clone } from '@self-evolving-world/world-core';
 import { readFileSync } from 'node:fs';
 import { expect, it } from 'vitest';
 import { continuousInputText } from '../src/forest-input-encoding.js';
@@ -575,4 +577,22 @@ it('never reinterprets literal short-reference strings or tuple-shaped user arra
     });
     expect(openTupleWire(wire)).toBe(wire);
   }
+});
+
+it('uses the existing lossless codec for the actual ex11 collective packet without dropping facts or increasing its guard', () => {
+  const state = JSON.parse(
+    readFileSync(
+      'experiment/ex11/technical-pauses/round-7/execution.json',
+      'utf8',
+    ),
+  ) as V7Execution;
+  const decisions = collectiveDecisions(v7Clone(state));
+  expect(decisions).toHaveLength(1);
+  for (const d of decisions) {
+    const encoded = continuousInputText(d.input);
+    expect(JSON.stringify(d.input).length).toBeGreaterThan(56000);
+    expect(encoded.length).toBeLessThan(56000);
+    expect(decode(encoded)).toEqual(JSON.parse(JSON.stringify(d.input)));
+  }
+  expect(state.world.config.collective?.contextCharacters).toBe(56000);
 });

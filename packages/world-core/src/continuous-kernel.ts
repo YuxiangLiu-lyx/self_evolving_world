@@ -1,3 +1,5 @@
+import { materialValidate } from './material-lots.js';
+import { collectiveAfterRound, collectiveAssert } from './collective-social.js';
 import { openPractice } from './open-experience.js';
 import { openConditions } from './open-physical.js';
 import { recuperationAfterRound } from './forest-recuperation.js';
@@ -278,6 +280,7 @@ function navigation(
   return { complete, writes: [] };
 }
 export function v7AssertWorld(world: V7World, registry?: V7Registry): void {
+  collectiveAssert(world);
   v7Json(world.state);
   const ids = new Set<string>();
   for (const collection of collections)
@@ -402,7 +405,8 @@ export function v7AssertWorld(world: V7World, registry?: V7Registry): void {
       )
         throw new Error('Solid object footprints overlap.');
     }
-  for (const stack of world.stacks)
+  for (const stack of world.stacks) {
+    materialValidate(stack);
     if (
       (world.state.foodAssessment === 1 || !!world.config.development
         ? stack.quantity <= 0 ||
@@ -414,6 +418,7 @@ export function v7AssertWorld(world: V7World, registry?: V7Registry): void {
       (stack.owner !== null && !world.actors.some((a) => a.id === stack.owner))
     )
       throw new Error('Invalid material identity, quantity or ownership.');
+  }
   if (JSON.stringify(world).length * 2 > world.config.computation.stateBytes)
     throw new V7ComputePause(
       'State-memory protection reached; persist and pause instead of deleting objects.',
@@ -562,6 +567,17 @@ export function v7Step(
               }
               target = review.ability;
             } else target = v7String(action.args.ability, 'ability');
+            if (actor.collective) {
+              if (
+                ability.handler === 'kernel.request' &&
+                !actor.collective.knownAbilities.includes(target)
+              )
+                actor.collective.knownAbilities.push(target);
+              if (!actor.collective.knownAbilities.includes(target))
+                throw new Error(
+                  'Discover this capability through actual consultation, reporting or teaching before individual study.',
+                );
+            }
             const learned = trial.abilities.find((a) => a.id === target);
             if (
               !learned ||
@@ -973,6 +989,7 @@ export function v7Step(
     routeInspectionAfterRound(next);
     normalizeFoodAccounting(next);
     forestPerception(world, next);
+    collectiveAfterRound(world, next);
     v7Wellbeing(next);
     forestExperienceAfterRound(world, next);
     v7Remember(next);

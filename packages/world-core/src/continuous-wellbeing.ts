@@ -1,4 +1,5 @@
 import { forestClimate, forestPhysiology } from './forest-environment.js';
+import { collectiveExperienceScale } from './collective-social.js';
 import type { V7Actor, V7World } from './continuous-types.js';
 import { v7RoundNumber, v7Id } from './continuous-data.js';
 import { v7Condition } from './continuous-observation.js';
@@ -136,12 +137,13 @@ export function v7Wellbeing(world: V7World): void {
           actor.wellbeing.sources.push(source);
         }
         const amplitude =
-          rule.repeatWindow &&
+          collectiveExperienceScale(actor, event.type) *
+          (rule.repeatWindow &&
           world.tick - lastReward <= rule.repeatWindow.rounds
             ? rule.repeatWindow.amount
             : rule.repetition === 'diminish'
               ? rule.amount / (1 + source.exposures * 0.15)
-              : rule.amount;
+              : rule.amount);
         source.value = Math.min(
           rule.cap,
           world.config.experience && rule.mode === 'maintained'

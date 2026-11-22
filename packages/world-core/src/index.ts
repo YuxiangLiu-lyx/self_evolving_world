@@ -224,3 +224,37 @@ export {
 } from './open-short-geometry.js';
 
 export { refugeExposure } from './open-shelter-exposure.js';
+export * from './collective-types.js';
+export * from './collective-social.js';
+
+export { collectiveFoodProfile } from './collective-food-profile.js';
+export { leanExposure } from './collective-shelter-exposure.js';
+export { collectiveJobs } from './collective-work.js';
+
+export { rootProcessing, rootDecayRate } from './collective-root-food.js';
+export { rootWater } from './collective-root-physics.js';
+
+export {
+  personalInventoryResult,
+  personalInventoryHistory,
+} from './collective-inventory.js';
+
+export {
+  surfaceDiagnosticHistory,
+  surfaceDiagnosticResult,
+} from './collective-surface-diagnostics.js';
+
+export { smallDryingAssessment } from './collective-small-drying-assessment.js';
+export { smallSupportValidity } from './collective-small-drying-site.js';
+
+export { rootAge } from './collective-root-physics.js';
+
+export {
+  trayClearanceHistory,
+  trayClearanceResult,
+} from './collective-tray-clearance.js';
+
+export {
+  toolAssessmentResult,
+  toolAssessmentHistory,
+} from './collective-tool-assessment.js';

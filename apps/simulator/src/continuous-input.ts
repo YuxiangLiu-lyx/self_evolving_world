@@ -5,6 +5,7 @@ import {
   openExtensionSummary,
 } from './open-context.js';
 import { forestExperienceSummary } from './forest-experience-context.js';
+import { collectiveRecords } from './collective-input.js';
 import {
   V7_GOAL,
   forestClimate,
@@ -176,13 +177,75 @@ export function worldContinuousInput(
   world: V7World,
   requests: Record<string, V7Action>,
 ) {
+  const sharedObjects = new Map<string, ReturnType<typeof objectFact>>();
+  const catalogue = openCatalogue(world);
+  // Review selects functions; execution schemas remain available in the source-bound handoff.
+  // Avoid repeating every baseline argument schema alongside its functional index.
+  if (world.config.collective) catalogue.interfaces = [];
   return {
     protocol: world.protocol,
     tick: world.tick,
-    catalogue: openCatalogue(world),
+    catalogue,
     physicalRules: world.config,
     applicants: Object.entries(requests).map(([actor, action]) => {
       const o = v7Observe(world, actor);
+      if (world.config.collective) {
+        const requested = JSON.stringify(action.args);
+        const relevant = o.objects.filter((object) =>
+          requested.includes(JSON.stringify(object.id)),
+        );
+        const nearby = [...o.objects].sort(
+          (a, b) =>
+            v7Distance(o.self.position, a.spatial) -
+            v7Distance(o.self.position, b.spatial),
+        );
+        const selected = collectiveRecords(
+          [
+            ...new Map(
+              [...relevant, ...nearby].map((object) => [object.id, object]),
+            ).values(),
+          ].map(objectFact),
+          4,
+          1800,
+        );
+        selected.shown.forEach((object) =>
+          sharedObjects.set(object.id, object),
+        );
+        return {
+          actor,
+          request: action.args,
+          actualState: {
+            position: o.self.position,
+            vitals: o.self.vitals,
+            mastered: o.self.mastered,
+            learning: o.self.learning,
+          },
+          personalRecords: {
+            projects: collectiveRecords(
+              Object.values(o.self.memory.projects ?? {}).sort(
+                (a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0),
+              ),
+              2,
+              900,
+            ),
+            knowledge: collectiveRecords(
+              Object.values(o.self.memory.knowledge ?? {}).sort(
+                (a, b) => b.tick - a.tick,
+              ),
+              4,
+              700,
+            ),
+          },
+          observedObjectIds: selected.shown.map((object) => object.id),
+          omittedObservedObjects: selected.omitted,
+          ownedItems: collectiveRecords(
+            o.stacks.filter((s) => s.owner === actor),
+            12,
+            2400,
+          ),
+          recentEvents: collectiveRecords(o.events, 3, 600),
+        };
+      }
       return {
         actor,
         request: action.args,
@@ -200,6 +263,13 @@ export function worldContinuousInput(
         recentEvents: o.events,
       };
     }),
+    ...(world.config.collective
+      ? {
+          sharedObservedObjects: [...sharedObjects.values()],
+          contextPolicy:
+            'Object IDs refer to deduplicated actual applicant observations. Whole records are selected with omission counts. Missing detail is unknown, not proof of absence. Full retained state is available during the development handoff; implementation must validate actual prerequisites and ownership.',
+        }
+      : {}),
     implementation:
       'New interfaces, state, geometry, persistent processes, rendering components and personal memory/task adapters can be delivered through a versioned current-conversation handoff. Source validation and history must remain intact. Declared implementation does not supply stock, objects or mastery.',
   };

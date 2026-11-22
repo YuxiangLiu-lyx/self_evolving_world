@@ -87,6 +87,7 @@ export async function selectModel(
 function completedDecision(
   value: unknown,
   responseFormat: 'sse' | 'json',
+  textLimit: number,
 ): ModelDecision {
   const completed = record(value);
   if (completed.status !== 'completed' || !Array.isArray(completed.output))
@@ -108,7 +109,7 @@ function completedDecision(
       texts.push(string(content.text, 'decision text'));
     }
   }
-  if (texts.length !== 1 || (texts[0]?.length ?? 0) > 10_000)
+  if (texts.length !== 1 || (texts[0]?.length ?? 0) > textLimit)
     throw new Error('Expected exactly one bounded decision output.');
   return {
     text: string(texts[0], 'decision text'),
@@ -128,7 +129,10 @@ export interface ResponseEvidence {
 export async function readDecisionStream(
   response: Response,
   observe?: (evidence: ResponseEvidence) => Promise<void>,
+  textLimit = 10_000,
 ): Promise<ModelDecision> {
+  if (!Number.isSafeInteger(textLimit) || textLimit < 1 || textLimit > 100_000)
+    throw new Error('Invalid bounded decision text limit.');
   const contentType = response.headers.get('content-type');
   let format: 'sse' | 'json' | undefined = contentType?.includes(
     'text/event-stream',
@@ -197,12 +201,12 @@ export async function readDecisionStream(
             `Responses ended with ${String(event.type)}; no decision was accepted.`,
           );
         if (event.type !== 'response.completed') continue;
-        return completedDecision(event.response, 'sse');
+        return completedDecision(event.response, 'sse', textLimit);
       }
     }
     if (!response.ok) await responseJson(response);
     if (format === 'json')
-      return completedDecision(parseResponseJson(buffer), 'json');
+      return completedDecision(parseResponseJson(buffer), 'json', textLimit);
     throw new Error('Response stream ended without response.completed.');
   } finally {
     try {

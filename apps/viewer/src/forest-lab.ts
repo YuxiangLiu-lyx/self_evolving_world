@@ -1,4 +1,11 @@
+import { appendToolAssessment } from './collective-tool-assessment-view.js';
+import { appendTrayClearance } from './collective-tray-clearance-view.js';
+import { appendSmallDrying } from './collective-small-drying-view.js';
+import { appendSurfaceDiagnostics } from './collective-surface-diagnostics-view.js';
+import { appendInventoryInspection } from './collective-inventory-view.js';
+import { appendMaterialLots } from './collective-material-view.js';
 import { renderExtraction } from './open-extraction-view.js';
+import { collectiveMemberText } from './collective-view.js';
 import { v7AssertWorld, forestClimate } from '@self-evolving-world/world-core';
 import type { V7World } from '@self-evolving-world/world-core';
 import { continuousScene } from './continuous-scene.js';
@@ -18,6 +25,11 @@ let frames: V7World[] = [],
   geometry = false,
   size = 12;
 const trialPanel = document.createElement('div');
+const collectivePanel = document.createElement('pre');
+collectivePanel.id = 'fixture-collective';
+collectivePanel.className = 'object-state';
+collectivePanel.hidden = true;
+document.getElementById('fixture-events')?.before(collectivePanel);
 trialPanel.id = 'fixture-trial-diagnostic';
 document.getElementById('fixture-events')?.before(trialPanel);
 const extractionPanel = document.createElement('div');
@@ -32,6 +44,8 @@ function render() {
   if (!w) return;
   const a = w.actors.find((a) => a.id === selected);
   if (!a) return;
+  collectivePanel.hidden = !a.collective;
+  collectivePanel.textContent = collectiveMemberText(a, w, false);
   drawForestCanvas(
     canvas,
     continuousScene(w, null),
@@ -64,6 +78,19 @@ function render() {
       .map((o) => ` · ${o.id}: stock ${String(Number(o.data.stock))}`)
       .join('')}`,
   );
+  const materialState = document.getElementById('fixture-state');
+  if (materialState)
+    appendMaterialLots(
+      materialState,
+      w.stacks.filter(
+        (s) => s.owner === a.id || (s.componentLots && s.reservedFor),
+      ),
+    );
+  if (materialState) appendInventoryInspection(materialState, w, a);
+  if (materialState) appendSurfaceDiagnostics(materialState, a);
+  if (materialState) appendTrayClearance(materialState, a);
+  if (materialState) appendToolAssessment(materialState, a);
+  if (materialState) appendSmallDrying(materialState, w, a);
   const samples = w.stacks.filter(
     (s) => s.owner === a.id && s.processing?.foodExamination,
   );

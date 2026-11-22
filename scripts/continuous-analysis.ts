@@ -1,4 +1,10 @@
 import { OPEN_OBJECTIVE, measureOpen } from './open-analysis.js';
+import { COLLECTIVE_OBJECTIVE } from '../apps/simulator/src/collective-scenario.js';
+import { measureCollective } from './collective-analysis.js';
+import {
+  requestRevisionBoundaries,
+  retainedRequestBuilder,
+} from './continuous-request-audit.js';
 import { readFileSync, lstatSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { v7Signature } from '@self-evolving-world/world-core';
@@ -81,6 +87,9 @@ export function measureContinuous(
     };
   });
   return {
+    ...(final.config.collective
+      ? { collective: measureCollective(state, frames, records) }
+      : {}),
     ...(final.config.development
       ? { openDevelopment: measureOpen(state, frames, records) }
       : {}),
@@ -342,11 +351,12 @@ export function measureContinuous(
 }
 export function continuousChart(state: V7Execution, frames: V7World[]): string {
   const width = 1120,
-    height = 620,
+    rows = Math.ceil(state.world.actors.length / 4),
+    height = 620 + (rows - 1) * 28,
     x = (tick: number) => 70 + (tick / Math.max(1, state.world.tick)) * 980,
     y = (value: number) => 470 - value * 3.5;
   const colors = ['#bb8a4c', '#557e5c', '#568d9e'];
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${String(width)}" height="${String(height)}" viewBox="0 0 ${String(width)} ${String(height)}" role="img" aria-label="Measured wellbeing over recorded rounds"><rect width="1120" height="620" fill="#f4f5ec"/><text x="64" y="55" font-family="Georgia,serif" font-size="30" fill="#214838">Life in a continuous world</text><text x="64" y="85" font-family="sans-serif" font-size="13" fill="#687a64">${String(state.world.tick)} observed rounds · ${state.phase} · wellbeing 0–100 · individual mechanisms are not causal treatments</text>${[0, 25, 50, 75, 100].map((v) => `<path d="M70 ${String(y(v))}H1050" stroke="#d7dece"/><text x="38" y="${String(y(v) + 4)}" font-family="sans-serif" font-size="12" fill="#7b8a73">${String(v)}</text>`).join('')}${state.world.actors
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${String(width)}" height="${String(height)}" viewBox="0 0 ${String(width)} ${String(height)}" role="img" aria-label="Measured wellbeing over recorded rounds"><rect width="1120" height="${String(height)}" fill="#f4f5ec"/><text x="64" y="55" font-family="Georgia,serif" font-size="30" fill="#214838">Life in a continuous world</text><text x="64" y="85" font-family="sans-serif" font-size="13" fill="#687a64">${String(state.world.tick)} observed rounds · ${state.phase} · wellbeing 0–100 · individual mechanisms are not causal treatments</text>${[0, 25, 50, 75, 100].map((v) => `<path d="M70 ${String(y(v))}H1050" stroke="#d7dece"/><text x="38" y="${String(y(v) + 4)}" font-family="sans-serif" font-size="12" fill="#7b8a73">${String(v)}</text>`).join('')}${state.world.actors
     .map(
       (a, i) =>
         `<polyline points="${frames
@@ -358,11 +368,11 @@ export function continuousChart(state: V7Execution, frames: V7World[]): string {
           })
           .join(
             ' ',
-          )}" fill="none" stroke="${String(colors[i % colors.length])}" stroke-width="2.4"/><circle cx="${String(80 + i * 230)}" cy="540" r="5" fill="${String(colors[i % colors.length])}"/><text x="${String(94 + i * 230)}" y="545" font-family="sans-serif" font-size="14" fill="#31513e">${a.id} · final ${a.wellbeing.total.toFixed(1)}</text>`,
+          )}" fill="none" stroke="${String(colors[i % colors.length])}" stroke-width="2.4"/><circle cx="${String(80 + (i % 4) * 230)}" cy="${String(540 + Math.floor(i / 4) * 28)}" r="5" fill="${String(colors[i % colors.length])}"/><text x="${String(94 + (i % 4) * 230)}" y="${String(545 + Math.floor(i / 4) * 28)}" font-family="sans-serif" font-size="14" fill="#31513e">${a.id} · final ${a.wellbeing.total.toFixed(1)}</text>`,
     )
     .join(
       '',
-    )}<text x="70" y="495" font-family="sans-serif" font-size="12" fill="#71816b">0</text><text x="1010" y="495" font-family="sans-serif" font-size="12" fill="#71816b">${String(state.world.tick)}</text><text x="70" y="585" font-family="sans-serif" font-size="12" fill="#71816b">Physical comfort contributes at most 10. Other sources require implemented, successful world events.</text></svg>`;
+    )}<text x="70" y="495" font-family="sans-serif" font-size="12" fill="#71816b">0</text><text x="1010" y="495" font-family="sans-serif" font-size="12" fill="#71816b">${String(state.world.tick)}</text><text x="70" y="${String(height - 35)}" font-family="sans-serif" font-size="12" fill="#71816b">Physical comfort contributes at most 10. Other sources require implemented, successful world events.</text></svg>`;
 }
 export function continuousReport(
   id: string,
@@ -372,7 +382,7 @@ export function continuousReport(
   const forestSummary = state.world.config.forest
     ? `## Forest lifecycle and environment\n\nModel: ${state.model}. Seed: ${String(state.world.config.seed)}. Observed seasons: ${results.forest?.seasons.map((s) => (typeof s === 'string' ? s : 'unknown')).join(', ') ?? 'unknown'}. Deaths and respawns are retained with exact evidence and prior plans in results.json. Full-state replay remains independent of rendering. Monetary cost and internal developer usage are unknown; recorded role-specific tokens below are measured. These formal events are distinct from isolated forest-lab fixtures.\n\n${state.world.actors.map((a) => `${a.name}: ${String(a.life?.deaths ?? 0)} deaths, ${String((a.life?.total ?? 0) - (a.life?.deaths ?? 0))} remaining lives.`).join('\n\n')}\n\n`
     : '';
-  return `# ${id}: Continuous World and Persistent Wellbeing\n\n## Scope and observation window\n\n${state.world.config.development ? OPEN_OBJECTIVE : state.world.config.experience ? EXPERIENCE_OBJECTIVE : CONTINUOUS_OBJECTIVE}\n\nObserved ${String(state.world.tick)} of ${String(state.windowTarget)} target rounds. State: ${state.phase}. ${state.reason ?? ''} This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.\n\n## Measured outcome\n\n| Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | ${state.world.config.experience ? 'Learned-interface successful rounds' : 'New-ability successful rounds'} |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n${results.actors.map((a) => `| ${a.id} | ${String(a.alive)} | ${String(a.finalVitals.health)} | ${String(a.finalVitals.satiety)} | ${a.meanWellbeing.toFixed(2)} | ${a.finalWellbeing.total.toFixed(2)} | ${String(a.newlyMastered.length)} | ${String(a.successfulNewAbilityUses)} |`).join('\n')}\n\nRequests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits.${state.world.config.development ? ' This fresh policy inherits no generated interfaces. The explicit authored allowlist, current-run package provenance, personal projects, verified knowledge, trials and persistent processes are retained separately in results.openDevelopment. Actor-written progress is a claim, not a physical outcome.' : state.world.config.experience ? ' In this policy the table includes personally learned baseline interfaces; results.experience separately lists newly developed interfaces, personal mastery, completed operations and pre-action reference invalidations. The initial ex8 catalogue is not new ex9 discovery.' : ''} Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.\n\n## Action distribution\n\n| Interface | Attempted | Successful rounds | Failed rounds |\n| --- | --- | --- | --- |\n${Object.entries(
+  return `# ${id}: Continuous World and Persistent Wellbeing\n\n## Scope and observation window\n\n${state.world.config.collective ? COLLECTIVE_OBJECTIVE : state.world.config.development ? OPEN_OBJECTIVE : state.world.config.experience ? EXPERIENCE_OBJECTIVE : CONTINUOUS_OBJECTIVE}\n\nObserved ${String(state.world.tick)} of ${String(state.windowTarget)} target rounds. State: ${state.phase}. ${state.reason ?? ''} This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.\n\n## Measured outcome\n\n| Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | ${state.world.config.experience ? 'Learned-interface successful rounds' : 'New-ability successful rounds'} |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n${results.actors.map((a) => `| ${a.id} | ${String(a.alive)} | ${String(a.finalVitals.health)} | ${String(a.finalVitals.satiety)} | ${a.meanWellbeing.toFixed(2)} | ${a.finalWellbeing.total.toFixed(2)} | ${String(a.newlyMastered.length)} | ${String(a.successfulNewAbilityUses)} |`).join('\n')}\n\nRequests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits.${state.world.config.development ? ' This fresh policy inherits no generated interfaces. The explicit authored allowlist, current-run package provenance, personal projects, verified knowledge, trials and persistent processes are retained separately in results.openDevelopment. Actor-written progress is a claim, not a physical outcome.' : state.world.config.experience ? ' In this policy the table includes personally learned baseline interfaces; results.experience separately lists newly developed interfaces, personal mastery, completed operations and pre-action reference invalidations. The initial ex8 catalogue is not new ex9 discovery.' : ''} Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.\n\n## Action distribution\n\n| Interface | Attempted | Successful rounds | Failed rounds |\n| --- | --- | --- | --- |\n${Object.entries(
     results.actions,
   )
     .map(
@@ -446,7 +456,25 @@ export function readContinuousExperiment(
     throw new Error(
       'Reconstructed final state differs from the durable checkpoint.',
     );
-  for (const attempt of state.attempts) {
+  const history = continuousHistory(root, id);
+  const sources = history.map((revision) => {
+    const files = continuousRead<Record<string, string>>(
+      resolve(directory, 'sources', `revision-${String(revision.id)}.json`),
+    );
+    if (
+      continuousHash(files) !== revision.sourceHash ||
+      Object.entries(files).some(
+        ([p, s]) => continuousHash(s) !== revision.files[p],
+      )
+    )
+      throw new Error('Retained source revision failed integrity validation.');
+    return files;
+  });
+  const boundaries = state.world.config.collective
+    ? requestRevisionBoundaries(history, state.attempts)
+    : [];
+  const builders = new Map<number, ReturnType<typeof retainedRequestBuilder>>();
+  for (const [position, attempt] of state.attempts.entries()) {
     if (
       !existsSync(resolve(directory, 'calls', `${attempt.id}.json`)) &&
       attempt.status === 'started' &&
@@ -459,18 +487,25 @@ export function readContinuousExperiment(
     );
     if (continuousHash(call.attempt) !== continuousHash(attempt))
       throw new Error('Call ledger disagrees with durable raw record.');
-  }
-  for (const revision of continuousHistory(root, id)) {
-    const files = continuousRead<Record<string, string>>(
-      resolve(directory, 'sources', `revision-${String(revision.id)}.json`),
-    );
-    if (
-      continuousHash(files) !== revision.sourceHash ||
-      Object.entries(files).some(
-        ([p, s]) => continuousHash(s) !== revision.files[p],
-      )
-    )
-      throw new Error('Retained source revision failed integrity validation.');
+    if (state.world.config.collective) {
+      const revision = boundaries.findLastIndex(
+        (boundary) => boundary <= position,
+      );
+      const files = sources[revision];
+      if (!files) throw new Error('Call has no retained source revision.');
+      const builder = builders.get(revision) ?? retainedRequestBuilder(files);
+      builders.set(revision, builder);
+      const expected =
+        new TextEncoder().encode(
+          JSON.stringify(builder(state.model, attempt.role, call.input)),
+        ).length +
+        state.world.config.collective.tokens.output +
+        4096;
+      if (attempt.reservedTokens !== expected)
+        throw new Error(
+          'Token reservation does not bind the retained complete request.',
+        );
+    }
   }
   const results = measureContinuous(state, frames, rounds);
   if (

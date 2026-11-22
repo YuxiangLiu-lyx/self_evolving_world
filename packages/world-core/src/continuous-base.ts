@@ -1,3 +1,6 @@
+import { materialPortion } from './material-lots.js';
+import { leanExposure, leanRest } from './collective-shelter-exposure.js';
+import { collectiveFoodProfile } from './collective-food-profile.js';
 import { preservationOnTray } from './open-preservation-physics.js';
 import { geometryGather, geometryTransfer } from './open-material-geometry.js';
 import { refugeExposure, refugeRest } from './open-shelter-exposure.js';
@@ -5,7 +8,7 @@ import { barkGatherState } from './open-bark-accounting.js';
 import { foodUnitMass } from './forest-food-accounting.js';
 import { forestResolveReference } from './forest-references.js';
 import { forestMeal, forestRestFactor } from './forest-experience.js';
-import { foodTenths } from './forest-food-accounting.js';
+import { foodTenths, foodSetQuantity } from './forest-food-accounting.js';
 import type {
   V7Ability,
   V7ActionContext,
@@ -107,7 +110,9 @@ export function v7ConsumeMaterials(
         !s.reservedFor && s.owner === actor.id && s.resource === cost.resource,
     )) {
       const count = Math.min(stack.quantity, remaining);
-      stack.quantity -= count;
+      if (stack.componentLots)
+        foodSetQuantity(stack, foodTenths(stack.quantity - count));
+      else stack.quantity -= count;
       remaining -= count;
     }
     if (remaining > 0) throw new Error(`Missing material: ${cost.resource}.`);
@@ -283,9 +288,12 @@ export const V7_BASE: V7Package = {
       actor.vitals.energy = Math.min(
         world.config.energyCap,
         before +
-          (world.config.restRecovery + bonus) * forestRestFactor(world, actor),
+          (world.config.restRecovery + bonus) *
+            forestRestFactor(world, actor) *
+            (leanExposure(world, actor)?.restFactor ?? 1),
       );
       refugeRest(world, actor, refuge, actor.vitals.energy - before);
+      leanRest(world, actor, actor.vitals.energy - before);
       emit(
         'rested',
         `Recovered ${String(v7RoundNumber(actor.vitals.energy - before))} energy.`,
@@ -338,7 +346,7 @@ export const V7_BASE: V7Package = {
         throw new Error(
           'Requested quantity is not on the ground within pickup reach.',
         );
-      const resource = world.resources.find((r) => r.id === stack.resource);
+      const resource = collectiveFoodProfile(world, stack);
       if (!resource) throw new Error('Unknown material.');
       if ((stack.mantle || stack.frictionKit || stack.waterCup) && n !== 1)
         throw new Error('Equipment is one indivisible persistent item.');
@@ -364,10 +372,14 @@ export const V7_BASE: V7Package = {
         );
         return done([stack.id]);
       }
-      stack.quantity -= n;
+      const part = stack.componentLots
+        ? materialPortion(stack, foodTenths(n))
+        : null;
+      if (part) foodSetQuantity(stack, foodTenths(stack.quantity - n));
+      else stack.quantity -= n;
       const id = v7Id(world, 'item');
       world.stacks.push({
-        ...stack,
+        ...(part ?? stack),
         id,
         quantity: n,
         owner: actor.id,
@@ -395,14 +407,16 @@ export const V7_BASE: V7Package = {
           world.state.foodPreservation === 1 ? 0.1 : 1,
         );
       if (world.state.foodPreservation === 1) foodTenths(n);
-      const resource = world.resources.find((r) => r.id === stack.resource);
+      const resource = collectiveFoodProfile(world, stack);
       if (!resource || resource.nutrition <= 0 || stack.quantity < n)
         throw new Error(
           'Requested owned food quantity is unavailable or inedible.',
         );
       const before = actor.vitals.satiety;
       v7FoodEffect(actor, resource, n, world, stack);
-      stack.quantity -= n;
+      if (stack.componentLots)
+        foodSetQuantity(stack, foodTenths(stack.quantity - n));
+      else stack.quantity -= n;
       emit(
         'ate',
         `Consumed ${String(n)} ${resource.name}; gained ${String(actor.vitals.satiety - before)} satiety.`,
@@ -595,10 +609,14 @@ function transfer(
     );
     return done([stack.id]);
   }
-  stack.quantity -= n;
+  const part = stack.componentLots
+    ? materialPortion(stack, foodTenths(n))
+    : null;
+  if (part) foodSetQuantity(stack, foodTenths(stack.quantity - n));
+  else stack.quantity -= n;
   const id = v7Id(world, 'item');
   world.stacks.push({
-    ...stack,
+    ...(part ?? stack),
     id,
     quantity: n,
     owner: recipient?.id ?? null,

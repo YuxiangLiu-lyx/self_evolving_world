@@ -690,15 +690,15 @@ export function validateExperiment(
   id: string,
   pending = false,
 ): ReturnType<typeof reconstructExperiment> {
-  if (pending) return reconstructExperiment(root, id, true);
   const started = performance.now(),
-    input = experimentFingerprint(root, id);
+    input = experimentFingerprint(root, id),
+    receiptId = `${pending ? 'experiment-capture' : 'experiment'}:${id}`;
   const cache = new EvidenceCache(
     root,
     process.env.WORLD_VALIDATION_RUN ?? randomUUID(),
   );
   const previous = cache.read<ReturnType<typeof reconstructExperiment>>(
-    `experiment:${id}`,
+    receiptId,
     input,
   );
   if (previous) {
@@ -712,12 +712,12 @@ export function validateExperiment(
     });
     return previous.value;
   }
-  const result = reconstructExperiment(root, id);
-  checkExperimentIntegrity(root, id);
+  const result = reconstructExperiment(root, id, pending);
+  if (!pending) checkExperimentIntegrity(root, id);
   if (experimentFingerprint(root, id) !== input)
     throw new Error('Archive inputs changed during reconstruction.');
   const durationMs = performance.now() - started;
-  const receipt = cache.write(`experiment:${id}`, input, result, durationMs);
+  const receipt = cache.write(receiptId, input, result, durationMs);
   recordReconstruction(root, {
     id,
     input,

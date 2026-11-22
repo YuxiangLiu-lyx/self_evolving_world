@@ -1,3 +1,8 @@
+import type {
+  CollectiveCoordination,
+  CollectiveIntent,
+} from '@self-evolving-world/world-core';
+import { collectiveSettle } from '@self-evolving-world/world-core';
 import {
   continuousRegistry,
   v7CanonicalNumbers,
@@ -17,6 +22,7 @@ import type {
   V7Review,
 } from '@self-evolving-world/world-core';
 export interface SceneRound {
+  coordination?: CollectiveCoordination[];
   registrationPrecisionHash?: string;
   tick: number;
   before: string;
@@ -30,6 +36,7 @@ export interface SceneRound {
       notes: string[];
       preferences: string[];
       intention?: string;
+      collectiveIntent?: CollectiveIntent;
       projects?: V7Project[];
     }
   >;
@@ -89,6 +96,13 @@ export async function replaySceneSegment(
     for (const actor of input.actors) {
       const m = record.memory[actor.id];
       if (m) {
+        if (m.collectiveIntent) {
+          if (!actor.collective)
+            throw new Error(
+              'Personal collective intention requires an actual member.',
+            );
+          actor.collective.intent = v7Clone(m.collectiveIntent);
+        }
         if (m.projects) openSaveProjects(actor, m.projects, world.tick);
         actor.memory.notes = m.notes;
         actor.memory.preferences = m.preferences;
@@ -105,6 +119,7 @@ export async function replaySceneSegment(
       record.reviews,
     );
     if (segment.initialCursors) v7FinishTasks(world, result, cursors);
+    result.world = collectiveSettle(result.world, record.coordination ?? []);
     if (
       result.paused ||
       (await browserDigest(v7Signature(result.world))) !== record.after ||

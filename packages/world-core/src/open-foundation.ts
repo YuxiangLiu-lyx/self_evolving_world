@@ -1,3 +1,4 @@
+import { collectiveFoodProfile } from './collective-food-profile.js';
 import type {
   V7Ability,
   V7ActionContext,
@@ -11,6 +12,7 @@ import { v7Distance, v7Reach } from './continuous-geometry.js';
 import { v7Observe } from './continuous-observation.js';
 import { openAdvanceProcess } from './open-processes.js';
 import { openConditions, openMaterial } from './open-physical.js';
+import { collectiveAtMeeting } from './collective-social.js';
 
 export const OPEN_BASELINE = [
   'navigate',
@@ -115,7 +117,9 @@ function probe(c: V7ActionContext) {
         object?.data.resource ?? object?.data.species ?? object?.kind,
         'trial subject',
       ),
-    r = w.resources.find((r) => r.id === subject);
+    r = stack
+      ? collectiveFoodProfile(w, stack)
+      : w.resources.find((r) => r.id === subject);
   if (mode === 'observe') {
     v7Spend(a, 0.2);
     const data = object?.data ?? {};
@@ -246,8 +250,31 @@ function consult(c: V7ActionContext) {
     kind = v7String(c.action.args.kind, 'record kind');
   v7Spend(c.actor, 0.2);
   if (kind === 'ability') {
+    if (c.actor.collective && !c.actor.collective.knownAbilities.includes(id)) {
+      if (!collectiveAtMeeting(c.world, c.actor))
+        throw new Error(
+          'Read the current public capability register at the known meeting location, or accept a nearby lesson.',
+        );
+      if (/^page:[0-9]+$/.test(id)) {
+        const page = Number(id.slice(5));
+        const records = c.world.abilities
+          .slice(page * 12, (page + 1) * 12)
+          .map((a) => ({ id: a.id, function: a.function }));
+        for (const record of records)
+          if (!c.actor.collective.knownAbilities.includes(record.id))
+            c.actor.collective.knownAbilities.push(record.id);
+        c.emit(
+          'record-consulted',
+          'Read a page of the current experiment capability register; mastery is unchanged.',
+          { records: v7Json(records), total: c.world.abilities.length, page },
+        );
+        return { complete: true, writes: [] };
+      }
+    }
     const a = c.world.abilities.find((a) => a.id === id);
     if (!a) throw new Error('No such capability exists in this experiment.');
+    if (c.actor.collective && !c.actor.collective.knownAbilities.includes(id))
+      c.actor.collective.knownAbilities.push(id);
     c.actor.memory.abilityDetails = [
       id,
       ...(c.actor.memory.abilityDetails ?? []).filter((x) => x !== id),

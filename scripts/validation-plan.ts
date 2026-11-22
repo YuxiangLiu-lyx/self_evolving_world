@@ -241,10 +241,25 @@ export function selectedBrowserFiles(
         : 'experiments.spec.ts',
     );
   // Later protocol fixtures are discoverable without changing this planner's baseline.
-  if (
-    plan.browserGroups.includes('continuous') &&
-    existsSync(resolve(root, 'apps/viewer/e2e/forest.spec.ts'))
-  )
-    files.add('forest.spec.ts');
+  for (const file of [
+    'forest.spec.ts',
+    'collective.spec.ts',
+    'collective-work.spec.ts',
+    'collective-roots.spec.ts',
+    'collective-bark.spec.ts',
+    'collective-food-inspection.spec.ts',
+    'collective-material-combine.spec.ts',
+    'collective-root-surface.spec.ts',
+    'collective-inventory.spec.ts',
+    'collective-surface-diagnostics.spec.ts',
+    'collective-small-drying.spec.ts',
+    'collective-tray-clearance.spec.ts',
+    'collective-tool-assessment.spec.ts',
+  ])
+    if (
+      plan.browserGroups.includes('continuous') &&
+      existsSync(resolve(root, 'apps/viewer/e2e', file))
+    )
+      files.add(file);
   return [...files];
 }

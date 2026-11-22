@@ -104,7 +104,13 @@ All submitted files live under `validation-results/`. For example, a preparation
 
 The review handoff includes a patch and **all** changed paths: untracked contents must also be opened. Use the existing [visual and behavior criteria](VALIDATION.md#visual-review), not an automatic PASS generator. The program checks completeness and bindings but cannot prove judgment quality.
 
-The version-bound GitHub COMMENT lists every reviewed file and combines each screenshot's actual judgment with its original path and SHA-256 in one record. This avoids duplicate paths within the bounded review body; the full original local review remains hash-bound and all freshness/completeness gates still apply.
+The version-bound GitHub COMMENT retains every reviewed file and each
+screenshot's actual judgment, original path and SHA-256. Directory keys factor
+repeated path prefixes without truncating entries: each complete path is the key
+plus its listed filename. Screenshot rows declare their columns explicitly. The
+full original local review remains hash-bound and all freshness/completeness
+gates still apply. A round-trip regression covers large inventories, root files,
+spaces and every screenshot judgment.
 
 The review body is bounded at 65,000 characters, below GitHub's single-body limit.
 Large experiment archives retain every reviewed path and screenshot judgment;
@@ -163,3 +169,17 @@ study; both controller and file adapter enforce the same preexisting-mastery
 condition. New or unmastered assignments still require the exact reviewed
 learning duration. This does not waive source-prefix replay, unit checks,
 review, budgets or version retention, and supplies no mastery or reward.
+
+## Collective comparison adapter
+
+A new continuous intent may set `comparison: "collective-life-v1"`. The same coordinator sequentially allocates A and B, retains ordinary development handoffs, and preserves B's actual short checkpoint before continuation. The short phase closes at 200 rounds or a short allocation boundary; the separately frozen long allocation then begins with counters bound to the preserved checkpoint. Unused allocations never transfer, and technical or uncertain-call pauses do not unlock continuation. The campaign journal preserves both allocated IDs and its stage across interruptions; all selected acceptance, review and delivery gates remain unchanged. See the [frozen-policy protocol](COLLECTIVE_LIFE.md).
+
+For the retained ex12 round-56 bark implementation defect, the same guarded
+repair entry accepts the verified missing feedback trigger and prior personal
+inspection stamps. The terminated pending call remains a failed unknown outcome
+with its full token reservation; it is never resent. An empty counted handoff can
+install only `bark-feedback@1`, with no actor actions, requests, reviews or mastery
+assignments. This corrects the already reviewed contract, preserves its parameters
+and never backfills rewards or knowledge. Its exact controller source pair is
+allowlisted and every prior round must reconstruct before resumption. It is not
+a general policy-change or budget-stop override.
