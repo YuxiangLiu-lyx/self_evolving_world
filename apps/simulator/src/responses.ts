@@ -88,11 +88,19 @@ function completedDecision(
   value: unknown,
   responseFormat: 'sse' | 'json',
   textLimit: number,
+  finalAnswerPhase: boolean,
 ): ModelDecision {
   const completed = record(value);
   if (completed.status !== 'completed' || !Array.isArray(completed.output))
     throw new Error('Invalid completed response.');
   const texts: string[] = [];
+  const phased =
+    finalAnswerPhase &&
+    (completed.output as unknown[]).some((value) => {
+      const item = record(value);
+      return item.type === 'message' && item.phase !== undefined;
+    });
+  let finalMessages = 0;
   for (const value of completed.output as unknown[]) {
     const item = record(value);
     if (item.type === 'reasoning') continue;
@@ -102,14 +110,28 @@ function completedDecision(
       !Array.isArray(item.content)
     )
       throw new Error('Response contains an unsupported output item.');
+    if (phased && !['commentary', 'final_answer'].includes(String(item.phase)))
+      throw new Error('Ambiguous or unsupported decision message phase.');
+    if (phased && item.status !== 'completed')
+      throw new Error('Decision message is not complete.');
+    if (phased && item.phase === 'final_answer') finalMessages++;
     for (const value of item.content as unknown[]) {
       const content = record(value);
       if (content.type !== 'output_text')
         throw new Error('Response did not provide an ordinary text decision.');
+      if (phased && item.phase === 'commentary') {
+        if (typeof content.text !== 'string')
+          throw new Error('Invalid commentary text.');
+        continue;
+      }
       texts.push(string(content.text, 'decision text'));
     }
   }
-  if (texts.length !== 1 || (texts[0]?.length ?? 0) > textLimit)
+  if (
+    (phased && finalMessages !== 1) ||
+    texts.length !== 1 ||
+    (texts[0]?.length ?? 0) > textLimit
+  )
     throw new Error('Expected exactly one bounded decision output.');
   return {
     text: string(texts[0], 'decision text'),
@@ -130,6 +152,7 @@ export async function readDecisionStream(
   response: Response,
   observe?: (evidence: ResponseEvidence) => Promise<void>,
   textLimit = 10_000,
+  finalAnswerPhase = false,
 ): Promise<ModelDecision> {
   if (!Number.isSafeInteger(textLimit) || textLimit < 1 || textLimit > 100_000)
     throw new Error('Invalid bounded decision text limit.');
@@ -201,12 +224,22 @@ export async function readDecisionStream(
             `Responses ended with ${String(event.type)}; no decision was accepted.`,
           );
         if (event.type !== 'response.completed') continue;
-        return completedDecision(event.response, 'sse', textLimit);
+        return completedDecision(
+          event.response,
+          'sse',
+          textLimit,
+          finalAnswerPhase,
+        );
       }
     }
     if (!response.ok) await responseJson(response);
     if (format === 'json')
-      return completedDecision(parseResponseJson(buffer), 'json', textLimit);
+      return completedDecision(
+        parseResponseJson(buffer),
+        'json',
+        textLimit,
+        finalAnswerPhase,
+      );
     throw new Error('Response stream ended without response.completed.');
   } finally {
     try {

@@ -77,6 +77,8 @@ export function currentAction(
   event: V7Event | undefined;
   kind: string;
   failed: boolean;
+  resting: boolean;
+  working: boolean;
 } {
   const events = actionEvents(world, actor.id);
   const failure = events.find(
@@ -84,10 +86,13 @@ export function currentAction(
   );
   const event =
     failure ??
+    events.findLast((e) => e.type === 'apple-trial-consumed') ??
     events.findLast((e) => e.type.endsWith('-completed')) ??
     events.at(-1);
   const kind = event?.interface ?? (actor.learning ? 'learn' : 'idle');
   const labels: Record<string, string> = {
+    'source-bound-opened-hazelnut-access-trial':
+      'Clearance / exterior contact; no extraction',
     navigate: 'Travelling',
     gather: 'Gathering',
     rest: 'Resting',
@@ -111,14 +116,71 @@ export function currentAction(
   return {
     label: failure
       ? 'Action failed / interrupted'
-      : event?.type.endsWith('-completed')
-        ? 'Work completed'
-        : event?.type === 'insulation-equipped'
-          ? 'Mantle equipped'
-          : (labels[kind] ?? kind),
+      : event?.type === 'separation-assessed'
+        ? 'Clearance checked; separation unresolved'
+        : event?.type === 'branch-assessment-completed'
+          ? 'Geometry unavailable; no load test performed'
+          : event?.type === 'birch-assessment-completed'
+            ? 'Assessment inconclusive; no container made'
+            : event?.type === 'recovery-assessment-completed'
+              ? 'Access checked; pickup and separation are separate'
+              : event?.type === 'nut-access-completed'
+                ? 'Contact test ended; no material transferred'
+                : event?.type === 'opened-assessment-completed'
+                  ? 'Assessment recorded; separability unresolved'
+                  : event?.type === 'nut-opening-completed'
+                    ? event.data.exposed === true
+                      ? 'Contact exposed a region; safety unverified'
+                      : 'Bounded contact ended; result unverified'
+                    : event?.type === 'apple-trial-consumed'
+                      ? 'Actual 0.1 portion consumed; safety unresolved'
+                      : event?.type === 'moss-apple-assessment-completed' ||
+                          event?.type === 'apple-assessment-completed' ||
+                          event?.type === 'moss-food-assessment-completed' ||
+                          event?.type === 'plum-assessment-completed'
+                        ? 'Assessment inconclusive; safety unverified'
+                        : event?.type === 'specimen-examination-completed'
+                          ? 'Specimen examined; safety unverified'
+                          : event?.type.endsWith('-completed')
+                            ? 'Work completed'
+                            : event?.type === 'insulation-equipped'
+                              ? 'Mantle equipped'
+                              : (labels[kind] ??
+                                world.abilities.find((a) => a.id === kind)
+                                  ?.name ??
+                                kind),
     event,
     kind,
     failed: !!failure,
+    resting:
+      !failure && (kind === 'rest' || events.some((e) => e.type === 'rested')),
+    working:
+      !failure &&
+      events.some((e) =>
+        [
+          'process-progress',
+          'site-examination-completed',
+          'prepared-placement-examined',
+          'root-inspected',
+          'moss-inspected',
+          'specimen-examination-completed',
+          'apple-assessment-completed',
+          'moss-food-assessment-completed',
+          'opened-assessment-completed',
+          'nut-opening-contact',
+          'nut-opening-inspected',
+          'nut-access-assessed',
+          'nut-access-contact',
+          'nut-access-observed',
+          'recovery-assessment-completed',
+          'birch-assessment-completed',
+          'branch-assessment-completed',
+          'separation-assessed',
+          'plum-assessment-completed',
+          'moss-apple-assessment-completed',
+          'apple-trial-consumed',
+        ].includes(e.type),
+      ),
   };
 }
 /** A displayed transition is never a new route. Use only adjacent successful
@@ -211,6 +273,33 @@ export function progress(
           ? 'Recorded paid work'
           : 'Interrupted; paid effort recorded',
     };
+  }
+  if (world.config.longDevelopment) {
+    const paid = actionEvents(world, actor.id).findLast(
+      (e) => e.type === 'process-progress',
+    );
+    if (
+      paid &&
+      typeof paid.data.completedWork === 'number' &&
+      typeof paid.data.initialWork === 'number'
+    )
+      return {
+        paid: paid.data.completedWork,
+        total: paid.data.initialWork,
+        label: 'Paid work steps; see actual outcome',
+      };
+    const binding = data(actor.extensionState['execution:operation']);
+    const operation = data(binding?.operation);
+    if (
+      operation &&
+      typeof operation.elapsed === 'number' &&
+      typeof operation.remaining === 'number'
+    )
+      return {
+        paid: operation.elapsed,
+        total: operation.elapsed + operation.remaining,
+        label: 'Retained operation; paid progress',
+      };
   }
   if (actor.learning) {
     const total = world.abilities.find(

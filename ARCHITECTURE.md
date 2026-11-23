@@ -317,3 +317,22 @@ parameters for the return link. Ashen asset provenance, actual event bookmarks
 and separate presentation evidence are described in the
 [presentation guide](docs/presentation/ex9/README.md) and
 [ADR 0025](docs/decisions/0025-ex9-presentation.md).
+
+### Bounded long-development requests
+
+The optional `long-development-v1` path reuses the continuous runner and registry.
+`long-context.ts` selects personal facts, active work and current-scope capabilities;
+read-only query batches remain inside the durable round barrier. `long-request.ts`
+provides a constant output envelope; execution still validates complete plans and
+interface arguments. `long-tokens.ts` keeps approximate request measurements and
+conservative unknown-use reservations distinct from actual provider usage. The
+single ledger is fungible across roles and stages. The core only receives immutable
+configuration and actions; it has no tokenizer, model transport or archive I/O.
+
+`long-pressure.ts` calculates a fixed recurring environmental schedule. Existing
+climate, ecology and bounded experience settlement consume it only for the new
+policy. No old skill package is enabled by retaining its source. The shared Ashen
+presentation selects an archive through `presentation/session.ts`, while event
+bookmarks are separate presentation metadata copied by the existing asset adapter.
+See [ADR 0026](docs/decisions/0026-bounded-long-development.md) and the
+[protocol](docs/LONG_DEVELOPMENT.md) for boundaries and limitations.

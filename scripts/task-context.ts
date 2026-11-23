@@ -28,6 +28,7 @@ export type ExperimentIntent =
       readonly seed?: number;
       readonly rounds?: number;
       readonly comparison?: 'collective-life-v1';
+      readonly scenario?: 'long-development-v1';
     };
 export interface TaskIntent {
   readonly id: string;
@@ -210,11 +211,30 @@ export function parseIntent(value: unknown): TaskIntent {
     e,
     mode === 'none'
       ? ['mode']
-      : ['mode', 'allocation', 'basis', 'id', 'seed', 'rounds', 'comparison'],
+      : [
+          'mode',
+          'allocation',
+          'basis',
+          'id',
+          'seed',
+          'rounds',
+          'comparison',
+          'scenario',
+        ],
   );
   let experiment: ExperimentIntent = { mode: 'none' };
   if (mode !== 'none') {
     const allocation = choice(e.allocation, ['new', 'reuse']);
+    if (
+      e.scenario !== undefined &&
+      (e.scenario !== 'long-development-v1' ||
+        mode !== 'continuous' ||
+        allocation !== 'new' ||
+        e.comparison !== undefined)
+    )
+      throw new Error(
+        'Long development requires one new continuous experiment.',
+      );
     if (
       e.comparison !== undefined &&
       (e.comparison !== 'collective-life-v1' ||
@@ -260,6 +280,7 @@ export function parseIntent(value: unknown): TaskIntent {
       ...(allocation === 'reuse' ? { id: experimentId(e.id) } : {}),
       ...(typeof e.seed === 'number' ? { seed: e.seed } : {}),
       ...(typeof e.rounds === 'number' ? { rounds: e.rounds } : {}),
+      ...(e.scenario === 'long-development-v1' ? { scenario: e.scenario } : {}),
       ...(e.comparison === 'collective-life-v1'
         ? ({ comparison: e.comparison } as const)
         : {}),

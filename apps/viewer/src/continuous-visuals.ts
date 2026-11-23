@@ -1,3 +1,4 @@
+import { joiningVisual } from './long-joining-visual.js';
 import { canopyVisual, canopyPostVisual } from './forest-canopy-visual.js';
 import { fireVisual } from './forest-fire-visual.js';
 import type { V7Object, V7Event } from '@self-evolving-world/world-core';
@@ -33,6 +34,13 @@ const rootSurface: ContinuousVisual = (o) => {
   return `<ellipse rx=".38" ry=".28" fill="#b99e73" stroke="#ddd0aa" stroke-width=".025" ${o.visual.state === 'ready' ? '' : 'stroke-dasharray=".05 .04"'}/><ellipse cx="-.28" rx=".09" ry=".12" fill="#8c9790"/>${o.kind === 'root-drying-tray' ? '<ellipse cx=".28" rx=".09" ry=".12" fill="#8c9790"/>' : ''}${present ? `<path transform="scale(${String(scale)})" d="M-.16-.08L.14-.1L.18.09L-.12.12Z" fill="${fill}"/>` : ''}`;
 };
 export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
+  'surface-residue': (o) =>
+    `<circle r=".1" fill="none" stroke="#b8a17b" stroke-width=".01"/>${Number(o.data.mass ?? 0) > 0 ? '<circle r=".03" fill="#574f39"/>' : ''}`,
+  'loose-material': (o) =>
+    `<circle r="${String(o.spatial.shape.kind === 'circle' ? o.spatial.shape.radius : 0)}" fill="none" stroke="#88a377" stroke-width=".015" stroke-dasharray=".03 .03"/>`,
+  'loose-wrap': joiningVisual,
+  'surface-work': (o) =>
+    `<circle r=".2" fill="${Number(o.data.exposedArea ?? 0) > 0 ? '#92795b' : 'none'}" stroke="#b8a17b" stroke-width=".012"/>${(Array.isArray(o.data.residues) ? o.data.residues : []).map((r) => (r && typeof r === 'object' && !Array.isArray(r) && Number(r.mass ?? 0) > 0 ? `<circle cx="${String(Number(r.x) - o.spatial.x)}" cy="${String(Number(r.y) - o.spatial.y)}" r="${String(Number(r.radius))}" fill="#574f39"/>` : '')).join('')}`,
   'root-work-surface': rootSurface,
   'small-root-drying': (o) => {
     const shape = o.spatial.shape;

@@ -1,0 +1,8 @@
+$ pnpm typecheck
+
+> self-evolving-world@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world
+> tsc --noEmit && pnpm --filter @self-evolving-world/world-core typecheck && pnpm --filter @self-evolving-world/viewer exec tsc --noEmit
+
+apps/simulator/test/long-forest-nut-examination.test.ts(119,3): error TS2532: Object is possibly 'undefined'.
+ ELIFECYCLE  Command failed with exit code 2.
+

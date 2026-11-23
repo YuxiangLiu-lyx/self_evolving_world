@@ -1,0 +1,433 @@
+{
+  "baseline": {
+    "version": 1,
+    "controller": "isolated-fresh-development-feasibility",
+    "modelCalls": 0,
+    "rounds": 1600,
+    "seed": 20261123,
+    "configuration": {
+      "protocol": "continuous-v1",
+      "seed": 20261123,
+      "width": 48,
+      "height": 36,
+      "dt": 1,
+      "speed": 0.8,
+      "vision": 5,
+      "interaction": 0.65,
+      "hunger": 0.9,
+      "starvation": 8,
+      "energyCap": 40,
+      "restRecovery": 4,
+      "physicalCap": 10,
+      "mentalCap": 90,
+      "budgets": {
+        "ordinary": 1800,
+        "world": 100,
+        "development": 40
+      },
+      "computation": {
+        "workPerRound": 2000000,
+        "inputBytes": 120000,
+        "stateBytes": 32000000
+      },
+      "forest": {
+        "version": 1,
+        "day": 80,
+        "year": 800,
+        "respawnSatiety": 80,
+        "lives": 3
+      },
+      "experience": {
+        "version": 1,
+        "targetRounds": 1600,
+        "mealWindow": 10,
+        "substantialNutrition": 8,
+        "mentalRate": 0.04,
+        "mentalDecay": 0.002,
+        "restMin": 0.85,
+        "restMax": 1.1,
+        "remoteStockScale": 3,
+        "growthScale": 0.85,
+        "exposure": 0.6,
+        "carryingScale": 1.2
+      },
+      "development": {
+        "version": 1,
+        "inheritSkills": false,
+        "scope": "long-preflight",
+        "baseline": [
+          "navigate",
+          "rest",
+          "wait",
+          "pickup",
+          "gather",
+          "eat",
+          "drop",
+          "give",
+          "message",
+          "request",
+          "learn",
+          "probe",
+          "consult",
+          "exchange"
+        ],
+        "detailLimit": 4,
+        "projectLimit": 4,
+        "knowledgeLimit": 8,
+        "climateOffset": 5,
+        "hazards": [
+          {
+            "id": "west-drought-1",
+            "kind": "drought",
+            "x": 9,
+            "y": 10,
+            "radius": 6,
+            "start": 260,
+            "duration": 100,
+            "recovery": 80,
+            "severity": 0.65
+          },
+          {
+            "id": "river-waterlogging-1",
+            "kind": "waterlogging",
+            "x": 22,
+            "y": 22,
+            "radius": 5,
+            "start": 520,
+            "duration": 80,
+            "recovery": 60,
+            "severity": 0.8
+          },
+          {
+            "id": "west-drought-2",
+            "kind": "drought",
+            "x": 9,
+            "y": 10,
+            "radius": 6,
+            "start": 1060,
+            "duration": 100,
+            "recovery": 80,
+            "severity": 0.65
+          },
+          {
+            "id": "river-waterlogging-2",
+            "kind": "waterlogging",
+            "x": 22,
+            "y": 22,
+            "radius": 5,
+            "start": 1320,
+            "duration": 80,
+            "recovery": 60,
+            "severity": 0.8
+          }
+        ]
+      },
+      "longDevelopment": {
+        "version": 1,
+        "tokens": 10000000,
+        "inputEstimateLimit": 14000,
+        "outputTokens": 3500,
+        "queriesPerDecision": 2,
+        "checkpoints": [200, 400, 800, 1200, 1600],
+        "cycle": 800,
+        "pressureStart": 220,
+        "difficultyStart": 380,
+        "recoveryStart": 600,
+        "recoveryEnd": 740,
+        "cold": 1.5,
+        "rain": 0.8,
+        "growthFloor": 0.3
+      }
+    },
+    "firstFoodRound": {
+      "sol": 5,
+      "lin": 6,
+      "moss": 6
+    },
+    "initialSafeNutrition": 4374,
+    "nearestFoodDistances": [
+      {
+        "actor": "lin",
+        "distance": 2.1931712199461306
+      },
+      {
+        "actor": "moss",
+        "distance": 2.193171219946132
+      },
+      {
+        "actor": "sol",
+        "distance": 1.5264337522473757
+      }
+    ],
+    "minima": {
+      "lin": {
+        "health": 64.31555602,
+        "satiety": 60.1
+      },
+      "moss": {
+        "health": 86.90087752,
+        "satiety": 71.1
+      },
+      "sol": {
+        "health": 25.79129569,
+        "satiety": 68.8
+      }
+    },
+    "actions": {
+      "wait": 3596,
+      "navigate": 194,
+      "gather": 331,
+      "eat": 330,
+      "rest": 349
+    },
+    "failures": {},
+    "optionalRounds": 3596,
+    "optionalShare": 0.7491666666666666,
+    "final": [
+      {
+        "id": "lin",
+        "vitals": {
+          "health": 64.31555602,
+          "satiety": 76,
+          "energy": 33.64192681,
+          "temperature": 14.04039043
+        },
+        "lives": {
+          "total": 3,
+          "deaths": 0,
+          "spawn": {
+            "x": 8.5,
+            "y": 10.5
+          },
+          "lastDeath": null
+        },
+        "mental": -0.73199454
+      },
+      {
+        "id": "moss",
+        "vitals": {
+          "health": 86.90087752,
+          "satiety": 94,
+          "energy": 35.19040864,
+          "temperature": 15.04039043
+        },
+        "lives": {
+          "total": 3,
+          "deaths": 0,
+          "spawn": {
+            "x": 18.5,
+            "y": 12.5
+          },
+          "lastDeath": null
+        },
+        "mental": -0.732845
+      },
+      {
+        "id": "sol",
+        "vitals": {
+          "health": 25.79129569,
+          "satiety": 82,
+          "energy": 32.67417091,
+          "temperature": 14.04039076
+        },
+        "lives": {
+          "total": 3,
+          "deaths": 0,
+          "spawn": {
+            "x": 14.5,
+            "y": 22.5
+          },
+          "lastDeath": null
+        },
+        "mental": -0.76308736
+      }
+    ],
+    "limitation": "Authored offline feasibility only; no autonomous discovery or causal guarantee. Oracle uses actual safe definitions, which are excluded from ordinary inputs."
+  },
+  "stationary": {
+    "version": 1,
+    "modelCalls": 0,
+    "rounds": 1600,
+    "selected": {
+      "lin": "start-0-roots",
+      "moss": "start-1-roots",
+      "sol": "forest-plum-2"
+    },
+    "firstDepletion": {
+      "lin": 82,
+      "moss": 82,
+      "sol": 174
+    },
+    "firstDeath": {
+      "lin": 227,
+      "moss": 227,
+      "sol": 292
+    },
+    "final": [
+      {
+        "id": "lin",
+        "vitals": {
+          "health": 0,
+          "satiety": 0,
+          "energy": 33.8515708,
+          "temperature": 14.31994653
+        },
+        "life": {
+          "total": 3,
+          "deaths": 3,
+          "spawn": {
+            "x": 8.5,
+            "y": 10.5
+          },
+          "lastDeath": {
+            "tick": 447,
+            "position": {
+              "x": 9.62397697,
+              "y": 11.55372841
+            },
+            "before": {
+              "health": 4,
+              "satiety": 0,
+              "energy": 33.8515708,
+              "temperature": 14.48294512
+            },
+            "after": {
+              "health": 0,
+              "satiety": 0,
+              "energy": 33.8515708,
+              "temperature": 14.31994653
+            },
+            "evidence": [
+              {
+                "id": "event-447-world-3058",
+                "description": "Physiological damage: starvation.",
+                "data": {
+                  "before": 4,
+                  "after": 0,
+                  "starvation": 8,
+                  "thermal": 0,
+                  "satiety": 0,
+                  "temperature": 14.31994653
+                }
+              }
+            ],
+            "cause": "Physiological damage: starvation.",
+            "unknown": "Unrecorded contributing factors are unknown.",
+            "priorPlan": "Unknown",
+            "remainingLives": 0
+          }
+        }
+      },
+      {
+        "id": "moss",
+        "vitals": {
+          "health": 0,
+          "satiety": 0,
+          "energy": 33.85345506,
+          "temperature": 15.30501093
+        },
+        "life": {
+          "total": 3,
+          "deaths": 3,
+          "spawn": {
+            "x": 18.5,
+            "y": 12.5
+          },
+          "lastDeath": {
+            "tick": 447,
+            "position": {
+              "x": 19.62397697,
+              "y": 13.55372841
+            },
+            "before": {
+              "health": 4,
+              "satiety": 0,
+              "energy": 33.85345506,
+              "temperature": 15.46746781
+            },
+            "after": {
+              "health": 0,
+              "satiety": 0,
+              "energy": 33.85345506,
+              "temperature": 15.30501093
+            },
+            "evidence": [
+              {
+                "id": "event-447-world-3059",
+                "description": "Physiological damage: starvation.",
+                "data": {
+                  "before": 4,
+                  "after": 0,
+                  "starvation": 8,
+                  "thermal": 0,
+                  "satiety": 0,
+                  "temperature": 15.30501093
+                }
+              }
+            ],
+            "cause": "Physiological damage: starvation.",
+            "unknown": "Unrecorded contributing factors are unknown.",
+            "priorPlan": "Unknown",
+            "remainingLives": 0
+          }
+        }
+      },
+      {
+        "id": "sol",
+        "vitals": {
+          "health": 0,
+          "satiety": 0,
+          "energy": 38.4,
+          "temperature": 10.43997323
+        },
+        "life": {
+          "total": 3,
+          "deaths": 3,
+          "spawn": {
+            "x": 14.5,
+            "y": 22.5
+          },
+          "lastDeath": {
+            "tick": 496,
+            "position": {
+              "x": 13.81867335,
+              "y": 22.91927794
+            },
+            "before": {
+              "health": 4,
+              "satiety": 0,
+              "energy": 38.4,
+              "temperature": 10.41389958
+            },
+            "after": {
+              "health": 0,
+              "satiety": 0,
+              "energy": 38.4,
+              "temperature": 10.43997323
+            },
+            "evidence": [
+              {
+                "id": "event-496-world-3260",
+                "description": "Physiological damage: starvation.",
+                "data": {
+                  "before": 4,
+                  "after": 0,
+                  "starvation": 8,
+                  "thermal": 0,
+                  "satiety": 0,
+                  "temperature": 10.43997323
+                }
+              }
+            ],
+            "cause": "Physiological damage: starvation.",
+            "unknown": "Unrecorded contributing factors are unknown.",
+            "priorPlan": "Unknown",
+            "remainingLives": 0
+          }
+        }
+      }
+    ],
+    "limitation": "Isolated single-source controller; this is not autonomous evidence or proof that every stationary strategy fails. No fixture policy enters the formal context."
+  },
+  "totalMs": 58530.581834000004
+}

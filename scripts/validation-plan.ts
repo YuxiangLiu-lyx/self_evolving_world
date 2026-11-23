@@ -34,6 +34,9 @@ export const GROUP_FILES: Readonly<Record<string, readonly string[]>> = {
   historical: ['continuous.spec.ts'],
 };
 const allGroups = Object.keys(GROUP_FILES);
+/** Published story JSON is a viewer input; screenshots and prose remain evidence. */
+export const presentationInput = (path: string): boolean =>
+  /^docs\/presentation\/ex[1-9]\d*\/story\.json$/.test(path);
 const groupFor = (v: number): string =>
   v < 3
     ? 'classic'
@@ -74,6 +77,10 @@ export function selectChecks(
       deep.add(archive);
       browser.add(archive);
       reasons[`experiment:${archive}`] = 'New or explicitly reused archive';
+      continue;
+    }
+    if (presentationInput(file)) {
+      groups.add('continuous');
       continue;
     }
     if (/\.md$|^docs\/|^experiment\/analyses\//.test(file)) continue;
@@ -142,8 +149,9 @@ export function selectChecks(
   reasons.code = code
     ? 'Code, test, dependency or acceptance-tool changes; unfiltered unit suite'
     : 'Not applicable: documentation/archive data only';
-  reasons.browser =
-    groups.size || browser.size
+  reasons.browser = files.some(presentationInput)
+    ? 'Published presentation metadata and affected browser/archive compatibility'
+    : groups.size || browser.size
       ? 'Affected browser scenarios and archive load/state compatibility'
       : 'Not applicable: no viewer/runtime/archive impact';
   reasons.archives =
@@ -211,6 +219,7 @@ export function browserInput(root: string, plan: CheckPlan): string {
         root,
         (p) =>
           toolchainInput(p) ||
+          presentationInput(p) ||
           p.startsWith('apps/viewer/') ||
           p === 'playwright.config.ts' ||
           p === 'scripts/browser-reporter.ts' ||

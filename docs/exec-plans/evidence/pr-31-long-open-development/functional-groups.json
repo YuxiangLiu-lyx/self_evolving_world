@@ -1,0 +1,48 @@
+{
+  "method": "Manual functional grouping based on inspected implementation, not the declared equivalence labels. Source/person applicability adapters and repeated names do not become independent physical inventions. A group can remain unproductive or unused.",
+  "physicalFamilies": {
+    "root placement with source compatibility adapters": [
+      "root-planting-trial",
+      "prepared-surface-root-placement",
+      "moss-prepared-root-placement"
+    ],
+    "planted specimen observation and uncover/recover": ["root-assessment"],
+    "local worksite examination": ["soil-worksite-assessment"],
+    "finite cover displacement": ["small-soil-patch-preparation"],
+    "loose moss arrangement and contact": ["moss-resting-pad-trial"],
+    "external residue relocation": [
+      "bounded-surface-residue-transfer",
+      "sol-surface-residue-transfer",
+      "moss-surface-residue-transfer"
+    ],
+    "whole-piece loose wrapping and recovery": ["source-bound-joining-trial"],
+    "source exterior observation": [
+      "owned-hazelnut-assessment",
+      "moss-source-bound-hazelnut-physical-examination"
+    ],
+    "bounded stone contact and exposed-region inspection": [
+      "source-bound-hazelnut-opening-trial",
+      "moss-source-bound-hazelnut-interior-access-trial"
+    ],
+    "exposed aperture measurement and optional exterior-rim trial": [
+      "source-bound-opened-hazelnut-access-trial",
+      "moss-conserved-hazelnut-separation-trial"
+    ],
+    "private assessment and separately authorized single-portion ingestion": [
+      "moss-source-bound-apple-food-trial"
+    ]
+  },
+  "diagnosticAndControl": [
+    "moss-prepared-surface-diagnostic",
+    "recoverable-vine-joining-assessment",
+    "joining-trial-state-reconciliation",
+    "bounded-unfamiliar-food-assessment",
+    "bounded-hazelnut-food-assessment",
+    "opened-hazelnut-preparation-assessment",
+    "moss-exposed-hazelnut-assessment-and-recovery",
+    "sol-birch-container-feasibility",
+    "source-bound-plum-food-assessment",
+    "sol-branch-rain-screen-feasibility"
+  ],
+  "limit": "Grouping is a transparent analyst interpretation, not a model-independent novelty score. Physical functions also reuse existing baseline mechanics, reviewed source-model assumptions and generic work code. Mastery, successful action, report completion, useful information and sustained benefit are separate outcomes. The final map covers all 28 implemented IDs exactly once; 27 had a successful action and the final branch assessment remained unused."
+}

@@ -1,3 +1,4 @@
+import { rootSpecimenVisible } from './long-root-visibility.js';
 import {
   shortPublicObject,
   shortPublicStack,
@@ -98,6 +99,7 @@ export function v7Observe(world: V7World, id: string): V7Observation {
       .map(preservationPublicObject)
       .map(shortPublicObject),
     stacks: world.stacks
+      .filter((s) => rootSpecimenVisible(world, s.id))
       .filter(
         (s) =>
           s.owner === id ||
@@ -121,6 +123,7 @@ export function v7Observe(world: V7World, id: string): V7Observation {
       .map(shortPublicStack),
     terrain,
     events: world.events
+      .filter((e) => rootSpecimenVisible(world, e.target))
       .filter(
         (e) =>
           e.actor === id ||

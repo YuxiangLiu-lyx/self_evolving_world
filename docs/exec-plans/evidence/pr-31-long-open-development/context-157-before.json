@@ -1,0 +1,1478 @@
+{
+  "input": {
+    "longContext": {
+      "version": 1,
+      "scope": "long-ex13",
+      "actor": "lin",
+      "role": "ordinary",
+      "remainingQueryBatches": 0,
+      "outputTokens": 3500
+    },
+    "protocol": "continuous-v1",
+    "tick": 157,
+    "catalogue": {
+      "interfaces": [],
+      "events": []
+    },
+    "packet": {
+      "goal": "Maintain health and tolerable risk, understand unknowns through evidence, develop reusable capabilities, and improve personal and shared living. You may choose, revise, pause or abandon your own questions and projects.",
+      "identity": {
+        "id": "lin",
+        "name": "Lin"
+      },
+      "time": 157,
+      "state": {
+        "position": {
+          "x": 9.16555508,
+          "y": 11.46498447
+        },
+        "vitals": {
+          "health": 100,
+          "satiety": 42.7,
+          "energy": 39.3,
+          "temperature": 28.60780416
+        },
+        "wellbeing": {
+          "physical": 8.25578264,
+          "total": 9.07319948
+        },
+        "life": {
+          "total": 3,
+          "deaths": 0,
+          "spawn": {
+            "x": 8.5,
+            "y": 10.5
+          },
+          "lastDeath": null
+        },
+        "learning": null,
+        "load": 4.8500000000000005,
+        "experience": {
+          "window": 40,
+          "mentalState": 0.05222642,
+          "sustainedRoutineBurden": 0,
+          "routineWindow": 160,
+          "temporaryMealPleasure": 0.79541684,
+          "monotony": 0,
+          "substantialMeals": [
+            {
+              "tick": 4,
+              "realizedNutrition": 14,
+              "experiencedQuality": 0.79698754,
+              "knownIngredients": ["root"],
+              "compositionUncertainty": "Unidentified composition is not revealed by this summary."
+            },
+            {
+              "tick": 40,
+              "realizedNutrition": 14,
+              "experiencedQuality": 0.67738127,
+              "knownIngredients": ["root"],
+              "compositionUncertainty": "Unidentified composition is not revealed by this summary."
+            },
+            {
+              "tick": 56,
+              "realizedNutrition": 14,
+              "experiencedQuality": 0.62333163,
+              "knownIngredients": ["root"],
+              "compositionUncertainty": "Unidentified composition is not revealed by this summary."
+            },
+            {
+              "tick": 71,
+              "realizedNutrition": 8,
+              "experiencedQuality": 0.70227871,
+              "knownIngredients": ["berry"],
+              "compositionUncertainty": "Unidentified composition is not revealed by this summary."
+            },
+            {
+              "tick": 81,
+              "realizedNutrition": 8,
+              "experiencedQuality": 0.60777247,
+              "knownIngredients": ["berry"],
+              "compositionUncertainty": "Unidentified composition is not revealed by this summary."
+            },
+            {
+              "tick": 99,
+              "realizedNutrition": 24,
+              "experiencedQuality": 0.76534739,
+              "knownIngredients": ["berry"],
+              "compositionUncertainty": "Unidentified composition is not revealed by this summary."
+            },
+            {
+              "tick": 115,
+              "realizedNutrition": 8,
+              "experiencedQuality": 0.63002484,
+              "knownIngredients": ["berry"],
+              "compositionUncertainty": "Unidentified composition is not revealed by this summary."
+            },
+            {
+              "tick": 151,
+              "realizedNutrition": 14,
+              "experiencedQuality": 0.79541684,
+              "knownIngredients": ["root"],
+              "compositionUncertainty": "Unidentified composition is not revealed by this summary."
+            }
+          ],
+          "trend": {
+            "health": 0,
+            "satiety": -21.099999999999994,
+            "energy": 4.29686169
+          },
+          "timeByAction": {
+            "probe": 2,
+            "gather": 3,
+            "rest": 10,
+            "request": 3,
+            "owned-hazelnut-assessment": 1,
+            "wait": 1,
+            "navigate": 12,
+            "source-bound-hazelnut-opening-trial": 5,
+            "pickup": 1,
+            "eat": 1,
+            "opened-hazelnut-preparation-assessment": 1
+          },
+          "totalEffort": 33.36011034,
+          "recoveredEnergy": 37.45697203,
+          "repeatedFailures": {
+            "The full contact region must be supported and locally accessible without another obstacle.": 1
+          },
+          "observedExperienceAwards": 1.6
+        }
+      },
+      "environment": {
+        "pressure": {
+          "phase": "mild",
+          "intensity": 0,
+          "cold": 0,
+          "rain": 0,
+          "growth": 1
+        },
+        "local": {
+          "ground": "f",
+          "moisture": 0.65,
+          "drought": 0,
+          "waterlogging": 0,
+          "travelFactor": 1,
+          "hazards": [],
+          "regime": "ordinary soil"
+        },
+        "rain": 0.81922479,
+        "wind": 0.13419811,
+        "exposure": "outdoors",
+        "temperature": 29.19268756,
+        "light": 0.07814169,
+        "moisture": 0.65,
+        "indoor": false,
+        "phase": 0.19625,
+        "season": "spring",
+        "daylight": 0.0784591,
+        "trend": "gradually warming"
+      },
+      "execution": {
+        "cursor": {
+          "intention": "Perform one paid assessment of the owned opened hazelnut, distinguishing observed access from unresolved separation and food safety.",
+          "step": 0,
+          "repetition": 0,
+          "cycle": 1,
+          "steps": [
+            {
+              "action": {
+                "interface": "opened-hazelnut-preparation-assessment",
+                "args": {
+                  "specimenId": "item-141-lin-821",
+                  "evidenceRefs": []
+                }
+              },
+              "repeat": 1,
+              "until": null,
+              "guard": {
+                "path": "self.energy",
+                "comparison": "gte",
+                "value": 2
+              }
+            }
+          ],
+          "reason": "The actor-defined task is complete.",
+          "operation": null
+        },
+        "binding": null,
+        "reserved": [],
+        "activeState": {
+          "collective:work:small-soil-patch-preparation": "manual-21-lin-111",
+          "collective:work:bounded-surface-residue-transfer": "manual-30-lin-172",
+          "collective:work:prepared-surface-root-placement": "manual-37-lin-223",
+          "long:work:planting": {
+            "id": "manual-37-lin-223",
+            "owner": "lin",
+            "ability": "prepared-surface-root-placement",
+            "mode": "plant",
+            "status": "completed",
+            "initialWork": 3,
+            "completedWork": 3,
+            "remainingWork": 0,
+            "paidEnergy": 2.5,
+            "escrow": ["item-37-lin-224"],
+            "sources": [
+              {
+                "itemId": "item-3-lin-12",
+                "escrowId": "item-37-lin-224",
+                "resource": "root",
+                "quantity": 1,
+                "owner": "lin",
+                "origin": "start-0-roots",
+                "harvestedAt": 3,
+                "decay": 33.896503
+              }
+            ],
+            "x": 9.25,
+            "y": 12.9,
+            "target": "root-trial-37-lin-225",
+            "outputs": ["root-trial-37-lin-225"],
+            "lastPaid": 39,
+            "preparedSurfaceId": "surface-21-lin-113"
+          },
+          "collective:work:root-assessment": "manual-43-lin-264",
+          "collective:work:recoverable-vine-joining-assessment": "manual-78-lin-459",
+          "collective:work:source-bound-joining-trial": "manual-88-lin-522",
+          "collective:work:joining-trial-state-reconciliation": "manual-113-lin-668",
+          "collective:work:source-bound-hazelnut-opening-trial": "manual-138-lin-799"
+        }
+      },
+      "observation": {
+        "actors": [],
+        "terrain": [
+          [9, 6, "f"],
+          [6, 7, "f"],
+          [7, 7, "f"],
+          [8, 7, "f"],
+          [9, 7, "f"],
+          [10, 7, "f"],
+          [11, 7, "f"],
+          [5, 8, "f"],
+          [6, 8, "f"],
+          [7, 8, "f"],
+          [8, 8, "f"],
+          [9, 8, "f"],
+          [10, 8, "f"],
+          [11, 8, "f"],
+          [12, 8, "f"],
+          [5, 9, "f"],
+          [6, 9, "f"],
+          [7, 9, "f"],
+          [8, 9, "f"],
+          [9, 9, "f"],
+          [10, 9, "f"],
+          [11, 9, "f"],
+          [12, 9, "f"],
+          [13, 9, "f"],
+          [4, 10, "f"],
+          [5, 10, "f"],
+          [6, 10, "f"],
+          [7, 10, "f"],
+          [8, 10, "f"],
+          [9, 10, "f"],
+          [10, 10, "f"],
+          [11, 10, "f"],
+          [12, 10, "f"],
+          [13, 10, "f"],
+          [4, 11, "f"],
+          [5, 11, "f"],
+          [6, 11, "f"],
+          [7, 11, "f"],
+          [8, 11, "f"],
+          [9, 11, "f"],
+          [10, 11, "f"],
+          [11, 11, "f"],
+          [12, 11, "f"],
+          [13, 11, "f"],
+          [4, 12, "f"],
+          [5, 12, "f"],
+          [6, 12, "f"],
+          [7, 12, "f"],
+          [8, 12, "f"],
+          [9, 12, "f"],
+          [10, 12, "f"],
+          [11, 12, "f"],
+          [12, 12, "f"],
+          [13, 12, "f"],
+          [5, 13, "f"],
+          [6, 13, "f"],
+          [7, 13, "f"],
+          [8, 13, "f"],
+          [9, 13, "f"],
+          [10, 13, "f"],
+          [11, 13, "f"],
+          [12, 13, "f"],
+          [13, 13, "f"],
+          [5, 14, "f"],
+          [6, 14, "f"],
+          [7, 14, "f"],
+          [8, 14, "f"],
+          [9, 14, "f"],
+          [10, 14, "f"],
+          [11, 14, "f"],
+          [12, 14, "f"],
+          [6, 15, "f"],
+          [7, 15, "f"],
+          [8, 15, "f"],
+          [9, 15, "f"],
+          [10, 15, "f"],
+          [11, 15, "f"]
+        ],
+        "objects": {
+          "total": 18,
+          "offset": 0,
+          "next": 8,
+          "records": [
+            {
+              "id": "surface-21-lin-113",
+              "fragment": "{\"id\":\"surface-21-lin-113\",\"kind\":\"prepared-surface\",\"spatial\":{\"x\":9.25,\"y\":12.9,\"angle\":0,\"shape\":{\"kind\":\"circle\",\"radius\":0.2},\"solid\":false,\"reserved\":false,\"interaction\":0.65,\"entrances\":[]},\"data\":{\"source\":\"terrain-footprint:9.25:12.9:0.2\",\"initialCoverMass\":0.04,\"coverMass\":0,\"residueMass\":0,\"residues\":[{\"source\":\"terrain-footprint:9.25:12.9:0.2\",\"mass\":0,\"x\":9.4,\"y\":12.9,\"radius\":0.03,\"edible\":false,\"harvestable\":false},{\"source\":\"terrain-footprint:9.25:12.9:0.2\",\"mass\":0,\"x\":9.1,\"y\":12.9,\"radius\":0.03,\"edible\":false,\"harvestable\":false}],\"exposedArea\":0.12566371,\"activeWork\":null,\"outcome\":\"transfer-unassessed\",\"coverModel\":\"Finite 0.04 mass units of loose surface litter for this 0.2-radius forest footprint; an authored extension",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 2,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            },
+            {
+              "id": "surface-38-moss-234",
+              "fragment": "{\"id\":\"surface-38-moss-234\",\"kind\":\"prepared-surface\",\"spatial\":{\"x\":14,\"y\":12.5,\"angle\":0,\"shape\":{\"kind\":\"circle\",\"radius\":0.2},\"solid\":false,\"reserved\":false,\"interaction\":0.65,\"entrances\":[]},\"data\":{\"source\":\"terrain-footprint:14:12.5:0.2\",\"initialCoverMass\":0.04,\"coverMass\":0,\"residueMass\":0,\"residues\":[{\"source\":\"terrain-footprint:14:12.5:0.2\",\"mass\":0,\"x\":14.15,\"y\":12.5,\"radius\":0.03,\"edible\":false,\"harvestable\":false},{\"source\":\"terrain-footprint:14:12.5:0.2\",\"mass\":0,\"x\":13.85,\"y\":12.5,\"radius\":0.03,\"edible\":false,\"harvestable\":false}],\"exposedArea\":0.12566371,\"activeWork\":null,\"outcome\":\"transfer-unassessed\",\"coverModel\":\"Finite 0.04 mass units of loose surface litter for this 0.2-radius forest footprint; an authored extension mo",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 2,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            },
+            {
+              "id": "residue-deposit-30-lin-175",
+              "fragment": "{\"id\":\"residue-deposit-30-lin-175\",\"kind\":\"surface-residue-deposit\",\"spatial\":{\"x\":9.65,\"y\":12.9,\"angle\":0,\"shape\":{\"kind\":\"circle\",\"radius\":0.1},\"solid\":false,\"reserved\":false,\"interaction\":0.65,\"entrances\":[]},\"data\":{\"deposits\":[{\"id\":\"debris-31-lin-180\",\"sourceId\":\"surface-21-lin-113\",\"sourceEntry\":0,\"source\":\"terrain-footprint:9.25:12.9:0.2\",\"mass\":0.02,\"x\":9.65,\"y\":12.9,\"radius\":0.03,\"edible\":false,\"harvestable\":false,\"route\":{\"from\":{\"x\":9.4,\"y\":12.9},\"to\":{\"x\":9.65,\"y\":12.9}},\"tick\":31},{\"id\":\"debris-32-lin-187\",\"sourceId\":\"surface-21-lin-113\",\"sourceEntry\":1,\"source\":\"terrain-footprint:9.25:12.9:0.2\",\"mass\":0.02,\"x\":9.65,\"y\":12.9,\"radius\":0.03,\"edible\":false,\"harvestable\":false,\"route\":{\"from\":{\"x\":9.1,\"y\":12.9},\"to\":{\"x\":9.65,\"y\":",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 2,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            },
+            {
+              "id": "start-0-nuts",
+              "value": {
+                "id": "start-0-nuts",
+                "kind": "plant",
+                "spatial": {
+                  "x": 5.4,
+                  "y": 12.5,
+                  "angle": 0,
+                  "shape": {
+                    "kind": "circle",
+                    "radius": 0.25
+                  },
+                  "solid": false,
+                  "interaction": 0.65,
+                  "entrances": []
+                },
+                "data": {
+                  "resource": "hazelnut",
+                  "stock": 4,
+                  "capacity": 5,
+                  "soil": 0.65,
+                  "stage": "mature"
+                }
+              }
+            },
+            {
+              "id": "start-0-stone",
+              "value": {
+                "id": "start-0-stone",
+                "kind": "rock",
+                "spatial": {
+                  "x": 5,
+                  "y": 8.5,
+                  "angle": 0,
+                  "shape": {
+                    "kind": "circle",
+                    "radius": 0.36
+                  },
+                  "solid": true,
+                  "interaction": 0.65,
+                  "entrances": [],
+                  "reserved": false
+                },
+                "data": {
+                  "resource": "stone",
+                  "stock": 6,
+                  "capacity": 7
+                }
+              }
+            },
+            {
+              "id": "forest-hazelnut-1",
+              "value": {
+                "id": "forest-hazelnut-1",
+                "kind": "plant",
+                "spatial": {
+                  "x": 9.2,
+                  "y": 15.3,
+                  "angle": 0,
+                  "shape": {
+                    "kind": "circle",
+                    "radius": 0.25
+                  },
+                  "solid": false,
+                  "interaction": 0.65,
+                  "entrances": []
+                },
+                "data": {
+                  "resource": "hazelnut",
+                  "stock": 20,
+                  "capacity": 21,
+                  "soil": 0.65,
+                  "stage": "mature"
+                }
+              }
+            },
+            {
+              "id": "root-trial-37-lin-225",
+              "fragment": "{\"id\":\"root-trial-37-lin-225\",\"kind\":\"root-trial\",\"spatial\":{\"x\":9.25,\"y\":12.9,\"angle\":0,\"shape\":{\"kind\":\"circle\",\"radius\":0.2},\"solid\":false,\"reserved\":true,\"interaction\":0.65,\"entrances\":[]},\"data\":{\"stage\":\"planted-unverified\",\"elapsed\":3,\"remainingWork\":0,\"progress\":1,\"inputItem\":\"item-37-lin-224\",\"source\":\"start-0-roots\",\"rootUnits\":1,\"workId\":\"manual-37-lin-223\",\"preparedSurfaceId\":\"surface-21-lin-113\",\"plantedAt\":39,\"observationRounds\":118,\"viability\":\"Unverified; this precursor supplies no propagation or harvest rule.\",\"soil\":0.65,\"exposure\":{\"temperature\":29.19268756,\"rain\":0.81922479},\"observationStatus\":\"inconclusive\",\"activeAssessment\":null,\"inspectionStatus\":\"covered\",\"exposed\":false,\"displacedSoil\":0,\"inspectionProgress\":1,\"in",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 2,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            },
+            {
+              "id": "root-trial-101-moss-602",
+              "fragment": "{\"id\":\"root-trial-101-moss-602\",\"kind\":\"root-trial\",\"spatial\":{\"x\":14,\"y\":12.5,\"angle\":0,\"shape\":{\"kind\":\"circle\",\"radius\":0.2},\"solid\":false,\"reserved\":true,\"interaction\":0.65,\"entrances\":[]},\"data\":{\"stage\":\"planted-unverified\",\"elapsed\":3,\"remainingWork\":0,\"progress\":1,\"inputItem\":\"item-101-moss-601\",\"source\":\"start-0-roots\",\"rootUnits\":1,\"workId\":\"manual-101-moss-600\",\"preparedSurfaceId\":\"surface-38-moss-234\",\"plantedAt\":103,\"observationRounds\":54,\"viability\":\"Unverified; this precursor supplies no propagation or harvest rule.\",\"soil\":0.65,\"exposure\":{\"temperature\":29.19268756,\"rain\":0.81922479},\"observationStatus\":\"inconclusive\",\"activeAssessment\":null,\"inspectionStatus\":\"covered\",\"exposed\":false,\"displacedSoil\":0,\"inspectionProgress\":",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 2,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            }
+          ]
+        },
+        "ground": {
+          "total": 0,
+          "offset": 0,
+          "next": null,
+          "records": []
+        },
+        "events": {
+          "total": 1,
+          "offset": 0,
+          "next": null,
+          "records": [
+            {
+              "id": "event-157-lin-904",
+              "fragment": "{\"id\":\"event-157-lin-904\",\"tick\":157,\"actor\":\"lin\",\"type\":\"opened-assessment-completed\",\"interface\":\"opened-hazelnut-preparation-assessment\",\"success\":true,\"description\":\"Assessment recorded; separability and food safety remain unresolved.\",\"position\":{\"x\":9.16555508,\"y\":11.46498447},\"target\":\"item-141-lin-821\",\"data\":{\"actorId\":\"lin\",\"specimenId\":\"item-141-lin-821\",\"reportId\":\"opened-assessment-157-lin-903\",\"method\":\"whole-assembly-exterior-view\",\"observedTick\":157,\"stage\":\"committed\",\"status\":",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 2,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            }
+          ]
+        }
+      },
+      "inventory": {
+        "total": 4,
+        "offset": 0,
+        "next": null,
+        "records": [
+          {
+            "id": "item-141-lin-821",
+            "value": {
+              "id": "item-141-lin-821",
+              "resource": "hazelnut",
+              "quantity": 1,
+              "position": {
+                "x": 5,
+                "y": 9.08
+              },
+              "owner": "lin",
+              "origin": "start-0-nuts",
+              "harvestedAt": 119,
+              "quantityTenths": 10,
+              "decay": 53.4854699,
+              "processing": {
+                "method": "source-bound-hazelnut-opening-trial@1",
+                "sourceUnit": 1,
+                "contacts": 2,
+                "covering": "contact discontinuity",
+                "exposed": true,
+                "retainedAssembly": true,
+                "visibleRegion": 0.2,
+                "sourceFractions": {
+                  "covering": 0.35,
+                  "interior": 0.65
+                }
+              }
+            }
+          },
+          {
+            "id": "item-131-lin-766",
+            "value": {
+              "id": "item-131-lin-766",
+              "resource": "stone",
+              "quantity": 1,
+              "position": {
+                "x": 5.34523706,
+                "y": 9.53747351
+              },
+              "owner": "lin",
+              "origin": "start-0-stone",
+              "harvestedAt": 131,
+              "quantityTenths": 10,
+              "processing": {
+                "method": "source-bound-hazelnut-opening-trial@1",
+                "blunting": 0.004,
+                "geometry": "single rounded piece",
+                "diameter": 0.12
+              }
+            }
+          },
+          {
+            "id": "item-76-lin-448",
+            "value": {
+              "id": "item-76-lin-448",
+              "resource": "branch",
+              "quantity": 2,
+              "position": {
+                "x": 7.1,
+                "y": 12.7
+              },
+              "owner": "lin",
+              "origin": "canopy-18",
+              "harvestedAt": 76,
+              "quantityTenths": 20
+            }
+          },
+          {
+            "id": "item-66-lin-388",
+            "value": {
+              "id": "item-66-lin-388",
+              "resource": "vine",
+              "quantity": 0.9,
+              "position": {
+                "x": 7.1,
+                "y": 12.7
+              },
+              "owner": "lin",
+              "origin": "forest-vine-1",
+              "harvestedAt": 66,
+              "quantityTenths": 9
+            }
+          }
+        ]
+      },
+      "memory": {
+        "tendencies": {
+          "curiosity": 0.55,
+          "riskTolerance": 0.48,
+          "socialNeed": 0.51,
+          "comfortPreference": 0.48
+        },
+        "offers": {},
+        "recentMessages": {
+          "total": 3,
+          "offset": 0,
+          "next": null,
+          "records": [
+            {
+              "id": "event-51-lin-309",
+              "value": {
+                "tick": 51,
+                "event": "event-51-lin-309",
+                "type": "message",
+                "summary": "I have learned a small recoverable loose-moss resting-pad trial, but have not found any actual moss material or source. Have you observed a harvestable moss source? If so, please share its location and observed identity. Your displaced surface litter is not established as usable moss. I will look toward the known berry patch; no pad benefit has been demonstrated."
+              }
+            },
+            {
+              "id": "event-52-moss-316",
+              "fragment": "{\"tick\":52,\"event\":\"event-52-moss-316\",\"type\":\"message\",\"summary\":\"I have not observed a harvestable moss source. At tick 51 my bounded transfer finished: 0.04 surface-litter mass moved from surface-38-moss-234 to residue-deposit-49-moss-298 at (14.4,12.5), leaving zero source residue. This is nonfood, nonharvestable litter, not established usable moss. Planting compatibility remains unassessed; I will examine the cleared footprint. No fertility, propagation, yield or resting benefit is establis",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 2,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            },
+            {
+              "id": "event-82-lin-487",
+              "value": {
+                "tick": 82,
+                "event": "event-82-lin-487",
+                "type": "message",
+                "summary": "My tick-78 vine-and-branch prerequisite assessment completed. It did not establish discrete branch geometry, wrapping, or joint strength; materials were released unchanged. The earlier vine press result likewise is not strength evidence. I am requesting bounded geometry and contact mechanics before attempting a useful joint. No usable joined object has been produced."
+              }
+            }
+          ]
+        },
+        "projects": {
+          "total": 6,
+          "offset": 0,
+          "next": 4,
+          "records": [
+            {
+              "id": "hazelnut-food-investigation",
+              "fragment": "{\"id\":\"hazelnut-food-investigation\",\"status\":\"paused\",\"question\":\"Can the observed hazelnut source provide an accessible additional food, and what preparation is actually required?\",\"evidence\":[\"The tick-124 examination recorded an opaque brown shell-like exterior without visible openings.\",\"The completed bounded contact trial retained specimen item-119-lin-699 on the ground at (5,8.83).\",\"Paid inspection at tick 140, event-140-lin-811, confirmed an actual contact discontinuity and limited exposed pale compact interior surface, color #d8bd91.\",\"The inspection explicitly established no safety, composition or nutrition claim.\"],\"uncertainty\":\"Whole interior condition, safe edible portions, preparation requirements and nutritional usefulness remain unknown.\",\"goal\":\"Establish source-specific access and preparation evidence without treating appearance as proof of food safety.\",\"completedSteps\":[\"Collected and examined one specimen.\",\"Completed a bounded two-contact opening trial.\",\"Inspect",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 2,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            },
+            {
+              "id": "vine-material-investigation",
+              "fragment": "{\"id\":\"vine-material-investigation\",\"status\":\"completed\",\"question\":\"What physical geometry and recoverable joining behavior can the surviving vine and branches demonstrate?\",\"evidence\":[\"Personal study of source-bound-joining-trial completed at tick 84; the tick-87 examination recorded approximate whole-piece geometry.\",\"Event event-89-lin-533 records completion of a loose unknotted wrap, not a qualified joint.\",\"The tick-113 reconciliation retains event-91-lin-544, whose summary reports paid local unwrapping and retrieval of the same surviving whole identities.\",\"At tick 113 inventory lists 0.9 vine and two branches owned by Lin, with no reservations reported in the reconciliation.\",\"The historical arrangement is absent from the currently accessible observation index; this does not prove global nonexistence. No original inspection or recovery operation is currently supported.\"],\"uncertainty\":\"Retained summaries do not supply complete source-linked recovery transition payloads. Local ",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 3,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            },
+            {
+              "id": "loose-moss-resting-investigation",
+              "fragment": "{\"id\":\"loose-moss-resting-investigation\",\"status\":\"paused\",\"question\":\"What can a small recoverable moss arrangement demonstrate about placement and actual resting contact?\",\"evidence\":[\"Personal study of moss-resting-pad-trial completed at tick 50.\",\"No owned moss or harvestable moss source has been established.\",\"Moss's tick-52 message reports no observed harvestable moss source and describes transferred surface litter as nonfood, nonharvestable, and not established usable moss.\"],\"uncertainty\":\"Material supply, site suitability, actual contact and practical usefulness remain unverified.\",\"goal\":\"If suitable real material becomes available, conduct one bounded recoverable placement and contact trial.\",\"completedSteps\":[\"Read the trial interface terms.\",\"Completed personal study.\",\"Asked Moss about an observed material source and received a negative report.\"],\"outputs\":[\"Personal mastery of the trial interface.\"],\"missing\":\"An established accessible moss source or suitable owned moss.",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 2,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            },
+            {
+              "id": "planted-root-assessment",
+              "fragment": "{\"id\":\"planted-root-assessment\",\"status\":\"completed\",\"question\":\"What condition can be evidenced by inspecting the existing planted root?\",\"evidence\":[\"The tick-43 external baseline recorded planted-unverified, with no stock or growth established.\",\"Paid physical uncovering at tick 44 recorded: original specimen remains; propagation unverified.\",\"At tick 47 the visible plot is covered, exposed is false, displacedSoil is zero, inspectionRemaining is zero and activeAssessment is null.\"],\"uncertainty\":\"Viability, growth and propagation remain unverified; the inspection was not a viability test.\",\"goal\":\"Complete one accounted inspection and replace displaced soil without claiming unsupported growth.\",\"completedSteps\":[\"Recorded an external baseline.\",\"Physically uncovered and inspected the original specimen.\",\"Completed the inspection and replaced displaced soil.\"],\"outputs\":[\"Dated personal exposed-root condition record.\",\"Covered existing root trial with no outstanding inspection work.\"",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 2,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            }
+          ]
+        },
+        "knowledge": {
+          "total": 18,
+          "offset": 0,
+          "next": 3,
+          "records": [
+            {
+              "id": "opened-assessment:opened-assessment-157-lin-903",
+              "fragment": "{\"key\":\"opened-assessment:opened-assessment-157-lin-903\",\"subject\":\"item-141-lin-821\",\"property\":\"dated opened-assembly access and evidence limits\",\"value\":{\"reportId\":\"opened-assessment-157-lin-903\",\"eventId\":\"event-157-lin-904\",\"observedTick\":157,\"sourceRevision\":\"{\\\"harvestedAt\\\":119,\\\"id\\\":\\\"item-141-lin-821\\\",\\\"origin\\\":\\\"start-0-nuts\\\",\\\"processing\\\":{\\\"contacts\\\":2,\\\"covering\\\":\\\"contact discontinuity\\\",\\\"exposed\\\":true,\\\"method\\\":\\\"source-bound-hazelnut-opening-trial@1\\\",\\\"retainedAssemb",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 6,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            },
+            {
+              "id": "joining-reconciliation:manual-113-lin-668",
+              "fragment": "{\"key\":\"joining-reconciliation:manual-113-lin-668\",\"subject\":\"manual-113-lin-668\",\"property\":\"dated accessible trial and containment evidence\",\"value\":{\"tick\":113,\"actor\":\"lin\",\"access\":\"Own trial ledger, full retained personal summaries and currently visible/owned identities only.\",\"trial\":{\"id\":\"manual-88-lin-522\",\"status\":\"completed\",\"completedWork\":2,\"remainingWork\":0,\"paidEnergy\":1,\"lastPaid\":89,\"active\":false,\"historicalOutput\":\"loose-wrap-88-lin-523\",\"allocation\":[{\"itemId\":\"item-66-lin-3",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 10,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            },
+            {
+              "id": "item-119-lin-699:visible-exterior",
+              "fragment": "{\"key\":\"item-119-lin-699:visible-exterior\",\"subject\":\"item-119-lin-699\",\"property\":\"visible exterior\",\"value\":{\"processId\":\"examination-124-lin-725\",\"tick\":124,\"actor\":\"lin\",\"specimenId\":\"item-119-lin-699\",\"quantity\":1,\"sourceRevision\":\"{\\\"harvestedAt\\\":119,\\\"id\\\":\\\"item-119-lin-699\\\",\\\"origin\\\":\\\"start-0-nuts\\\",\\\"processing\\\":null,\\\"quantity\\\":1,\\\"resource\\\":\\\"hazelnut\\\"}\",\"location\":{\"x\":6.35561846,\"y\":12.57377543},\"method\":\"nondamaging local viewing and gentle reorientation\",\"modelBoundary\":\"",
+              "encoding": "paged-json",
+              "part": 0,
+              "parts": 4,
+              "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+            }
+          ]
+        },
+        "records": {
+          "total": 124,
+          "offset": 0,
+          "next": 2,
+          "records": [
+            {
+              "id": "intention",
+              "value": "Perform one paid assessment of the owned opened hazelnut, distinguishing observed access from unresolved separation and food safety."
+            },
+            {
+              "id": "event-123-lin-720",
+              "value": {
+                "tick": 123,
+                "event": "event-123-lin-720",
+                "type": "requested",
+                "summary": "Provide a learnable, bounded physical examination of my owned hazelnut specimen item-119-lin-699. Determine what exterior, shell or accessible interior evidence can actually be observed, and whether a separate preparation trial is needed. Generic probe observation returned only null plant-state fields, not useful specimen evidence."
+              }
+            }
+          ]
+        },
+        "remembered": [
+          {
+            "id": "residue-deposit-49-moss-298",
+            "kind": "surface-residue-deposit",
+            "position": {
+              "x": 14.4,
+              "y": 12.5
+            },
+            "seenAt": 51
+          },
+          {
+            "id": "canopy-26",
+            "kind": "tree",
+            "resource": "branch",
+            "stockWhenSeen": 2,
+            "position": {
+              "x": 14.4,
+              "y": 9.2
+            },
+            "seenAt": 4
+          },
+          {
+            "id": "forest-resin-1",
+            "kind": "tree",
+            "resource": "resin",
+            "stockWhenSeen": 11,
+            "position": {
+              "x": 4.2,
+              "y": 14.3
+            },
+            "seenAt": 148
+          },
+          {
+            "id": "forest-walnut-0",
+            "kind": "plant",
+            "resource": "walnut",
+            "stockWhenSeen": 12,
+            "position": {
+              "x": 5.2,
+              "y": 7.3
+            },
+            "seenAt": 148
+          },
+          {
+            "id": "canopy-51",
+            "kind": "tree",
+            "resource": "branch",
+            "stockWhenSeen": 2,
+            "position": {
+              "x": 9.4,
+              "y": 5.2
+            },
+            "seenAt": 105
+          },
+          {
+            "id": "canopy-43",
+            "kind": "tree",
+            "resource": "branch",
+            "stockWhenSeen": 2,
+            "position": {
+              "x": 2.4,
+              "y": 10.2
+            },
+            "seenAt": 147
+          }
+        ]
+      },
+      "abilities": {
+        "total": 34,
+        "baseline": [
+          {
+            "id": "navigate",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              },
+              "required": ["target", "x", "y"],
+              "additionalProperties": false
+            },
+            "references": {
+              "target": "known"
+            }
+          },
+          {
+            "id": "rest",
+            "parameters": {
+              "type": "object",
+              "properties": {},
+              "required": [],
+              "additionalProperties": false
+            }
+          },
+          {
+            "id": "wait",
+            "parameters": {
+              "type": "object",
+              "properties": {},
+              "required": [],
+              "additionalProperties": false
+            }
+          },
+          {
+            "id": "pickup",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": ["target", "quantity"],
+              "additionalProperties": false
+            },
+            "references": {
+              "target": "ground"
+            }
+          },
+          {
+            "id": "eat",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": ["target", "quantity"],
+              "additionalProperties": false
+            },
+            "references": {
+              "target": "owned"
+            }
+          },
+          {
+            "id": "gather",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": ["target", "quantity"],
+              "additionalProperties": false
+            },
+            "references": {
+              "target": "object"
+            }
+          },
+          {
+            "id": "drop",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": 1
+                }
+              },
+              "required": ["target", "quantity"],
+              "additionalProperties": false
+            },
+            "references": {
+              "target": "owned"
+            }
+          },
+          {
+            "id": "give",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "quantity": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "recipient": {
+                  "type": "string",
+                  "maxLength": 1000
+                }
+              },
+              "required": ["target", "quantity", "recipient"],
+              "additionalProperties": false
+            },
+            "references": {
+              "target": "owned"
+            }
+          },
+          {
+            "id": "message",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "recipient": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "text": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "urgency": {
+                  "type": "string",
+                  "enum": ["ordinary", "urgent"]
+                },
+                "subject": {
+                  "type": "string"
+                }
+              },
+              "required": ["recipient", "text", "urgency", "subject"],
+              "additionalProperties": false
+            }
+          },
+          {
+            "id": "learn",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "ability": {
+                  "type": "string",
+                  "maxLength": 1000
+                }
+              },
+              "required": ["ability"],
+              "additionalProperties": false
+            }
+          },
+          {
+            "id": "request",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "function": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "conditions": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "inputs": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "costs": {
+                  "type": "string",
+                  "maxLength": 1000
+                },
+                "effects": {
+                  "type": "string",
+                  "maxLength": 1000
+                }
+              },
+              "required": [
+                "name",
+                "function",
+                "conditions",
+                "inputs",
+                "costs",
+                "effects"
+              ],
+              "additionalProperties": false
+            }
+          },
+          {
+            "id": "probe",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "target": {
+                  "type": "string",
+                  "maxLength": 360
+                },
+                "mode": {
+                  "type": "string",
+                  "enum": ["observe", "press", "wet", "heat"]
+                },
+                "intensity": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": ["target", "mode", "intensity"],
+              "additionalProperties": false
+            },
+            "references": {
+              "target": "visible"
+            }
+          },
+          {
+            "id": "consult",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "kind": {
+                  "type": "string",
+                  "enum": ["ability", "project", "knowledge"]
+                },
+                "subject": {
+                  "type": "string",
+                  "maxLength": 360
+                }
+              },
+              "required": ["kind", "subject"],
+              "additionalProperties": false
+            }
+          },
+          {
+            "id": "exchange",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "mode": {
+                  "type": "string",
+                  "enum": ["offer", "accept"]
+                },
+                "recipient": {
+                  "type": "string",
+                  "maxLength": 360
+                },
+                "finding": {
+                  "type": "string",
+                  "maxLength": 360
+                }
+              },
+              "required": ["mode", "recipient", "finding"],
+              "additionalProperties": false
+            }
+          }
+        ],
+        "candidates": [
+          {
+            "id": "opened-hazelnut-preparation-assessment",
+            "function": "Assess the actual opened retained specimen for supported access evidence and unresolved separation/preparation prerequisites; no further physical transformation.",
+            "learning": 1,
+            "mastered": true
+          },
+          {
+            "id": "bounded-hazelnut-food-assessment",
+            "function": "Perform a bounded nondestructive assessment of Moss actual owned [unobserved instance], reporting represented exterior and food uncertainties without ingestion.",
+            "learning": 1,
+            "mastered": false
+          },
+          {
+            "id": "bounded-unfamiliar-food-assessment",
+            "function": "Examine the represented exterior of Sol actual owned apple [unobserved instance] and separate supplied personal evidence from unresolved food safety and preparation.",
+            "learning": 1,
+            "mastered": false
+          },
+          {
+            "id": "moss-source-bound-hazelnut-physical-examination",
+            "function": "Examine Moss actual whole owned [unobserved instance] from forest-hazelnut-1, observing supported exterior and reporting controlled interior-access limitations.",
+            "learning": 1,
+            "mastered": false
+          }
+        ],
+        "details": [
+          {
+            "id": "opened-hazelnut-preparation-assessment",
+            "parameters": {
+              "type": "object",
+              "properties": {
+                "specimenId": {
+                  "type": "string"
+                },
+                "evidenceRefs": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "maxLength": 200
+                  }
+                },
+                "optionalToolId": {
+                  "type": "string"
+                }
+              },
+              "required": ["specimenId"],
+              "additionalProperties": false
+            },
+            "references": {
+              "specimenId": "owned"
+            },
+            "execution": {
+              "duration": 1,
+              "interruption": "cancel",
+              "progress": "Atomic paid private assessment; no partially successful separation or remaining work."
+            },
+            "learning": 1,
+            "prerequisites": [],
+            "costs": "Study1 round/0.2 energy. Assess(specimenId=item-141-lin-821,evidenceRefs=[],optionalToolId omitted or empty):one atomic active round/0.5 energy. At most8 exact complete personal evidence keys. Optional actual owned stone item-131-lin-766 is observed only, not used or worn. Exact unchanged own unreserved assembly/access/energy checked before charge. No travel, tools supplied, consumables, support, receiver, heat, water, touching exposed interior, tasting, sniff challenge, pressing, striking, prying, opening or separation.",
+            "effects": "Reuses actual source lineage, exhausted2-contact ledger and represented limited visible region. Gentler whole-assembly viewing preserves identity/quantity/owner/location/processing and ordinary ageing. Private dated report separates observed discontinuity/exposure and supported body-scale geometry (world-distance resolution0.02 uncertainty0.01) from unresolved clearance/retention/graspability/detachability. Model assumptions are not calibrated measurement or food facts. Accounting fractions are never edible yields. Opening does not establish separability, food identification, preparation sufficiency, toxin absence or nutrition. An independently implemented bounded separation method with actual actuator/support/receiver if needed, source allocation, cost, failure and fragment conservation is still missing; this action does not authorize it or reset contacts. Current findings repeat prior evidence and model limitations, so no novelty/practice/comfort reward. Supplied own complete records keep scope/provenance; no other person answer, hidden lookup or consent. Atomic precommit failure/cancellation/death yields no paid report, completion no refund; no escrow, persistent work, maintenance or automatic refresh. No new material, interior region, food certificate or world object.",
+            "mastered": true
+          }
+        ],
+        "masteredCount": 27
+      },
+      "rules": {
+        "hunger": 0.9,
+        "energyCap": 40,
+        "bounds": [48, 36],
+        "interaction": 0.65,
+        "inheritSkills": false
+      },
+      "access": "Omission is not absence. Query abilities, own inventory, knowledge, projects, memory, state or personally observed objects in batches. Ability search/list returns compact catalogue entries; use exact ids for full interface details and applicability. Offset is a zero-based record offset; part selects a large exact-record fragment. Queries expose no hidden properties, other private records or historical capabilities. Queries do not perform physical trials or award experience."
+    },
+    "retrieval": [
+      {
+        "query": {
+          "section": "knowledge",
+          "search": "",
+          "ids": ["opened-assessment:opened-assessment-157-lin-903"],
+          "offset": 0,
+          "part": 3
+        },
+        "total": 1,
+        "offset": 0,
+        "next": null,
+        "records": [
+          {
+            "id": "opened-assessment:opened-assessment-157-lin-903",
+            "fragment": "",
+            "encoding": "paged-json",
+            "part": 3,
+            "parts": 3,
+            "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+          }
+        ]
+      },
+      {
+        "query": {
+          "section": "knowledge",
+          "search": "",
+          "ids": ["opened-assessment:opened-assessment-157-lin-903"],
+          "offset": 0,
+          "part": 4
+        },
+        "total": 1,
+        "offset": 0,
+        "next": null,
+        "records": [
+          {
+            "id": "opened-assessment:opened-assessment-157-lin-903",
+            "fragment": "",
+            "encoding": "paged-json",
+            "part": 4,
+            "parts": 3,
+            "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+          }
+        ]
+      },
+      {
+        "query": {
+          "section": "knowledge",
+          "search": "",
+          "ids": ["opened-assessment:opened-assessment-157-lin-903"],
+          "offset": 0,
+          "part": 5
+        },
+        "total": 1,
+        "offset": 0,
+        "next": null,
+        "records": [
+          {
+            "id": "opened-assessment:opened-assessment-157-lin-903",
+            "fragment": "",
+            "encoding": "paged-json",
+            "part": 5,
+            "parts": 3,
+            "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+          }
+        ]
+      },
+      {
+        "query": {
+          "section": "knowledge",
+          "search": "food",
+          "ids": [],
+          "offset": 0,
+          "part": 0
+        },
+        "total": 2,
+        "offset": 0,
+        "next": null,
+        "records": [
+          {
+            "id": "item-119-lin-699:visible-exterior",
+            "fragment": "{\"key\":\"item-119-lin-699:visible-exterior\",\"subject\":\"item-119-lin-699\",\"property\":\"visible exterior\",\"value\":{\"processId\":\"examination-124-lin-725\",\"tick\":124,\"actor\":\"lin\",\"specimenId\":\"item-119-lin-699\",\"quantity\":1,\"sourceRevision\":\"{\\\"harvestedAt\\\":119,\\\"id\\\":\\\"item-119-lin-699\\\",\\\"origin\\\":\\\"start-0-nuts\\\",\\\"processing\\\":null,\\\"quantity\\\":1,\\\"resource\\\":\\\"hazelnut\\\"}\",\"location\":{\"x\":6.35561846,\"y\":12.57377543},\"method\":\"nondamaging local viewing and gentle reorientation\",\"modelBoundary\":\"Versioned external appearance model for the surviving specimen, not a prior measurement: a small ovoid with opaque brown covering and fine surface ridges. No internal anatomy, safety, edibility, mass or nutrient transformation is modeled or inferred.\",\"findings\":{\"shape\":\"ovoid\",\"color\":\"#a5814f\",\"texture\":\"fine visible ridges\",\"covering\":\"opaque shell-like exterior, anatomy unconfirmed\",\"visibleOpenings\":[],\"visibleDiscontinuities\":[],\"approximateLength\":0.04,\"approximateWidth\":0.04,\"unit\":\"world-distance\",\"reference\":\"direct visual comparison to body diameter\",\"resolution\":0.02,\"uncertainty\"",
+            "encoding": "paged-json",
+            "part": 0,
+            "parts": 2,
+            "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+          },
+          {
+            "id": "opened-assessment:opened-assessment-157-lin-903",
+            "fragment": "{\"key\":\"opened-assessment:opened-assessment-157-lin-903\",\"subject\":\"item-141-lin-821\",\"property\":\"dated opened-assembly access and evidence limits\",\"value\":{\"reportId\":\"opened-assessment-157-lin-903\",\"eventId\":\"event-157-lin-904\",\"observedTick\":157,\"sourceRevision\":\"{\\\"harvestedAt\\\":119,\\\"id\\\":\\\"item-141-lin-821\\\",\\\"origin\\\":\\\"start-0-nuts\\\",\\\"processing\\\":{\\\"contacts\\\":2,\\\"covering\\\":\\\"contact discontinuity\\\",\\\"exposed\\\":true,\\\"method\\\":\\\"source-bound-hazelnut-opening-trial@1\\\",\\\"retainedAssembly\\\":true,\\\"sourceFractions\\\":{\\\"covering\\\":0.35,\\\"interior\\\":0.65},\\\"sourceUnit\\\":1,\\\"visibleRegion\\\":0.2},\\\"quantity\\\":1}\",\"revisionMeaning\":\"Control/source accounting signature, not measured edible yield.\",\"lineage\":{\"sourceRevision\":\"{\\\"harvestedAt\\\":119,\\\"id\\\":\\\"item-141-lin-821\\\",\\\"origin\\\":\\\"start-0-nuts\\\",\\\"processing\\\":{\\\"contacts\\\":2,\\\"covering\\\":\\\"contact discontinuity\\\",\\\"exposed\\\":true,\\\"method\\\":\\\"source-bound-hazelnut-opening-trial@1\\\",\\\"retainedAssembly\\\":true,\\\"sourceFractions\\\":{\\\"covering\\\":0.35,\\\"interior\\\":0.65},\\\"sourceUnit\\\":1,\\\"visibleRegion\\\":0.2},\\\"quantity\\\":1}\",\"sou",
+            "encoding": "paged-json",
+            "part": 0,
+            "parts": 3,
+            "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+          }
+        ]
+      },
+      {
+        "query": {
+          "section": "knowledge",
+          "search": "",
+          "ids": ["opened-assessment:opened-assessment-157-lin-903"],
+          "offset": 0,
+          "part": 1
+        },
+        "total": 1,
+        "offset": 0,
+        "next": null,
+        "records": [
+          {
+            "id": "opened-assessment:opened-assessment-157-lin-903",
+            "fragment": "rceItem\":\"item-119-lin-699\",\"currentItem\":\"item-141-lin-821\",\"pickupEvent\":\"event-141-lin-822\",\"processId\":\"manual-138-lin-799\",\"model\":\"source-bound-hazelnut-opening-trial@1\"},\"method\":\"Nondamaging viewing and gentle whole-assembly reorientation; no interior contact.\",\"observations\":{\"covering\":\"contact discontinuity\",\"limitedExposure\":true,\"visibleRegion\":0.2,\"interior\":{\"color\":\"#d8bd91\",\"texture\":\"pale compact surface\",\"scope\":\"Only the already represented exposed region; remaining interior unavailable.\"},\"bodyScale\":{\"length\":0.04,\"width\":0.04,\"resolution\":0.02,\"uncertainty\":0.01,\"unit\":\"world-distance\",\"boundary\":\"Existing source model and approximate body comparison, not calibrated measurements.\"}},\"access\":{\"clearance\":\"unresolved\",\"retention\":\"unresolved\",\"graspability\":\"unresolved\",\"detachability\":\"not established\"},\"food\":{\"identification\":\"unresolved\",\"ediblePortions\":\"unresolved\",\"conditionSafety\":\"unresolved\",\"preparation\":\"unresolved\",\"nutrition\":\"unresolved\"},\"missing\":[\"Source-specific accessibility/retention observation or a separately implemented bounded physical t",
+            "encoding": "paged-json",
+            "part": 1,
+            "parts": 3,
+            "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+          }
+        ]
+      },
+      {
+        "query": {
+          "section": "knowledge",
+          "search": "",
+          "ids": ["opened-assessment:opened-assessment-157-lin-903"],
+          "offset": 0,
+          "part": 2
+        },
+        "total": 1,
+        "offset": 0,
+        "next": null,
+        "records": [
+          {
+            "id": "opened-assessment:opened-assessment-157-lin-903",
+            "fragment": "rial.\",\"A real suitable actuator/tool, reaction support and reachable material-retaining receiver if the future method requires them.\",\"Exact allocations, work/energy limits, failure response and fragment/residue conservation before later separation.\",\"Personally applicable food evidence; appearance and eat availability do not certify safety.\"],\"tool\":null,\"suppliedPersonalEvidence\":[],\"openingContactsRemaining\":0,\"materialConsumed\":0,\"paidEnergy\":0.5,\"novelInformation\":false},\"method\":\"paid nondestructive source-bound view\",\"condition\":\"No separation or food-safety claim\",\"verified\":false,\"tick\":157,\"evidence\":\"event-157-lin-904\"}",
+            "encoding": "paged-json",
+            "part": 2,
+            "parts": 3,
+            "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+          }
+        ]
+      },
+      {
+        "query": {
+          "section": "observed",
+          "search": "root",
+          "ids": [],
+          "offset": 0,
+          "part": 0
+        },
+        "total": 5,
+        "offset": 0,
+        "next": 3,
+        "records": [
+          {
+            "id": "start-0-roots",
+            "value": {
+              "seenAt": 157,
+              "object": {
+                "id": "start-0-roots",
+                "name": "Meadow roots",
+                "kind": "plant",
+                "spatial": {
+                  "x": 10.1,
+                  "y": 12,
+                  "angle": 0,
+                  "shape": {
+                    "kind": "circle",
+                    "radius": 0.25
+                  },
+                  "solid": false,
+                  "interaction": 0.65,
+                  "entrances": []
+                },
+                "visual": {
+                  "component": "plant",
+                  "color": "#cfaf79",
+                  "accent": "#cfaf79",
+                  "label": "Meadow roots",
+                  "state": "ready"
+                },
+                "data": {
+                  "resource": "root",
+                  "stock": 1,
+                  "capacity": 6,
+                  "soil": 0.65,
+                  "stage": "mature"
+                },
+                "createdBy": null,
+                "createdAt": 0,
+                "revision": "foundation-forest@1"
+              }
+            }
+          },
+          {
+            "id": "surface-21-lin-113",
+            "fragment": "{\"seenAt\":157,\"object\":{\"id\":\"surface-21-lin-113\",\"kind\":\"prepared-surface\",\"name\":\"Examined forest-floor footprint\",\"spatial\":{\"x\":9.25,\"y\":12.9,\"angle\":0,\"shape\":{\"kind\":\"circle\",\"radius\":0.2},\"solid\":false,\"reserved\":false,\"interaction\":0.65,\"entrances\":[]},\"visual\":{\"component\":\"surface-work\",\"color\":\"#8f7959\",\"accent\":\"#d6be87\",\"label\":\"Surface: assessment pending\",\"state\":\"partial\"},\"data\":{\"source\":\"terrain-footprint:9.25:12.9:0.2\",\"initialCoverMass\":0.04,\"coverMass\":0,\"residueMass\":0,\"residues\":[{\"source\":\"terrain-footprint:9.25:12.9:0.2\",\"mass\":0,\"x\":9.4,\"y\":12.9,\"radius\":0.03,\"edible\":false,\"harvestable\":false},{\"source\":\"terrain-footprint:9.25:12.9:0.2\",\"mass\":0,\"x\":9.1,\"y\":12.9,\"radius\":0.03,\"edible\":false,\"harvestable\":false}],\"exposedArea\":0.12566371,\"activeWork\":null,\"outcome\":\"transfer-unassessed\",\"coverModel\":\"Finite 0.04 mass units of loose surface litter for this 0.2-radius forest footprint; an authored extension model, not a botanical discovery. No food or inventory resource.\",\"handCapacity\":0.02,\"completedPaidRounds\":3,\"rootTrial\":\"root-trial-37-lin-225\"},\"create",
+            "encoding": "paged-json",
+            "part": 0,
+            "parts": 2,
+            "access": "Use the same exact id and the next part; concatenate fragments before parsing."
+          },
+          {
+            "id": "root-trial-37-lin-225",
+            "value": {
+              "seenAt": 157,
+              "object": {
+                "id": "root-trial-37-lin-225",
+                "kind": "root-trial",
+                "name": "Root planting trial",
+                "spatial": {
+                  "x": 9.25,
+                  "y": 12.9,
+                  "angle": 0,
+                  "shape": {
+                    "kind": "circle",
+                    "radius": 0.2
+                  },
+                  "solid": false,
+                  "reserved": true,
+                  "interaction": 0.65,
+                  "entrances": []
+                },
+                "visual": {
+                  "component": "plant",
+                  "color": "#8e7254",
+                  "accent": "#d6be87",
+                  "label": "Root trial",
+                  "state": "covered"
+                },
+                "data": {
+                  "stage": "planted-unverified",
+                  "elapsed": 3,
+                  "remainingWork": 0,
+                  "progress": 1,
+                  "inputItem": "item-37-lin-224",
+                  "source": "start-0-roots",
+                  "rootUnits": 1,
+                  "workId": "manual-37-lin-223",
+                  "preparedSurfaceId": "surface-21-lin-113",
+                  "plantedAt": 39,
+                  "observationRounds": 118,
+                  "viability": "Unverified; this precursor supplies no propagation or harvest rule.",
+                  "soil": 0.65,
+                  "exposure": {
+                    "temperature": 29.19268756,
+                    "rain": 0.81922479
+                  },
+                  "observationStatus": "inconclusive",
+                  "activeAssessment": null,
+                  "inspectionStatus": "covered",
+                  "exposed": false,
+                  "displacedSoil": 0,
+                  "inspectionProgress": 1,
+                  "inspectionRemaining": 0
+                },
+                "createdBy": "lin",
+                "createdAt": 37,
+                "revision": "root-planting-trial@1"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "query": {
+          "section": "observed",
+          "search": "berry",
+          "ids": [],
+          "offset": 0,
+          "part": 0
+        },
+        "total": 1,
+        "offset": 0,
+        "next": null,
+        "records": [
+          {
+            "id": "start-0-berries",
+            "value": {
+              "seenAt": 157,
+              "object": {
+                "id": "start-0-berries",
+                "name": "Red berries",
+                "kind": "plant",
+                "spatial": {
+                  "x": 6.7,
+                  "y": 9.2,
+                  "angle": 0,
+                  "shape": {
+                    "kind": "circle",
+                    "radius": 0.25
+                  },
+                  "solid": false,
+                  "interaction": 0.65,
+                  "entrances": []
+                },
+                "visual": {
+                  "component": "plant",
+                  "color": "#b34f66",
+                  "accent": "#b34f66",
+                  "label": "Red berries",
+                  "state": "growing"
+                },
+                "data": {
+                  "resource": "berry",
+                  "stock": 0,
+                  "capacity": 5,
+                  "soil": 0.65,
+                  "stage": "mature"
+                },
+                "createdBy": null,
+                "createdAt": 0,
+                "revision": "foundation-forest@1"
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "measure": {
+    "estimator": "o200k_base; approximate model mapping",
+    "inputEstimate": 14489,
+    "modules": {
+      "instructions": 661,
+      "schema": 168,
+      "longContext": 32,
+      "protocol": 3,
+      "tick": 1,
+      "catalogue": 7,
+      "packet": 8410,
+      "retrieval": 2871,
+      "packet.goal": 39,
+      "packet.identity": 9,
+      "packet.time": 1,
+      "packet.state": 630,
+      "packet.environment": 142,
+      "packet.execution": 475,
+      "packet.observation": 2585,
+      "packet.inventory": 415,
+      "packet.memory": 2477,
+      "packet.abilities": 1498,
+      "packet.rules": 30,
+      "packet.access": 83
+    },
+    "requestBytes": 52815,
+    "reservation": 60411
+  }
+}

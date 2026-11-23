@@ -484,21 +484,46 @@ export function v7Step(
               pkg.beforeAction?.(trial, actor, action, !!bound);
         }
         if (actor.learning) {
-          actor.learning.remaining -= 1;
-          const ability = actor.learning.ability;
-          if (actor.learning.remaining <= 0) {
-            actor.mastered.push(ability);
-            actor.learning = null;
-            emit('mastered', `Mastered ${ability} through actual study.`, {
-              ability,
-            });
-          } else
+          const studyEnergy =
+            trial.abilities.find((a) => a.id === actor.learning?.ability)
+              ?.learningEnergy ?? 0;
+          if (actor.vitals.energy < studyEnergy) {
+            const rest = trial.abilities.find((a) => a.id === 'rest');
+            const handler =
+              rest && actor.mastered.includes(rest.id)
+                ? registry.handlers[rest.handler]
+                : undefined;
+            if (action.interface !== 'rest' || !handler)
+              throw new Error(
+                'Insufficient energy for study; use the known rest interface to recover while retaining progress.',
+              );
+            result = handler({ world: trial, actor, action, work, emit });
             emit(
               'learning',
-              `Studying ${ability}; ${String(actor.learning.remaining)} rounds remain.`,
-              { ability, remaining: actor.learning.remaining },
+              'Study paused for actual recovery; paid learning progress retained.',
+              {
+                ability: actor.learning.ability,
+                remaining: actor.learning.remaining,
+              },
             );
-          result = { complete: false, writes: [] };
+          } else {
+            if (studyEnergy) actor.vitals.energy -= studyEnergy;
+            actor.learning.remaining -= 1;
+            const ability = actor.learning.ability;
+            if (actor.learning.remaining <= 0) {
+              actor.mastered.push(ability);
+              actor.learning = null;
+              emit('mastered', `Mastered ${ability} through actual study.`, {
+                ability,
+              });
+            } else
+              emit(
+                'learning',
+                `Studying ${ability}; ${String(actor.learning.remaining)} rounds remain.`,
+                { ability, remaining: actor.learning.remaining },
+              );
+            result = { complete: false, writes: [] };
+          }
         } else {
           const ability = trial.abilities.find(
             (a) => a.id === action.interface,
@@ -583,6 +608,12 @@ export function v7Step(
                 'Unimplemented ability or missing individual prerequisites.',
               );
             if (!actor.mastered.includes(target)) {
+              const studyEnergy = learned.learningEnergy ?? 0;
+              if (actor.vitals.energy < studyEnergy)
+                throw new Error(
+                  'Insufficient energy to begin this study round.',
+                );
+              if (studyEnergy) actor.vitals.energy -= studyEnergy;
               if (learned.learning <= 1) {
                 actor.mastered.push(target);
                 emit(

@@ -1,0 +1,460 @@
+{
+  "version": 1,
+  "formalCalls": 0,
+  "method": "Complete serialized request estimated with o200k_base BPE; model mapping and server framing are approximate. Actual retained usage is reported separately. Byte reservations are conservative ceilings, not token estimates. Module counts overlap (packet and its fields) and are not additive.",
+  "projections": [
+    {
+      "name": "fresh",
+      "actor": "lin",
+      "before": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 10876,
+        "modules": {
+          "instructions": 995,
+          "schema": 1852,
+          "experience": 63,
+          "execution": 1,
+          "development": 44,
+          "harness": 1,
+          "protocol": 3,
+          "goal": 39,
+          "tick": 1,
+          "time": 1,
+          "identity": 9,
+          "state": 144,
+          "observation": 2221,
+          "environment": 139,
+          "memory": 116,
+          "previousTask": 1,
+          "catalogue": 4461,
+          "rules": 100,
+          "remainingSharedOrdinaryCalls": 1
+        },
+        "requestBytes": 46641,
+        "reservation": 54237
+      },
+      "after": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 3875,
+        "modules": {
+          "instructions": 661,
+          "schema": 168,
+          "longContext": 32,
+          "protocol": 3,
+          "tick": 1,
+          "catalogue": 7,
+          "packet": 2779,
+          "retrieval": 1,
+          "packet.goal": 39,
+          "packet.identity": 9,
+          "packet.time": 1,
+          "packet.state": 152,
+          "packet.environment": 139,
+          "packet.execution": 17,
+          "packet.observation": 1299,
+          "packet.inventory": 16,
+          "packet.memory": 159,
+          "packet.abilities": 823,
+          "packet.rules": 30,
+          "packet.access": 69
+        },
+        "requestBytes": 15064,
+        "reservation": 22660
+      }
+    },
+    {
+      "name": "fresh",
+      "actor": "moss",
+      "before": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 10086,
+        "modules": {
+          "instructions": 995,
+          "schema": 1852,
+          "experience": 63,
+          "execution": 1,
+          "development": 44,
+          "harness": 1,
+          "protocol": 3,
+          "goal": 39,
+          "tick": 1,
+          "time": 1,
+          "identity": 11,
+          "state": 144,
+          "observation": 1603,
+          "environment": 139,
+          "memory": 116,
+          "previousTask": 1,
+          "catalogue": 4393,
+          "rules": 100,
+          "remainingSharedOrdinaryCalls": 1
+        },
+        "requestBytes": 44264,
+        "reservation": 51860
+      },
+      "after": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 3710,
+        "modules": {
+          "instructions": 661,
+          "schema": 168,
+          "longContext": 33,
+          "protocol": 3,
+          "tick": 1,
+          "catalogue": 7,
+          "packet": 2614,
+          "retrieval": 1,
+          "packet.goal": 39,
+          "packet.identity": 11,
+          "packet.time": 1,
+          "packet.state": 152,
+          "packet.environment": 139,
+          "packet.execution": 17,
+          "packet.observation": 1132,
+          "packet.inventory": 16,
+          "packet.memory": 159,
+          "packet.abilities": 823,
+          "packet.rules": 30,
+          "packet.access": 69
+        },
+        "requestBytes": 14832,
+        "reservation": 22428
+      }
+    },
+    {
+      "name": "fresh",
+      "actor": "sol",
+      "before": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 10820,
+        "modules": {
+          "instructions": 995,
+          "schema": 1852,
+          "experience": 63,
+          "execution": 1,
+          "development": 44,
+          "harness": 1,
+          "protocol": 3,
+          "goal": 39,
+          "tick": 1,
+          "time": 1,
+          "identity": 9,
+          "state": 144,
+          "observation": 2138,
+          "environment": 139,
+          "memory": 116,
+          "previousTask": 1,
+          "catalogue": 4520,
+          "rules": 100,
+          "remainingSharedOrdinaryCalls": 1
+        },
+        "requestBytes": 46593,
+        "reservation": 54189
+      },
+      "after": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 3843,
+        "modules": {
+          "instructions": 661,
+          "schema": 168,
+          "longContext": 32,
+          "protocol": 3,
+          "tick": 1,
+          "catalogue": 7,
+          "packet": 2747,
+          "retrieval": 1,
+          "packet.goal": 39,
+          "packet.identity": 9,
+          "packet.time": 1,
+          "packet.state": 152,
+          "packet.environment": 139,
+          "packet.execution": 17,
+          "packet.observation": 1267,
+          "packet.inventory": 16,
+          "packet.memory": 159,
+          "packet.abilities": 823,
+          "packet.rules": 30,
+          "packet.access": 69
+        },
+        "requestBytes": 15162,
+        "reservation": 22758
+      }
+    },
+    {
+      "name": "archived-ex10-at-358-projection-only",
+      "actor": "lin",
+      "before": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 21057,
+        "modules": {
+          "instructions": 995,
+          "schema": 2784,
+          "encoding": 7,
+          "meaning": 84,
+          "keys": 135,
+          "recordColumns": 344,
+          "shared": 2559,
+          "payload": 13022
+        },
+        "requestBytes": 78134,
+        "reservation": 85730
+      },
+      "after": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 9077,
+        "modules": {
+          "instructions": 661,
+          "schema": 168,
+          "longContext": 32,
+          "protocol": 3,
+          "tick": 1,
+          "catalogue": 7,
+          "packet": 7175,
+          "retrieval": 1,
+          "packet.goal": 39,
+          "packet.identity": 9,
+          "packet.time": 1,
+          "packet.state": 653,
+          "packet.environment": 161,
+          "packet.execution": 458,
+          "packet.observation": 1388,
+          "packet.inventory": 857,
+          "packet.memory": 1872,
+          "packet.abilities": 1612,
+          "packet.rules": 30,
+          "packet.access": 69
+        },
+        "requestBytes": 34306,
+        "reservation": 41902
+      }
+    },
+    {
+      "name": "archived-ex10-at-358-projection-only",
+      "actor": "moss",
+      "before": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 23277,
+        "modules": {
+          "instructions": 995,
+          "schema": 2818,
+          "encoding": 7,
+          "meaning": 84,
+          "keys": 163,
+          "recordColumns": 431,
+          "shared": 2792,
+          "payload": 14680
+        },
+        "requestBytes": 84128,
+        "reservation": 91724
+      },
+      "after": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 10039,
+        "modules": {
+          "instructions": 661,
+          "schema": 168,
+          "longContext": 33,
+          "protocol": 3,
+          "tick": 1,
+          "catalogue": 7,
+          "packet": 7935,
+          "retrieval": 1,
+          "packet.goal": 39,
+          "packet.identity": 11,
+          "packet.time": 1,
+          "packet.state": 653,
+          "packet.environment": 161,
+          "packet.execution": 155,
+          "packet.observation": 1958,
+          "packet.inventory": 1071,
+          "packet.memory": 2364,
+          "packet.abilities": 1397,
+          "packet.rules": 30,
+          "packet.access": 69
+        },
+        "requestBytes": 37952,
+        "reservation": 45548
+      }
+    },
+    {
+      "name": "archived-ex10-at-358-projection-only",
+      "actor": "sol",
+      "before": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 23204,
+        "modules": {
+          "instructions": 995,
+          "schema": 2706,
+          "encoding": 7,
+          "meaning": 84,
+          "keys": 191,
+          "recordColumns": 385,
+          "shared": 3075,
+          "payload": 14461
+        },
+        "requestBytes": 83251,
+        "reservation": 90847
+      },
+      "after": {
+        "estimator": "o200k_base; approximate model mapping",
+        "inputEstimate": 10158,
+        "modules": {
+          "instructions": 661,
+          "schema": 168,
+          "longContext": 32,
+          "protocol": 3,
+          "tick": 1,
+          "catalogue": 7,
+          "packet": 8077,
+          "retrieval": 1,
+          "packet.goal": 39,
+          "packet.identity": 9,
+          "packet.time": 1,
+          "packet.state": 704,
+          "packet.environment": 161,
+          "packet.execution": 265,
+          "packet.observation": 1686,
+          "packet.inventory": 1185,
+          "packet.memory": 1807,
+          "packet.abilities": 2095,
+          "packet.rules": 30,
+          "packet.access": 69
+        },
+        "requestBytes": 38977,
+        "reservation": 46573
+      }
+    }
+  ],
+  "expanded5000": {
+    "ordinary": {
+      "estimator": "o200k_base; approximate model mapping",
+      "inputEstimate": 4027,
+      "modules": {
+        "instructions": 661,
+        "schema": 168,
+        "longContext": 32,
+        "protocol": 3,
+        "tick": 1,
+        "catalogue": 7,
+        "packet": 2927,
+        "retrieval": 1,
+        "packet.goal": 39,
+        "packet.identity": 9,
+        "packet.time": 1,
+        "packet.state": 152,
+        "packet.environment": 139,
+        "packet.execution": 17,
+        "packet.observation": 1299,
+        "packet.inventory": 16,
+        "packet.memory": 213,
+        "packet.abilities": 917,
+        "packet.rules": 30,
+        "packet.access": 69
+      },
+      "requestBytes": 15715,
+      "reservation": 23311
+    },
+    "world": {
+      "estimator": "o200k_base; approximate model mapping",
+      "inputEstimate": 2928,
+      "modules": {
+        "instructions": 495,
+        "schema": 168,
+        "longContext": 32,
+        "protocol": 3,
+        "tick": 1,
+        "catalogue": 7,
+        "packet": 2075,
+        "retrieval": 1,
+        "packet.requests": 16,
+        "packet.applicants": 935,
+        "packet.registry": 722,
+        "packet.rules": 347,
+        "packet.access": 43
+      },
+      "requestBytes": 12616,
+      "reservation": 20212
+    }
+  },
+  "distributions": [
+    {
+      "id": "ex10",
+      "roles": [
+        {
+          "role": "ordinary",
+          "attempts": 209,
+          "failed": 1,
+          "unknownUsage": 1,
+          "actualInput": {
+            "sum": 3715291,
+            "median": 19140,
+            "p90": 20943,
+            "maximum": 22633
+          },
+          "actualOutput": 108780
+        },
+        {
+          "role": "world",
+          "attempts": 15,
+          "failed": 1,
+          "unknownUsage": 0,
+          "actualInput": {
+            "sum": 214448,
+            "median": 14686,
+            "p90": 16911,
+            "maximum": 18801
+          },
+          "actualOutput": 22767
+        }
+      ]
+    },
+    {
+      "id": "ex12",
+      "roles": [
+        {
+          "role": "ordinary",
+          "attempts": 402,
+          "failed": 6,
+          "unknownUsage": 4,
+          "actualInput": {
+            "sum": 4274889,
+            "median": 10665,
+            "p90": 12441,
+            "maximum": 13982
+          },
+          "actualOutput": 262273
+        },
+        {
+          "role": "world",
+          "attempts": 34,
+          "failed": 0,
+          "unknownUsage": 0,
+          "actualInput": {
+            "sum": 283702,
+            "median": 7888,
+            "p90": 10020,
+            "maximum": 10935
+          },
+          "actualOutput": 32306
+        }
+      ]
+    }
+  ],
+  "forecast": {
+    "targetRounds": 1600,
+    "actors": 3,
+    "roundsPerDecision": 5,
+    "ordinaryDecisions": 960,
+    "retrievalFraction": 0.2,
+    "completeInputEstimate": 6000,
+    "averageOutputAssumption": 700,
+    "ordinaryAndRetrieval": 7718400,
+    "worldCalls": 60,
+    "worldInputOutputAssumption": 8000,
+    "world": 480000,
+    "unknownUsageAllowance": 200000,
+    "projectedTotal": 8398400,
+    "hardCeiling": 10000000,
+    "interpretation": "Plausible coverage under declared assumptions, not a guarantee. One fungible ordinary/world pool across all stages; no probe launched, no automatic budget increase. Development/review/tool usage is separate and unobservable here."
+  }
+}

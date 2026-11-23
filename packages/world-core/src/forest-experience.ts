@@ -143,14 +143,38 @@ export function forestExperienceAfterRound(
     const events = world.events.filter((e) => e.actor === actor.id);
     const rewards = events.filter((e) => e.type === 'satisfaction');
     const meal = events.find((e) => e.type === 'meal-experience');
+    const tendencies = actor.extensionState['long:tendencies'];
+    const traits =
+      world.config.longDevelopment &&
+      tendencies &&
+      typeof tendencies === 'object' &&
+      !Array.isArray(tendencies)
+        ? tendencies
+        : {};
+    const curious = events.some(
+      (e) => e.type === 'information-confirmed' && e.data.qualified === true,
+    );
+    const social = events.some(
+      (e) => e.type === 'finding-accepted' && e.data.qualified === true,
+    );
+    const weight = world.config.longDevelopment
+      ? 1 +
+        (Number(
+          traits[
+            curious ? 'curiosity' : social ? 'socialNeed' : 'comfortPreference'
+          ] ?? 0.5,
+        ) -
+          0.5) *
+          0.4
+      : 1;
     const positive = Math.min(
       1,
-      rewards.reduce((n, e) => n + Number(e.data.value ?? 0) / 5, 0) +
+      weight * rewards.reduce((n, e) => n + Number(e.data.value ?? 0) / 5, 0) +
         (meal?.data.rewarded ? Number(meal.data.pleasure) * 0.2 : 0),
     );
     const negative = Math.min(
       1,
-      openRoutine(world, actor) +
+      openRoutine(world, actor, before) +
         events.filter((e) => e.type === 'injured').length * 0.3 +
         (meal ? Number(meal.data.monotony ?? 0) * 0.15 : 0),
     );

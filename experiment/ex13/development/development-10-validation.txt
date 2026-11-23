@@ -1,0 +1,9 @@
+$ pnpm typecheck
+
+> self-evolving-world@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world
+> tsc --noEmit && pnpm --filter @self-evolving-world/world-core typecheck && pnpm --filter @self-evolving-world/viewer exec tsc --noEmit
+
+apps/simulator/test/long-prepared-planting.test.ts(50,17): error TS2322: Type 'V7Json | undefined' is not assignable to type 'V7Json'.
+  Type 'undefined' is not assignable to type 'V7Json'.
+ ELIFECYCLE  Command failed with exit code 2.
+

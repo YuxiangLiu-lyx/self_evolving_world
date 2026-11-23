@@ -1,0 +1,63 @@
+{
+  "provenance": "Actual round38 source before development12; regression input only.",
+  "object": {
+    "id": "surface-34-sol-201",
+    "kind": "prepared-surface",
+    "name": "Examined forest-floor footprint",
+    "spatial": {
+      "x": 13,
+      "y": 25,
+      "angle": 0,
+      "shape": {
+        "kind": "circle",
+        "radius": 0.2
+      },
+      "solid": false,
+      "reserved": false,
+      "interaction": 0.65,
+      "entrances": []
+    },
+    "visual": {
+      "component": "surface-work",
+      "color": "#8f7959",
+      "accent": "#d6be87",
+      "label": "Partial ground preparation",
+      "state": "partial"
+    },
+    "data": {
+      "source": "terrain-footprint:13:25:0.2",
+      "initialCoverMass": 0.04,
+      "coverMass": 0,
+      "residueMass": 0.04,
+      "residues": [
+        {
+          "source": "terrain-footprint:13:25:0.2",
+          "mass": 0.02,
+          "x": 13.15,
+          "y": 25,
+          "radius": 0.03,
+          "edible": false,
+          "harvestable": false
+        },
+        {
+          "source": "terrain-footprint:13:25:0.2",
+          "mass": 0.02,
+          "x": 12.85,
+          "y": 25,
+          "radius": 0.03,
+          "edible": false,
+          "harvestable": false
+        }
+      ],
+      "exposedArea": 0.12566371,
+      "activeWork": null,
+      "outcome": "partial",
+      "coverModel": "Finite 0.04 mass units of loose surface litter for this 0.2-radius forest footprint; an authored extension model, not a botanical discovery. No food or inventory resource.",
+      "handCapacity": 0.02,
+      "completedPaidRounds": 3
+    },
+    "createdBy": "sol",
+    "createdAt": 34,
+    "revision": "small-soil-patch-preparation@1"
+  }
+}

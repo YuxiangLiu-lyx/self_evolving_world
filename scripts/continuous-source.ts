@@ -76,6 +76,7 @@ export function continuousSources(root: string): Record<string, string> {
       (p.startsWith('continuous-') ||
         p.startsWith('forest-') ||
         p.startsWith('open-') ||
+        p.startsWith('long-') ||
         p.startsWith('collective-')) &&
       p.endsWith('.ts'),
   ))
@@ -221,9 +222,27 @@ export function captureContinuousBaseline(
       source: continuousHash(continuousSources(root)),
     };
   if (existsSync(path)) {
-    if (v7Signature(continuousRead(path)) !== v7Signature(baseline))
+    if (!sameDevelopmentBaseline(continuousRead(path), baseline))
       throw new Error('Development baseline changed.');
   } else continuousAtomic(path, baseline);
+}
+/** Called only after currentContinuousRuntimeMatches: test/tool edits cannot invalidate paid world/call identity. */
+export function sameDevelopmentBaseline(
+  recorded: unknown,
+  current: {
+    world: string;
+    attempts: string;
+    barrier: string;
+    history: string;
+    source: string;
+  },
+): boolean {
+  const saved = v7Record(recorded);
+  return (
+    typeof saved.source === 'string' &&
+    /^[a-f0-9]{64}$/.test(saved.source) &&
+    v7Signature(saved) === v7Signature({ ...current, source: saved.source })
+  );
 }
 /** Manifest-declared source changes, full tests and exact old-prefix replay replace the old five-file allowlist. */
 export function validateContinuousDevelopment(
@@ -307,7 +326,7 @@ export function validateContinuousDevelopment(
     );
   // These enforce experiment identity, authorization and exactly-once budgets rather than world design.
   const protectedPaths =
-    /(^scripts\/continuous-|continuous-policy\.ts$|continuous-(run|provider|input)\.ts$|packages\/world-core\/src\/world\.ts$|chatgpt-auth\.ts$|responses\.ts$|package\.json$|pnpm-lock\.yaml$)/;
+    /(^scripts\/continuous-|continuous-policy\.ts$|(continuous-(run|provider|input)|long-(context|request|tokens|scenario|pressure))\.ts$|packages\/world-core\/src\/world\.ts$|chatgpt-auth\.ts$|responses\.ts$|package\.json$|pnpm-lock\.yaml$)/;
   if (
     changed.some(
       (p) =>

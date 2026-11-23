@@ -1,3 +1,35 @@
+import { LONG_BRANCH_ASSESSMENT } from './long-branch-assessment.js';
+import { LONG_MOSS_APPLE } from './long-moss-apple.js';
+import { LONG_PLUM_ASSESSMENT } from './long-plum-assessment.js';
+import { LONG_MOSS_SEPARATION } from './long-moss-separation.js';
+import { LONG_BIRCH_ASSESSMENT } from './long-birch-assessment.js';
+import { LONG_MOSS_RECOVERY } from './long-moss-recovery.js';
+import { LONG_MOSS_OPENING } from './long-moss-opening.js';
+import { LONG_NUT_ACCESS } from './long-nut-access.js';
+import { LONG_FOREST_NUT_EXAMINATION } from './long-forest-nut-examination.js';
+import { LONG_OPENED_ASSESSMENT } from './long-opened-assessment.js';
+import { LONG_MOSS_FOOD_ASSESSMENT } from './long-moss-food-assessment.js';
+import { LONG_APPLE_ASSESSMENT } from './long-apple-assessment.js';
+import { LONG_NUT_OPENING } from './long-nut-opening.js';
+import { LONG_NUT_EXAMINATION } from './long-nut-examination.js';
+import { LONG_JOIN_RECONCILIATION } from './long-join-reconciliation.js';
+import { LONG_JOINING } from './long-joining.js';
+import { LONG_JOIN_ASSESSMENT } from './long-join-assessment.js';
+import { LONG_MOSS_DIAGNOSTIC } from './long-moss-diagnostic.js';
+import {
+  LONG_PREPARED_PLANTING,
+  LONG_MOSS_PREPARED_PLANTING,
+} from './long-prepared-planting.js';
+import {
+  LONG_RESIDUE,
+  LONG_SOL_RESIDUE,
+  LONG_MOSS_RESIDUE,
+} from './long-residue.js';
+import { LONG_MOSS } from './long-moss.js';
+import { LONG_SURFACE } from './long-surface-work.js';
+import { LONG_SITE_ASSESSMENT } from './long-site-assessment.js';
+import { LONG_ROOT_ASSESSMENT } from './long-root-assessment.js';
+import { LONG_PLANTING } from './long-planting.js';
 import { TOOL_ASSESSMENT_PACKAGE } from './collective-tool-assessment.js';
 import { TRAY_CLEARANCE_PACKAGE } from './collective-tray-clearance-package.js';
 import { SMALL_DRYING_PACKAGE } from './collective-small-drying.js';
@@ -100,6 +132,34 @@ export const V7_PACKAGES: V7Package[] = [
   SURFACE_DIAGNOSTIC_PACKAGE,
   TOOL_ASSESSMENT_PACKAGE,
   SMALL_DRYING_PACKAGE,
+  LONG_PLANTING,
+  LONG_ROOT_ASSESSMENT,
+  LONG_SITE_ASSESSMENT,
+  LONG_SURFACE,
+  LONG_MOSS,
+  LONG_RESIDUE,
+  LONG_PREPARED_PLANTING,
+  LONG_SOL_RESIDUE,
+  LONG_MOSS_RESIDUE,
+  LONG_MOSS_DIAGNOSTIC,
+  LONG_MOSS_PREPARED_PLANTING,
+  LONG_JOIN_ASSESSMENT,
+  LONG_JOINING,
+  LONG_JOIN_RECONCILIATION,
+  LONG_NUT_EXAMINATION,
+  LONG_NUT_OPENING,
+  LONG_APPLE_ASSESSMENT,
+  LONG_MOSS_FOOD_ASSESSMENT,
+  LONG_OPENED_ASSESSMENT,
+  LONG_FOREST_NUT_EXAMINATION,
+  LONG_NUT_ACCESS,
+  LONG_MOSS_OPENING,
+  LONG_MOSS_RECOVERY,
+  LONG_BIRCH_ASSESSMENT,
+  LONG_MOSS_SEPARATION,
+  LONG_PLUM_ASSESSMENT,
+  LONG_MOSS_APPLE,
+  LONG_BRANCH_ASSESSMENT,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(

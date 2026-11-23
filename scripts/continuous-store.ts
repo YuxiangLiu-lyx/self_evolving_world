@@ -1,3 +1,5 @@
+import { initialLongWorld } from '../apps/simulator/src/long-scenario.js';
+import { longTokenBudget } from '../apps/simulator/src/long-tokens.js';
 import { collectiveSettle } from '@self-evolving-world/world-core';
 import { initialCollectiveWorld } from '../apps/simulator/src/collective-scenario.js';
 import { OPEN_CONFIG } from '../apps/simulator/src/open-scenario.js';
@@ -100,24 +102,26 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
     !Array.isArray(state.developments) ||
     v7Signature(state.world.config) !==
       v7Signature(
-        state.world.config.collective
-          ? initialCollectiveWorld(
-              `collective-${id}`,
-              state.world.config.collective.arm,
-            ).config
-          : state.world.config.development
-            ? {
-                ...OPEN_CONFIG,
-                development: {
-                  ...OPEN_CONFIG.development,
-                  scope: `open-${id}`,
-                },
-              }
-            : state.world.config.experience
-              ? FOREST_EXPERIENCE_CONFIG
-              : state.world.config.forest
-                ? FOREST_CONFIG
-                : V7_CONFIG,
+        state.world.config.longDevelopment
+          ? initialLongWorld(`long-${id}`).config
+          : state.world.config.collective
+            ? initialCollectiveWorld(
+                `collective-${id}`,
+                state.world.config.collective.arm,
+              ).config
+            : state.world.config.development
+              ? {
+                  ...OPEN_CONFIG,
+                  development: {
+                    ...OPEN_CONFIG.development,
+                    scope: `open-${id}`,
+                  },
+                }
+              : state.world.config.experience
+                ? FOREST_EXPERIENCE_CONFIG
+                : state.world.config.forest
+                  ? FOREST_CONFIG
+                  : V7_CONFIG,
       )
   )
     throw new Error(
@@ -257,6 +261,30 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
           'A collective phase exceeded its measured/reserved token allocation.',
         );
     }
+  if (state.world.config.longDevelopment) {
+    for (const attempt of state.attempts) {
+      if (
+        !Number.isSafeInteger(attempt.reservedTokens) ||
+        (attempt.reservedTokens ?? 0) <= 0 ||
+        !attempt.requestMeasure
+      )
+        throw new Error('Missing complete-request measurement/reservation.');
+      if (
+        attempt.usage &&
+        ([attempt.usage.inputTokens, attempt.usage.outputTokens].some(
+          (n) => !Number.isSafeInteger(n) || n < 0,
+        ) ||
+          attempt.usage.outputTokens >
+            state.world.config.longDevelopment.outputTokens)
+      )
+        throw new Error('Invalid long-run usage.');
+    }
+    const budget = longTokenBudget(state);
+    if (budget && budget.used > budget.limit)
+      throw new Error(
+        'Long-run shared measured/reserved token ceiling exceeded.',
+      );
+  }
   return state;
 }
 export function continuousSink(root: string, id: string): V7Sink {

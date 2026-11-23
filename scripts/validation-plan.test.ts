@@ -1,6 +1,6 @@
 import { continuousRuntimeHash } from './continuous-source.js';
 import { describe, expect, it } from 'vitest';
-import { selectChecks } from './validation-plan.js';
+import { browserInput, selectChecks } from './validation-plan.js';
 import { experimentInput } from './validation-inputs.js';
 const archives = { ex1: 1, ex2: 2, ex3: 3, ex4: 4, ex5: 5, ex6: 6, ex7: 7 };
 const plan = (files: string[]) => selectChecks(files, archives, 'fixture-base');
@@ -68,6 +68,33 @@ describe('dependency-scoped acceptance plans', () => {
     expect(selected.browserArchives).toEqual(['ex8']);
     expect(selected.browserGroups).toEqual([]);
   });
+  it('binds published story changes to browser evidence while prose and recordings remain documentation', () => {
+    const root = mkdtempSync(join(tmpdir(), 'story-dependencies-'));
+    try {
+      const directory = join(root, 'docs/presentation/ex13');
+      mkdirSync(directory, { recursive: true });
+      const story = join(directory, 'story.json');
+      writeFileSync(story, '{"bookmarks":[]}');
+      const selected = selectChecks(
+        ['docs/presentation/ex13/story.json'],
+        {},
+        'base',
+      );
+      expect(selected.browserGroups).toEqual(['continuous']);
+      expect(selected.code).toBe(false);
+      const before = browserInput(root, selected);
+      writeFileSync(join(directory, 'README.md'), 'Presentation evidence');
+      writeFileSync(join(directory, 'playback.webm'), 'recording fixture');
+      expect(browserInput(root, selected)).toBe(before);
+      writeFileSync(story, '{"bookmarks":[{"tick":11}]}');
+      expect(browserInput(root, selected)).not.toBe(before);
+      expect(plan(['docs/presentation/ex13/README.md']).browserGroups).toEqual(
+        [],
+      );
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
   it('keeps isolated continuous runtime changes separate from grid protocols', () => {
     const selected = plan(['packages/world-core/src/continuous-nature.ts']);
     expect(selected.experiments).toEqual(['ex7']);
@@ -93,7 +120,15 @@ describe('dependency-scoped acceptance plans', () => {
 });
 
 // Workflow-level invariants prevent duplicate quality and permanently pending required jobs.
-import { readFileSync } from 'node:fs';
+import {
+  readFileSync,
+  mkdirSync,
+  mkdtempSync,
+  writeFileSync,
+  rmSync,
+} from 'node:fs';
+import { join } from 'node:path';
+import { tmpdir } from 'node:os';
 it('keeps stable checks while separating main pushes, PR commits and body edits', () => {
   const quality = readFileSync('.github/workflows/ci.yml', 'utf8');
   const policy = readFileSync('.github/workflows/pr-policy.yml', 'utf8');

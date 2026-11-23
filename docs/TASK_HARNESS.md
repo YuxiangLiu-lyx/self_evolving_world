@@ -162,6 +162,13 @@ The independent `continuous` mode uses the same experiment/development/analysis/
 
 The same technical-repair handoff accepts the exact experience-mode context-protection pause only before inference, with no pending call, review barrier, uncertain attempt or exhausted budget. It retains the original capture and creates an empty, counted technical barrier; context-only recovery cannot install packages or actions and clears the barrier before normal decisions. [Forest Experience](FOREST_EXPERIENCE.md#retained-context-pause-and-lossless-transport-repair) documents the lossless JSON transport repair and its fixed-limit tests.
 
+The opt-in long-development controller also retains failed or repeatedly rejected
+ordinary decisions as a technical pause. The same counted repair entry requires
+a settled failed-call journal, no pending invocation and an empty actor barrier.
+Recovery cannot add actions, packages, mastery or reviews; prior token charges and
+query results remain intact. The frozen token guard still applies before the next
+call. A technical repair is not permission to change experimental policy.
+
 An implementation repair can target an unchanged interface already personally
 mastered before its handoff. The ex9 continuation repair keeps the original
 learning cost and permits that existing master to reuse it without duplicate
@@ -183,3 +190,18 @@ assignments. This corrects the already reviewed contract, preserves its paramete
 and never backfills rewards or knowledge. Its exact controller source pair is
 allowlisted and every prior round must reconstruct before resumption. It is not
 a general policy-change or budget-stop override.
+
+## Abandoned long-run invocation
+
+If an external interruption kills a coordinator during an ordinary long-development
+call, use the same `pnpm task -- repair ID` entry while the dead execution lease
+is still present. The command checks that the recorded coordinator PID is absent
+and no continuous inference worker is alive. It accepts only this task's unpublished
+run with exactly one final started ordinary attempt and no durable result.
+
+The original checkpoint is retained before reconciliation. The call becomes a
+failed **unknown outcome**, retains its full token reservation, and is never resent.
+A counted empty technical handoff preserves the world, paid work and previous
+results. A subsequent decision includes the abandonment notice and is a new counted
+invocation. Missing process evidence, an alive worker, an existing durable result or
+an ambiguous journal blocks this path; no API response or exit code is invented.

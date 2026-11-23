@@ -39,6 +39,77 @@ export function forestCheckpointRepair(
   after: string,
   declaration: unknown,
 ): boolean {
+  // Ex13 round 157: stable pagination and bounded search indexes repair actual
+  // empty continuation pages; retained results and all physical/policy state persist.
+  if (declaration === 'long-stable-pagination-v1')
+    return (
+      path === 'apps/simulator/src/long-context.ts' &&
+      before ===
+        '82b6a5429f6f68add763d7ef9fd148684067392fe461e1d828430fdd5626458b' &&
+      after ===
+        '1caaf40375f1a8fa218fafefdc5aac1638201cc3fc2a8cb80f718f8ac9c15373'
+    );
+  // Ex13 round 56: broad catalogue retrieval is an index; exact-id details and
+  // active operations remain intact. Original requests/results and limits persist.
+  if (declaration === 'long-catalogue-view-v1')
+    return (
+      path === 'apps/simulator/src/long-context.ts' &&
+      before ===
+        '174dee00c43fe36084993bd39c04a9efeb9b11a53a631d7bb88fb195725ecfa5' &&
+      after ===
+        '82b6a5429f6f68add763d7ef9fd148684067392fe461e1d828430fdd5626458b'
+    );
+  // Ex13 round 25: an empty commentary is not a decision. Bound capability views
+  // also withhold unobserved instance IDs; execution state and all policy stay fixed.
+  if (declaration === 'long-empty-commentary-and-instance-view-v1') {
+    const pairs: Record<string, { before: string; after: string }> = {
+      'apps/simulator/src/responses.ts': {
+        before:
+          'dfec542a97ad920528c1edce4aa7352c52906d6ba32974cec01cc96eee0a3371',
+        after:
+          'c5ddbe394637cd7b03ec4dc738a7d498b4eec2e0f64b9fd9a50ba10afb0937ea',
+      },
+      'apps/simulator/src/long-context.ts': {
+        before:
+          '04d07f306045b10b3a965245a9e8bfe66acfe9c908abc3f26516a97a6f776876',
+        after:
+          '174dee00c43fe36084993bd39c04a9efeb9b11a53a631d7bb88fb195725ecfa5',
+      },
+    };
+    const pair = pairs[path];
+    return pair?.before === before && pair.after === after;
+  }
+  // Ex13 round 23: only the long-run transport recognizes explicit commentary/final-answer
+  // phases. Raw failed evidence and usage stay unchanged; no policy or request change.
+  if (declaration === 'long-final-answer-phase-v1') {
+    const pairs: Record<string, { before: string; after: string }> = {
+      'apps/simulator/src/responses.ts': {
+        before:
+          '300b8189a667ad4f16882ee9e921258f69804d1802d3bf36d2ef3a48bc05f5e2',
+        after:
+          'dfec542a97ad920528c1edce4aa7352c52906d6ba32974cec01cc96eee0a3371',
+      },
+      'apps/simulator/src/continuous-provider.ts': {
+        before:
+          'a3891d7e1781a344a29afdef3d69f5cbd1f07a56d40090bc4fe300652f3ed989',
+        after:
+          '1661ae2886124e371d370d0338ee8c72aaf10a82fed998bc2c0f66609dd2b7a1',
+      },
+    };
+    const pair = pairs[path];
+    return pair?.before === before && pair.after === after;
+  }
+  // Ex13 round 7: both actual world replies used quoted learning durations after
+  // ambiguous output-type wording. Clarify only JSON field types; preserve objectives,
+  // capability policy, cost ceilings, physical state and every failed call.
+  if (declaration === 'long-review-field-types-v1')
+    return (
+      path === 'apps/simulator/src/long-request.ts' &&
+      before ===
+        '1d2439f0c1ffd1631cedc0b7edb713d2bf14d6701d1e5b67304c2cc9a4c7a0bf' &&
+      after ===
+        '789f2d98956fa85bd50e009ccfa3f04264cbb4b691201a3a7ab975c36400bf3d'
+    );
   // Ex12 round 56: clear only the explicitly reviewed feedback-repair barrier.
   // No scheduler, budget, prompt, goal, parameter or previously executed action changes.
   if (declaration === 'collective-reviewed-bark-feedback-v1')

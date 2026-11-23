@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/workflows/ci.yml)
 
-**Can autonomous agents discover needs, develop capabilities and change their world in ways that deliver lasting benefits?** This research project tests that question in a reproducible world. The latest protocol studies three groups of six independent people: shared coordination versus private knowledge, mild personal preferences and persistent intentions. Each arm starts with isolated basic skills in a continuous 2D forest; materials, learning, communication and work have real costs.
+**Can autonomous agents discover needs, develop capabilities and change their world in ways that deliver lasting benefits?** This research project tests that question in a reproducible world. The latest run studies three independent people with bounded context, private projects and recurring environmental pressure. Each starts with isolated basic skills in a continuous 2D forest; materials, learning, communication and work have real costs.
 
 **The mechanism:** agents act from private observations and request missing capabilities. A World Agent reviews functional equivalence, prerequisites, costs and effects. When implementation is needed, the world pauses and hands development to the current Codex conversation. Tested, versioned extensions become available; each actor must still learn and pay the execution costs. Requests and skill counts earn no reward. This is world-level learning, not model-weight training.
 
@@ -10,6 +10,7 @@
 
 | Run                                                                            | Observation                                                                        | Measured outcome                                                                                                                                                                                                                                                                                               |
 | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [ex13](docs/exec-plans/evidence/pr-31-long-open-development/final-results.md)  | 3 agents; paused at 280 / 1,600 rounds                                             | All alive. Paid material trials formed short dependency chains; Moss tested and then ate apples. Context was smaller, but queries used 48.7% of known tokens and the 40-development cap stopped the run. No sustained productivity gain was established.                                                       |
 | [ex11 / ex12](docs/exec-plans/evidence/pr-25-collective-life/final-results.md) | 3 groups × 6 members per arm; A stopped at 7 rounds, B at 37 then continued to 136 | All survived. Real material accumulation, voluntary refusal and one stone handover occurred; a tray remained half built. Token/engineering budgets prevented the matched 200-round comparison and 1,600-round horizon. No stable division of labor or sustained productivity gain was established.             |
 | [ex10](experiment/analyses/ex10/pr-24-open-development.md)                     | 3 agents, fresh skills; paused at 358 / 1,600 rounds                               | All alive. A material test resumed after 128 rounds; another actor learned a water capability, made a cup and collected water. Tiny-sample drying reduced deterioration, but no shelter or broad productivity gain was demonstrated. Context protection stopped the run with all 20 development attempts used. |
 | [ex9](experiment/analyses/ex9/pr-23-forest-experience.md)                      | 3 agents, 1,200 rounds; diet, slow mental state and seasonal pressure              | All survived. Five new capabilities were implemented; insulation, willow processing and recuperation were used by all three. Four mantles, two repairs and 25.82 restored health provide real benefits; learned fire and canopy were unused. 404/650 ordinary calls.                                           |
@@ -17,9 +18,9 @@
 
 These are exploratory runs with different rules and goals, not causal comparisons. [The archive](experiment/README.md) retains configuration, events, replay, analysis and model-call records where applicable; authored starting abilities and isolated test fixtures are excluded from autonomous discoveries.
 
-[![Actual ex12 replay at round 136: eighteen members and retained unfinished work](experiment/ex12/final.png)](experiment/ex12/final.png)
+[![Actual ex13 replay at round 280: retained people and trial objects](experiment/ex13/final.png)](experiment/ex13/final.png)
 
-_Actual saved ex12 state at the 136-round token-budget boundary, viewable here without installation. Interactive replay runs locally after setup; it is read-only and makes no model calls._
+_Actual saved ex13 state at the 280-round development-budget boundary, viewable here without installation. Interactive replay runs locally after setup; it is read-only and makes no model calls._
 
 ## Five-minute quick start
 
@@ -33,7 +34,11 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open [Local replay (after setup)](http://127.0.0.1:5173/?experiment=ex12) while `pnpm dev` is running on your computer. This loopback URL points to your own machine; it is not a public hosted demo. Seek the timeline, follow an agent, switch to its personal view and inspect recorded events. No API key is needed. `/classic.html` retains the original grid inspector; old experiments preserve their original rules. See [development setup](docs/DEVELOPMENT.md) and [collective protocol and recorded limitations](docs/COLLECTIVE_LIFE.md), and [live-run/resume instructions](docs/CONTINUOUS_WORLD.md) for more.
+Open [Local replay (after setup)](http://127.0.0.1:5173/?experiment=ex13) while `pnpm dev` is running on your computer. This loopback URL points to your own machine; it is not a public hosted demo. Seek the timeline, follow an agent, switch to its personal view and inspect recorded events. No API key is needed. `/classic.html` retains the original grid inspector; old experiments preserve their original rules. See [development setup](docs/DEVELOPMENT.md) and [collective protocol and recorded limitations](docs/COLLECTIVE_LIFE.md), and [live-run/resume instructions](docs/CONTINUOUS_WORLD.md) for more.
+
+The [EX13 Ashen preview (local, after setup)](http://127.0.0.1:5173/ashen.html?experiment=ex13)
+shows the actual soil, residue, loose wrapping, nut-contact and apple-trial sequence.
+See its [event guide and recording](docs/presentation/ex13/README.md).
 
 The independent [EX9 Ashen-style preview (local, after setup)](http://127.0.0.1:5173/ashen.html)
 adds a close follow camera and real-event bookmarks for the shelter, mantle,

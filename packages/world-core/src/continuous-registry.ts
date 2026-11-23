@@ -115,6 +115,11 @@ export function v7Install(
     );
   for (const ability of pkg.abilities) {
     if (
+      ability.learningEnergy !== undefined &&
+      (!Number.isFinite(ability.learningEnergy) || ability.learningEnergy < 0)
+    )
+      throw new Error('Study energy must be finite and nonnegative.');
+    if (
       ability.practiceEvidence &&
       !(pkg.events ?? []).includes(ability.practiceEvidence)
     )

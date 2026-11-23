@@ -1,6 +1,9 @@
 import { test, expect } from './validators.js';
 import type { Page, TestInfo } from '@playwright/test';
 import { BOOKMARKS } from '../src/presentation/ex9/bookmarks.js';
+// Keep these GPU/encoder-heavy cases independent but sequential within this file.
+// Concurrent recordings distorted frame timing and exceeded unchanged deadlines.
+test.describe.configure({ mode: 'default' });
 async function at(page: Page, tick: number): Promise<void> {
   await expect(page.locator('#presentation')).toHaveAttribute(
     'data-tick',
@@ -19,6 +22,8 @@ async function capture(
       () => document.documentElement.scrollWidth <= innerWidth + 1,
     ),
   ).toBe(true);
+  // Let the presentation cut finish before inspecting a new archive boundary.
+  if (page.url().includes('experiment=ex13')) await page.waitForTimeout(350);
   const path = info.outputPath(`continuous-ashen-${name}.png`);
   await page.screenshot({ path, fullPage: true, animations: 'disabled' });
   await info.attach(`review:continuous-ashen-${name}`, {
@@ -468,6 +473,216 @@ test('actual walking, work, camera and speed recording', async ({
     await context.close();
     if (video)
       await info.attach('ashen-actual-playback', {
+        path: await video.path(),
+        contentType: 'video/webm',
+      });
+  }
+});
+
+test('ex13 preview follows recorded root, material and residue evidence without changing the original replay', async ({
+  page,
+}, info) => {
+  test.setTimeout(180_000);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/ashen.html?experiment=ex13&round=11&actor=moss');
+  await at(page, 11);
+  await expect(page.locator('#presentation')).toContainText('EX13');
+  await expect(page.locator('#action-copy')).toContainText(
+    'One real root unit',
+  );
+  await capture(page, info, 'ex13-root');
+  await page.locator('#timeline').fill('25');
+  await page.locator('[data-person="sol"]').click();
+  await at(page, 25);
+  await expect(page.locator('#action-copy')).toContainText('moss');
+  await capture(page, info, 'ex13-moss');
+  await page.locator('#timeline').fill('32');
+  await page.locator('[data-person="lin"]').click();
+  await at(page, 32);
+  await expect(page.locator('#action-copy')).toContainText('transfer');
+  await capture(page, info, 'ex13-residue');
+  for (const size of [
+    { width: 1440, height: 900 },
+    { width: 1920, height: 1080 },
+  ]) {
+    await page.setViewportSize(size);
+    await page.waitForTimeout(350);
+    const box = await page.locator('#forest').boundingBox();
+    expect((box?.width ?? 0) / size.width).toBeGreaterThanOrEqual(0.9);
+    expect((box?.height ?? 0) / size.height).toBeGreaterThanOrEqual(0.85);
+    await capture(page, info, `ex13-${String(size.width)}`);
+  }
+  await page.locator('#bookmarks-toggle').click();
+  const bookmarks = await page
+    .locator('#bookmarks-panel button[data-tick]')
+    .evaluateAll((nodes) =>
+      nodes.map((n) => ({
+        tick: Number(n.getAttribute('data-tick')),
+        actor: n.getAttribute('data-person'),
+      })),
+    );
+  expect(bookmarks.length).toBeGreaterThanOrEqual(4);
+  for (const bookmark of bookmarks) {
+    await page
+      .locator(`#bookmarks-panel button[data-tick="${String(bookmark.tick)}"]`)
+      .first()
+      .click();
+    await at(page, bookmark.tick);
+    await expect(page.locator('#chapter-copy')).not.toBeEmpty();
+    if (bookmark.tick === 89) await capture(page, info, 'ex13-wrap');
+    if (bookmark.tick === 91) await capture(page, info, 'ex13-recovery');
+    if (bookmark.tick === 180) await capture(page, info, 'ex13-moss-contact');
+    if (bookmark.tick === 264) {
+      await expect(page.locator('#action')).toContainText(
+        '0.1 portion consumed',
+      );
+      await capture(page, info, 'ex13-apple');
+    }
+    if (bookmark.tick === 139) {
+      await expect(page.locator('#action')).toContainText('safety unverified');
+      await capture(page, info, 'ex13-contact');
+    }
+  }
+  await page.locator('#bookmarks-toggle').click();
+  await page.locator('#timeline').fill('32');
+  await page.locator('[data-person="lin"]').click();
+  await at(page, 32);
+  await page.locator('#original').click();
+  await expect(page.locator('#archive')).toHaveValue('ex13');
+  await expect(page.locator('#round')).toContainText('32 /', {
+    timeout: 90_000,
+  });
+  await expect(page.locator('#actor')).toHaveValue('lin');
+  await page.locator('#follow').click();
+  await capture(page, info, 'ex13-original');
+});
+
+test('records actual ex13 playback, work and camera transitions', async ({
+  browser,
+}, info) => {
+  test.setTimeout(120_000);
+  const context = await browser.newContext({
+    viewport: { width: 1440, height: 900 },
+    baseURL: 'http://127.0.0.1:4173',
+    recordVideo: {
+      dir: info.outputPath('ex13-recording'),
+      size: { width: 1440, height: 900 },
+    },
+  });
+  const page = await context.newPage(),
+    video = page.video(),
+    errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  page.on('console', (m) => {
+    if (m.type() === 'error') errors.push(m.text());
+  });
+  page.on('response', (r) => {
+    if (r.status() >= 400) errors.push(`${String(r.status())} ${r.url()}`);
+  });
+  try {
+    await page.addInitScript(() => {
+      const samples: unknown[] = [];
+      Object.assign(window, { ex13Motion: samples });
+      window.addEventListener('ashen-frame', (event) =>
+        samples.push((event as CustomEvent<unknown>).detail),
+      );
+    });
+    await page.goto('/ashen.html?experiment=ex13&round=0&actor=moss&trace=1');
+    await at(page, 0);
+    await page.locator('#play').click();
+    await page.waitForTimeout(8000);
+    await page.locator('#play').click();
+    await page.locator('#timeline').fill('18');
+    await page.locator('[data-person="lin"]').click();
+    await at(page, 18);
+    await page.locator('#play').click();
+    await page.waitForTimeout(6000);
+    await page.locator('#speed').selectOption('2');
+    await page.waitForTimeout(3000);
+    await page.locator('#speed').selectOption('4');
+    await page.waitForTimeout(1200);
+    await page.locator('#play').click();
+    await page.locator('#timeline').fill('23');
+    await page.locator('[data-person="sol"]').click();
+    await at(page, 23);
+    await page.locator('#speed').selectOption('1');
+    await page.locator('#play').click();
+    await page.waitForTimeout(6000);
+    await page.locator('#play').click();
+    await page.locator('#timeline').fill('87');
+    await page.locator('[data-person="lin"]').click();
+    await at(page, 87);
+    await page.locator('#play').click();
+    await page.waitForTimeout(6000);
+    await page.locator('#play').click();
+    await page.locator('#timeline').fill('98');
+    await at(page, 98);
+    await page.locator('#play').click();
+    await page.waitForTimeout(5000);
+    await page.locator('#play').click();
+    await page.locator('#timeline').fill('136');
+    await at(page, 136);
+    await page.locator('#play').click();
+    await page.waitForTimeout(6000);
+    await page.locator('#play').click();
+    await page.locator('#timeline').fill('177');
+    await page.locator('[data-person="moss"]').click();
+    await at(page, 177);
+    await page.locator('#play').click();
+    await page.waitForTimeout(5000);
+    await page.locator('#play').click();
+    await page.locator('#timeline').fill('263');
+    await at(page, 263);
+    await page.locator('#play').click();
+    await page.waitForTimeout(4000);
+    await page.locator('#play').click();
+    await page.locator('#zoom-in').click();
+    const box = await page.locator('#forest').boundingBox();
+    if (!box) throw new Error('Missing rendered canvas');
+    await page.mouse.move(box.width * 0.6, box.height * 0.5);
+    await page.mouse.down();
+    await page.mouse.move(box.width * 0.6 + 90, box.height * 0.5 + 30, {
+      steps: 12,
+    });
+    await page.mouse.up();
+    await expect(page.locator('#follow')).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    await page.waitForTimeout(1000);
+    await page.locator('#follow').click();
+    await page.waitForTimeout(2000);
+    const samples = await page.evaluate(
+      () => (window as unknown as { ex13Motion: MotionSample[] }).ex13Motion,
+    );
+    const walking = samples.filter(
+      (s) => s.playing && s.moving && !s.buffering,
+    );
+    expect(walking.length).toBeGreaterThan(10);
+    const segments = walking.slice(1).flatMap((b, i) => {
+      const a = walking[i];
+      if (!a || a.tick !== b.tick || b.now - a.now > 100 || b.speed !== a.speed)
+        return [];
+      return [
+        {
+          dt: b.now - a.now,
+          distance: Math.hypot(b.point.x - a.point.x, b.point.y - a.point.y),
+          phase: b.phase - a.phase,
+        },
+      ];
+    });
+    expect(segments.some((s) => s.distance > 0.0001)).toBe(true);
+    for (const s of segments)
+      expect(s.phase).toBeCloseTo((s.distance * Math.PI * 2) / 0.65, 5);
+    await info.attach('ex13-rendered-motion', {
+      body: JSON.stringify({ samples, segments }),
+      contentType: 'application/json',
+    });
+    expect(errors).toEqual([]);
+  } finally {
+    await context.close();
+    if (video)
+      await info.attach('ex13-actual-playback', {
         path: await video.path(),
         contentType: 'video/webm',
       });

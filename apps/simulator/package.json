@@ -7,6 +7,7 @@
     "build": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@self-evolving-world/world-core": "workspace:*"
+    "@self-evolving-world/world-core": "workspace:*",
+    "js-tiktoken": "1.0.21"
   }
 }
