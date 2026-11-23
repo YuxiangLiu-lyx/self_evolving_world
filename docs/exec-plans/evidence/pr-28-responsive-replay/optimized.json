@@ -1,0 +1,101 @@
+{
+  "label": "final",
+  "node": "v24.22.2",
+  "browser": "158.0.8127.18",
+  "platform": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M4 Pro",
+  "viewport": {
+    "width": 1440,
+    "height": 1100
+  },
+  "results": [
+    {
+      "id": "ex8",
+      "initialMs": 72.46258399999999,
+      "initial": {
+        "longTasks": 0,
+        "longTotalMs": 0,
+        "maxLongMs": 0,
+        "maxHeartbeatGapMs": 18.200000047683716,
+        "canvasResizes": 4,
+        "domNodes": 690
+      },
+      "seekMs": 764.9300000000001,
+      "seek": {
+        "longTasks": 0,
+        "longTotalMs": 0,
+        "maxLongMs": 0,
+        "maxHeartbeatGapMs": 17.200000047683716,
+        "canvasResizes": 0,
+        "domNodes": 727
+      },
+      "pan": {
+        "longTasks": 0,
+        "longTotalMs": 0,
+        "maxLongMs": 0,
+        "maxHeartbeatGapMs": 51.799999952316284,
+        "canvasResizes": 0,
+        "domNodes": 727
+      }
+    },
+    {
+      "id": "ex10",
+      "initialMs": 75.33995800000002,
+      "initial": {
+        "longTasks": 0,
+        "longTotalMs": 0,
+        "maxLongMs": 0,
+        "maxHeartbeatGapMs": 26.799999952316284,
+        "canvasResizes": 4,
+        "domNodes": 690
+      },
+      "seekMs": 1409.9753329999999,
+      "seek": {
+        "longTasks": 0,
+        "longTotalMs": 0,
+        "maxLongMs": 0,
+        "maxHeartbeatGapMs": 23.5,
+        "canvasResizes": 0,
+        "domNodes": 764
+      },
+      "pan": {
+        "longTasks": 0,
+        "longTotalMs": 0,
+        "maxLongMs": 0,
+        "maxHeartbeatGapMs": 63.5,
+        "canvasResizes": 0,
+        "domNodes": 764
+      }
+    },
+    {
+      "id": "ex12",
+      "initialMs": 176.8022920000003,
+      "initial": {
+        "longTasks": 0,
+        "longTotalMs": 0,
+        "maxLongMs": 0,
+        "maxHeartbeatGapMs": 64.80000007152557,
+        "canvasResizes": 4,
+        "domNodes": 2685
+      },
+      "seekMs": 24298.221625,
+      "seek": {
+        "longTasks": 0,
+        "longTotalMs": 0,
+        "maxLongMs": 0,
+        "maxHeartbeatGapMs": 70.80000007152557,
+        "canvasResizes": 0,
+        "domNodes": 2776
+      },
+      "pan": {
+        "longTasks": 1,
+        "longTotalMs": 58,
+        "maxLongMs": 58,
+        "maxHeartbeatGapMs": 70.30000007152557,
+        "canvasResizes": 0,
+        "domNodes": 2776
+      }
+    }
+  ]
+}

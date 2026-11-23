@@ -449,6 +449,10 @@ if (!capture)
     const arrived = new Promise<void>((resolve) => {
       started = resolve;
     });
+    let responseSent: (() => void) | undefined;
+    const oldResponseSent = new Promise<void>((resolve) => {
+      responseSent = resolve;
+    });
     let oldLoads = 0;
     await page.route('**/experiments/index.json', (route) =>
       route.fulfill({
@@ -486,6 +490,7 @@ if (!capture)
           await hold;
         }
         await route.fulfill({ contentType: 'application/json', body: source });
+        if (archive === 'ex99') responseSent?.();
       }
     });
     try {
@@ -499,7 +504,7 @@ if (!capture)
         page.locator('#scene [data-scene-actor="a"]'),
       ).toHaveAttribute('data-x', '9');
       release?.();
-      await page.waitForLoadState('networkidle');
+      await oldResponseSent;
       await expect(page.locator('#archive')).toHaveValue('ex98');
       await expect(
         page.locator('#scene [data-scene-actor="a"]'),
@@ -512,4 +517,61 @@ if (!capture)
     } finally {
       release?.();
     }
+  });
+
+if (!capture)
+  test('large replay keeps controls responsive, cancels obsolete seeks and reuses verified frames', async ({
+    page,
+  }, info) => {
+    test.setTimeout(90_000);
+    await page.goto('/?experiment=ex12');
+    await expect(page.locator('#round')).toHaveText('0 / 136');
+    await expect
+      .poll(() => page.locator('#scene *').count())
+      .toBeLessThan(3000);
+    await page.locator('#time').fill('90');
+    await expect(page.locator('#status')).toContainText(
+      'Verifying saved state:',
+    );
+    // The interaction must settle before the long target. A main-thread replay
+    // would freeze this click until all ninety rounds had already completed.
+    await page.locator('#geometry').click();
+    await expect(page.locator('#geometry')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    await expect(page.locator('#round')).toHaveText('0 / 136');
+    await page.locator('#time').fill('3');
+    await expect(page.locator('#round')).toHaveText('3 / 136');
+    await page.locator('#geometry').click();
+    await page.locator('#time').fill('0');
+    await expect(page.locator('#round')).toHaveText('0 / 136');
+    await page.locator('#play').click();
+    await expect(page.locator('#round')).toHaveText('1 / 136');
+    await page.locator('#play').click();
+    await expect(page.locator('#play')).toHaveText('Play');
+    await page.locator('#time').fill('0');
+    await expect(page.locator('#round')).toHaveText('0 / 136');
+    await page.waitForTimeout(1100);
+    await expect(page.locator('#round')).toHaveText('0 / 136');
+    await page.locator('#private').click();
+    await expect(page.locator('#stage-tag')).toContainText('PERSONAL');
+    // Select an actual member before inspecting the private hit layer.
+    await page.locator('#actor').selectOption('ash-1');
+    await expect(page.locator('#scene [data-scene-actor="ash-1"]')).toHaveCount(
+      1,
+    );
+    await expect(
+      page.locator('#scene [data-scene-actor="birch-1"]'),
+    ).toHaveCount(0);
+    await page.locator('#global').click();
+    await page.locator('#fit').click();
+    await screenshot(page, info, 'continuous-responsive-collective');
+    await page.locator('#time').fill('90');
+    await page.locator('#archive').selectOption('ex8');
+    await expect(page.locator('#round')).toHaveText('0 / 897');
+    await expect(page.locator('#status')).toContainText('ex8 · Verified');
+    await expect(page.locator('#scene [data-scene-actor="ash-1"]')).toHaveCount(
+      0,
+    );
   });

@@ -706,24 +706,29 @@ function routeOverlay(
     );
   c.restore();
 }
-export function drawForestCanvas(
-  canvas: HTMLCanvasElement,
+interface TerrainLayer {
+  frame: SceneFrame;
+  key: string;
+  canvas: HTMLCanvasElement;
+}
+const terrainLayers = new WeakMap<HTMLCanvasElement, TerrainLayer>();
+function terrainLayer(
+  owner: HTMLCanvasElement,
   frame: SceneFrame,
-  selected: string,
   camera: ForestCamera,
-  geometry = false,
-  phase = 1,
-  previous?: SceneFrame,
-): void {
+  width: number,
+  height: number,
+  dpr: number,
+): HTMLCanvasElement {
+  const key = [camera.x, camera.y, camera.size, width, height, dpr].join(',');
+  const prior = terrainLayers.get(owner);
+  if (prior?.frame === frame && prior.key === key) return prior.canvas;
+  const canvas = prior?.canvas ?? document.createElement('canvas');
+  if (canvas.width !== owner.width) canvas.width = owner.width;
+  if (canvas.height !== owner.height) canvas.height = owner.height;
   const c = canvas.getContext('2d');
-  if (!c) return;
-  const rect = canvas.getBoundingClientRect(),
-    dpr = window.devicePixelRatio || 1;
-  const width = Math.max(1, rect.width),
-    height = Math.max(1, rect.height);
-  canvas.width = Math.round(width * dpr);
-  canvas.height = Math.round(height * dpr);
-  c.scale(dpr, dpr);
+  if (!c) return canvas;
+  c.setTransform(dpr, 0, 0, dpr, 0, 0);
   c.fillStyle = '#263d34';
   c.fillRect(0, 0, width, height);
   const scale = Math.min(width, height) / camera.size;
@@ -734,8 +739,24 @@ export function drawForestCanvas(
   c.scale(scale, scale);
   c.translate(-camera.x, -camera.y);
   const visible = frame.visible ? new Set(frame.visible) : null;
-  for (let y = 0; y < frame.height; y++)
-    for (let x = 0; x < frame.width; x++) {
+  const left = Math.max(
+    0,
+    Math.floor(camera.x - (width / scale - camera.size) / 2 - 1),
+  );
+  const top = Math.max(
+    0,
+    Math.floor(camera.y - (height / scale - camera.size) / 2 - 1),
+  );
+  const right = Math.min(
+    frame.width,
+    Math.ceil(camera.x + camera.size + (width / scale - camera.size) / 2 + 1),
+  );
+  const bottom = Math.min(
+    frame.height,
+    Math.ceil(camera.y + camera.size + (height / scale - camera.size) / 2 + 1),
+  );
+  for (let y = top; y < bottom; y++)
+    for (let x = left; x < right; x++) {
       const cell = frame.terrain[y * frame.width + x] ?? '.';
       c.fillStyle =
         visible && !visible.has(`${String(x)},${String(y)}`)
@@ -769,6 +790,39 @@ export function drawForestCanvas(
         );
       }
     }
+  terrainLayers.set(owner, { frame, key, canvas });
+  return canvas;
+}
+export function drawForestCanvas(
+  canvas: HTMLCanvasElement,
+  frame: SceneFrame,
+  selected: string,
+  camera: ForestCamera,
+  geometry = false,
+  phase = 1,
+  previous?: SceneFrame,
+): void {
+  const c = canvas.getContext('2d');
+  if (!c) return;
+  const rect = canvas.getBoundingClientRect(),
+    dpr = window.devicePixelRatio || 1;
+  const width = Math.max(1, rect.width),
+    height = Math.max(1, rect.height);
+  if (canvas.width !== Math.round(width * dpr))
+    canvas.width = Math.round(width * dpr);
+  if (canvas.height !== Math.round(height * dpr))
+    canvas.height = Math.round(height * dpr);
+  c.save();
+  c.setTransform(1, 0, 0, 1, 0, 0);
+  c.drawImage(terrainLayer(canvas, frame, camera, width, height, dpr), 0, 0);
+  c.scale(dpr, dpr);
+  const scale = Math.min(width, height) / camera.size;
+  c.translate(
+    (width - camera.size * scale) / 2,
+    (height - camera.size * scale) / 2,
+  );
+  c.scale(scale, scale);
+  c.translate(-camera.x, -camera.y);
   const self = frame.actors.find((a) => a.id === selected);
   const beneathClosedRoof = (point: { x: number; y: number }): boolean =>
     frame.objects.some(
@@ -1443,5 +1497,6 @@ export function drawForestCanvas(
     c.fillStyle = `rgba(19,30,56,${String((1 - climate.daylight) * 0.12)})`;
     c.fillRect(0, 0, frame.width, frame.height);
   }
+  c.restore();
 }
 import { drawMantle } from './forest-insulation-visual.js';

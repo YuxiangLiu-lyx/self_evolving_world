@@ -72,6 +72,11 @@ The game observatory is the primary page; `classic.html` preserves the original 
 
 Inspect blank pages, missing styles, obstruction, odd spacing, unreadable text, distinguishable colors, overlapping controls, and state feedback. Automated layout checks cover objective issues such as horizontal overflow, clipping, panel overlap, and missing controls or grid cells. **Basic aesthetics still require looking at the actual page.** There is no pixel baseline, and producing a screenshot is not visual acceptance.
 
+The `continuous-responsive-collective` scene covers an actual ex12 replay after
+a cancelled long seek, settled playback, private-view isolation and camera fit.
+Its browser case checks that controls respond before the long target is reached;
+it does not interpret test interactions as agent behavior.
+
 ## Behavior review
 
 Review the browser assertions and key frames, compare states before and after actions, and use core and timeline tests to verify:
