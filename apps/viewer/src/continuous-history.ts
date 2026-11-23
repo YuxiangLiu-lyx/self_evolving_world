@@ -66,6 +66,11 @@ export async function browserDigest(text: string): Promise<string> {
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 }
+export class ReplaySuperseded extends Error {
+  constructor() {
+    super('Replay request superseded.');
+  }
+}
 /** A segment-local verified prefix. Concurrent seeks share one ordered replay;
  * a failed round poisons this reader instead of reusing partially changed cursors. */
 export function incrementalSceneReplay(segment: SceneSegment) {
@@ -77,7 +82,13 @@ export function incrementalSceneReplay(segment: SceneSegment) {
   const cursors = v7Clone(segment.initialCursors ?? {});
   let pending: Promise<void> = Promise.resolve();
   let failure: Error | undefined;
-  function frame(tick: number): Promise<V7World> {
+  function frame(
+    tick: number,
+    control?: {
+      current: () => boolean;
+      advanced: (tick: number) => Promise<void>;
+    },
+  ): Promise<V7World> {
     if (
       !Number.isInteger(tick) ||
       tick < segment.start ||
@@ -90,6 +101,7 @@ export function incrementalSceneReplay(segment: SceneSegment) {
     const result = pending.then(async () => {
       if (failure) throw failure;
       try {
+        if (control && !control.current()) throw new ReplaySuperseded();
         while (frames.length <= offset) {
           const record = segment.rounds[frames.length - 1];
           if (!record) throw new Error('Missing requested replay round.');
@@ -153,11 +165,18 @@ export function incrementalSceneReplay(segment: SceneSegment) {
             throw new Error(`Replay mismatch at ${String(record.tick)}.`);
           world = result.world;
           frames.push(world);
+          // Cancellation only happens at a fully verified boundary. Never leave
+          // partially installed packages, paid actions or cursors for a retry.
+          if (control) {
+            await control.advanced(world.tick);
+            if (!control.current()) throw new ReplaySuperseded();
+          }
         }
         const value = frames[offset];
         if (!value) throw new Error('Missing verified replay frame.');
         return value;
       } catch (error) {
+        if (error instanceof ReplaySuperseded) throw error;
         failure = error instanceof Error ? error : new Error('Replay failed.');
         throw failure;
       }

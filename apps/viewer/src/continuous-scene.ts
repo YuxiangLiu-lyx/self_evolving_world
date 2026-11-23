@@ -245,6 +245,79 @@ const colors: Record<string, string> = {
   damp: '#819a7b',
   water: '#6aa8ac',
 };
+function objectBounds(o: V7Object): string {
+  const shape = o.spatial.shape;
+  return shape.kind === 'circle'
+    ? `<circle r="${String(Math.max(0.35, shape.radius))}"/>`
+    : `<rect x="${String(-shape.width / 2)}" y="${String(-shape.height / 2)}" width="${String(shape.width)}" height="${String(shape.height)}"/>`;
+}
+
+/** Forest pixels are already drawn on Canvas. The transparent SVG only needs
+ * accessible interaction bounds, not a second hidden rendering of every cell. */
+export function sceneHitSvg(frame: SceneFrame): string {
+  return (
+    frame.stacks
+      .map(
+        (s) =>
+          `<circle data-scene-stack="${svgText(s.id)}" cx="${String(s.x)}" cy="${String(s.y)}" r=".2"><title>${svgText(s.label)}</title></circle>`,
+      )
+      .join('') +
+    [...frame.objects]
+      .sort((a, b) => a.spatial.y - b.spatial.y)
+      .map(
+        (o) =>
+          `<g data-scene-object="${svgText(o.id)}" tabindex="0" role="button" aria-label="Inspect ${svgText(o.name)}" transform="translate(${String(o.spatial.x)} ${String(o.spatial.y)}) rotate(${String((o.spatial.angle * 180) / Math.PI)})">${objectBounds(o)}<title>${svgText(o.name)} · ${svgText(o.visual.state)}</title></g>`,
+      )
+      .join('') +
+    [...frame.actors]
+      .sort((a, b) => a.position.y - b.position.y)
+      .map(
+        (a) =>
+          `<g data-scene-actor="${svgText(a.id)}" data-x="${String(a.position.x)}" data-y="${String(a.position.y)}" role="button" tabindex="0" aria-label="Observe ${svgText(a.name)}" transform="translate(${String(a.position.x)} ${String(a.position.y)})"><circle r=".4"/><title>${svgText(a.name)}</title></g>`,
+      )
+      .join('')
+  );
+}
+
+/** A map at overview scale: merge equal-color terrain runs and omit subpixel
+ * decoration. Use only the supplied perspective, including its hidden cells. */
+export function sceneMinimapSvg(frame: SceneFrame): string {
+  const visible = frame.visible ? new Set(frame.visible) : null;
+  const paths = new Map<string, string[]>();
+  const color = (x: number, y: number): string =>
+    visible && !visible.has(`${String(x)},${String(y)}`)
+      ? '#203d37'
+      : (colors[frame.terrain[y * frame.width + x] ?? 'grass'] ?? '#8da36a');
+  for (let y = 0; y < frame.height; y++) {
+    for (let x = 0; x < frame.width;) {
+      const fill = color(x, y),
+        start = x;
+      while (x < frame.width && color(x, y) === fill) x++;
+      const runs = paths.get(fill) ?? [];
+      runs.push(
+        `M${String(start)} ${String(y)}h${String(x - start)}v1H${String(start)}Z`,
+      );
+      paths.set(fill, runs);
+    }
+  }
+  return (
+    [...paths]
+      .map(([fill, runs]) => `<path fill="${fill}" d="${runs.join('')}"/>`)
+      .join('') +
+    frame.objects
+      .map(
+        (o) =>
+          `<g fill="${svgText(o.visual.color)}" transform="translate(${String(o.spatial.x)} ${String(o.spatial.y)}) rotate(${String((o.spatial.angle * 180) / Math.PI)})">${objectBounds(o)}</g>`,
+      )
+      .join('') +
+    frame.actors
+      .map(
+        (a) =>
+          `<circle cx="${String(a.position.x)}" cy="${String(a.position.y)}" r=".45" fill="#ffe0a3" stroke="#294439" stroke-width=".12"/>`,
+      )
+      .join('')
+  );
+}
 export function sceneSvg(
   frame: SceneFrame,
   selected: string,

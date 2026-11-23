@@ -13,11 +13,14 @@ import {
   continuousScene,
   historicalScene,
   sceneSvg,
+  sceneHitSvg,
+  sceneMinimapSvg,
 } from './continuous-scene.js';
 import type { SceneFrame } from './continuous-scene.js';
 import { svgText } from './continuous-visuals.js';
-import { incrementalSceneReplay, browserDigest } from './continuous-history.js';
-import type { SceneIndex, SceneSegment } from './continuous-history.js';
+import type { SceneIndex } from './continuous-history.js';
+import { ReplayClient } from './replay-client.js';
+import { replayPlayback } from './replay-playback.js';
 import { parseReplay } from './timeline.js';
 import type { Timeline } from './timeline.js';
 import './observatory.css';
@@ -59,18 +62,21 @@ let id = '',
   frame: SceneFrame | null = null,
   tasks: Record<string, V7Cursor> = {},
   sequence = 0,
-  timer: number | undefined,
   follow = false,
   geometry = false,
   compare = false;
 let camera = { x: 0, y: 0, size: 24 };
-const cache = new Map<
-  string,
-  Promise<{
-    segment: SceneSegment;
-    replay: ReturnType<typeof incrementalSceneReplay>;
-  }>
->();
+let replay: ReplayClient | undefined;
+const playback = replayPlayback(
+  async () => {
+    if (tick >= maximum) return false;
+    await seek(tick + 1);
+    return tick < maximum;
+  },
+  (playing) => {
+    el('play').textContent = playing ? 'Pause' : 'Play';
+  },
+);
 function status(text: string, error = false): void {
   el('status').textContent = text;
   el('status').classList.toggle('error', error);
@@ -112,7 +118,9 @@ function render(): void {
   const isForest = !!current.continuous?.config.forest;
   forestCanvas.hidden = !isForest;
   scene.classList.toggle('forest-hit-regions', isForest);
-  scene.innerHTML = sceneSvg(current, actor, geometry);
+  scene.innerHTML = isForest
+    ? sceneHitSvg(current)
+    : sceneSvg(current, actor, geometry);
   if (isForest) {
     cancelAnimationFrame(animation);
     const started = performance.now();
@@ -133,7 +141,7 @@ function render(): void {
     animation = requestAnimationFrame(animate);
   }
   mini.innerHTML =
-    sceneSvg(current, '', false) +
+    (isForest ? sceneMinimapSvg(current) : sceneSvg(current, '', false)) +
     `<rect data-camera x="${String(camera.x)}" y="${String(camera.y)}" width="${String(camera.size)}" height="${String(camera.size)}" fill="none" stroke="#fff5cc" stroke-width=".3"/>`;
   mini.setAttribute(
     'viewBox',
@@ -393,7 +401,7 @@ function render(): void {
     g.addEventListener('click', () => {
       if (privateView) return;
       actor = g.dataset.sceneActor ?? actor;
-      void seek(tick);
+      perspective();
     });
   });
   scene.querySelectorAll<SVGGElement>('[data-scene-object]').forEach((g) => {
@@ -405,6 +413,20 @@ function render(): void {
       if (e.key === 'Enter') run();
     });
   });
+}
+/** Perspective is a projection of the displayed, already verified world. It
+ * must not wait behind a seek or briefly show a different visibility mode. */
+function perspective(): void {
+  if (!frame) return;
+  if (frame.continuous)
+    frame = continuousScene(frame.continuous, privateView ? actor : null);
+  else {
+    const world = legacy?.frames[frame.tick];
+    if (!world) return;
+    frame = historicalScene(world, privateView ? actor : null);
+  }
+  priorFrame = undefined;
+  render();
 }
 function inspect(objectId: string): void {
   renderTrialDiagnostic(trialPanel);
@@ -427,41 +449,34 @@ async function seek(requested: number): Promise<void> {
     if (legacy) {
       const world = legacy.frames[at];
       if (!world) throw new Error('Missing historical frame.');
+      if (!world.agents.some((a) => a.id === actor))
+        actor = world.agents[0]?.id ?? '';
       frame = historicalScene(world, privateView ? actor : null);
       tasks = {};
     } else if (index) {
       const part = index.segments.find((p) => p.start <= at && p.end >= at);
       if (!part) throw new Error('Missing indexed segment.');
-      let loading = cache.get(part.path);
-      if (!loading) {
-        status(
-          `Loading saved rounds ${String(part.start)}–${String(part.end)}…`,
-        );
-        // Store the in-flight load before awaiting it: overlapping selections
-        // share bytes and verified progress, without another full reconstruction.
-        loading = (async () => {
-          const source = await asset(part.path);
-          if ((await browserDigest(source)) !== part.sha256)
-            throw new Error('Segment integrity check failed.');
-          const segment = JSON.parse(source) as SceneSegment;
-          if (
-            segment.start !== part.start ||
-            segment.start + segment.rounds.length !== part.end
-          )
-            throw new Error('Replay segment bounds differ from its index.');
-          return { segment, replay: incrementalSceneReplay(segment) };
-        })();
-        cache.set(part.path, loading);
-        if (cache.size > 3) cache.delete(cache.keys().next().value ?? '');
-      }
-      const value = await loading;
-      if (token !== sequence) return;
+      if (!replay) throw new Error('Replay worker is unavailable.');
       status(`Verifying saved state through round ${String(at)}…`);
-      const world = await value.replay.frame(at);
-      if (token !== sequence) return;
+      const value = await replay.seek(
+        {
+          url: new URL(`./experiments/${id}/${part.path}`, location.href).href,
+          part,
+          tick: at,
+        },
+        (verified) => {
+          if (token === sequence)
+            status(
+              `Verifying saved state: ${String(verified)} / ${String(at)} rounds…`,
+            );
+        },
+      );
+      if (token !== sequence || !value) return;
       priorFrame = frame ?? undefined;
-      frame = continuousScene(world, privateView ? actor : null);
-      tasks = value.segment.rounds.find((r) => r.tick === at)?.tasks ?? {};
+      if (!value.world.actors.some((a) => a.id === actor))
+        actor = value.world.actors[0]?.id ?? '';
+      frame = continuousScene(value.world, privateView ? actor : null);
+      tasks = value.tasks;
     }
     if (token !== sequence) return;
     render();
@@ -475,15 +490,16 @@ async function seek(requested: number): Promise<void> {
   }
 }
 function stop(): void {
-  window.clearInterval(timer);
-  timer = undefined;
-  el('play').textContent = 'Play';
+  playback.stop();
 }
 async function open(experiment: string): Promise<void> {
   stop();
   const token = ++sequence;
   id = experiment;
-  cache.clear();
+  replay?.dispose();
+  replay = undefined;
+  cancelAnimationFrame(animation);
+  priorFrame = undefined;
   legacy = null;
   index = null;
   actor = 'lin';
@@ -496,6 +512,11 @@ async function open(experiment: string): Promise<void> {
     if (token !== sequence) return;
     if (data.version === 7) {
       index = data as SceneIndex;
+      replay = new ReplayClient(
+        new Worker(new URL('./replay-worker.ts', import.meta.url), {
+          type: 'module',
+        }),
+      );
       maximum = index.observed;
       camera = { x: 0, y: 0, size: 24 };
     } else {
@@ -529,7 +550,7 @@ select('archive').addEventListener('change', () => {
 });
 select('actor').addEventListener('change', () => {
   actor = select('actor').value;
-  void seek(tick);
+  perspective();
 });
 slider.addEventListener('input', () => {
   stop();
@@ -544,14 +565,8 @@ el('next').addEventListener('click', () => {
   void seek(tick + 1);
 });
 el('play').addEventListener('click', () => {
-  if (timer) stop();
-  else {
-    el('play').textContent = 'Pause';
-    timer = window.setInterval(() => {
-      if (tick >= maximum) stop();
-      else void seek(tick + 1);
-    }, 900);
-  }
+  if (playback.playing) stop();
+  else playback.start();
 });
 for (const [key, value] of [
   ['global', false],
@@ -561,7 +576,7 @@ for (const [key, value] of [
     privateView = value;
     el('private').setAttribute('aria-pressed', String(value));
     el('global').setAttribute('aria-pressed', String(!value));
-    void seek(tick);
+    perspective();
   });
 el('follow').addEventListener('click', () => {
   follow = !follow;

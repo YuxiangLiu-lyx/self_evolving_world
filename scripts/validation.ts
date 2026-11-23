@@ -33,6 +33,7 @@ export const REVIEW_SCENES = [
   'historical-unmeasured-vitals',
   'isolated-continuous-extension',
   'continuous-initial-world-fixture',
+  'continuous-responsive-collective',
   'isolated-collective-ash-members',
   'isolated-collective-birch-member',
   'paid-food-work',

@@ -56,3 +56,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-25](completed/pr-25-collective-life.md): eighteen-member collective life, private knowledge and bounded ex11/ex12 observations with preserved budget pauses.
 
 - [PR-26](completed/pr-26-incremental-observatory-replay.md): incremental verified viewer prefixes and post-merge large-archive loading repair.
+
+- [PR-28](completed/pr-28-responsive-replay.md): measured replay responsiveness, worker verification and reduced forest rendering work.
