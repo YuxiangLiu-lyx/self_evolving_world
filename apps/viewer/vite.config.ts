@@ -13,6 +13,7 @@ export default defineConfig(() => {
       rolldownOptions: {
         input: {
           main: resolve(import.meta.dirname, 'index.html'),
+          ashen: resolve(import.meta.dirname, 'ashen.html'),
           classic: resolve(import.meta.dirname, 'classic.html'),
           observatory: resolve(import.meta.dirname, 'observatory.html'),
           forestLab: resolve(import.meta.dirname, 'forest-lab.html'),

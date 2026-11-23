@@ -301,3 +301,15 @@ The B-only `collective-tool-assessment` module reuses the unchanged pure
 personal tool-only records, while generic contact representation runs on a copy
 and cannot mutate material. The viewer separates provenance-backed hardness from
 experimental evidence and renders only a brief inspection indicator.
+
+## EX9 presentation preview
+
+`apps/viewer/ashen.html` loads the isolated `src/presentation/ex9` Canvas view.
+It shares the existing replay worker and pure continuous geometry queries, but
+has no simulation, capability installation, inference or archive-write path.
+Camera controls and conservative adjacent-frame interpolation operate on verified
+snapshots only. The original observatory accepts optional round/actor URL
+parameters for the return link. Ashen asset provenance, actual event bookmarks
+and separate presentation evidence are described in the
+[presentation guide](docs/presentation/ex9/README.md) and
+[ADR 0025](docs/decisions/0025-ex9-presentation.md).

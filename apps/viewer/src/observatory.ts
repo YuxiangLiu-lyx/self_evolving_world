@@ -27,7 +27,7 @@ import './observatory.css';
 
 const root = document.getElementById('observatory');
 if (!root) throw new Error('Missing observatory root.');
-root.innerHTML = `<header class="obs-header"><div class="brand"><div class="brand-mark" aria-hidden="true">♧</div><div><div class="eyebrow">Self-evolving world</div><h1>World Observatory</h1><p>A living record of choices and consequences</p></div></div><div class="header-controls"><a id="classic-link" href="./classic.html">Classic inspector ↗</a><select id="archive" aria-label="Saved experiment"></select></div></header><main class="obs-layout"><section class="world-column"><div class="world-toolbar"><div><div class="eyebrow" id="world-label">Loading archive</div><h2 id="world-title">Life, at its own pace</h2></div><div class="mode-controls"><button id="global" aria-pressed="true">Whole world</button><button id="private" aria-pressed="false">Personal view</button></div></div><div class="world-stage"><canvas id="forest-scene" aria-label="Recorded forest canvas" hidden></canvas><svg class="world-canvas" id="scene" role="img" aria-label="Recorded world scene" viewBox="0 0 24 24"></svg><div class="stage-tag" id="stage-tag">READ-ONLY OBSERVATION</div><div class="camera-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="fit">Fit</button><button id="follow" aria-pressed="false">Follow</button><button id="geometry" aria-pressed="false">Geometry</button></div><svg id="minimap" class="minimap" role="img" aria-label="World minimap"></svg><div class="stage-caption" id="spatial-caption">Drag to pan · Scroll to zoom · Select a character</div></div><div class="timeline-card"><div class="playback"><button id="previous" aria-label="Previous round">‹</button><button id="play">Play</button><button id="next" aria-label="Next round">›</button><input id="time" type="range" min="0" max="0" value="0" aria-label="Observation round"/><span class="round-value" id="round">0 / 0</span><button id="compare" aria-pressed="false">Before</button></div><p class="timeline-note" id="timeline-note">Playback reads saved state; it never advances the experiment.</p></div><div class="events-head"><h3>What happened here</h3><span class="badge" id="event-count">0 events</span></div><div class="event-list" id="events"></div></section><aside class="obs-aside"><section class="observer-card"><div class="eyebrow">Individual perspective</div><div class="actor-heading"><h3 id="actor-name">—</h3><select id="actor" aria-label="Observed actor"></select></div><div class="coordinates" id="coordinates"></div><div class="vitals" id="vitals"></div><div class="eyebrow inventory-heading">Carried items</div><div id="carried" class="carried-items"></div></section><section class="observer-card"><div class="eyebrow">Experienced wellbeing</div><h3>How life feels</h3><div class="wellbeing-number" id="happiness">—</div><div class="wellbeing-split"><div id="body-bar" class="wellbeing-body"></div><div id="mind-bar" class="wellbeing-mind"></div></div><div class="small-label" id="happiness-split">Physical comfort + other satisfaction</div><div id="sources"></div></section><section class="observer-card"><div class="eyebrow">Personal continuity</div><h3>Intent & memory</h3><p id="task">No saved task.</p><ul class="memory-list" id="memory"></ul><p id="learning"></p><details><summary>Questions, projects & knowledge</summary><ul class="memory-list" id="projects"></ul><ul class="memory-list" id="knowledge"></ul></details><details><summary>Important experience</summary><ul class="memory-list" id="important"></ul></details><details><summary>Past wildlife sightings</summary><ul class="memory-list" id="sightings"></ul></details><details><summary>Route inspection evidence</summary><p id="route-evidence"></p></details><details><summary>Food assessment evidence</summary><ul class="memory-list" id="assessments"></ul></details><details><summary>Recent experience</summary><ul class="memory-list" id="experiences"></ul></details></section><section class="observer-card"><div class="eyebrow">World state</div><h3 id="object-title">A closer look</h3><p id="object-description">Select a visible object to inspect its actual geometry, state and provenance.</p><pre class="object-state" id="object-state"></pre></section></aside></main><div id="status" class="obs-status" role="status">Loading recorded evidence…</div>`;
+root.innerHTML = `<header class="obs-header"><div class="brand"><div class="brand-mark" aria-hidden="true">♧</div><div><div class="eyebrow">Self-evolving world</div><h1>World Observatory</h1><p>A living record of choices and consequences</p></div></div><div class="header-controls"><a id="ashen-link" href="./ashen.html" lang="zh">Ashen 风格回放（预览） ↗</a><a id="classic-link" href="./classic.html">Classic inspector ↗</a><select id="archive" aria-label="Saved experiment"></select></div></header><main class="obs-layout"><section class="world-column"><div class="world-toolbar"><div><div class="eyebrow" id="world-label">Loading archive</div><h2 id="world-title">Life, at its own pace</h2></div><div class="mode-controls"><button id="global" aria-pressed="true">Whole world</button><button id="private" aria-pressed="false">Personal view</button></div></div><div class="world-stage"><canvas id="forest-scene" aria-label="Recorded forest canvas" hidden></canvas><svg class="world-canvas" id="scene" role="img" aria-label="Recorded world scene" viewBox="0 0 24 24"></svg><div class="stage-tag" id="stage-tag">READ-ONLY OBSERVATION</div><div class="camera-tools"><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button><button id="fit">Fit</button><button id="follow" aria-pressed="false">Follow</button><button id="geometry" aria-pressed="false">Geometry</button></div><svg id="minimap" class="minimap" role="img" aria-label="World minimap"></svg><div class="stage-caption" id="spatial-caption">Drag to pan · Scroll to zoom · Select a character</div></div><div class="timeline-card"><div class="playback"><button id="previous" aria-label="Previous round">‹</button><button id="play">Play</button><button id="next" aria-label="Next round">›</button><input id="time" type="range" min="0" max="0" value="0" aria-label="Observation round"/><span class="round-value" id="round">0 / 0</span><button id="compare" aria-pressed="false">Before</button></div><p class="timeline-note" id="timeline-note">Playback reads saved state; it never advances the experiment.</p></div><div class="events-head"><h3>What happened here</h3><span class="badge" id="event-count">0 events</span></div><div class="event-list" id="events"></div></section><aside class="obs-aside"><section class="observer-card"><div class="eyebrow">Individual perspective</div><div class="actor-heading"><h3 id="actor-name">—</h3><select id="actor" aria-label="Observed actor"></select></div><div class="coordinates" id="coordinates"></div><div class="vitals" id="vitals"></div><div class="eyebrow inventory-heading">Carried items</div><div id="carried" class="carried-items"></div></section><section class="observer-card"><div class="eyebrow">Experienced wellbeing</div><h3>How life feels</h3><div class="wellbeing-number" id="happiness">—</div><div class="wellbeing-split"><div id="body-bar" class="wellbeing-body"></div><div id="mind-bar" class="wellbeing-mind"></div></div><div class="small-label" id="happiness-split">Physical comfort + other satisfaction</div><div id="sources"></div></section><section class="observer-card"><div class="eyebrow">Personal continuity</div><h3>Intent & memory</h3><p id="task">No saved task.</p><ul class="memory-list" id="memory"></ul><p id="learning"></p><details><summary>Questions, projects & knowledge</summary><ul class="memory-list" id="projects"></ul><ul class="memory-list" id="knowledge"></ul></details><details><summary>Important experience</summary><ul class="memory-list" id="important"></ul></details><details><summary>Past wildlife sightings</summary><ul class="memory-list" id="sightings"></ul></details><details><summary>Route inspection evidence</summary><p id="route-evidence"></p></details><details><summary>Food assessment evidence</summary><ul class="memory-list" id="assessments"></ul></details><details><summary>Recent experience</summary><ul class="memory-list" id="experiences"></ul></details></section><section class="observer-card"><div class="eyebrow">World state</div><h3 id="object-title">A closer look</h3><p id="object-description">Select a visible object to inspect its actual geometry, state and provenance.</p><pre class="object-state" id="object-state"></pre></section></aside></main><div id="status" class="obs-status" role="status">Loading recorded evidence…</div>`;
 function el(id: string): HTMLElement {
   const e = document.getElementById(id);
   if (!e) throw new Error(`Missing observatory element: ${id}`);
@@ -492,7 +492,11 @@ async function seek(requested: number): Promise<void> {
 function stop(): void {
   playback.stop();
 }
-async function open(experiment: string): Promise<void> {
+async function open(
+  experiment: string,
+  initialRound = 0,
+  initialActor = 'lin',
+): Promise<void> {
   stop();
   const token = ++sequence;
   id = experiment;
@@ -502,7 +506,7 @@ async function open(experiment: string): Promise<void> {
   priorFrame = undefined;
   legacy = null;
   index = null;
-  actor = 'lin';
+  actor = initialActor;
   compare = false;
   el('compare').setAttribute('aria-pressed', 'false');
   el('compare').textContent = 'Before';
@@ -538,8 +542,15 @@ async function open(experiment: string): Promise<void> {
       : './classic.html';
     const url = new URL(location.href);
     url.searchParams.set('experiment', id);
+    if (url.searchParams.has('round'))
+      url.searchParams.set(
+        'round',
+        String(Math.max(0, Math.min(maximum, Math.trunc(initialRound)))),
+      );
+    if (url.searchParams.has('actor'))
+      url.searchParams.set('actor', initialActor);
     history.replaceState(null, '', url);
-    await seek(0);
+    await seek(Math.max(0, Math.min(maximum, Math.trunc(initialRound))));
   } catch (error) {
     if (token !== sequence) return;
     status(error instanceof Error ? error.message : 'Archive failed.', true);
@@ -671,8 +682,15 @@ try {
   const requested =
     new URL(location.href).searchParams.get('experiment') ??
     catalogue.experiments.at(-1)?.id;
-  if (requested) await open(requested);
-  else status('No saved experiment is available.');
+  if (requested) {
+    const query = new URL(location.href).searchParams;
+    const round = Number(query.get('round') ?? 0);
+    await open(
+      requested,
+      Number.isFinite(round) ? round : 0,
+      query.get('actor') ?? 'lin',
+    );
+  } else status('No saved experiment is available.');
 } catch (error) {
   status(error instanceof Error ? error.message : 'Catalogue failed.', true);
 }

@@ -30,7 +30,7 @@ export const GROUP_FILES: Readonly<Record<string, readonly string[]>> = {
   learning: ['learning.spec.ts'],
   evolution: ['evolution.spec.ts'],
   coevolution: ['coevolution.spec.ts'],
-  continuous: ['continuous.spec.ts'],
+  continuous: ['continuous.spec.ts', 'ashen.spec.ts'],
   historical: ['continuous.spec.ts'],
 };
 const allGroups = Object.keys(GROUP_FILES);
