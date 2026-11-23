@@ -1,0 +1,19 @@
+First PR CI: https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/runs/45255088331
+Reviewed head: 7b032704bae9d1cc9e0309edb7a47df4c391be0e
+Browser tests had not started. Selected excerpts from the retained GitHub job log follow.
+
+2026-11-23T20:04:23.9422764Z {"check":"archive-preservation","reason":"Batch compare every historical archive blob and actual file inventory with the base","status":"passed","durationMs":1273}
+2026-11-23T20:04:37.1096942Z {"check":"typecheck","reason":"Code, test, dependency or acceptance-tool changes; unfiltered unit suite","status":"passed","durationMs":13167}
+2026-11-23T20:04:58.4862589Z {"check":"lint","reason":"Code, test, dependency or acceptance-tool changes; unfiltered unit suite","status":"passed","durationMs":21376}
+2026-11-23T20:05:13.0012994Z {"check":"format:check","reason":"Code, test, dependency or acceptance-tool changes; unfiltered unit suite","status":"passed","durationMs":14513}
+2026-11-23T20:05:14.6319537Z {"check":"architecture:check","reason":"Code, test, dependency or acceptance-tool changes; unfiltered unit suite","status":"passed","durationMs":1627}
+2026-11-23T20:07:26.2239324Z [2m      Tests [22m [1m[32m907 passed[39m[22m[90m (907)[39m
+2026-11-23T20:07:26.2876204Z {"check":"test","reason":"Code, test, dependency or acceptance-tool changes; unfiltered unit suite","status":"passed","durationMs":131655}
+2026-11-23T20:10:53.9839731Z {"check":"analysis","reason":"Check companion identities, artifact bindings and prose pairs without replaying worlds","status":"passed","durationMs":1627}
+2026-11-23T20:11:04.6925056Z {"check":"build","reason":"Compile selected delivery and public assets; integrity reads never reconstruct archives","status":"passed","durationMs":10709}
+2026-11-23T20:11:05.4594263Z {"check":"demo:check","reason":"Check compiled CLI behavior","status":"passed","durationMs":763}
+2026-11-23T20:11:10.7053522Z /home/runner/work/self_evolving_world/self_evolving_world/node_modules/.pnpm/playwright-core@1.65.0/node_modules/playwright-core/lib/coreBundle.js:10459
+2026-11-23T20:11:10.7057019Z RangeError: Invalid string length
+2026-11-23T20:11:10.7057924Z     at Socket.<anonymous> (/home/runner/work/self_evolving_world/self_evolving_world/node_modules/.pnpm/playwright-core@1.65.0/node_modules/playwright-core/lib/coreBundle.js:10459:56)
+2026-11-23T20:11:10.7060121Z Node.js v24.22.2
+2026-11-23T20:11:10.7658404Z Selected check failed: exec

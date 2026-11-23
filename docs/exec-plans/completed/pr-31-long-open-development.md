@@ -116,3 +116,27 @@ screenshots are retained in the [presentation evidence](../../presentation/ex13/
 Published story JSON is explicitly included in impact selection and browser fingerprints;
 prose, screenshots and recordings remain documentation. A regression verifies that story
 changes invalidate browser evidence while review media do not. Neither fix resumes inference.
+
+## Remote acceptance boundary
+
+Implementation, the fixed-budget observation and local acceptance are complete.
+This completed implementation plan retains pending delivery gates at the reviewed
+commit boundary; the coordinator's independently verified receipt establishes
+remote completion. The first PR CI passed all 907 unit tests, archive reconstruction
+and build, then failed before browser startup. Playwright automatically buffered
+the entire archive-sized Git diff before truncating its optional report attachment,
+causing `RangeError: Invalid string length`. The [retained failure excerpts](../evidence/pr-31-long-open-development/ci-startup-failure.txt)
+identify that run. Browser configuration now retains commit metadata and disables
+only the duplicate raw diff attachment. The complete harness diff review, archive
+hashes, screenshot provenance, assertions and deadlines remain enforced. The [local startup probe](../evidence/pr-31-long-open-development/ci-metadata-startup.json)
+passed with the actual PR base and retained commit metadata, without invoking
+`git diff`; all selected browser checks
+are rerun for the changed configuration, and fresh current-head CI remains required.
+No simulation source, policy, archive or model call changes in this repair.
+
+A subsequent local browser run retained 79 passes and six timeouts after the host
+slept for 928 seconds; two failed traces contain matching approximately 926-second
+gaps. The [power-log and trace evidence](../evidence/pr-31-long-open-development/local-sleep-interruption.txt)
+distinguishes this environmental interruption from the CI metadata fault. The
+interrupted run remains failed. Revalidation uses temporary idle-sleep prevention
+with the same assertions, timeouts and experiment state.

@@ -40,5 +40,5 @@ A full catalogue in every response, automatic history inheritance, a second serv
 and unbounded retry loops were rejected. This is a joint exploratory protocol,
 not evidence isolating the causal effect of any one mechanism.
 
-See [protocol](../LONG_DEVELOPMENT.md), [plan](../exec-plans/active/pr-31-long-open-development.md)
+See [protocol](../LONG_DEVELOPMENT.md), [plan](../exec-plans/completed/pr-31-long-open-development.md)
 and [regressions](../../apps/simulator/test/long-development.test.ts).

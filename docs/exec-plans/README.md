@@ -63,4 +63,4 @@ Plans must distinguish intended validation from actual passing results. Explain 
 
 - [PR-30](completed/pr-30-ex9-continuous-presentation.md): continuous ex9 game-view playback, verified lookahead, damped camera and measured motion acceptance.
 
-- Active: [Long open development with bounded context](active/pr-31-long-open-development.md).
+- [PR-31: Long open development with bounded context](completed/pr-31-long-open-development.md).

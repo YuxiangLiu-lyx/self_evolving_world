@@ -1,0 +1,7 @@
+Local validation a8c8b3e7-8a16-4a32-b7f1-7241168f42b2: 907 units passed; browser result 79 passed / 6 timed out.
+System power log excerpts:
+2026-11-23 15:16:03 -0500 Sleep               	Entering Sleep state due to 'Sleep Service Back to Sleep':TCPKeepAlive=active Using AC (Charge:100%) 928 secs  
+2026-11-23 15:31:31 -0500 DarkWake            	DarkWake from Deep Idle [CDNPB] : due to NUB.SPMI0Sw3IRQ nub-spmi0.0x02 nub-spmi-a0.0x3F rtc/SleepService Using AC (Charge:100%)           
+
+Actual trace gaps: EX9 observatory 925977 ms; EX9 Ashen milestone case 925902 ms.
+The interrupted run remains failed. Retry uses temporary caffeinate -is with unchanged assertions and deadlines.
