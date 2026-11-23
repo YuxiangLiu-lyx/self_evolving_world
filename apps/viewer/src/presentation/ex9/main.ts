@@ -6,6 +6,7 @@ import { ReplayClient } from '../../replay-client.js';
 import { svgText as escape } from '../../continuous-visuals.js';
 import { loadArt } from './assets.js';
 import { BOOKMARKS } from './bookmarks.js';
+import { FrameBuffer, PlaybackClock } from './playback.js';
 import { ForestRenderer } from './renderer.js';
 import {
   actionEvents,
@@ -19,21 +20,23 @@ import type { Person } from './model.js';
 
 const root = document.querySelector<HTMLDivElement>('#presentation');
 if (!root) throw new Error('Missing presentation root.');
-root.innerHTML = `<header class="masthead"><a class="wordmark" href="./">SELF / EVOLVING WORLD</a><span class="preview-label" lang="zh">Ashen 风格回放（预览）</span><a id="original" href="./?experiment=ex9">Original replay ↗</a></header>
-<main><div class="intro"><div><p class="eyebrow" lang="zh">EX9 · 真实实验回放 · 视觉增强</p><h1>Three lives in a changing forest.</h1></div><p class="intro-note">A real experiment, seen closer.<br>Saved actions. No new simulation.</p></div>
-<div class="layout"><section class="theater" aria-label="Presentation replay"><div class="stage-head"><div class="people" role="group" aria-label="Follow a character">${Object.entries(
+root.innerHTML = `<main class="game" aria-label="EX9 enhanced replay"><canvas id="forest" aria-label="Enhanced recorded forest" tabindex="0"></canvas>
+<header class="masthead glass"><a class="wordmark" href="./">SELF / EVOLVING WORLD</a><span class="preview-label" lang="zh">Ashen 风格回放（预览）</span><span class="provenance" lang="zh">EX9 · 真实实验回放 · 视觉增强</span><a id="original" href="./?experiment=ex9">Original replay ↗</a><button id="fullscreen">Fullscreen</button></header>
+<section class="character-hud glass" aria-label="Character HUD"><div class="people" role="group" aria-label="Follow a character">${Object.entries(
   PEOPLE,
 )
   .map(
     ([id, color]) =>
       `<button data-person="${id}" style="--person:${color}" aria-pressed="${String(id === 'lin')}">${String(id[0]?.toUpperCase())}${id.slice(1)}</button>`,
   )
-  .join('')}</div><span id="weather"></span></div>
-<div class="stage"><canvas id="forest" aria-label="Enhanced recorded forest" tabindex="0"></canvas><div class="stage-legend"><span class="live-dot"></span> RECORDED WORLD <span id="space"></span></div><div class="camera-tools"><button id="follow" aria-pressed="true">Follow</button><button id="overview">Full map</button><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button></div><canvas id="minimap" width="192" height="144" aria-label="Click to position the camera" tabindex="0"></canvas><span class="gesture-note">Drag to pan · Scroll to zoom · Click a person</span><div id="loading" role="status">Opening verified ex9 records…</div></div>
-<div class="transport"><button id="previous" aria-label="Previous round">‹</button><button id="play">Play</button><button id="next" aria-label="Next round">›</button><span id="round">— / 1200</span><select id="speed" aria-label="Playback speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></div><input id="timeline" type="range" min="0" max="1200" value="79" aria-label="Replay round"/><div class="timeline-labels"><span>0</span><span>One recorded round at a time</span><span>1200</span></div>
-<div class="chapter"><span class="eyebrow" id="chapter-number">FIELD NOTES</span><h2 id="chapter-title">A shared shelter</h2><p id="chapter-copy"></p></div><div class="bookmarks" aria-label="Event bookmarks">${BOOKMARKS.map((b) => `<button data-tick="${String(b.tick)}"><span>${String(b.tick).padStart(3, '0')}</span>${escape(b.title)}</button>`).join('')}</div></section>
-<aside><section class="person-card"><p class="eyebrow">INDIVIDUAL PERSPECTIVE</p><h2 id="person-name">Lin</h2><p id="location"></p><div id="vitals"></div><p class="eyebrow activity-heading">RECORDED ACTION</p><h3 id="action">—</h3><p id="action-copy"></p><div id="progress"></div><div id="equipment"></div></section><section class="event-card"><p class="eyebrow">EVIDENCE AT THIS ROUND</p><div id="events"></div></section><details class="record-details"><summary>Inventory, learning & source</summary><div id="details"></div></details><p class="footnote">Illustrated appearance; authoritative positions, quantities and results. Fire and rain canopy were never built or used in ex9.</p></aside></div>
-<footer>Visual assets adapted from <a href="https://github.com/YuxiangLiu-lyx/Ashen">Ashen</a> · <a href="./presentation/ex9/assets/provenance.json">Asset provenance</a> · <a href="./experiments/ex9/replay.json">Original replay index</a><span>Presentation lighting keeps recorded night scenes readable.</span></footer></main>`;
+  .join(
+    '',
+  )}</div><div class="brief"><strong id="person-name">Lin</strong><span id="brief-vitals"></span></div><h3 id="action">—</h3><div id="progress"></div><div id="equipment"></div><button id="evidence-toggle" aria-expanded="false" aria-controls="evidence">State & evidence</button></section>
+<div class="camera-tools glass"><button id="follow" aria-pressed="true">Follow</button><button id="overview">Full map</button><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button></div>
+<div class="map-hud"><span id="weather"></span><canvas id="minimap" width="192" height="144" aria-label="Click to position the camera" tabindex="0"></canvas></div>
+<section class="playback-hud glass" aria-label="Playback controls"><div class="transport"><button id="previous" aria-label="Previous round">‹</button><button id="play">Play</button><button id="next" aria-label="Next round">›</button><span id="round">— / 1200</span><select id="speed" aria-label="Playback speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select><button id="bookmarks-toggle" aria-expanded="false" aria-controls="bookmarks-panel">Milestones</button></div><input id="timeline" type="range" min="0" max="1200" value="79" aria-label="Replay round"/><div class="timeline-labels"><span id="phase">Saved boundary</span><span class="gesture-note">Drag to pan · Scroll to zoom · Click a person</span></div></section>
+<section id="bookmarks-panel" class="drawer glass" hidden aria-label="Event bookmarks"><button class="close" data-close="bookmarks-panel" aria-label="Close milestones">×</button><div class="chapter"><span class="eyebrow" id="chapter-number">FIELD NOTES</span><h2 id="chapter-title">A shared shelter</h2><p id="chapter-copy"></p></div><div class="bookmarks">${BOOKMARKS.map((b) => `<button data-tick="${String(b.tick)}"><span>${String(b.tick).padStart(3, '0')}</span>${escape(b.title)}</button>`).join('')}</div></section>
+<aside id="evidence" class="drawer glass" hidden aria-label="Recorded evidence"><button class="close" data-close="evidence" aria-label="Close evidence">×</button><p class="eyebrow">LAST VERIFIED BOUNDARY</p><p id="location"></p><span id="space"></span><div id="vitals"></div><p id="action-copy"></p><section class="event-card"><p class="eyebrow">EVIDENCE AT THIS ROUND</p><div id="events"></div></section><details class="record-details"><summary>Inventory, learning & source</summary><div id="details"></div></details><p class="footnote">Illustrated appearance; authoritative positions, quantities and results. Fire and rain canopy were never built or used in ex9. Animation never runs the world.</p><footer>Art adapted from <a href="https://github.com/YuxiangLiu-lyx/Ashen">Ashen</a> · <a href="./presentation/ex9/assets/provenance.json">Asset provenance</a> · <a href="./experiments/ex9/replay.json">Replay index</a></footer></aside><div id="loading" role="status">Opening verified ex9 records…</div><div id="cut" aria-hidden="true"></div></main>`;
 function el(id: string): HTMLElement {
   const element = document.getElementById(id);
   if (!element) throw new Error(`Missing ${id}.`);
@@ -46,33 +49,45 @@ let renderer: ForestRenderer | undefined,
   index: SceneIndex | undefined,
   world: V7World | undefined,
   person: Person = 'lin',
-  playing = false,
-  timer: ReturnType<typeof setTimeout> | undefined,
+  clock: PlaybackClock | undefined,
+  buffer: FrameBuffer | undefined,
   sequence = 0,
-  busy = false;
+  busy = false,
+  animation = 0,
+  lastFrame = 0,
+  redrawUntil = 0;
+const trace = new URL(location.href).searchParams.get('trace') === '1';
+function wake(): void {
+  redrawUntil = performance.now() + 1800;
+}
+function cut(): void {
+  el('cut')
+    .getAnimations()
+    .forEach((a) => {
+      a.cancel();
+    });
+  el('cut').animate([{ opacity: 0.65 }, { opacity: 0 }], { duration: 180 });
+  wake();
+}
 const client = new ReplayClient(
   new Worker(new URL('../../replay-worker.ts', import.meta.url), {
     type: 'module',
   }),
 );
 function stop(): void {
-  playing = false;
-  clearTimeout(timer);
+  if (clock) clock.playing = false;
   el('play').textContent = 'Play';
+  wake();
 }
 function follow(value: boolean): void {
-  if (renderer) {
-    renderer.follow = value;
-    renderer.draw();
-  }
+  if (renderer) renderer.follow = value;
   el('follow').setAttribute('aria-pressed', String(value));
+  wake();
 }
 function selectPerson(id: Person): void {
   person = id;
-  if (renderer) {
-    renderer.selected = id;
-    follow(true);
-  }
+  if (renderer?.select(id)) cut();
+  follow(true);
   update();
 }
 function update(): void {
@@ -93,6 +108,8 @@ function update(): void {
   (el('original') as HTMLAnchorElement).href =
     `./?experiment=ex9&round=${String(world.tick)}&actor=${person}`;
   el('person-name').textContent = actor.name;
+  el('brief-vitals').textContent =
+    `Health ${actor.vitals.health.toFixed(0)} · Energy ${actor.vitals.energy.toFixed(0)}`;
   el('location').textContent =
     `${inside ? `Inside ${inside.name}` : 'Outdoors'} · (${actor.position.x.toFixed(2)}, ${actor.position.y.toFixed(2)})`;
   el('weather').textContent =
@@ -155,31 +172,21 @@ function update(): void {
   root?.setAttribute('data-tick', String(world.tick));
   root?.setAttribute('data-actor', person);
 }
-async function seek(tick: number, animate = false): Promise<void> {
-  if (!index || !renderer) return;
+async function seek(tick: number): Promise<void> {
+  if (!index || !renderer || !buffer || !clock) return;
   const token = ++sequence;
   busy = true;
   tick = Math.max(0, Math.min(index.observed, Math.trunc(tick)));
-  const part = index.segments.find((s) => tick >= s.start && tick <= s.end);
-  if (!part) throw new Error('Round is outside the retained index.');
   el('loading').hidden = false;
-  el('loading').textContent = `Reading round ${String(tick)}…`;
+  el('loading').textContent = `Verifying saved round ${String(tick)}…`;
   try {
-    const response = await client.seek(
-      {
-        url: new URL(`./experiments/ex9/${part.path}`, location.href).href,
-        part,
-        tick,
-      },
-      (n) => {
-        el('loading').textContent =
-          `Verifying saved round ${String(n)} → ${String(tick)}…`;
-      },
-    );
-    if (!response || token !== sequence) return;
-    world = response.world;
-    renderer.setWorld(world, animate);
+    const loaded = await buffer.seek(tick);
+    if (!loaded || token !== sequence) return;
+    world = loaded;
+    clock.seek(tick);
+    renderer.setWorld(world, buffer.frames.get(tick + 1), true);
     update();
+    cut();
     el('loading').hidden = true;
   } catch (error) {
     if (token === sequence) {
@@ -191,45 +198,80 @@ async function seek(tick: number, animate = false): Promise<void> {
     if (token === sequence) busy = false;
   }
 }
-function schedule(): void {
-  clearTimeout(timer);
-  if (!playing) return;
-  timer = setTimeout(
-    () => {
-      void advance();
-    },
-    900 / Number((el('speed') as HTMLSelectElement).value),
-  );
-}
-async function advance(): Promise<void> {
-  if (!playing || !world || !index) return;
-  if (busy) {
-    schedule();
-    return;
+function frame(now: number): void {
+  const gap = lastFrame ? now - lastFrame : 0;
+  lastFrame = now;
+  // A suspended tab does not accumulate presentation debt or skip visible motion.
+  const dt = document.hidden || gap > 250 ? 0 : gap;
+  if (clock && buffer && renderer && world && !busy) {
+    if (buffer.error) {
+      stop();
+      el('loading').hidden = false;
+      el('loading').textContent =
+        `Replay verification stopped: ${buffer.error.message}`;
+    } else {
+      clock.advance(dt, (tick) => buffer?.frames.has(tick) ?? false);
+      const saved = buffer.frames.get(clock.tick);
+      if (saved && saved !== world) {
+        world = saved;
+        update();
+        wake();
+      }
+      buffer.prefetch(clock.tick);
+      el('loading').hidden = !clock.buffering;
+      if (clock.buffering)
+        el('loading').textContent =
+          'Buffering verified records — presentation time paused';
+    }
+    el('play').textContent = clock.playing ? 'Pause' : 'Play';
+    el('phase').textContent =
+      clock.fraction > 0
+        ? `${clock.playing ? 'Playing' : 'Paused'} ${String(clock.tick)} → ${String(clock.tick + 1)} · ${String(Math.floor(clock.fraction * 100))}%`
+        : 'Exact saved boundary';
+    renderer.setWorld(world, buffer.frames.get(clock.tick + 1));
+    if (clock.playing || now < redrawUntil) {
+      renderer.render(
+        clock.fraction,
+        clock.time,
+        clock.buffering ? 0 : (dt / 1000) * (clock.playing ? clock.speed : 1),
+        clock.playing || clock.fraction > 0,
+      );
+      if (trace)
+        window.dispatchEvent(
+          new CustomEvent('ashen-frame', {
+            detail: {
+              now,
+              tick: clock.tick,
+              fraction: clock.fraction,
+              speed: clock.speed,
+              playing: clock.playing,
+              buffering: clock.buffering,
+              ...renderer.snapshot(),
+            },
+          }),
+        );
+    }
   }
-  if (world.tick >= index.observed) {
-    stop();
-    return;
-  }
-  await seek(world.tick + 1, true);
-  schedule();
+  animation = requestAnimationFrame(frame);
 }
 el('play').addEventListener('click', () => {
-  if (playing) stop();
+  if (!clock || busy || buffer?.error) return;
+  if (clock.playing) stop();
   else {
-    playing = true;
-    el('play').textContent = 'Pause';
-    schedule();
+    clock.playing = true;
+    wake();
   }
 });
-el('speed').addEventListener('change', schedule);
+el('speed').addEventListener('change', () => {
+  if (clock) clock.speed = Number((el('speed') as HTMLSelectElement).value);
+});
 for (const [id, delta] of [
   ['previous', -1],
   ['next', 1],
 ] as const)
   el(id).addEventListener('click', () => {
     stop();
-    void seek((world?.tick ?? 0) + delta, true);
+    void seek((world?.tick ?? 0) + delta);
   });
 slider.addEventListener('input', () => {
   stop();
@@ -241,7 +283,7 @@ document.querySelectorAll<HTMLButtonElement>('[data-tick]').forEach((b) => {
     const bookmark = BOOKMARKS.find((v) => v.tick === Number(b.dataset.tick));
     if (bookmark) {
       selectPerson(bookmark.actor);
-      if (renderer) renderer.camera.span = 16;
+      if (renderer) renderer.rig.span = 18;
       void seek(bookmark.tick);
     }
   });
@@ -257,7 +299,7 @@ el('follow').addEventListener('click', () => {
 el('overview').addEventListener('click', () => {
   if (!renderer || !world) return;
   follow(false);
-  renderer.camera = {
+  Object.assign(renderer.camera, {
     x: world.config.width / 2,
     y: world.config.height / 2,
     span: Math.max(
@@ -266,16 +308,14 @@ el('overview').addEventListener('click', () => {
         0.78 +
         3,
     ),
-  };
-  renderer.draw();
+  });
+  renderer.rig.span = renderer.camera.span;
+  cut();
 });
 function zoom(factor: number): void {
   if (!renderer) return;
-  renderer.camera.span = Math.max(
-    7,
-    Math.min(64, renderer.camera.span * factor),
-  );
-  renderer.draw();
+  renderer.rig.span = Math.max(7, Math.min(64, renderer.rig.span * factor));
+  wake();
 }
 el('zoom-in').addEventListener('click', () => {
   zoom(0.8);
@@ -333,12 +373,14 @@ canvas.addEventListener('pointercancel', () => {
 mini.addEventListener('click', (e) => {
   if (!renderer || !world) return;
   const r = mini.getBoundingClientRect();
-  renderer.camera = {
+  Object.assign(renderer.camera, {
     x: ((e.clientX - r.left) / r.width) * world.config.width,
     y: ((e.clientY - r.top) / r.height) * world.config.height,
-    span: 16,
-  };
+    span: 18,
+  });
+  renderer.rig.span = renderer.camera.span;
   follow(false);
+  cut();
 });
 canvas.addEventListener('keydown', (e) => {
   if (!renderer) return;
@@ -357,11 +399,43 @@ canvas.addEventListener('keydown', (e) => {
   } else if (e.key === '+' || e.key === '=') zoom(0.8);
   else if (e.key === '-') zoom(1.25);
 });
-const resize = new ResizeObserver(() => renderer?.draw());
+for (const [button, panel] of [
+  ['evidence-toggle', 'evidence'],
+  ['bookmarks-toggle', 'bookmarks-panel'],
+] as const) {
+  const toggle = () => {
+    el(panel).hidden = !el(panel).hidden;
+    el(button).setAttribute('aria-expanded', String(!el(panel).hidden));
+  };
+  el(button).addEventListener('click', toggle);
+  document
+    .querySelector(`[data-close="${panel}"]`)
+    ?.addEventListener('click', toggle);
+}
+el('fullscreen').addEventListener('click', () => {
+  const action = document.fullscreenElement
+    ? document.exitFullscreen()
+    : root.requestFullscreen();
+  void action.catch(() => {
+    el('fullscreen').textContent = 'Fullscreen unavailable';
+  });
+});
+document.addEventListener('fullscreenchange', () => {
+  el('fullscreen').textContent = document.fullscreenElement
+    ? 'Exit fullscreen'
+    : 'Fullscreen';
+  wake();
+});
+document.addEventListener('visibilitychange', () => {
+  lastFrame = 0;
+  wake();
+});
+const resize = new ResizeObserver(wake);
 resize.observe(canvas);
 window.addEventListener('pagehide', () => {
   stop();
-  renderer?.dispose();
+  cancelAnimationFrame(animation);
+  buffer?.dispose();
   client.dispose();
   resize.disconnect();
 });
@@ -381,9 +455,27 @@ try {
   index = loaded;
   slider.max = String(index.observed);
   renderer = new ForestRenderer(canvas, mini, art);
+  clock = new PlaybackClock(index.observed);
+  buffer = new FrameBuffer(index.observed, async (tick) => {
+    const part = index?.segments.find((s) => tick >= s.start && tick <= s.end);
+    if (!part) throw new Error('Round is outside the retained index.');
+    return (
+      (
+        await client.seek(
+          {
+            url: new URL(`./experiments/ex9/${part.path}`, location.href).href,
+            part,
+            tick,
+          },
+          () => undefined,
+        )
+      )?.world ?? null
+    );
+  });
+  animation = requestAnimationFrame(frame);
   const query = new URL(location.href).searchParams,
     requested = query.get('actor');
-  if (requested && requested in PEOPLE) {
+  if (requested && Object.hasOwn(PEOPLE, requested)) {
     person = requested as Person;
     renderer.selected = person;
   }
