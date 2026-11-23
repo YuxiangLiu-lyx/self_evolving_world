@@ -1,0 +1,58 @@
+CI workload deadline: https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/runs/45265693638
+Head: f2d67745ec74625de89dc3b61eab64daa208ff68
+This run is cancelled, not passed. All reported assertions passed before the outer 15-minute deadline; remaining cases did not finish.
+Selected actual log excerpts:
+
+2026-11-23T21:04:41.7714883Z {"check":"archive-preservation","reason":"Batch compare every historical archive blob and actual file inventory with the base","status":"passed","durationMs":2955}
+2026-11-23T21:05:02.1973101Z {"check":"typecheck","reason":"Code, test, dependency or acceptance-tool changes; unfiltered unit suite","status":"passed","durationMs":20427}
+2026-11-23T21:05:33.4398240Z {"check":"lint","reason":"Code, test, dependency or acceptance-tool changes; unfiltered unit suite","status":"passed","durationMs":31238}
+2026-11-23T21:05:54.1435796Z {"check":"format:check","reason":"Code, test, dependency or acceptance-tool changes; unfiltered unit suite","status":"passed","durationMs":20703}
+2026-11-23T21:05:56.6924690Z {"check":"architecture:check","reason":"Code, test, dependency or acceptance-tool changes; unfiltered unit suite","status":"passed","durationMs":2548}
+2026-11-23T21:09:11.4061561Z {"check":"test","reason":"Code, test, dependency or acceptance-tool changes; unfiltered unit suite","status":"passed","durationMs":194712}
+2026-11-23T21:10:46.1797221Z {"id":"experiment:ex13","input":"f3cf5d9b15f7bf6c4074b532e772e2aa559f730da2788c877d8d5fa7d7098b38","status":"passed","durationMs":91423.88251099999,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:10:57.4148839Z {"id":"experiment:ex11","input":"2c8c29433d692f66f2d44997ad737fdbaab5542130223bf878187d9496641a37","status":"passed","durationMs":9053.407852999999,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:11:41.7064843Z {"id":"experiment:ex10","input":"0c1744c6436ae1a6454e0d6b53eab8c9701f2bfac3c3b3ac590c44b8c4b71086","status":"passed","durationMs":42121.24504,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:11:45.9060715Z {"id":"experiment:ex12","input":"f7407d5c4eab80e5ea4ebe679d02ea5fe51a106b504bf203d4fd975f0e7d58f7","status":"passed","durationMs":151656.766804,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:12:53.8715761Z {"id":"experiment:ex8","input":"10857c1ea07ba13c1c4712ecbb5f3512b25add3d4bb19ca4b7120ee358f1ba3f","status":"passed","durationMs":65718.605144,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:13:11.6814646Z {"id":"experiment:ex7","input":"e87c53d71a8110813a3e9b72a3e3dfed87990a8c963acda3cf8bd872e938d8f5","status":"passed","durationMs":15944.430219999998,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:13:20.8993818Z {"id":"experiment:ex6","input":"3dd58735f2d044de4606dd602cfea782f5bf92f2507c47dd0fb3c010e3a30f3d","status":"passed","durationMs":7024.636116000001,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:13:25.4117782Z {"id":"experiment:ex5","input":"6967f231ee4a9a61351a917c7ca812b78d33744ef3c753b022a02ee38a45fa55","status":"passed","durationMs":2586.1099139999997,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:13:27.4257740Z {"id":"experiment:ex4","input":"e52814e5472e62fe6442f71d2923dab7966f6949ea865b0c5aae3c395e15f57d","status":"passed","durationMs":145.88704099999995,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:13:29.3580728Z {"id":"experiment:ex3","input":"952f90903fca499bef290277ca9f8d277c2425ff6569e11f04a2b1c01189538c","status":"passed","durationMs":96.03038100000003,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:13:31.2897801Z {"id":"experiment:ex2","input":"28edd2cec55015827da3694b133a26095bbc9a3d7a7e4a21c2b591fd000656f1","status":"passed","durationMs":96.64267199999995,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:13:33.2102642Z {"id":"experiment:ex1","input":"d6739461e6388cefa023be352efccbaab99874ea0427da9f56228e8fcc612e03","status":"passed","durationMs":103.1660240000001,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:14:14.3864200Z {"id":"experiment:ex9","input":"1e6d6ddbc4971e4e76b6ee7eedaecfbe86f9ee5c256d983ec24c3cb5f330ae63","status":"passed","durationMs":149662.710384,"deepRebuilds":1,"originRun":"323b8bce-e3e6-4b6e-bef6-cdd0e11f2d33","reason":"Shared or unclassified dependency: scripts/validation.ts"}
+2026-11-23T21:14:16.1501096Z {"check":"analysis","reason":"Check companion identities, artifact bindings and prose pairs without replaying worlds","status":"passed","durationMs":1761}
+2026-11-23T21:14:31.3327175Z {"check":"build","reason":"Compile selected delivery and public assets; integrity reads never reconstruct archives","status":"passed","durationMs":15183}
+2026-11-23T21:14:32.4572395Z {"check":"demo:check","reason":"Check compiled CLI behavior","status":"passed","durationMs":1120}
+2026-11-23T21:14:44.5935348Z Running 85 tests using 2 workers
+2026-11-23T21:14:46.3593577Z   ✓   1 apps/viewer/e2e/anomalies.spec.ts:93:1 › layout validator catches horizontal overflow regressions (944ms)
+2026-11-23T21:14:47.0223420Z   ✓   2 apps/viewer/e2e/anomalies.spec.ts:4:1 › rejects boundary/collision moves, conserves items and never executes a try (1.6s)
+2026-11-23T21:14:54.7404182Z   ✓   4 apps/viewer/e2e/coevolution.spec.ts:11:1 › shows persistent shared facilities, personal projects and actual energy in version-six replay (7.2s)
+2026-11-23T21:14:57.3193640Z   ✓   5 apps/viewer/e2e/collective-bark.spec.ts:3:1 › reviewed branch precursor shows uncertainty, paid separation, conserved output and actual cancellation (2.5s)
+2026-11-23T21:14:59.0829476Z   ✓   6 apps/viewer/e2e/collective-food-inspection.spec.ts:3:1 › reviewed non-ingestive sample opening shows real paid work and explicitly unknown food safety (1.7s)
+2026-11-23T21:15:01.2160225Z   ✓   7 apps/viewer/e2e/collective-inventory.spec.ts:3:1 › recorded personal inventory pages show exact identities and revision changes without reading later holdings (2.1s)
+2026-11-23T21:15:03.8972275Z   ✓   8 apps/viewer/e2e/collective-material-combine.spec.ts:3:1 › reviewed combination and actual downstream reservation retain readable material provenance (2.6s)
+2026-11-23T21:15:06.5133907Z   ✓   9 apps/viewer/e2e/collective-root-surface.spec.ts:3:1 › fractional sheet assessment and real selected-root work retain explicit geometric uncertainty (2.6s)
+2026-11-23T21:15:08.4445312Z   ✓  10 apps/viewer/e2e/collective-roots.spec.ts:3:1 › reviewed root fixture shows paid material work, empty tray, actual drying and reversible rewetting (1.9s)
+2026-11-23T21:15:11.8953371Z   ✓  11 apps/viewer/e2e/collective-small-drying.spec.ts:3:1 › actual small drying surfaces show paid construction, sample exposure, blockers and released materials (3.4s)
+2026-11-23T21:15:14.2333625Z   ✓  12 apps/viewer/e2e/collective-surface-diagnostics.spec.ts:3:1 › dated surface diagnostics distinguish physical failure, unknown detail and historical read (2.3s)
+2026-11-23T21:15:16.9708090Z   ✓  13 apps/viewer/e2e/collective-tool-assessment.spec.ts:3:1 › tool-only provenance and historical results remain distinct from experiments (2.7s)
+2026-11-23T21:15:18.6021967Z   ✓  14 apps/viewer/e2e/collective-tray-clearance.spec.ts:3:1 › tray placement diagnostics show dated clear blocked and unknown geometry (1.6s)
+2026-11-23T21:15:20.4782624Z   ✓  15 apps/viewer/e2e/collective-work.spec.ts:7:1 › reviewed collective fixture shows actual paid work, prepared portions and traversable weather roof (1.9s)
+2026-11-23T21:15:21.8873306Z   ✓  16 apps/viewer/e2e/collective.spec.ts:4:1 › isolated collective view distinguishes eighteen members and their retained individual records (1.4s)
+2026-11-23T21:15:26.2464835Z {"check":"archive-initial-frame","id":"ex13","durationMs":785}
+2026-11-23T21:15:48.7238411Z   ✓  17 apps/viewer/e2e/continuous.spec.ts:66:3 › ex13 verifies segmented continuous evidence in the game observatory (25.3s)
+2026-11-23T21:15:50.7187390Z {"check":"archive-initial-frame","id":"ex12","durationMs":1343}
+2026-11-23T21:15:54.8753090Z {"check":"ashen-milestone-and-original-compatibility","durationMs":68408,"bookmarks":10}
+2026-11-23T21:15:54.9003694Z   ✓   3 apps/viewer/e2e/ashen.spec.ts:34:1 › ex9 presentation binds milestones, clothing, work and interiors to the real archive (1.1m)
+2026-11-23T21:16:14.8197250Z {"check":"ashen-latest-seek-and-camera-controls","durationMs":11231,"round":495}
+2026-11-23T21:16:14.8446386Z   ✓  19 apps/viewer/e2e/ashen.spec.ts:146:1 › presentation controls preserve exact seeks, failures and responsive camera interaction (19.9s)
+2026-11-23T21:16:25.2228270Z   ✓  20 apps/viewer/e2e/ashen.spec.ts:214:1 › presentation is readable and operable on a narrow screen (10.4s)
+2026-11-23T21:17:01.3419204Z   ✓  21 apps/viewer/e2e/ashen.spec.ts:246:1 › continuous clock preserves trajectories, gait, speed changes and segment crossing (36.1s)
+2026-11-23T21:17:19.2134867Z   ✓  22 apps/viewer/e2e/ashen.spec.ts:339:1 › unavailable verified segment freezes the clock without hiding a real failure (17.9s)
+2026-11-23T21:18:07.6593130Z   ✓  18 apps/viewer/e2e/continuous.spec.ts:66:3 › ex12 verifies segmented continuous evidence in the game observatory (2.3m)
+2026-11-23T21:18:09.3886033Z {"check":"archive-initial-frame","id":"ex11","durationMs":1199}
+2026-11-23T21:18:34.7383609Z   ✓  24 apps/viewer/e2e/continuous.spec.ts:66:3 › ex11 verifies segmented continuous evidence in the game observatory (27.0s)
+2026-11-23T21:18:36.5877519Z {"check":"archive-initial-frame","id":"ex10","durationMs":1055}
+2026-11-23T21:18:38.5924997Z ##[error]The operation was canceled.

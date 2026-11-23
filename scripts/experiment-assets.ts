@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
   experimentIds,
@@ -18,6 +18,9 @@ export function experimentAssets(root: string): Map<string, string> {
     // Capture/resume builds must remain possible before a run is complete.
     if (manifest.status === 'running' || manifest.status === 'failed') continue;
     const record = checkExperimentIntegrity(root, id);
+    const story = resolve(root, 'docs/presentation', id, 'story.json');
+    if (existsSync(story))
+      assets.set(`presentation/${id}/story.json`, readFileSync(story, 'utf8'));
     entries.push({ ...record.config, createdAt: record.manifest.createdAt });
     const exposed =
       manifest.version === 7

@@ -1,0 +1,341 @@
+$ pnpm typecheck
+
+> self-evolving-world@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world
+> tsc --noEmit && pnpm --filter @self-evolving-world/world-core typecheck && pnpm --filter @self-evolving-world/viewer exec tsc --noEmit
+
+
+> @self-evolving-world/world-core@0.0.0 typecheck /Users/liuyuxiang/developer/self_evolving_world/packages/world-core
+> tsc -p tsconfig.json --noEmit
+
+
+$ pnpm architecture:check
+
+> self-evolving-world@0.0.0 architecture:check /Users/liuyuxiang/developer/self_evolving_world
+> depcruise --config dependency-cruiser.config.cjs apps packages
+
+
+✔ no dependency violations found (470 modules, 2204 dependencies cruised)
+
+
+$ pnpm test
+
+> self-evolving-world@0.0.0 test /Users/liuyuxiang/developer/self_evolving_world
+> vitest run
+
+
+ RUN  v4.1.12 /Users/liuyuxiang/developer/self_evolving_world
+
+ ✓ apps/simulator/test/collective-life.test.ts (14 tests) 6516ms
+     ✓ uses one slot per group, fairly serves all eighteen members and reconstructs preserved intentions  5271ms
+ ✓ scripts/task-entry.test.ts (14 tests) 7576ms
+     ✓ rejects raw publish-task.ts before credentials, allocation or accepting evidence  852ms
+     ✓ rejects raw finish-task.ts before credentials, allocation or accepting evidence  874ms
+     ✓ rejects raw validate.ts before credentials, allocation or accepting evidence  849ms
+     ✓ rejects raw experiment-cli.ts before credentials, allocation or accepting evidence  825ms
+     ✓ rejects raw survival-cli.ts before credentials, allocation or accepting evidence  832ms
+     ✓ rejects raw learning-cli.ts before credentials, allocation or accepting evidence  827ms
+     ✓ rejects raw evolution-cli.ts before credentials, allocation or accepting evidence  844ms
+     ✓ rejects raw coevolution-cli.ts before credentials, allocation or accepting evidence  835ms
+ ✓ apps/simulator/test/open-woven.test.ts (8 tests) 4843ms
+   ✓ requires real learned tests and fresh local materials, retains paid dry/wet observations and finite water accounting  383ms
+   ✓ builds and calibrates only through all paid stages, conserved comparison pieces and actual geometry  514ms
+   ✓ releases only surviving allocations once, resumes remaining work and salvages consumed components after destruction  426ms
+   ✓ requires personal assay learning before calibration and uses the shared sample contract without granting others mastery  786ms
+   ✓ retains escaped food units and invalidates estimates when real aperture or tare changes  789ms
+   ✓ keeps calibration and sample use unavailable to unlearned actors, then permits paid learning and real shared use  1016ms
+   ✓ does not repeat understanding rewards for known batch tests and preserves conserved material through wet contact  845ms
+ ✓ scripts/finish-task.test.ts (4 tests) 4428ms
+     ✓ completes an explicit local-only task without credentials, publication or a network remote  932ms
+     ✓ requires publication when no local exception plan was supplied and replaces old success with failure  890ms
+     ✓ rejects evidence that has not passed local review and source changes after review  1698ms
+     ✓ does not use the local-only entry point to waive default merge completion  907ms
+ ✓ apps/simulator/test/open-extraction.test.ts (9 tests) 3382ms
+   ✓ requires fresh scope, exact personally studied dependencies and four actual learning rounds  344ms
+   ✓ allocates two actual portions and conserves solids/nutrients/toxins through real leakage, separation and cancellation  400ms
+   ✓ rejects wrong ownership, repeated references, alias ambiguity, absent water and actual overcapacity before payment  350ms
+   ✓ retains one allocation, paid work and real contact time across unpaid pauses and JSON restoration  310ms
+   ✓ keeps installed contact, weather and loss active when an actor leaves, and releases surviving matter once on death  369ms
+   ✓ measures actual residues with uncertainty and refuses a safety certificate or rewards for inconclusive or repeated readings  408ms
+   ✓ balances all physical mass against retained deposits and measured atmospheric exchange, including vessel collapse  658ms
+ ✓ apps/simulator/test/collective-small-drying.test.ts (8 tests) 2850ms
+     ✓ rejects unknown, fragmented, stale, wrong-owner and oversized inputs without inventing sheet or food  698ms
+     ✓ keeps old tray semantics and fresh scopes; the actual applicant still lacks owned bark and cannot receive a free support  723ms
+ ✓ apps/simulator/test/collective-surface-diagnostics.test.ts (6 tests) 2788ms
+     ✓ reports multiple independent failures and unknown dimensions without inventing a connected sheet or hidden evidence  396ms
+     ✓ requires separate learning, exact owned access, paid commitment and preserves isolation of personal reads and public context  776ms
+     ✓ explains the real round-111 request and succeeds at a clear nearby site in an isolated control without editing the archive  961ms
+ ✓ apps/simulator/test/collective-material-combine.test.ts (7 tests) 2372ms
+     ✓ rejects stale, foreign, locked, duplicate and incompatible actual sources before material or energy changes  939ms
+     ✓ preserves exact checkpoint state, rejects use without study, and keeps another experiment registry fresh  411ms
+ ✓ apps/simulator/test/collective-tool-assessment.test.ts (5 tests) 2106ms
+     ✓ uses actual registry hardness without a scratch claim or reward and changes no material  366ms
+     ✓ retains personal dated reads, live damage and unknown hardness without name inference  348ms
+     ✓ requires personal learning, affordable atomic payment and private record ownership  660ms
+     ✓ checks the real round-132 applicant stone without requiring bark or a recipe experiment  515ms
+ ✓ scripts/open-registration.test.ts (2 tests) 2139ms
+   ✓ binds supplementary browser precision to the actual original migration without changing any original round field  908ms
+   ✓ rejects corrupt precision evidence, raw prefix tampering and precision proofs attached to unrelated rounds  1230ms
+ ✓ apps/simulator/test/open-preservation.test.ts (12 tests) 2028ms
+ ✓ apps/simulator/test/forest-input-encoding.test.ts (17 tests) 2032ms
+   ✓ restores every retained round-149 field and literal through the key dictionary, without mutating policy or calls  374ms
+ ✓ scripts/task-runtime.test.ts (14 tests) 1797ms
+ ✓ apps/simulator/test/collective-root-surface.test.ts (5 tests) 1778ms
+     ✓ rejects fines, disconnected or undersized sheets, wrong tools and blocked sites without preparing extra food  758ms
+     ✓ requires separate extension mastery, supports the original interface after study and preserves active legacy operations  376ms
+ ✓ apps/simulator/test/open-water.test.ts (14 tests) 1827ms
+ ✓ apps/simulator/test/collective-observed-failures.test.ts (4 tests) 1688ms
+   ✓ distinguishes the actual ex12 malformed item reference from an alleged owned-inventory lookup defect  790ms
+   ✓ combines the two actual ex12 round-90 bark supplies without retuning the retained world  447ms
+   ✓ assesses the actual fractional bark from the ex12 round-95 request with one mass conversion and no free roots  448ms
+ ✓ scripts/unit-reporter.test.ts (6 tests) 1609ms
+ ✓ apps/simulator/test/collective-tray-clearance.test.ts (5 tests) 1587ms
+     ✓ rejects invalid or unaffordable work before payment, reports independent failures and requires individual learning  550ms
+     ✓ reproduces the real round-127 requester geometry without inventing a historical blocker  548ms
+ ✓ apps/simulator/test/open-short-refuge.test.ts (12 tests) 1584ms
+ ✓ apps/simulator/test/forest-fire.test.ts (8 tests) 1511ms
+     ✓ preserves component mass and kit identity; a finite fire warms another actor and consumes fuel without healing  491ms
+ ✓ apps/simulator/test/open-shelter.test.ts (9 tests) 1445ms
+ ✓ apps/simulator/test/collective-roots.test.ts (8 tests) 1236ms
+ ✓ apps/simulator/test/open-food-assay.test.ts (5 tests) 1194ms
+   ✓ conserves nutrient units and physical sample mass plus evaporated water through genuine passive drying and paid uncertain readings  341ms
+   ✓ preserves actual drying after leaving while stopping unperformed readings and releases a dying performer exactly once  460ms
+ ✓ apps/simulator/test/collective-bark.test.ts (9 tests) 1145ms
+ ✓ apps/simulator/test/forest-canopy.test.ts (7 tests) 1120ms
+ ✓ apps/simulator/test/collective-food-inspection.test.ts (6 tests) 988ms
+     ✓ rejects missing or wrong material, insufficient quantity, changed contact and overlapping bodies without fabricating inputs  411ms
+ ✓ apps/simulator/test/collective-work.test.ts (8 tests) 1026ms
+ ✓ apps/simulator/test/long-planting.test.ts (3 tests) 994ms
+     ✓ persists a completed actual specimen, allows other observers, ages it without food multiplication and labels the observation limit honestly  604ms
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 20/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 40/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 60/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 80/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 100/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+ ✓ apps/simulator/test/evolution-run.test.ts (5 tests) 921ms
+     ✓ pauses development at the same tick, resumes once, and audits every retained private input  866ms
+ ✓ scripts/forest-experience-replay.test.ts (1 test) 903ms
+     ✓ reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events  902ms
+ ✓ apps/simulator/test/open-metrology.test.ts (10 tests) 798ms
+ ✓ apps/simulator/test/forest-willow.test.ts (6 tests) 793ms
+   ✓ qualifies real willow panels and manufactured cord for unchanged mantle and hearth recipe costs  405ms
+ ✓ apps/simulator/test/long-prepared-planting.test.ts (3 tests) 790ms
+ ✓ scripts/continuous-request-audit.test.ts (3 tests) 839ms
+   ✓ reconstructs actual pre/post repair reservations from their source and exact attempt boundary without inference  832ms
+ ✓ apps/simulator/test/forest-insulation.test.ts (7 tests) 754ms
+ ✓ apps/simulator/test/forest-recuperation.test.ts (7 tests) 768ms
+ ✓ apps/simulator/test/open-contact.test.ts (6 tests) 764ms
+ ✓ apps/simulator/test/long-root-assessment.test.ts (3 tests) 778ms
+   ✓ requires study and creator permission, releases work on cancellation/death, and never automatically reburies or duplicates the root  419ms
+ ✓ apps/simulator/test/coevolution.test.ts (5 tests) 664ms
+ ✓ apps/simulator/test/collective-inventory.test.ts (5 tests) 692ms
+ ✓ apps/simulator/test/open-short-diagnostics.test.ts (7 tests) 625ms
+ ✓ apps/simulator/test/long-sol-residue.test.ts (2 tests) 619ms
+   ✓ reuses the same physical function through a separately learned binding without widening the original actor or experiment scope  304ms
+   ✓ keeps partial transfers on cancellation and death, requires exact identity, and refuses invented receivers  314ms
+ ✓ packages/world-core/test/forest-shelter.test.ts (7 tests) 618ms
+     ✓ expires after 160 actual exposure rounds while retaining walls; paid maintenance restores only 160  392ms
+ ✓ apps/simulator/test/long-development.test.ts (8 tests) 597ms
+ ✓ apps/simulator/test/long-moss-diagnostic.test.ts (3 tests) 606ms
+ ✓ apps/simulator/test/long-moss.test.ts (3 tests) 572ms
+ ✓ apps/simulator/test/collective-bark-feedback.test.ts (4 tests) 533ms
+ ✓ scripts/delivery-git.test.ts (4 tests) 563ms
+ ✓ apps/simulator/test/open-shelter-diagnostics.test.ts (6 tests) 517ms
+ ✓ apps/simulator/test/long-residue.test.ts (3 tests) 500ms
+ ✓ scripts/harness.test.ts (4 tests) 531ms
+ ✓ apps/simulator/test/open-hardness.test.ts (7 tests) 468ms
+ ✓ apps/simulator/test/forest-operation-continuity.test.ts (5 tests) 464ms
+ ✓ apps/simulator/test/forest-experience.test.ts (11 tests) 474ms
+ ✓ apps/simulator/test/long-join-assessment.test.ts (2 tests) 464ms
+ ✓ scripts/validation.test.ts (15 tests) 372ms
+ ✓ scripts/continuous-store.test.ts (5 tests) 361ms
+ ✓ apps/simulator/test/open-development.test.ts (9 tests) 320ms
+ ✓ scripts/collective-campaign.test.ts (5 tests) 361ms
+ ✓ apps/simulator/test/long-surface.test.ts (2 tests) 315ms
+ ✓ apps/simulator/test/open-bark.test.ts (5 tests) 310ms
+ ✓ apps/simulator/test/open-food-examination.test.ts (5 tests) 250ms
+ ✓ scripts/task-continuous-repair.test.ts (5 tests) 265ms
+ ✓ apps/simulator/test/long-moss-residue.test.ts (2 tests) 234ms
+ ✓ scripts/coevolution-source.test.ts (4 tests) 230ms
+ ✓ apps/simulator/test/long-site-assessment.test.ts (2 tests) 180ms
+ ✓ apps/simulator/test/continuous.test.ts (6 tests) 197ms
+ ✓ packages/world-core/test/forest-food.test.ts (8 tests) 175ms
+ ✓ packages/world-core/test/forest.test.ts (10 tests) 157ms
+ ✓ apps/simulator/test/open-ecology.test.ts (5 tests) 143ms
+ ✓ apps/simulator/test/long-catalogue.test.ts (2 tests) 151ms
+ ✓ packages/world-core/test/forest-warming.test.ts (5 tests) 104ms
+ ✓ scripts/experiments.test.ts (20 tests) 120ms
+ ✓ apps/viewer/test/continuous-history.test.ts (7 tests) 104ms
+ ✓ packages/world-core/test/forest-routing.test.ts (6 tests) 89ms
+ ✓ apps/viewer/test/replay-service.test.ts (7 tests) 86ms
+ ✓ scripts/long-empty-commentary-repair.test.ts (1 test) 93ms
+ ✓ scripts/documentation.test.ts (15 tests) 77ms
+ ✓ packages/world-core/test/forest-wildlife.test.ts (3 tests) 74ms
+ ✓ apps/simulator/test/random-run.test.ts (12 tests) 73ms
+ ✓ packages/world-core/test/continuous.test.ts (12 tests) 70ms
+ ✓ scripts/long-response-repair.test.ts (1 test) 59ms
+ ✓ scripts/long-catalogue-repair.test.ts (1 test) 65ms
+ ✓ apps/simulator/test/open-process-physical.test.ts (3 tests) 56ms
+ ✓ apps/simulator/test/long-capability-view.test.ts (1 test) 52ms
+ ✓ scripts/learning-analysis.test.ts (1 test) 50ms
+ ✓ apps/simulator/test/collective-transport.test.ts (3 tests) 48ms
+ ✓ scripts/forest-navigation.test.ts (2 tests) 44ms
+ ✓ apps/simulator/test/forest.test.ts (1 test) 46ms
+ ✓ apps/simulator/test/synchronous-run.test.ts (4 tests) 40ms
+ ✓ apps/simulator/test/forest-context.test.ts (2 tests) 37ms
+ ✓ scripts/long-interruption.test.ts (1 test) 36ms
+ ✓ apps/viewer/test/ashen.test.ts (9 tests) 34ms
+ ✓ apps/simulator/test/learning-run.test.ts (5 tests) 29ms
+ ✓ scripts/long-review-types.test.ts (1 test) 32ms
+ ✓ packages/world-core/test/continuous-mosaic.test.ts (2 tests) 27ms
+ ✓ apps/simulator/test/experiment.test.ts (21 tests) 26ms
+ ✓ scripts/survival-analysis.test.ts (2 tests) 23ms
+ ✓ packages/world-core/test/continuous-nature.test.ts (2 tests) 22ms
+ ✓ packages/world-core/test/coevolution.test.ts (11 tests) 21ms
+ ✓ apps/simulator/test/survival-run.test.ts (5 tests) 22ms
+ ✓ apps/simulator/test/long-response-phase.test.ts (5 tests) 18ms
+ ✓ apps/viewer/test/timeline.test.ts (7 tests) 13ms
+ ✓ scripts/pr-policy.test.ts (13 tests) 13ms
+ ✓ scripts/validation-reconstruction.test.ts (6 tests) 17ms
+ ✓ packages/world-core/test/forest-perception.test.ts (1 test) 10ms
+ ✓ packages/world-core/test/learning.test.ts (22 tests) 10ms
+ ✓ scripts/github.test.ts (2 tests) 12ms
+ ✓ packages/world-core/test/evolution.test.ts (10 tests) 9ms
+ ✓ packages/world-core/test/continuous-equality.test.ts (2 tests) 9ms
+ ✓ apps/simulator/test/chatgpt-auth.test.ts (9 tests) 8ms
+ ✓ apps/simulator/test/chatgpt-renewal.test.ts (1 test) 6ms
+ ✓ packages/world-core/test/world.test.ts (38 tests) 6ms
+ ✓ scripts/task-flow.test.ts (16 tests) 7ms
+ ✓ scripts/validation-cache.test.ts (3 tests) 5ms
+ ✓ scripts/task-review.test.ts (9 tests) 6ms
+ ✓ packages/world-core/test/program.test.ts (16 tests) 5ms
+ ✓ apps/viewer/test/scene-layers.test.ts (3 tests) 5ms
+ ✓ packages/world-core/test/survival.test.ts (7 tests) 4ms
+ ✓ scripts/delivery.test.ts (7 tests) 5ms
+ ✓ apps/viewer/test/experiments.test.ts (10 tests) 3ms
+ ✓ scripts/validation-plan.test.ts (8 tests) 4ms
+ ✓ apps/viewer/test/long-presentation.test.ts (2 tests) 3ms
+ ✓ packages/world-core/test/round.test.ts (5 tests) 4ms
+ ✓ apps/viewer/test/replay-playback.test.ts (3 tests) 4ms
+ ✓ apps/viewer/test/ashen-playback.test.ts (7 tests) 3ms
+ ✓ apps/simulator/test/demo.test.ts (3 tests) 3ms
+ ✓ apps/viewer/test/long-labels.test.ts (1 test) 2ms
+ ✓ scripts/publication.test.ts (6 tests) 4ms
+ ✓ scripts/continuous-baseline.test.ts (1 test) 1ms
+
+ Test Files  130 passed (130)
+      Tests  845 passed (845)
+   Start at  08:46:22
+   Duration  59.81s (transform 1.32s, setup 0ms, import 22.25s, tests 89.09s, environment 6ms)
+
+
+$ pnpm build
+
+> self-evolving-world@0.0.0 build /Users/liuyuxiang/developer/self_evolving_world
+> pnpm -r build
+
+Scope: 3 of 4 workspace projects
+packages/world-core build$ tsc -p tsconfig.json
+packages/world-core build: Done
+apps/simulator build$ tsc -p tsconfig.json
+apps/viewer build$ tsc --noEmit && vite build
+apps/simulator build: Done
+apps/viewer build: vite v8.3.6 building client environment for production...
+apps/viewer build: transforming...
+apps/viewer build: ✓ 231 modules transformed.
+apps/viewer build: rendering chunks...
+apps/viewer build: computing gzip size...
+apps/viewer build: dist/experiments/ex11/replay.json                              0.27 kB │ gzip:     0.22 kB
+apps/viewer build: dist/experiments/ex12/replay.json                              0.42 kB │ gzip:     0.29 kB
+apps/viewer build: dist/forest-lab.html                                           0.70 kB │ gzip:     0.35 kB
+apps/viewer build: dist/experiments/ex10/replay.json                              0.71 kB │ gzip:     0.41 kB
+apps/viewer build: dist/ashen.html                                                0.71 kB │ gzip:     0.37 kB
+apps/viewer build: dist/index.html                                                0.95 kB │ gzip:     0.41 kB
+apps/viewer build: dist/observatory.html                                          0.95 kB │ gzip:     0.41 kB
+apps/viewer build: dist/experiments/ex8/replay.json                               1.39 kB │ gzip:     0.63 kB
+apps/viewer build: dist/experiments/ex7/replay.json                               1.54 kB │ gzip:     0.69 kB
+apps/viewer build: dist/experiments/ex4/overview.svg                              1.72 kB │ gzip:     0.65 kB
+apps/viewer build: dist/experiments/ex9/replay.json                               1.89 kB │ gzip:     0.79 kB
+apps/viewer build: dist/experiments/ex3/overview.svg                              4.14 kB │ gzip:     1.48 kB
+apps/viewer build: dist/experiments/index.json                                    4.64 kB │ gzip:     1.57 kB
+apps/viewer build: dist/experiments/ex3/replay.json                               4.91 kB │ gzip:     1.09 kB
+apps/viewer build: dist/experiments/ex5/overview.svg                              5.80 kB │ gzip:     1.22 kB
+apps/viewer build: dist/experiments/ex2/overview.svg                              6.87 kB │ gzip:     1.76 kB
+apps/viewer build: dist/experiments/ex11/overview.svg                             7.49 kB │ gzip:     1.06 kB
+apps/viewer build: dist/classic.html                                             14.12 kB │ gzip:     3.49 kB
+apps/viewer build: dist/experiments/ex1/overview.svg                             14.69 kB │ gzip:     1.89 kB
+apps/viewer build: dist/experiments/ex10/overview.svg                            17.24 kB │ gzip:     6.31 kB
+apps/viewer build: dist/experiments/ex6/overview.svg                             24.14 kB │ gzip:     3.34 kB
+apps/viewer build: dist/experiments/ex4/replay.json                              36.08 kB │ gzip:     4.31 kB
+apps/viewer build: dist/experiments/ex8/overview.svg                             39.91 kB │ gzip:    14.64 kB
+apps/viewer build: dist/experiments/ex12/overview.svg                            39.99 kB │ gzip:    11.13 kB
+apps/viewer build: dist/experiments/ex1/replay.json                              42.25 kB │ gzip:     1.40 kB
+apps/viewer build: dist/experiments/ex7/overview.svg                             44.25 kB │ gzip:    13.94 kB
+apps/viewer build: dist/experiments/ex2/replay.json                              49.36 kB │ gzip:     1.21 kB
+apps/viewer build: dist/experiments/ex9/overview.svg                             52.67 kB │ gzip:    19.66 kB
+apps/viewer build: dist/experiments/ex5/replay.json                             191.65 kB │ gzip:    22.73 kB
+apps/viewer build: dist/experiments/ex6/replay.json                             213.78 kB │ gzip:    24.13 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000900-001000.json          695.34 kB │ gzip:    38.84 kB
+apps/viewer build: dist/assets/replay-worker-Brmfp1Pw.js                        703.57 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000600-000700.json          730.99 kB │ gzip:    40.93 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000800-000900.json          731.41 kB │ gzip:    42.68 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000100-000200.json          740.54 kB │ gzip:    42.15 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000700-000800.json          748.80 kB │ gzip:    43.46 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000200-000300.json          751.98 kB │ gzip:    43.64 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000500-000600.json          773.42 kB │ gzip:    44.74 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000000-000100.json          773.77 kB │ gzip:    49.94 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000400-000500.json          786.06 kB │ gzip:    46.49 kB
+apps/viewer build: dist/experiments/ex11/replay/execution-000000-000007.json    879.80 kB │ gzip:    65.46 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000000-000100.json     896.12 kB │ gzip:    71.54 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000300-000400.json          898.19 kB │ gzip:    52.83 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000100-000200.json     978.68 kB │ gzip:    88.62 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000200-000300.json   1,026.67 kB │ gzip:    92.53 kB
+apps/viewer build: dist/experiments/ex10/replay/execution-000300-000358.json  1,095.01 kB │ gzip:   135.64 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000300-000400.json   1,095.04 kB │ gzip:    98.68 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000800-000897.json        1,111.90 kB │ gzip:   101.01 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000700-000800.json        1,125.42 kB │ gzip:   102.94 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000400-000500.json   1,167.16 kB │ gzip:   122.13 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000600-000700.json        1,176.15 kB │ gzip:   116.03 kB
+apps/viewer build: dist/experiments/ex10/replay/execution-000000-000100.json  1,316.61 kB │ gzip:   132.79 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000000-000100.json        1,399.16 kB │ gzip:    74.33 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000500-000600.json   1,453.49 kB │ gzip:   148.44 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000900-001000.json   1,516.66 kB │ gzip:   147.73 kB
+apps/viewer build: dist/experiments/ex10/replay/execution-000200-000300.json  1,518.93 kB │ gzip:   170.61 kB
+apps/viewer build: dist/experiments/ex10/replay/precision-000100-000200.json  1,520.78 kB │ gzip:   178.22 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-001000-001100.json   1,527.12 kB │ gzip:   149.35 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000600-000700.json   1,533.62 kB │ gzip:   151.65 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000700-000800.json   1,545.79 kB │ gzip:   148.82 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-001100-001200.json   1,593.41 kB │ gzip:   158.81 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000800-000900.json   1,599.06 kB │ gzip:   148.74 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000500-000600.json        1,774.75 kB │ gzip:   146.78 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000300-000400.json        2,184.52 kB │ gzip:   122.76 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000200-000300.json        2,232.20 kB │ gzip:   120.30 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000100-000200.json        2,279.24 kB │ gzip:   111.35 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000400-000500.json        2,282.68 kB │ gzip:   143.69 kB
+apps/viewer build: dist/experiments/ex12/replay/execution-000100-000136.json  3,887.95 kB │ gzip:   657.17 kB
+apps/viewer build: dist/experiments/ex12/replay/execution-000000-000100.json  7,216.31 kB │ gzip: 1,167.76 kB
+apps/viewer build: dist/assets/ashen-bi2Sj6hO.css                                 5.70 kB │ gzip:     2.05 kB
+apps/viewer build: dist/assets/open-trial-diagnostic-view-CgiL_Adj.css            7.59 kB │ gzip:     2.51 kB
+apps/viewer build: dist/assets/classic-CkITEJCO.css                              16.01 kB │ gzip:     4.83 kB
+apps/viewer build: dist/assets/replay-client-D7BLL8xG.js                          0.80 kB │ gzip:     0.39 kB
+apps/viewer build: dist/assets/timeline-BmqtmwIr.js                               4.86 kB │ gzip:     1.54 kB
+apps/viewer build: dist/assets/forestLab-GoE7t_-s.js                              7.67 kB │ gzip:     2.97 kB
+apps/viewer build: dist/assets/continuous-visuals-DPxB3tY3.js                     9.22 kB │ gzip:     3.31 kB
+apps/viewer build: dist/assets/observatory-0SwrZaxx.js                           21.46 kB │ gzip:     7.82 kB
+apps/viewer build: dist/assets/classic-CtqdZig_.js                               35.70 kB │ gzip:    11.89 kB
+apps/viewer build: dist/assets/ashen-CAvN1zkE.js                                 40.04 kB │ gzip:    15.13 kB
+apps/viewer build: dist/assets/open-trial-diagnostic-view-BCox6Sw4.js            72.76 kB │ gzip:    21.46 kB
+apps/viewer build: dist/assets/dist-CxjoaEo_.js                                 220.02 kB │ gzip:    64.72 kB
+apps/viewer build: ✓ built in 839ms
+apps/viewer build: Done
+
+Every saved round reconstructed with identical world and event hashes.

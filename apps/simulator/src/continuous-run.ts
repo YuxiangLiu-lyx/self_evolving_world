@@ -1,3 +1,11 @@
+import {
+  LONG_CALL_PAUSE,
+  longOrdinaryInput,
+  longWorldInput,
+  longRetrieve,
+  parseLongDecision,
+} from './long-context.js';
+import { longTokenBudget, longRequestMeasure } from './long-tokens.js';
 import { forestPlanArguments } from './forest-plan-arguments.js';
 import {
   collectiveAttention,
@@ -181,6 +189,85 @@ function acceptCall(state: V7Execution, record: V7CallRecord): void {
     );
   state.attempts[index] = record.attempt;
   state.pendingCall = null;
+  if ('longContext' in record.input) {
+    const key = record.attempt.actor;
+    state.longRetrieval ??= {};
+    const old = state.longRetrieval[key];
+    if (record.attempt.status === 'accepted' && record.response) {
+      const result = parseLongDecision(record.response.text);
+      if (result.queries.length) {
+        state.longRetrieval[key] = {
+          tick: state.world.tick,
+          batches: (old?.batches ?? 0) + 1,
+          results: [
+            ...(old?.results ?? []),
+            ...longRetrieve(
+              state.world,
+              key,
+              record.attempt.role,
+              result.queries,
+            ),
+          ],
+        };
+        if (record.attempt.role === 'world' && state.barrier)
+          state.barrier.input = longWorldInput(
+            state.world,
+            state.barrier.requests,
+            state.longRetrieval[key],
+          );
+        return;
+      }
+      state.longRetrieval = Object.fromEntries(
+        Object.entries(state.longRetrieval).filter(([id]) => id !== key),
+      );
+      if (record.attempt.role === 'ordinary')
+        state.cursors[key] = v7Cursor(
+          parsePlan(result.decision ?? '', state),
+          state.world.tick,
+        );
+      else {
+        if (!state.barrier) throw new Error('Missing world-review barrier.');
+        state.barrier.worldAttempts += 1;
+        state.barrier.reviews = parseContinuousReviews(
+          result.decision ?? '',
+          state.barrier,
+          state.world,
+        );
+      }
+    } else {
+      const failures = state.attempts.filter(
+        (a) =>
+          a.actor === key &&
+          a.tick === state.world.tick &&
+          ['failed', 'rejected'].includes(a.status),
+      );
+      state.longRetrieval[key] = {
+        tick: state.world.tick,
+        batches: old?.batches ?? 0,
+        results: [
+          ...(old?.results ?? []),
+          { validationError: record.attempt.error },
+        ],
+      };
+      if (record.attempt.role === 'world' && state.barrier) {
+        state.barrier.worldAttempts += 1;
+        state.barrier.errors.push(record.attempt.error ?? 'Failed review.');
+        state.barrier.input = longWorldInput(
+          state.world,
+          state.barrier.requests,
+          state.longRetrieval[key],
+        );
+      }
+      if (
+        record.attempt.role === 'ordinary' &&
+        (failures.length >= 2 || record.attempt.status === 'failed')
+      ) {
+        state.phase = 'paused';
+        state.reason = LONG_CALL_PAUSE;
+      }
+    }
+    return;
+  }
   if ('collective' in record.input) {
     const attention = collectiveAttention(state);
     for (const id of record.input.collective.eligible)
@@ -271,25 +358,36 @@ async function invoke(
     await sink.checkpoint(state, state.reason);
     return;
   }
-  const tokenBudget = collectiveTokenBudget(state);
+  const tokenBudget = longTokenBudget(state) ?? collectiveTokenBudget(state);
+  const measure = state.world.config.longDevelopment
+    ? longRequestMeasure(
+        continuousRequest(state.model, role, input),
+        state.world.config.longDevelopment.outputTokens,
+      )
+    : null;
   // Conservative reservation includes the complete serialized request and bounded output,
   // with room for protocol framing. Unknown usage retains its reservation rather than zero.
-  const reservation = tokenBudget
-    ? new TextEncoder().encode(
-        JSON.stringify(continuousRequest(state.model, role, input)),
-      ).length +
-      (state.world.config.collective?.tokens.output ?? 0) +
-      4096
-    : 0;
+  const reservation =
+    measure?.reservation ??
+    (tokenBudget
+      ? new TextEncoder().encode(
+          JSON.stringify(continuousRequest(state.model, role, input)),
+        ).length +
+        (state.world.config.collective?.tokens.output ?? 0) +
+        4096
+      : 0);
   if (tokenBudget && tokenBudget.used + reservation > tokenBudget.limit) {
     state.phase = 'paused';
     state.reason =
-      'Phase token budget cannot reserve the next complete attempt; world paused.';
+      'Frozen token budget cannot reserve the next complete attempt; world paused.';
     await sink.save(state);
     await sink.checkpoint(state, state.reason);
     return;
   }
   if (
+    (measure &&
+      measure.inputEstimate >
+        (state.world.config.longDevelopment?.inputEstimateLimit ?? 0)) ||
     continuousInputText(input).length * 2 >
       state.world.config.computation.inputBytes ||
     (state.world.config.collective &&
@@ -319,6 +417,7 @@ async function invoke(
         }
       : {}),
     ...(tokenBudget ? { reservedTokens: reservation } : {}),
+    ...(measure ? { requestMeasure: measure } : {}),
     elapsedMs: null,
     usage: null,
     error: null,
@@ -344,12 +443,38 @@ async function invoke(
         response.usage.inputTokens + response.usage.outputTokens >
           reservation ||
         response.usage.outputTokens >
-          (state.world.config.collective?.tokens.output ?? 0))
+          (state.world.config.longDevelopment?.outputTokens ??
+            state.world.config.collective?.tokens.output ??
+            0))
     )
       throw new V7ComputePause(
         'Provider usage violated the frozen reservation or output limit; retained for audit without advancing the world.',
       );
-    if ('collective' in input) {
+    if ('longContext' in input) {
+      const result = parseLongDecision(response.text);
+      if (result.queries.length) {
+        if (input.longContext.remainingQueryBatches <= 0)
+          throw new Error(
+            'Read-only query batch limit reached; submit a decision using retained results.',
+          );
+        longRetrieve(state.world, actor, role, result.queries);
+      } else if (role === 'ordinary') {
+        const plan = parsePlan(result.decision ?? '', state);
+        if (
+          plan.steps.length > 6 ||
+          (plan.projects?.length ?? 0) > 4 ||
+          !v7TaskAction(state.world, actor, v7Cursor(plan, state.world.tick))
+        )
+          throw new Error('Expected a bounded executable personal plan.');
+      } else {
+        if (!state.barrier) throw new Error('Missing world-review barrier.');
+        parseContinuousReviews(
+          result.decision ?? '',
+          state.barrier,
+          state.world,
+        );
+      }
+    } else if ('collective' in input) {
       const decision = parseCollectiveDecision(response.text, input, (text) =>
         parsePlan(text, state),
       );
@@ -486,7 +611,7 @@ export async function continueContinuousExecution(
           )) {
             if (actor.learning) continue;
             let cursor = state.cursors[actor.id];
-            if (!cursor || !v7TaskAction(state.world, actor.id, cursor)) {
+            while (!cursor || !v7TaskAction(state.world, actor.id, cursor)) {
               const reason =
                 cursor?.reason ??
                 'Initial decision for this persistent identity.';
@@ -494,19 +619,28 @@ export async function continueContinuousExecution(
                 state,
                 'ordinary',
                 actor.id,
-                ordinaryContinuousInput(
-                  state.world,
-                  actor.id,
-                  cursor,
-                  state.world.config.budgets.ordinary -
-                    state.attempts.filter((a) => a.role === 'ordinary').length,
-                ),
+                state.world.config.longDevelopment
+                  ? longOrdinaryInput(
+                      state.world,
+                      actor.id,
+                      cursor,
+                      state.longRetrieval?.[actor.id],
+                    )
+                  : ordinaryContinuousInput(
+                      state.world,
+                      actor.id,
+                      cursor,
+                      state.world.config.budgets.ordinary -
+                        state.attempts.filter((a) => a.role === 'ordinary')
+                          .length,
+                    ),
                 reason,
                 provider,
                 sink,
               );
               if (!isRunning(state)) return state;
               cursor = state.cursors[actor.id];
+              if (!state.world.config.longDevelopment) break;
             }
             if (!cursor) throw new Error('Missing persisted actor task.');
           }
@@ -556,7 +690,9 @@ export async function continueContinuousExecution(
           reviews: [],
           worldAttempts: 0,
           errors: [],
-          input: worldContinuousInput(state.world, requests),
+          input: state.world.config.longDevelopment
+            ? longWorldInput(state.world, requests)
+            : worldContinuousInput(state.world, requests),
           developmentAttempt: null,
         };
         await sink.save(state);
@@ -652,7 +788,13 @@ export async function continueContinuousExecution(
         state.attention.intents = {};
       }
       state.registrations = [];
-      if (state.world.tick % V7_STAGE_INTERVAL === 0)
+      if (
+        state.world.config.longDevelopment
+          ? state.world.config.longDevelopment.checkpoints.includes(
+              state.world.tick,
+            )
+          : state.world.tick % V7_STAGE_INTERVAL === 0
+      )
         state.stages.push(state.world.tick);
       if (state.world.tick >= state.windowTarget) {
         state.phase = 'window-complete';
@@ -660,7 +802,13 @@ export async function continueContinuousExecution(
       }
       await sink.round(record, state);
       await sink.save(state);
-      if (state.world.tick % V7_STAGE_INTERVAL === 0)
+      if (
+        state.world.config.longDevelopment
+          ? state.world.config.longDevelopment.checkpoints.includes(
+              state.world.tick,
+            )
+          : state.world.tick % V7_STAGE_INTERVAL === 0
+      )
         await sink.checkpoint(
           state,
           'Scheduled observation stage; no actor hint.',
@@ -701,6 +849,7 @@ export function resolveContinuousDevelopment(
     (!barrier.reviews.length &&
       !(
         [
+          LONG_CALL_PAUSE,
           'Simulation computation budget exhausted; checkpoint the entire world.',
           'Observation input exceeds computational context protection; no hidden truncation or inference.',
           'A bounded collective response reader failed; the stopped transport attempt remains charged and will not be repeated.',
@@ -758,6 +907,7 @@ export function resolveContinuousDevelopment(
   }
   if (
     [
+      LONG_CALL_PAUSE,
       'Observation input exceeds computational context protection; no hidden truncation or inference.',
       'A bounded collective response reader failed; the stopped transport attempt remains charged and will not be repeated.',
     ].includes(barrier.technicalReason ?? '')

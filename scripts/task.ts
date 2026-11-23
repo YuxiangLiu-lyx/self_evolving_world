@@ -28,6 +28,7 @@ const root = process.cwd(),
 const args = process.argv.slice(2).filter((a) => a !== '--');
 const [command, target, response] = args;
 let unlock: (() => void) | undefined;
+let abandonedCoordinator: number | undefined;
 function statePath(id: string): string {
   if (!/^[a-z0-9][a-z0-9-]{1,79}$/.test(id))
     throw new Error('Invalid task ID.');
@@ -48,6 +49,7 @@ function lock(): () => void {
       );
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== 'ESRCH') throw error;
+      abandonedCoordinator = pid;
       rmSync(path);
     }
   }
@@ -101,7 +103,11 @@ try {
     const effects = new LocalTaskEffects(root, save);
     const flow = new TaskFlow(context, effects, save);
     if (command === 'repair') {
-      await requestContinuousTechnicalRepair(root, context);
+      await requestContinuousTechnicalRepair(
+        root,
+        context,
+        abandonedCoordinator,
+      );
       save();
     }
     if (command === 'recover') {

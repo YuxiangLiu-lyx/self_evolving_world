@@ -310,6 +310,8 @@ export interface V7Ability {
   parameters: V7Schema;
   prerequisites: string[];
   learning: number;
+  /** Optional paid study energy for a versioned capability; absence preserves historical learning. */
+  learningEnergy?: number;
   costs: string;
   effects: string;
   handler: string;
@@ -373,6 +375,22 @@ export interface V7SatisfactionRule {
   repeatWindow?: { rounds: number; amount: number };
 }
 export interface V7Configuration {
+  longDevelopment?: {
+    version: 1;
+    tokens: number;
+    inputEstimateLimit: number;
+    outputTokens: number;
+    queriesPerDecision: number;
+    checkpoints: number[];
+    cycle: number;
+    pressureStart: number;
+    difficultyStart: number;
+    recoveryStart: number;
+    recoveryEnd: number;
+    cold: number;
+    rain: number;
+    growthFloor: number;
+  };
   collective?: CollectivePolicy;
   protocol: 'continuous-v1';
   seed: number;

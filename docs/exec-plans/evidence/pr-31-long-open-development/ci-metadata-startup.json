@@ -1,0 +1,22 @@
+{
+  "kind": "local-ci-metadata-regression-not-remote-ci",
+  "base": "7d800b15e1ff8070bb0dd221c14f68408751a2fc",
+  "head": "7b032704bae9d1cc9e0309edb7a47df4c391be0e",
+  "runtime": "Node 24.22.2 via pnpm",
+  "input": "Actual EX13 PR base and current Playwright config; local GitHub CI metadata fixture only.",
+  "checks": {
+    "commitMetadataRetained": true,
+    "rawDiffAttachmentAbsent": true,
+    "gitDiffNotInvoked": true,
+    "realViewerCanvasVisible": true
+  },
+  "stats": {
+    "startTime": "2026-11-23T20:13:21.839Z",
+    "duration": 1542.4740000000002,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "remoteAcceptance": "Fresh current-head quality and pr-policy checks remain required."
+}

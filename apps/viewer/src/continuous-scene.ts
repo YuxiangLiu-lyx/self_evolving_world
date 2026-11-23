@@ -1,3 +1,4 @@
+import { joiningContains } from './long-joining-visual.js';
 import { v7Observe } from '@self-evolving-world/world-core';
 import type {
   V7World,
@@ -38,7 +39,11 @@ export function continuousScene(
       : world.actors,
     objects: observation?.objects ?? world.objects,
     stacks: (observation?.stacks ?? world.stacks)
-      .filter((s) => s.owner === null)
+      .filter(
+        (s) =>
+          s.owner === null &&
+          !joiningContains(observation?.objects ?? world.objects, s),
+      )
       .map((s) => ({
         id: s.id,
         x: s.position.x,

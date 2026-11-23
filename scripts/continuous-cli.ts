@@ -1,3 +1,8 @@
+import {
+  initialLongWorld,
+  LONG_OBJECTIVE,
+} from '../apps/simulator/src/long-scenario.js';
+import { longPreflight } from './long-preflight.js';
 import { OPEN_OBJECTIVE } from './open-analysis.js';
 import {
   initialCollectiveWorld,
@@ -60,10 +65,15 @@ try {
     const comparison =
       context.intent.experiment.mode === 'continuous' &&
       context.intent.experiment.comparison;
+    const long =
+      context.intent.experiment.mode === 'continuous' &&
+      context.intent.experiment.scenario === 'long-development-v1';
     const arm = context.comparison?.stage === 'A' ? 'A' : 'B';
     const genesis = comparison
       ? initialCollectiveWorld('collective-preflight', arm)
-      : initialOpenWorld();
+      : long
+        ? initialLongWorld()
+        : initialOpenWorld();
     const physicalHash = comparison
       ? continuousHash(collectivePhysicalGenesis(genesis))
       : null;
@@ -71,6 +81,7 @@ try {
       baseline: ReturnType<typeof openPreflight>;
       physicalHash?: string;
       reusedFrom?: string;
+      stationary?: ReturnType<typeof longPreflight>;
     };
     if (comparison && arm === 'B' && context.comparison?.a) {
       const prior = continuousRead<typeof preflight>(
@@ -92,6 +103,7 @@ try {
     } else
       preflight = {
         baseline: openPreflight(1600, genesis),
+        ...(long ? { stationary: longPreflight(genesis) } : {}),
         ...(physicalHash ? { physicalHash } : {}),
       };
     token = await renewableAccessToken();
@@ -110,14 +122,20 @@ try {
       'chatgpt-plan',
       comparison
         ? initialCollectiveWorld(`collective-${id}`, arm)
-        : initialOpenWorld(`open-${id}`),
+        : long
+          ? initialLongWorld(`long-${id}`)
+          : initialOpenWorld(`open-${id}`),
     );
     if (comparison) state.windowTarget = 200;
     continuousAtomic(resolve(directory, 'manifest.json'), {
       format: 'self-evolving-world/experiment',
       version: 7,
       id,
-      objective: comparison ? COLLECTIVE_OBJECTIVE : OPEN_OBJECTIVE,
+      objective: comparison
+        ? COLLECTIVE_OBJECTIVE
+        : long
+          ? LONG_OBJECTIVE
+          : OPEN_OBJECTIVE,
       schedule: 'continuous-v1',
       controller: 'chatgpt-plan',
       steps: 0,

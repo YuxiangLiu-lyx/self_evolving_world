@@ -1,0 +1,160 @@
+{
+  "experiment": "ex13",
+  "tick": 200,
+  "source": "experiment/ex13/checkpoints/stage-000200.json",
+  "purpose": "Read-only milestone analysis; not sent to actors; not a final run result.",
+  "roles": {
+    "ordinary": {
+      "attempts": 343,
+      "statuses": {
+        "accepted": 337,
+        "failed": 6
+      },
+      "inputTokens": 2781104,
+      "outputTokens": 127421,
+      "inputMedian": 8429,
+      "inputMax": 11736,
+      "queryResponses": 169,
+      "queryTokens": 1369406,
+      "unknownReserved": 166759
+    },
+    "world": {
+      "attempts": 79,
+      "statuses": {
+        "accepted": 76,
+        "rejected": 2,
+        "failed": 1
+      },
+      "inputTokens": 493357,
+      "outputTokens": 47930,
+      "inputMedian": 6454.5,
+      "inputMax": 9333,
+      "queryResponses": 51,
+      "queryTokens": 297273,
+      "unknownReserved": 42929
+    }
+  },
+  "people": {
+    "lin": {
+      "vitals": {
+        "health": 100,
+        "satiety": 48,
+        "energy": 34.4041769,
+        "temperature": 29.66609568
+      },
+      "mental": 0.07247906,
+      "monotony": 0,
+      "wellbeingTotal": 8.70154674,
+      "actions": {
+        "navigate": 59,
+        "gather": 13,
+        "eat": 13,
+        "probe": 6,
+        "rest": 45,
+        "learn": 4,
+        "wait": 7,
+        "root-planting-trial": 2,
+        "request": 11,
+        "soil-worksite-assessment": 2,
+        "small-soil-patch-preparation": 3,
+        "bounded-surface-residue-transfer": 4,
+        "prepared-surface-root-placement": 3,
+        "root-assessment": 3,
+        "message": 5,
+        "recoverable-vine-joining-assessment": 2,
+        "source-bound-joining-trial": 6,
+        "joining-trial-state-reconciliation": 2,
+        "owned-hazelnut-assessment": 1,
+        "source-bound-hazelnut-opening-trial": 5,
+        "pickup": 1,
+        "opened-hazelnut-preparation-assessment": 1,
+        "source-bound-opened-hazelnut-access-trial": 2
+      },
+      "failed": 7,
+      "requests": 11,
+      "masteryEvents": 14,
+      "informationConfirmed": 4,
+      "messagesSent": 4,
+      "deaths": 0
+    },
+    "moss": {
+      "vitals": {
+        "health": 100,
+        "satiety": 32,
+        "energy": 35.14912433,
+        "temperature": 29.68260303
+      },
+      "mental": 0.03610847,
+      "monotony": 0.71428571,
+      "wellbeingTotal": 7.59621977,
+      "actions": {
+        "navigate": 70,
+        "gather": 10,
+        "eat": 13,
+        "rest": 44,
+        "request": 11,
+        "wait": 4,
+        "root-planting-trial": 2,
+        "probe": 1,
+        "root-assessment": 6,
+        "learn": 2,
+        "soil-worksite-assessment": 3,
+        "consult": 2,
+        "small-soil-patch-preparation": 3,
+        "message": 5,
+        "moss-surface-residue-transfer": 5,
+        "moss-prepared-surface-diagnostic": 1,
+        "moss-prepared-root-placement": 8,
+        "bounded-hazelnut-food-assessment": 1,
+        "moss-source-bound-hazelnut-physical-examination": 1,
+        "moss-source-bound-hazelnut-interior-access-trial": 4,
+        "moss-exposed-hazelnut-assessment-and-recovery": 1,
+        "pickup": 2,
+        "moss-conserved-hazelnut-separation-trial": 1
+      },
+      "failed": 6,
+      "requests": 11,
+      "masteryEvents": 12,
+      "informationConfirmed": 3,
+      "messagesSent": 3,
+      "deaths": 0
+    },
+    "sol": {
+      "vitals": {
+        "health": 100,
+        "satiety": 48,
+        "energy": 39.38560674,
+        "temperature": 29.73771352
+      },
+      "mental": 0.04101775,
+      "monotony": 0,
+      "wellbeingTotal": 8.91817092,
+      "actions": {
+        "navigate": 78,
+        "gather": 12,
+        "eat": 11,
+        "probe": 14,
+        "rest": 48,
+        "request": 4,
+        "wait": 3,
+        "moss-resting-pad-trial": 6,
+        "learn": 4,
+        "soil-worksite-assessment": 2,
+        "small-soil-patch-preparation": 3,
+        "sol-surface-residue-transfer": 3,
+        "consult": 2,
+        "root-planting-trial": 2,
+        "root-assessment": 3,
+        "bounded-unfamiliar-food-assessment": 1,
+        "message": 3,
+        "sol-birch-container-feasibility": 1
+      },
+      "failed": 9,
+      "requests": 4,
+      "masteryEvents": 8,
+      "informationConfirmed": 3,
+      "messagesSent": 2,
+      "deaths": 0
+    }
+  }
+}

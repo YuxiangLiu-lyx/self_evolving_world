@@ -1,3 +1,5 @@
+import type { LongInput, LongRetrieval } from './long-context.js';
+import type { LongRequestMeasure } from './long-tokens.js';
 import type {
   V7World,
   V7Project,
@@ -35,6 +37,7 @@ export interface V7Attempt {
   contextBytes?: number;
   contextCodeUnits?: number;
   reservedTokens?: number;
+  requestMeasure?: LongRequestMeasure;
   usage: V7ProviderResult['usage'];
   error: string | null;
 }
@@ -64,7 +67,7 @@ export interface V7Barrier {
   reviews: V7Review[];
   worldAttempts: number;
   errors: string[];
-  input: WorldContinuousInput;
+  input: WorldContinuousInput | LongInput;
   developmentAttempt: string | null;
 }
 export interface V7Execution {
@@ -85,6 +88,7 @@ export interface V7Execution {
   } | null;
   registrations: string[];
   stages: number[];
+  longRetrieval?: Record<string, LongRetrieval>;
   attention?: CollectiveAttention;
   collectiveContinuation?: {
     round: number;

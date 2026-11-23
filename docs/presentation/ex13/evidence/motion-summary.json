@@ -1,0 +1,28 @@
+{
+  "source": "isolated actual Chromium playback, unchanged viewer runtime; final selected suite separately required",
+  "samples": 3328,
+  "sampledSeconds": 60.7476,
+  "frameIntervalMs": {
+    "median": 16.69999999999709,
+    "p95": 16.799999999995634,
+    "max": 2449.899999999994
+  },
+  "playingBufferFrames": 0,
+  "walkingFramesBySpeed": {
+    "1": 200,
+    "2": 54
+  },
+  "walkingPairs": 250,
+  "continuousWalkingBoundaries": 2,
+  "zeroDistanceWalkingPairs": 0,
+  "maximumPhaseDistanceResidual": 8.673617379884035e-16,
+  "crossSegmentSeen": [99, 100, 101],
+  "note": "All speeds1/2/4 exercised. This specific EX13 clip has moving frames at1x/2x; its4x interval is real stationary work/rest. Pauses and camera cuts are intentional. Video25fps is a recording format, not the display frame rate. No heartbeat-only smoothness claim.",
+  "camera": {
+    "normalPlayingPairs": 3030,
+    "speedP95WorldUnitsPerSecond": 0.7999697684,
+    "maximumSpeedWorldUnitsPerSecond": 2.3049984188,
+    "frameDisplacementsAbovePointTwoWorldUnits": 0,
+    "exclusions": "Manual seeks, cuts, buffering, paused frames and gaps over100ms."
+  }
+}

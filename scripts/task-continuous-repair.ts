@@ -1,4 +1,8 @@
 import {
+  LONG_CALL_PAUSE,
+  longWorldInput,
+} from '../apps/simulator/src/long-context.js';
+import {
   copyFileSync,
   existsSync,
   mkdirSync,
@@ -6,6 +10,7 @@ import {
   readdirSync,
 } from 'node:fs';
 import { resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { v7Clone } from '@self-evolving-world/world-core';
 import type {
   V7Execution,
@@ -29,6 +34,77 @@ export const TRANSPORT_REPAIR =
   'A bounded collective response reader failed; the stopped transport attempt remains charged and will not be repeated.';
 export const BARK_FEEDBACK_REPAIR =
   'Reviewed bark feedback and personal inspection retention are incomplete; repair the preserved implementation without changing experimental policy.';
+
+/** A dead coordinator lease plus absent workers establishes abandonment, never an API outcome. */
+export function abandonedLongTransport(
+  saved: V7Execution,
+  evidence: {
+    coordinatorPid: number;
+    observedAt: string;
+    coordinatorAbsent: boolean;
+    workerAbsent: boolean;
+  },
+): { state: V7Execution; record: V7CallRecord } {
+  const state = v7Clone(saved),
+    pending = state.pendingCall;
+  const attempt = state.attempts.at(-1);
+  if (
+    !state.world.config.longDevelopment ||
+    state.phase !== 'running' ||
+    state.barrier ||
+    !pending ||
+    !attempt ||
+    attempt.id !== pending.id ||
+    attempt.role !== 'ordinary' ||
+    attempt.status !== 'started' ||
+    attempt.tick !== state.world.tick ||
+    state.attempts.filter((a) => a.status === 'started').length !== 1 ||
+    !attempt.reservedTokens ||
+    !Number.isSafeInteger(evidence.coordinatorPid) ||
+    evidence.coordinatorPid < 1 ||
+    !Number.isFinite(Date.parse(evidence.observedAt)) ||
+    !evidence.coordinatorAbsent ||
+    !evidence.workerAbsent
+  )
+    throw new Error(
+      'Only a proved abandoned long-run ordinary invocation can be reconciled as unknown.',
+    );
+  attempt.status = 'failed';
+  attempt.usage = null;
+  attempt.elapsedMs = null;
+  attempt.error =
+    'The coordinator and inference worker were terminated before a durable result. API outcome and usage are unknown; the original invocation is never resent and retains its complete reservation.';
+  const record: V7CallRecord = {
+    attempt: v7Clone(attempt),
+    input: pending.input,
+    response: null,
+    failureEvidence: JSON.stringify({
+      kind: 'abandoned-long-invocation',
+      ...evidence,
+      checkpointHash: continuousHash(saved),
+      apiOutcomeKnown: false,
+      usageKnown: false,
+    }),
+  };
+  state.pendingCall = null;
+  state.phase = 'paused';
+  state.reason = LONG_CALL_PAUSE;
+  state.longRetrieval ??= {};
+  const old = state.longRetrieval[attempt.actor];
+  state.longRetrieval[attempt.actor] = {
+    tick: state.world.tick,
+    batches: old?.tick === state.world.tick ? old.batches : 0,
+    results: [
+      ...(old?.tick === state.world.tick ? old.results : []),
+      {
+        abandonedInvocation: attempt.id,
+        notice:
+          'No decision or physical action was accepted from this unknown invocation. After technical review, make a fresh decision using the preserved state; prior costs remain charged.',
+      },
+    ],
+  };
+  return { state, record };
+}
 
 export function hasReviewedBarkFeedbackDefect(state: V7Execution): boolean {
   return (
@@ -147,6 +223,7 @@ export function restoreUnstartedCollectiveArm(
 export async function requestContinuousTechnicalRepair(
   root: string,
   task: TaskContext,
+  abandonedCoordinator?: number,
 ): Promise<void> {
   if (
     !task.experiment?.id &&
@@ -176,10 +253,45 @@ export async function requestContinuousTechnicalRepair(
   const original = continuousCheckpoint(root, id);
   const commandFailure = task.experiment?.error ?? task.reason;
   const feedback = hasReviewedBarkFeedbackDefect(original);
+  let abandoned: ReturnType<typeof abandonedLongTransport> | null = null;
+  if (
+    abandonedCoordinator !== undefined &&
+    original.world.config.longDevelopment &&
+    task.status === 'running' &&
+    task.step === 'experiment' &&
+    original.pendingCall
+  ) {
+    try {
+      process.kill(abandonedCoordinator, 0);
+      throw new Error('The previous coordinator is still alive.');
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== 'ESRCH') throw error;
+    }
+    const runningWorker = execFileSync('ps', ['-axo', 'pid=,args='], {
+      encoding: 'utf8',
+    })
+      .split('\n')
+      .some((line) =>
+        /\bnode(?:js)?\b.*(?:scripts\/continuous-cli\.ts|apps\/simulator\/dist\/continuous)/.test(
+          line,
+        ),
+      );
+    if (runningWorker)
+      throw new Error(
+        'A continuous inference worker is still alive; do not reconcile or duplicate it.',
+      );
+    abandoned = abandonedLongTransport(original, {
+      coordinatorPid: abandonedCoordinator,
+      observedAt: new Date().toISOString(),
+      coordinatorAbsent: true,
+      workerAbsent: true,
+    });
+  }
   const interrupted =
-    task.status === 'needs_fix' && original.pendingCall && commandFailure
+    abandoned ??
+    (task.status === 'needs_fix' && original.pendingCall && commandFailure
       ? abandonedCollectiveTransport(original, commandFailure, feedback)
-      : null;
+      : null);
   const state = interrupted?.state ?? original;
   assertContinuousTechnicalRepair(state);
   const reason = state.reason;
@@ -266,7 +378,9 @@ export async function requestContinuousTechnicalRepair(
       reviews: [],
       worldAttempts: 0,
       errors: [],
-      input: worldContinuousInput(state.world, {}),
+      input: state.world.config.longDevelopment
+        ? longWorldInput(state.world, {})
+        : worldContinuousInput(state.world, {}),
       developmentAttempt: null,
     }),
     technicalReason: reason,
@@ -298,6 +412,16 @@ export async function requestContinuousTechnicalRepair(
 
 /** Refuse ambiguous calls, budget exhaustion, settled windows and actor review barriers. */
 export function assertContinuousTechnicalRepair(state: V7Execution): void {
+  const longFailure =
+    !!state.world.config.longDevelopment &&
+    state.reason === LONG_CALL_PAUSE &&
+    state.barrier === null &&
+    state.attempts.some(
+      (a) =>
+        a.tick === state.world.tick &&
+        a.role === 'ordinary' &&
+        ['failed', 'rejected'].includes(a.status),
+    );
   const computation =
     state.reason ===
       'Simulation computation budget exhausted; checkpoint the entire world.' &&
@@ -317,7 +441,7 @@ export function assertContinuousTechnicalRepair(state: V7Execution): void {
     hasReviewedBarkFeedbackDefect(state);
   if (
     state.phase !== 'paused' ||
-    !(computation || context || transport || feedback) ||
+    !(computation || context || transport || feedback || longFailure) ||
     state.pendingCall ||
     state.attempts.some((a) => a.status === 'started') ||
     state.world.tick >= state.windowTarget ||

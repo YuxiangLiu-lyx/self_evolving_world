@@ -258,3 +258,7 @@ export {
   toolAssessmentResult,
   toolAssessmentHistory,
 } from './collective-tool-assessment.js';
+
+export { openRoutine } from './open-experience.js';
+
+export { rootSpecimenVisible } from './long-root-visibility.js';

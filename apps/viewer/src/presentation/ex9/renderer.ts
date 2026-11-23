@@ -1,3 +1,7 @@
+import { specimenAppearance } from '../../long-specimen-visual.js';
+import { joiningPaths, joiningContains } from '../../long-joining-visual.js';
+import { labelRows } from './labels.js';
+import { rootSpecimenVisible } from '@self-evolving-world/world-core';
 import { v7Interior, v7Walls } from '@self-evolving-world/world-core';
 import type {
   V7Actor,
@@ -114,15 +118,20 @@ export class ForestRenderer {
       this.poses.set(actor.id, point);
       const action = this.poseAction(actor),
         work =
-          !movement &&
-          !action.failed &&
-          [
-            'gather',
-            'process-willow',
-            'portable-insulation',
-            'build-shelter',
-            'twist-cord',
-          ].includes(action.kind);
+          (!movement &&
+            !action.failed &&
+            [
+              'gather',
+              'process-willow',
+              'portable-insulation',
+              'build-shelter',
+              'twist-cord',
+            ].includes(action.kind)) ||
+          (!movement &&
+            !action.failed &&
+            !!this.world?.config.longDevelopment &&
+            action.working &&
+            !action.resting);
       const blend = this.workBlend.get(actor.id) ?? 0;
       this.workBlend.set(
         actor.id,
@@ -336,15 +345,75 @@ export class ForestRenderer {
         });
       }
     }
-    for (const s of world.stacks.filter((s) => !s.owner && s.quantity > 0)) {
-      const pos = p(s.position);
+    for (const e of world.events.filter(
+      (e) =>
+        ['site-examination-completed', 'join-geometry-assessed'].includes(
+          e.type,
+        ) && e.success,
+    )) {
+      if (typeof e.data.x !== 'number' || typeof e.data.y !== 'number')
+        continue;
+      const point = p({ x: e.data.x, y: e.data.y });
+      if (e.type === 'join-geometry-assessed')
+        this.labels.push({
+          x: point.x,
+          y: point.y - 10,
+          text: 'Join geometry unresolved',
+          color: '#d3c49e',
+        });
+      c.save();
+      c.strokeStyle = '#d6be87bb';
+      c.lineWidth = 2;
+      c.setLineDash([3, 3]);
+      c.beginPath();
+      c.ellipse(
+        point.x,
+        point.y,
+        scale * 0.2,
+        scale * 0.2 * DEPTH,
+        0,
+        0,
+        Math.PI * 2,
+      );
+      c.stroke();
+      c.restore();
+    }
+    for (const s of world.stacks.filter(
+      (s) =>
+        !s.owner &&
+        s.quantity > 0 &&
+        rootSpecimenVisible(world, s.id) &&
+        !joiningContains(world.objects, s),
+    )) {
+      const pos = p(s.position),
+        specimen = specimenAppearance(s);
       drawables.push({
-        y: s.position.y,
+        // The observation glyph stays at the recorded point, above a co-located tool.
+        y: s.position.y + (specimen ? 0.000001 : 0),
         draw: () => {
           this.shadow(c, pos.x, pos.y, scale * 0.18);
           c.fillStyle =
             world.resources.find((r) => r.id === s.resource)?.color ??
             '#d4bf8a';
+          if (specimen) {
+            // A minimum-size observation glyph, not a fabricated detached kernel.
+            const radius = Math.max(3.5, scale * 0.025);
+            c.beginPath();
+            c.ellipse(pos.x, pos.y, radius, radius * 0.8, 0, 0, Math.PI * 2);
+            c.fill();
+            c.strokeStyle = specimen.exposed ? '#d8bd91' : '#3a291f';
+            c.lineWidth = specimen.exposed ? 2 : 1;
+            c.beginPath();
+            if (specimen.deformed)
+              c.arc(pos.x, pos.y - radius / 2, radius / 2, 0.3, Math.PI - 0.3);
+            else {
+              c.moveTo(pos.x - radius / 2, pos.y - radius / 3);
+              c.lineTo(pos.x, pos.y);
+              c.lineTo(pos.x + radius / 2, pos.y - radius / 3);
+            }
+            c.stroke();
+            return;
+          }
           c.fillRect(
             pos.x - scale * 0.1,
             pos.y - scale * 0.12,
@@ -368,7 +437,16 @@ export class ForestRenderer {
       .forEach((d) => {
         d.draw();
       });
-    for (const label of this.labels)
+    c.font = '600 12px system-ui';
+    const labels = world.config.longDevelopment
+      ? labelRows(
+          this.labels.map((label) => ({
+            ...label,
+            width: c.measureText(label.text).width + 18,
+          })),
+        )
+      : this.labels;
+    for (const label of labels)
       this.label(c, label.x, label.y, label.text, label.color);
     // Selected identity stays readable above foreground foliage.
     const selected = world.actors.find((a) => a.id === this.selected);
@@ -502,6 +580,166 @@ export class ForestRenderer {
       c.moveTo(pos.x + scale * 0.13, pos.y - scale * 0.12);
       c.lineTo(pos.x + scale * 0.12, pos.y);
       c.stroke();
+    } else if (o.kind === 'loose-wrap-trial') {
+      for (const path of joiningPaths(o)) {
+        c.strokeStyle = path.kind === 'branch' ? '#92734d' : '#a8b77b';
+        c.lineWidth = Math.max(1, path.diameter * scale);
+        c.beginPath();
+        path.points.forEach((q, i) => {
+          const x = pos.x + q.x * scale,
+            y = pos.y + (q.y * DEPTH - q.z) * scale;
+          if (i === 0) c.moveTo(x, y);
+          else c.lineTo(x, y);
+        });
+        c.stroke();
+      }
+      this.labels.push({
+        x: pos.x,
+        y: pos.y - Math.max(34, scale * 0.14 + 20),
+        text: o.visual.label,
+        color: '#d7d9b5',
+      });
+    } else if (o.kind === 'surface-residue-deposit') {
+      c.strokeStyle = '#b8a17b';
+      c.lineWidth = 1;
+      c.beginPath();
+      c.ellipse(
+        pos.x,
+        pos.y,
+        scale * 0.1,
+        scale * 0.1 * DEPTH,
+        0,
+        0,
+        Math.PI * 2,
+      );
+      c.stroke();
+      if (Number(o.data.mass ?? 0) > 0) {
+        c.fillStyle = '#574f39';
+        c.beginPath();
+        c.ellipse(
+          pos.x,
+          pos.y,
+          scale * 0.03,
+          scale * 0.03 * DEPTH,
+          0,
+          0,
+          Math.PI * 2,
+        );
+        c.fill();
+      }
+      this.labels.push({
+        x: pos.x,
+        y: pos.y - 10,
+        text: o.visual.label,
+        color: '#d1c1a2',
+      });
+    } else if (o.kind === 'loose-moss-arrangement') {
+      const r = o.spatial.shape.kind === 'circle' ? o.spatial.shape.radius : 0;
+      c.strokeStyle = '#88a377';
+      c.lineWidth = 1;
+      c.beginPath();
+      c.ellipse(pos.x, pos.y, r * scale, r * scale * DEPTH, 0, 0, Math.PI * 2);
+      c.stroke();
+      this.labels.push({
+        x: pos.x,
+        y: pos.y - r * scale * DEPTH - 8,
+        text: o.visual.label,
+        color: '#c4d2a5',
+      });
+      // The actual loose ground portions are rendered separately, never as an invented full bed.
+    } else if (o.kind === 'prepared-surface') {
+      c.strokeStyle = '#c5b18d';
+      c.lineWidth = 1;
+      c.beginPath();
+      c.ellipse(
+        pos.x,
+        pos.y,
+        scale * 0.2,
+        scale * 0.2 * DEPTH,
+        0,
+        0,
+        Math.PI * 2,
+      );
+      c.stroke();
+      const ratio = Math.max(
+        0,
+        Math.min(1, Number(o.data.exposedArea ?? 0) / (Math.PI * 0.04)),
+      );
+      if (ratio > 0) {
+        c.fillStyle = '#92795b';
+        c.beginPath();
+        c.ellipse(
+          pos.x,
+          pos.y,
+          scale * 0.2 * Math.sqrt(ratio),
+          scale * 0.2 * DEPTH * Math.sqrt(ratio),
+          0,
+          0,
+          Math.PI * 2,
+        );
+        c.fill();
+      }
+      for (const r of Array.isArray(o.data.residues) ? o.data.residues : []) {
+        if (
+          !r ||
+          typeof r !== 'object' ||
+          Array.isArray(r) ||
+          Number(r.mass ?? 0) <= 0
+        )
+          continue;
+        c.fillStyle = '#574f39';
+        c.beginPath();
+        c.ellipse(
+          pos.x + (Number(r.x) - o.spatial.x) * scale,
+          pos.y + (Number(r.y) - o.spatial.y) * scale * DEPTH,
+          Number(r.radius) * scale,
+          Number(r.radius) * scale * DEPTH,
+          0,
+          0,
+          Math.PI * 2,
+        );
+        c.fill();
+      }
+      this.labels.push({
+        x: pos.x,
+        y: pos.y - scale * 0.2 * DEPTH - 8,
+        text: o.visual.label,
+        color: '#e0d7b9',
+      });
+    } else if (this.world?.config.longDevelopment && o.createdBy !== null) {
+      // A generic assembly uses the recorded footprint, color and stage, never an invented building.
+      const shape = o.spatial.shape;
+      const width =
+        (shape.kind === 'rectangle' ? shape.width : shape.radius * 2) * scale;
+      const height =
+        (shape.kind === 'rectangle' ? shape.height : shape.radius * 2) *
+        scale *
+        DEPTH;
+      c.save();
+      c.translate(pos.x, pos.y);
+      c.rotate(o.spatial.angle);
+      c.fillStyle = o.visual.color;
+      c.strokeStyle = o.visual.accent;
+      c.lineWidth = 2;
+      c.fillRect(-width / 2, -height / 2, width, height);
+      c.strokeRect(-width / 2, -height / 2, width, height);
+      if (o.kind === 'root-trial' && o.data.exposed === true) {
+        c.fillStyle = '#483d2d';
+        c.fillRect(-width * 0.4, -height * 0.4, width * 0.8, height * 0.8);
+        if (Number(o.data.remainingRootUnits ?? 0) > 0) {
+          c.fillStyle = '#d6bd8b';
+          c.beginPath();
+          c.ellipse(0, 0, width * 0.25, height * 0.2, 0.3, 0, Math.PI * 2);
+          c.fill();
+        }
+      }
+      c.restore();
+      this.labels.push({
+        x: pos.x,
+        y: pos.y - height / 2 - 8,
+        text: o.visual.label.slice(0, 36),
+        color: '#e0d7b9',
+      });
     } else if (o.data.resource === 'fish') {
       c.strokeStyle = '#9bb5a5aa';
       c.lineWidth = 1.2;
@@ -689,7 +927,7 @@ export class ForestRenderer {
     c.beginPath();
     c.ellipse(pos.x, pos.y, scale * 0.32, scale * 0.12, 0, 0, Math.PI * 2);
     c.stroke();
-    const resting = action.kind === 'rest' && !action.failed;
+    const resting = action.resting;
     c.save();
     c.translate(pos.x, pos.y);
     const work = this.workBlend.get(a.id) ?? 0;

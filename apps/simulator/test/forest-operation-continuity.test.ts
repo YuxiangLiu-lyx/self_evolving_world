@@ -21,6 +21,7 @@ import {
 } from './fixtures/willow.js';
 import { resolveContinuousDevelopment } from '../src/continuous-run.js';
 import type { V7Execution } from '../src/continuous-run.js';
+import { initialLongWorld } from '../src/long-scenario.js';
 const pkg = 'willow-operation-continuity@1';
 const fixture = () =>
   JSON.parse(
@@ -35,6 +36,31 @@ const fixture = () =>
   };
 const step = (w: V7World, action: V7Action) =>
   v7Step(w, { lin: action, moss: fireWait, sol: fireWait }, fireRegistry);
+it('normalizes whitespace aliases before matching already paid work without restarting or duplicating escrow', () => {
+  const f = fixture();
+  let w = v7Clone(v7Install(f.world, fireRegistry, pkg));
+  w.config.longDevelopment = required(
+    initialLongWorld().config.longDevelopment,
+  );
+  const energy = required(w.actors[0]).vitals.energy;
+  const alias = v7Clone(f.action);
+  if (typeof alias.args.target !== 'string')
+    throw new Error('Missing fixture target.');
+  alias.args.target = 'item: ' + alias.args.target.replace(/^item:/, '');
+  for (let n = 0; n < 2; n++) {
+    const r = step(w, alias);
+    expect(r.outcomes.lin?.success).toBe(true);
+    expect(r.world.events.some((e) => e.type === 'willow-work-cancelled')).toBe(
+      false,
+    );
+    w = v7Clone(r.world);
+  }
+  expect(energy - required(w.actors[0]).vitals.energy).toBeCloseTo(2);
+  expect(w.stacks.filter((s) => s.resource === 'bast-cord')).toHaveLength(1);
+  expect(
+    required(w.actors[0]).extensionState['execution:operation'],
+  ).toBeUndefined();
+});
 it('reproduces actual ex9 round495 failure and continues migrated paid escrow across fresh plans without charging or consuming twice', () => {
   const f = fixture();
   expect(step(f.world, f.action).outcomes.lin?.success).toBe(false);

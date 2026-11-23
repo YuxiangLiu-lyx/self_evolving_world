@@ -1,0 +1,1 @@
+{"format":"self-evolving-world/replay","version":7,"protocol":"continuous-v1","observed":23,"target":1600,"phase":"paused","segments":[{"path":"replay/execution-000000-000023.json","start":0,"end":23,"sha256":"0a196101a0f2a09ffec1087e816b499041ccd10df0929ee33b890c3c4d3887e6"}]}

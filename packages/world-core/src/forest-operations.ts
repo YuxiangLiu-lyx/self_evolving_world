@@ -5,7 +5,10 @@ import type {
   V7World,
 } from './continuous-types.js';
 import { v7Clone, v7Signature, v7Json } from './continuous-data.js';
-import { FOREST_REFERENCE_SCOPES } from './forest-references.js';
+import {
+  forestReferenceSpelling,
+  FOREST_REFERENCE_SCOPES,
+} from './forest-references.js';
 
 type Operation = NonNullable<V7Cursor['operation']>;
 interface Binding {
@@ -34,7 +37,35 @@ export function forestBoundOperation(
         b.operation.remaining < 1))
   )
     throw new Error('Invalid persisted operation progress.');
-  const candidates = [b.request, b.operation.action];
+  const normalize = (request: V7Action): V7Action => {
+    if (!w.config.longDevelopment) return request;
+    const copy = v7Clone(request);
+    const scopes =
+      w.abilities.find((ability) => ability.id === request.interface)
+        ?.references ??
+      FOREST_REFERENCE_SCOPES[request.interface] ??
+      {};
+    for (const field of Object.keys(scopes)) {
+      const raw = copy.args[field];
+      if (typeof raw === 'string')
+        copy.args[field] = forestReferenceSpelling(w, raw);
+      else if (Array.isArray(raw))
+        copy.args[field] = raw.map((item) => {
+          if (typeof item === 'string') return forestReferenceSpelling(w, item);
+          if (
+            item &&
+            typeof item === 'object' &&
+            !Array.isArray(item) &&
+            typeof item.target === 'string'
+          )
+            return { ...item, target: forestReferenceSpelling(w, item.target) };
+          return item;
+        });
+    }
+    return copy;
+  };
+  action = normalize(action);
+  const candidates = [normalize(b.request), b.operation.action];
   // Typed aliases may spell the same already-bound identity. Resource aliases are accepted
   // only if they were the original request; no new lookup can select another resource.
   const typed = v7Clone(b.operation.action);

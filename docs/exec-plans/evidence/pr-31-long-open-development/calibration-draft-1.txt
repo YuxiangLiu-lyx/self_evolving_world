@@ -1,0 +1,18 @@
+mobile 200
+mobile 400
+mobile 600
+mobile 800
+mobile 1000
+mobile 1200
+/Users/liuyuxiang/developer/self_evolving_world/scripts/open-preflight.ts:201
+        throw new Error(
+              ^
+
+Error: Isolated baseline lost a life: sol at 1368; {"minima":{"lin":{"health":61.00356651,"satiety":71.6},"moss":{"health":87.3441683,"satiety":71.1},"sol":{"health":0.4133113,"satiety":69.7}},"actions":{"wait":3204,"navigate":141,"gather":252,"eat":252,"rest":255},"failures":{}}
+    at openPreflight (/Users/liuyuxiang/developer/self_evolving_world/scripts/open-preflight.ts:201:15)
+    at <anonymous> (/Users/liuyuxiang/developer/self_evolving_world/validation-results/pr31-calibrate.ts:7:16)
+    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)
+    at async node:internal/modules/esm/loader:647:26
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)
+
+Node.js v24.22.2

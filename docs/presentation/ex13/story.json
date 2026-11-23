@@ -1,0 +1,103 @@
+{
+  "experiment": "ex13",
+  "title": "EX13 \u00b7 Real experiment replay \u00b7 Visual enhancement",
+  "initialRound": 25,
+  "bookmarks": [
+    {
+      "tick": 11,
+      "actor": "moss",
+      "sourceActor": "moss",
+      "title": "A root is actually placed",
+      "type": "root-trial-planted",
+      "text": "Two paid work rounds place one real root in a persistent trial plot. Propagation and future food remain unverified."
+    },
+    {
+      "tick": 19,
+      "actor": "sol",
+      "sourceActor": "sol",
+      "title": "A material trial can fail usefully",
+      "type": "information-confirmed",
+      "text": "Sol consumes 0.1 moss in a real press trial. It fails the tested load and reveals a bounded material response; this is not evidence of a usable bed."
+    },
+    {
+      "tick": 23,
+      "actor": "lin",
+      "sourceActor": "lin",
+      "title": "Work completes, the problem remains",
+      "type": "surface-preparation-ended",
+      "text": "Lin moves loose cover within a small footprint. Conserved residues remain, so the complete planting footprint is still unsuitable. Paid work is not a success reward."
+    },
+    {
+      "tick": 25,
+      "actor": "sol",
+      "sourceActor": "sol",
+      "title": "From a sample to a physical arrangement",
+      "type": "moss-placement-completed",
+      "text": "Sol completes two paid placement rounds using 0.9 owned moss. Actual loose ground portions persist; coverage, comfort and resting benefits remain unproven."
+    },
+    {
+      "tick": 32,
+      "actor": "lin",
+      "sourceActor": "lin",
+      "title": "Real material moves, compatibility stays open",
+      "type": "residue-transfer-completed",
+      "text": "Lin completes a paid transfer of 0.04 loose residue to a checked adjacent receiver. The material persists at its real destination; this step does not certify planting suitability."
+    },
+    {
+      "tick": 39,
+      "actor": "lin",
+      "sourceActor": "lin",
+      "title": "Earlier work supports a later operation",
+      "type": "root-trial-planted",
+      "text": "After actual cover removal and residue transfer, Lin completes the separately learned compatibility adapter and places one conserved root. The earlier surface remains linked to the trial; propagation and food yield are still unverified."
+    },
+    {
+      "tick": 46,
+      "actor": "lin",
+      "sourceActor": "lin",
+      "title": "Information travels through an actual message",
+      "type": "message",
+      "text": "After Moss reports its own remaining residue at round43, Lin sends its observed transfer and placement results. This is real communication, with uncertainty about viability and yield retained; it does not transfer mastery or material."
+    },
+    {
+      "tick": 89,
+      "actor": "lin",
+      "sourceActor": "lin",
+      "title": "A real loose wrap, not a strength claim",
+      "type": "joining-wrapped",
+      "text": "After paid geometry observation, Lin positions the actual two branches and whole vine, then completes a loose wrap. Material leaves inventory and persists at the worksite. No calibrated force, useful joint or wellbeing benefit has been established."
+    },
+    {
+      "tick": 91,
+      "actor": "lin",
+      "sourceActor": "lin",
+      "title": "Recovery conserves the original material",
+      "type": "joining-recovered",
+      "text": "Following a separate inspection, Lin pays for local unwrapping and retrieves the same 0.9 vine and two branch units. The temporary arrangement is removed; no replacement stock or strength restoration is supplied."
+    },
+    {
+      "tick": 139,
+      "actor": "lin",
+      "sourceActor": "lin",
+      "title": "A real contact changes the specimen",
+      "type": "nut-opening-completed",
+      "text": "After actual stone gathering and a failed reach check, Lin completes two paid stone contacts. A small interior region is exposed in the same conserved specimen; the tool has bounded recorded wear. No additional edible stock or safety conclusion is created."
+    },
+    {
+      "tick": 180,
+      "actor": "moss",
+      "sourceActor": "moss",
+      "title": "Reuse still needs personal work and observation",
+      "type": "nut-opening-inspected",
+      "text": "Moss gathers its own stone at round171, performs two paid contacts at178\u2013179, then inspects the actual exposed region at180. The source-specific implementation reuses the earlier contact method; neither code reuse nor exposure establishes food safety, transferable knowledge or dietary benefit."
+    },
+    {
+      "tick": 264,
+      "actor": "moss",
+      "sourceActor": "moss",
+      "title": "A chosen trial precedes actual food use",
+      "type": "apple-trial-consumed",
+      "text": "Moss separately authorizes and swallows 0.1 of an actually collected apple, leaving 0.9. Its private immediate record shows satiety +1 and health change 0, not general safety. Moss then chooses further collection at265 and a real two-apple meal at266 (+20 nutrition). The food profile already existed; the new interface supplies a conserved personal trial, not free food or new nutrition."
+    }
+  ]
+}

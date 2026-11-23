@@ -5,7 +5,7 @@ import type { SceneIndex } from '../../continuous-history.js';
 import { ReplayClient } from '../../replay-client.js';
 import { svgText as escape } from '../../continuous-visuals.js';
 import { loadArt } from './assets.js';
-import { BOOKMARKS } from './bookmarks.js';
+import { presentationExperiment, presentationStory } from '../session.js';
 import { FrameBuffer, PlaybackClock } from './playback.js';
 import { ForestRenderer } from './renderer.js';
 import {
@@ -20,8 +20,12 @@ import type { Person } from './model.js';
 
 const root = document.querySelector<HTMLDivElement>('#presentation');
 if (!root) throw new Error('Missing presentation root.');
-root.innerHTML = `<main class="game" aria-label="EX9 enhanced replay"><canvas id="forest" aria-label="Enhanced recorded forest" tabindex="0"></canvas>
-<header class="masthead glass"><a class="wordmark" href="./">SELF / EVOLVING WORLD</a><span class="preview-label" lang="zh">Ashen 风格回放（预览）</span><span class="provenance" lang="zh">EX9 · 真实实验回放 · 视觉增强</span><a id="original" href="./?experiment=ex9">Original replay ↗</a><button id="fullscreen">Fullscreen</button></header>
+const experiment = presentationExperiment(location.search);
+const story = await presentationStory(experiment);
+const BOOKMARKS = story.bookmarks;
+document.title = `${experiment.toUpperCase()} · Ashen replay preview`;
+root.innerHTML = `<main class="game" aria-label="${experiment.toUpperCase()} enhanced replay"><canvas id="forest" aria-label="Enhanced recorded forest" tabindex="0"></canvas>
+<header class="masthead glass"><a class="wordmark" href="./">SELF / EVOLVING WORLD</a><span class="preview-label" lang="zh">Ashen 风格回放（预览）</span><span class="provenance" lang="zh">${experiment === 'ex9' ? 'EX9 · 真实实验回放 · 视觉增强' : escape(story.title)}</span><a id="original" href="./?experiment=${experiment}">Original replay ↗</a><a href="./ashen.html?experiment=${experiment === 'ex9' ? 'ex13' : 'ex9'}">${experiment === 'ex9' ? 'EX13' : 'EX9'}</a><button id="fullscreen">Fullscreen</button></header>
 <section class="character-hud glass" aria-label="Character HUD"><div class="people" role="group" aria-label="Follow a character">${Object.entries(
   PEOPLE,
 )
@@ -34,9 +38,9 @@ root.innerHTML = `<main class="game" aria-label="EX9 enhanced replay"><canvas id
   )}</div><div class="brief"><strong id="person-name">Lin</strong><span id="brief-vitals"></span></div><h3 id="action">—</h3><div id="progress"></div><div id="equipment"></div><button id="evidence-toggle" aria-expanded="false" aria-controls="evidence">State & evidence</button></section>
 <div class="camera-tools glass"><button id="follow" aria-pressed="true">Follow</button><button id="overview">Full map</button><button id="zoom-in" aria-label="Zoom in">+</button><button id="zoom-out" aria-label="Zoom out">−</button></div>
 <div class="map-hud"><span id="weather"></span><canvas id="minimap" width="192" height="144" aria-label="Click to position the camera" tabindex="0"></canvas></div>
-<section class="playback-hud glass" aria-label="Playback controls"><div class="transport"><button id="previous" aria-label="Previous round">‹</button><button id="play">Play</button><button id="next" aria-label="Next round">›</button><span id="round">— / 1200</span><select id="speed" aria-label="Playback speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select><button id="bookmarks-toggle" aria-expanded="false" aria-controls="bookmarks-panel">Milestones</button></div><input id="timeline" type="range" min="0" max="1200" value="79" aria-label="Replay round"/><div class="timeline-labels"><span id="phase">Saved boundary</span><span class="gesture-note">Drag to pan · Scroll to zoom · Click a person</span></div></section>
-<section id="bookmarks-panel" class="drawer glass" hidden aria-label="Event bookmarks"><button class="close" data-close="bookmarks-panel" aria-label="Close milestones">×</button><div class="chapter"><span class="eyebrow" id="chapter-number">FIELD NOTES</span><h2 id="chapter-title">A shared shelter</h2><p id="chapter-copy"></p></div><div class="bookmarks">${BOOKMARKS.map((b) => `<button data-tick="${String(b.tick)}"><span>${String(b.tick).padStart(3, '0')}</span>${escape(b.title)}</button>`).join('')}</div></section>
-<aside id="evidence" class="drawer glass" hidden aria-label="Recorded evidence"><button class="close" data-close="evidence" aria-label="Close evidence">×</button><p class="eyebrow">LAST VERIFIED BOUNDARY</p><p id="location"></p><span id="space"></span><div id="vitals"></div><p id="action-copy"></p><section class="event-card"><p class="eyebrow">EVIDENCE AT THIS ROUND</p><div id="events"></div></section><details class="record-details"><summary>Inventory, learning & source</summary><div id="details"></div></details><p class="footnote">Illustrated appearance; authoritative positions, quantities and results. Fire and rain canopy were never built or used in ex9. Animation never runs the world.</p><footer>Art adapted from <a href="https://github.com/YuxiangLiu-lyx/Ashen">Ashen</a> · <a href="./presentation/ex9/assets/provenance.json">Asset provenance</a> · <a href="./experiments/ex9/replay.json">Replay index</a></footer></aside><div id="loading" role="status">Opening verified ex9 records…</div><div id="cut" aria-hidden="true"></div></main>`;
+<section class="playback-hud glass" aria-label="Playback controls"><div class="transport"><button id="previous" aria-label="Previous round">‹</button><button id="play">Play</button><button id="next" aria-label="Next round">›</button><span id="round">Loading recorded boundary</span><select id="speed" aria-label="Playback speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select><button id="bookmarks-toggle" aria-expanded="false" aria-controls="bookmarks-panel">Milestones</button></div><input id="timeline" type="range" min="0" max="1200" value="79" aria-label="Replay round"/><div class="timeline-labels"><span id="phase">Saved boundary</span><span class="gesture-note">Drag to pan · Scroll to zoom · Click a person</span></div></section>
+<section id="bookmarks-panel" class="drawer glass" hidden aria-label="Event bookmarks"><button class="close" data-close="bookmarks-panel" aria-label="Close milestones">×</button><div class="chapter"><span class="eyebrow" id="chapter-number">FIELD NOTES</span><h2 id="chapter-title">Recorded field notes</h2><p id="chapter-copy"></p></div><div class="bookmarks">${BOOKMARKS.map((b) => `<button data-tick="${String(b.tick)}"><span>${String(b.tick).padStart(3, '0')}</span>${escape(b.title)}</button>`).join('')}</div></section>
+<aside id="evidence" class="drawer glass" hidden aria-label="Recorded evidence"><button class="close" data-close="evidence" aria-label="Close evidence">×</button><p class="eyebrow">LAST VERIFIED BOUNDARY</p><p id="location"></p><span id="space"></span><div id="vitals"></div><p id="action-copy"></p><section class="event-card"><p class="eyebrow">EVIDENCE AT THIS ROUND</p><div id="events"></div></section><details class="record-details"><summary>Inventory, learning & source</summary><div id="details"></div></details><p class="footnote">Illustrated appearance; authoritative positions, quantities and results. ${experiment === 'ex9' ? 'Fire and rain canopy were never built or used in ex9.' : 'Only source-bound objects, events and paid progress are shown.'} Animation never runs the world.</p><footer>Art adapted from <a href="https://github.com/YuxiangLiu-lyx/Ashen">Ashen</a> · <a href="./presentation/ex9/assets/provenance.json">Asset provenance</a> · <a href="./experiments/${experiment}/replay.json">Replay index</a></footer></aside><div id="loading" role="status">Opening verified ${experiment} records…</div><div id="cut" aria-hidden="true"></div></main>`;
 function el(id: string): HTMLElement {
   const element = document.getElementById(id);
   if (!element) throw new Error(`Missing ${id}.`);
@@ -106,14 +110,14 @@ function update(): void {
     `${String(world.tick)} / ${String(index?.observed ?? 1200)}`;
   slider.value = String(world.tick);
   (el('original') as HTMLAnchorElement).href =
-    `./?experiment=ex9&round=${String(world.tick)}&actor=${person}`;
+    `./?experiment=${experiment}&round=${String(world.tick)}&actor=${person}`;
   el('person-name').textContent = actor.name;
   el('brief-vitals').textContent =
     `Health ${actor.vitals.health.toFixed(0)} · Energy ${actor.vitals.energy.toFixed(0)}`;
   el('location').textContent =
     `${inside ? `Inside ${inside.name}` : 'Outdoors'} · (${actor.position.x.toFixed(2)}, ${actor.position.y.toFixed(2)})`;
   el('weather').textContent =
-    `${climate.temperature.toFixed(1)}°C · ${climate.season} · ${climate.rain && climate.rain > 0.3 ? 'Rain' : 'Dry'}`;
+    `${climate.temperature.toFixed(1)}°C · ${climate.season} · ${climate.rain && climate.rain > 0.3 ? 'Rain' : 'Dry'}${climate.pressure ? ` · ${climate.pressure.phase}` : ''}`;
   el('space').textContent = inside ? ' / interior cutaway' : '';
   el('vitals').innerHTML = [
     ['Health', actor.vitals.health],
@@ -149,7 +153,7 @@ function update(): void {
     (s) => s.owner === actor.id && s.quantity > 0,
   );
   el('details').innerHTML =
-    `<h4>Actual inventory</h4><ul>${items.map((s) => `<li>${escape(s.resource)} × ${String(s.quantity)}${s.reservedFor ? ' · reserved' : ''}<small>${escape(s.id)}</small></li>`).join('') || '<li>Empty</li>'}</ul><h4>Individual mastery</h4><p>${actor.mastered.map(escape).join(', ')}</p><p>${actor.learning ? `${escape(actor.learning.ability)} · ${String(actor.learning.remaining)} study rounds remaining` : 'No study in progress.'}</p><h4>Source boundary</h4><p>ex9 · round ${String(world.tick)} · actor ${escape(actor.id)}</p><p>Bookmarks cite original events. Approval and study do not create items. Pending work is drawn only when retained operation state exists.</p>`;
+    `<h4>Actual inventory</h4><ul>${items.map((s) => `<li>${escape(s.resource)} × ${String(s.quantity)}${s.reservedFor ? ' · reserved' : ''}<small>${escape(s.id)}</small></li>`).join('') || '<li>Empty</li>'}</ul><h4>Individual mastery</h4><p>${actor.mastered.map(escape).join(', ')}</p><p>${actor.learning ? `${escape(actor.learning.ability)} · ${String(actor.learning.remaining)} study rounds remaining` : 'No study in progress.'}</p><h4>Source boundary</h4><p>${experiment} · round ${String(world.tick)} · actor ${escape(actor.id)}</p><p>Bookmarks cite original events. Approval and study do not create items. Pending work is drawn only when retained operation state exists.</p>`;
   const bookmark = BOOKMARKS.find((b) => b.tick === world?.tick);
   el('chapter-number').textContent = bookmark
     ? `RECORDED MILESTONE / ${String(bookmark.tick)}`
@@ -442,8 +446,9 @@ window.addEventListener('pagehide', () => {
 try {
   const [art, loaded] = await Promise.all([
     loadArt(),
-    fetch('./experiments/ex9/replay.json').then(async (r) => {
-      if (!r.ok) throw new Error('EX9 index unavailable.');
+    fetch(`./experiments/${experiment}/replay.json`).then(async (r) => {
+      if (!r.ok)
+        throw new Error(`${experiment.toUpperCase()} index unavailable.`);
       return (await r.json()) as SceneIndex & { version: number };
     }),
   ]);
@@ -463,7 +468,10 @@ try {
       (
         await client.seek(
           {
-            url: new URL(`./experiments/ex9/${part.path}`, location.href).href,
+            url: new URL(
+              `./experiments/${experiment}/${part.path}`,
+              location.href,
+            ).href,
             part,
             tick,
           },
@@ -479,8 +487,8 @@ try {
     person = requested as Person;
     renderer.selected = person;
   }
-  const round = Number(query.get('round') ?? 79);
-  await seek(Number.isFinite(round) ? round : 79);
+  const round = Number(query.get('round') ?? story.initialRound);
+  await seek(Number.isFinite(round) ? round : story.initialRound);
 } catch (error) {
   el('loading').textContent =
     error instanceof Error ? error.message : 'Presentation failed.';

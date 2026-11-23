@@ -5,6 +5,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: true,
   retries: 0,
+  // The task harness retains the complete reviewed diff. Playwright's CI metadata
+  // collector buffers that entire archive patch before truncating its display.
+  captureGitInfo: { commit: true, diff: false },
   reporter: [
     ['list'],
     ['html', { open: 'never' }],

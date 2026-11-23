@@ -62,7 +62,11 @@ export function openPractice(
     );
 }
 /** A small response to sustained actual subsistence repetition, not absence of pleasure or changing labels. */
-export function openRoutine(world: V7World, actor: V7Actor): number {
+export function openRoutine(
+  world: V7World,
+  actor: V7Actor,
+  before?: V7World,
+): number {
   if (!world.config.development) return 0;
   const event = world.events.find(
     (e) => e.actor === actor.id && e.interface && e.success,
@@ -87,7 +91,40 @@ export function openRoutine(world: V7World, actor: V7Actor): number {
       ].includes(e.type) &&
       e.data.qualified === true,
   );
+  let progress = meaningful;
+  if (world.config.longDevelopment) {
+    const old = before?.actors.find((a) => a.id === actor.id);
+    const location = `${String(Math.floor(actor.position.x))},${String(Math.floor(actor.position.y))}`;
+    const visited = actor.extensionState['long:visited'];
+    const cells = Array.isArray(visited)
+      ? visited.filter((x): x is string => typeof x === 'string')
+      : [];
+    const novelPlace = !cells.includes(location);
+    if (novelPlace) cells.push(location);
+    actor.extensionState['long:visited'] = cells;
+    const work = world.events.some(
+      (e) =>
+        e.actor === actor.id &&
+        e.success &&
+        e.interface &&
+        !survival.includes(e.interface) &&
+        !['learn', 'request', 'consult', 'probe'].includes(e.interface) &&
+        (typeof e.data.remaining === 'number' ||
+          typeof e.data.progress === 'number' ||
+          typeof e.data.elapsed === 'number'),
+    );
+    if (meaningful || work || (novelPlace && event?.interface === 'navigate'))
+      actor.extensionState['long:lastProgress'] = world.tick;
+    progress =
+      meaningful ||
+      work ||
+      world.tick - Number(actor.extensionState['long:lastProgress'] ?? -1000) <=
+        16;
+    // Neutral rest/repositioning after real progress is not meaningless routine. Textual projects give no credit.
+    if (old?.learning) progress = true;
+  }
   const repeating =
+    (!world.config.longDevelopment || !progress) &&
     !!event &&
     (survival.includes(event.interface ?? '') ||
       (event.interface === 'probe' && !meaningful));

@@ -2,6 +2,7 @@ import type { V7World, V7Point, V7Data, V7Object } from './continuous-types.js';
 import { v7Id, v7RoundNumber } from './continuous-data.js';
 import { v7Interior } from './continuous-geometry.js';
 import { openConditions } from './open-physical.js';
+import { longPressure } from './long-pressure.js';
 
 export function forestEvent(
   world: V7World,
@@ -46,13 +47,15 @@ export function forestClimate(world: V7World, position: V7Point) {
     2 * Math.sin((world.time * Math.PI) / 113 + (world.config.seed % 19));
   const region =
     ground === ':' ? -3 : ground === ',' ? -1.5 : ground === 'f' ? 0.5 : 1.5;
+  const pressure = longPressure(world);
   let temperature =
     14 +
     seasonal +
     weather +
     region +
     4 * (daylight - 0.4) +
-    (world.config.development?.climateOffset ?? 0);
+    (world.config.development?.climateOffset ?? 0) -
+    (pressure?.cold ?? 0);
   let light = daylight * (0.65 + Math.max(-0.35, seasonal / 30));
   let moisture =
     ground === ',' || ground === '=' ? 0.9 : ground === ':' ? 0.25 : 0.65;
@@ -72,6 +75,7 @@ export function forestClimate(world: V7World, position: V7Point) {
     moisture = Number(object.data.moisture ?? moisture);
   }
   const rain = Math.max(
+    pressure?.rain ?? 0,
     0,
     Math.sin(world.time / 37 + (world.config.seed % 11)),
   );
@@ -79,6 +83,7 @@ export function forestClimate(world: V7World, position: V7Point) {
   if (world.config.experience && !indoor)
     temperature -= world.config.experience.exposure * (rain + wind);
   return {
+    ...(pressure ? { pressure } : {}),
     ...(world.state.foodPreservation === 1
       ? {
           airHumidity: v7RoundNumber(
@@ -122,6 +127,7 @@ export function forestGrowth(world: V7World, object: V7Object): number {
   const light = Math.max(climate.light, Number(object.data.light ?? 0));
   const moisture = Number(object.data.moisture ?? climate.moisture);
   return (
+    (longPressure(world)?.growth ?? 1) *
     (world.config.experience
       ? world.config.experience.growthScale /
         (1 + Number(object.data.depletion ?? 0) / 20)

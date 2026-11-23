@@ -20,6 +20,13 @@ export class ForestReferenceError extends Error {
   }
 }
 
+/** The new control policy accepts surrounding/prefix whitespace uniformly, never a different identity. */
+export function forestReferenceSpelling(world: V7World, value: string): string {
+  return world.config.longDevelopment
+    ? value.trim().replace(/^(item|object|resource):\s+/, '$1:')
+    : value;
+}
+
 /** Exactly one observed identity. Resource categories never silently select a stack. */
 export function forestResolveReference(
   world: V7World,
@@ -28,6 +35,7 @@ export function forestResolveReference(
   scope: V7ReferenceScope,
   quantity = 0,
 ): string {
+  reference = forestReferenceSpelling(world, reference);
   const o = v7Observe(world, actor.id);
   if (scope === 'optional-exact-surface') {
     const cell = /^river:([0-9]+):([0-9]+)$/.exec(reference);
@@ -69,6 +77,7 @@ export function forestResolveReference(
       : o.objects;
   const prefix =
     scope === 'optional-exact-visible' &&
+    !world.config.longDevelopment &&
     world.state.refugeDiagnostics !== 1 &&
     world.state.foodPreservation !== 1 &&
     world.state.shortRefuge !== 1 &&
@@ -117,7 +126,8 @@ export function forestResolveReference(
   const candidates = permitted.map((x) => `${x.kind}:${x.id}`);
   if (
     scope === 'optional-exact-visible' &&
-    (world.state.refugeDiagnostics === 1 ||
+    (world.config.longDevelopment ||
+      world.state.refugeDiagnostics === 1 ||
       world.state.foodPreservation === 1 ||
       world.state.shortRefuge === 1 ||
       world.state.riverWater === 1)

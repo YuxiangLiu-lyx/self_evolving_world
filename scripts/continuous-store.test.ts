@@ -251,3 +251,29 @@ it('binds fresh checkpoint scope and baseline, preserves projects through real r
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+it('binds the long-run checkpoint to its fresh scope and frozen environment policy', async () => {
+  const { initialLongWorld } =
+    await import('../apps/simulator/src/long-scenario.js');
+  const root = mkdtempSync(resolve(tmpdir(), 'long-checkpoint-'));
+  try {
+    const state = newContinuousExecution(
+      'fixture',
+      'isolated-fixture',
+      initialLongWorld('long-ex1'),
+    );
+    const path = resolve(root, 'experiment/ex1/execution.json');
+    continuousAtomic(path, state);
+    expect(readContinuousExecution(root, 'ex1')).toEqual(state);
+    const altered = v7Clone(state);
+    if (!altered.world.config.longDevelopment)
+      throw new Error('Missing policy');
+    altered.world.config.longDevelopment.cold = 9;
+    continuousAtomic(path, altered);
+    expect(() => readContinuousExecution(root, 'ex1')).toThrow(
+      'protected run configuration',
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

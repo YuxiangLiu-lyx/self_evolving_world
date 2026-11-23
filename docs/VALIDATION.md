@@ -123,13 +123,18 @@ Fix every selected automated, visual, or behavior failure and rerun the affected
 
 CI runs the same automated validation on the [canonical repository](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions) and produces pending review. Each run uploads available reports, screenshots, and traces with 14-day retention, including failed runs. Download the complete artifact to preserve the report's relative evidence paths. There is no remote visual or semantic review service. GitHub protection is configured and verified separately under the [PR contract](PULL_REQUESTS.md#github-checks-and-merge-restrictions). The task executor performs actual visual and behavior review and references the plan and findings in the PR.
 
-The quality job has a fifteen-minute total limit, including environment setup
+The quality job has a twenty-five-minute total limit, including environment setup
 and evidence upload. Individual test deadlines and all selected assertions stay
-unchanged. This margin follows measured removal of repeated compilation, eager
-segment reconstruction and redundant entity serialization: the complete
-761-test/75-browser-case run passed in 9m39s, while another runner reached the old
-ten-minute limit near the last browser cases. See the
-[retained measurements](exec-plans/completed/pr-27-ci-audit-headroom.md).
+unchanged. Earlier removal of repeated compilation, eager segment reconstruction
+and redundant serialization established the [previous workload baseline](exec-plans/completed/pr-27-ci-audit-headroom.md).
+The larger EX13 delivery has 907 unit tests, 85 browser cases and 13 archives.
+After disabling Playwright's duplicate archive-sized raw diff attachment, its next
+CI run passed all reported assertions but reached the old fifteen-minute outer
+deadline during browser work. Units took 194.7s versus 131.7s on the preceding
+runner; ex12 reconstruction took 151.7s versus 101.7s, with one deep rebuild per
+archive in both runs. The [retained measurements](exec-plans/evidence/pr-31-long-open-development/ci-deadline.txt)
+justify total workload headroom, not a claimed performance improvement. Commit
+metadata, the complete harness diff review and dependency-bound evidence remain.
 Use the existing `workflow_dispatch` full audit to verify all archives and
 scenes; an expired job or missing check remains a failure, regardless of its
 earlier successful steps.

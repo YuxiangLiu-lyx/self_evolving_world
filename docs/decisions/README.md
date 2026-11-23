@@ -55,3 +55,5 @@ For a material change to an accepted decision, create a new ADR and mark the old
 - [0024](0024-responsive-replay.md): archive-owned replay workers, cancellable verified prefixes and bounded forest presentation.
 
 - [0025](0025-ex9-presentation.md): isolated Ashen-inspired ex9 presentation using verified snapshots, grounded bookmarks and separate visual evidence.
+
+- [0026](0026-bounded-long-development.md): permission-scoped control retrieval, constant output envelope, durable shared token accounting and opt-in long-run pressure.

@@ -1,0 +1,65 @@
+{
+  "video": "actual-playback-58s.webm",
+  "durationSeconds": 58,
+  "source": "Actual isolated Chromium EX13 recording, no world execution, first58seconds without frame synthesis. Full source67.8seconds retained locally. Selected85-test suite independently passed afterward.",
+  "selectedValidationRun": "980deaef-60f0-4f69-8b99-cdd0589e9d84",
+  "screenshots": [
+    {
+      "id": "continuous-ashen-ex13-root",
+      "source": "test-results/ashen-ex13-preview-follows-90a56-hanging-the-original-replay/attachments/review-continuous-ashen-ex13-root-65c39b90ca368ca6ca8562f8bf7ceff300c43003.png",
+      "sha256": "c67218eec1fe6dd391ed75932f407758fd7e509c341bdf5bad6a98f313c65822"
+    },
+    {
+      "id": "continuous-ashen-ex13-moss",
+      "source": "test-results/ashen-ex13-preview-follows-90a56-hanging-the-original-replay/attachments/review-continuous-ashen-ex13-moss-960b6393e26d5380e704e561dee44a02313818cc.png",
+      "sha256": "df9d9bc6fc7e8efa1e957814c7068cc75af27dc66875d8bc17e20ba9ab8210e8"
+    },
+    {
+      "id": "continuous-ashen-ex13-residue",
+      "source": "test-results/ashen-ex13-preview-follows-90a56-hanging-the-original-replay/attachments/review-continuous-ashen-ex13-residue-7e0baa04588b64a7a2d2afbb82e39db56d3e8889.png",
+      "sha256": "4172e6ac143d71e082a7913fe69720d8c4f438d6d6ac32f1fc9a4becbc912b61"
+    },
+    {
+      "id": "continuous-ashen-ex13-1440",
+      "source": "test-results/ashen-ex13-preview-follows-90a56-hanging-the-original-replay/attachments/review-continuous-ashen-ex13-1440-42f7c6e02619e8f0a7075a9adbad4506314a26fb.png",
+      "sha256": "4172e6ac143d71e082a7913fe69720d8c4f438d6d6ac32f1fc9a4becbc912b61"
+    },
+    {
+      "id": "continuous-ashen-ex13-1920",
+      "source": "test-results/ashen-ex13-preview-follows-90a56-hanging-the-original-replay/attachments/review-continuous-ashen-ex13-1920-72ef7eb681f4930ff522215de917f7a9fa9becb1.png",
+      "sha256": "f9c3301da9bc6a69ec069c0ebb75e489d44c2af7f3b3b31f8f2eafbadeba5957"
+    },
+    {
+      "id": "continuous-ashen-ex13-wrap",
+      "source": "test-results/ashen-ex13-preview-follows-90a56-hanging-the-original-replay/attachments/review-continuous-ashen-ex13-wrap-9f63c6673378a5e7fb0d7742f7083bd353fa6c89.png",
+      "sha256": "1d17b8e92d90101836b01c75c05f7fb6c0a146540c19353ce5bd1841d9f741ae"
+    },
+    {
+      "id": "continuous-ashen-ex13-recovery",
+      "source": "test-results/ashen-ex13-preview-follows-90a56-hanging-the-original-replay/attachments/review-continuous-ashen-ex13-recovery-ed85ff9cf4c7288bad899aa30cc9f9205f4ca6ef.png",
+      "sha256": "ca24909a12fda61486bb09f358ef8f9e74dc2f81f4809277c1ca12c894121ad8"
+    },
+    {
+      "id": "continuous-ashen-ex13-contact",
+      "source": "test-results/ashen-ex13-preview-follows-90a56-hanging-the-original-replay/attachments/review-continuous-ashen-ex13-contact-f940c7890eb9b312ea60267932e7cd4e88eb6634.png",
+      "sha256": "bc6cc836f95c4608cf915e1824f5268c812cd1f0e3ecc4c833bced5e2b28d00f"
+    },
+    {
+      "id": "continuous-ashen-ex13-moss-contact",
+      "source": "test-results/ashen-ex13-preview-follows-90a56-hanging-the-original-replay/attachments/review-continuous-ashen-ex13-moss-contact-71e190b080c3bf3b5c39a730517c04a827ef7b7a.png",
+      "sha256": "e8e4723e49ca99a446c024f6317fdc1a39248eb1fbfdeca53eb4229fb6853f08"
+    },
+    {
+      "id": "continuous-ashen-ex13-apple",
+      "source": "test-results/ashen-ex13-preview-follows-90a56-hanging-the-original-replay/attachments/review-continuous-ashen-ex13-apple-896611beae7de6190a4f13b20501cea90df18825.png",
+      "sha256": "33af2b7d1ddb69aa2cb9a05e4498f7c12c109a87d7b8be977d1db4f712aa01b0"
+    },
+    {
+      "id": "continuous-ashen-ex13-original",
+      "source": "test-results/ashen-ex13-preview-follows-90a56-hanging-the-original-replay/attachments/review-continuous-ashen-ex13-original-6343269cc16d1bb3d29d0dd53d5afa6cd4aeed8e.png",
+      "sha256": "da2aab24129d0da06a89107b8d7c6227b70292549f96ed06846ead4765ca60ce"
+    }
+  ],
+  "videoSha256": "3b80d5874e6ffa5e62d65e7950af9850c03d443319b5e4160d7c31c1a5569822",
+  "inspection": "Sampled actual video frames at1,5,10,15,20,25,30,35,40,45,50,55,57seconds, combined with3328rendered trajectory samples. Normal playback, work transitions, actual recovery, cuts, pending verification overlay and apple exposure inspected. This is not a claim that every video frame was manually inspected."
+}
