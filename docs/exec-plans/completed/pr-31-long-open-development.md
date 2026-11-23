@@ -140,3 +140,18 @@ gaps. The [power-log and trace evidence](../evidence/pr-31-long-open-development
 distinguishes this environmental interruption from the CI metadata fault. The
 interrupted run remains failed. Revalidation uses temporary idle-sleep prevention
 with the same assertions, timeouts and experiment state.
+
+The next remote [run45265693638](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/runs/45265693638)
+passed browser startup and every reported assertion, but the outer 15-minute job
+deadline cancelled the unfinished suite. [Measured workload excerpts](../evidence/pr-31-long-open-development/ci-deadline.txt)
+show 907 units at194.7s (prior runner131.7s), ex12 deep verification151.7s
+(prior101.7s), and ex9 deep verification149.7s (prior100.7s). All13 archives
+were rebuilt exactly once; browser work began only at21:14:44 and cancellation
+was at21:18:38. These are observed runner differences, not controlled benchmarks.
+After removing duplicate raw-diff buffering and retaining authenticated reuse,
+the remaining selected workload is real required verification. The outer quality
+allowance is now25 minutes to cover this larger13-archive,907-unit,85-browser scope
+and runner variation. Individual test deadlines, assertions, no-retry policy,
+stable check names and current-head failure gates are unchanged. This is workflow
+headroom, not a claimed speedup or experimental budget increase. No service, cache
+trust exception, separate task framework or model call is introduced.
