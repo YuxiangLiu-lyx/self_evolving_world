@@ -60,3 +60,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-28](completed/pr-28-responsive-replay.md): measured replay responsiveness, worker verification and reduced forest rendering work.
 
 - [PR-29](completed/pr-29-ex9-ashen-preview.md): independent Ashen-inspired ex9 replay with verified bookmarks, faithful equipment/work/interior states and separate presentation evidence.
+
+- [PR-30](completed/pr-30-ex9-continuous-presentation.md): continuous ex9 game-view playback, verified lookahead, damped camera and measured motion acceptance.

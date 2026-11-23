@@ -42,6 +42,8 @@ export const REVIEW_SCENES = [
   'continuous-ashen-overview',
   'continuous-ashen-expired',
   'continuous-ashen-mobile',
+  'continuous-ashen-game-1440',
+  'continuous-ashen-game-1920',
   'continuous-ashen-original-shelter',
   'continuous-ashen-original-mantle',
   'continuous-ashen-original-cave',

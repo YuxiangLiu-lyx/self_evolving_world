@@ -31,7 +31,16 @@ Retain presentation evidence outside historical experiment archives.
 
 The extra art is requested only by the preview page. Terrain and sprite decoding
 are cached, and paused views redraw on state/camera changes. The preview reuses
-verified prefix cancellation and bounds playback work to actual selected rounds.
+verified prefix cancellation and bounds playback work to a ten-frame window around the selected boundary.
+
+The continuous presentation refinement uses one animation-frame clock for motion,
+gait, work and speed changes, plus a separate damped follow camera. A missing
+verified frame freezes presentation time rather than accumulating catch-up debt.
+Objects and outputs change only at integer saved boundaries. A paused fractional
+pose is labeled as between boundaries; exact stepping and seeking reset it.
+Fullscreen and optional drawers remain confined to this entry. Dynamic acceptance
+measures rendered feet, gait phase and camera movement across round and segment
+boundaries, alongside actual recording review; heartbeat timing alone is insufficient.
 
 The art set and buildings are intentionally modest. Tile river edges, recorded
 rectangular footprints and sparse paths remain constraints. This is an ex9-only

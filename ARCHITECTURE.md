@@ -307,8 +307,12 @@ experimental evidence and renders only a brief inspection indicator.
 `apps/viewer/ashen.html` loads the isolated `src/presentation/ex9` Canvas view.
 It shares the existing replay worker and pure continuous geometry queries, but
 has no simulation, capability installation, inference or archive-write path.
-Camera controls and conservative adjacent-frame interpolation operate on verified
-snapshots only. The original observatory accepts optional round/actor URL
+An isolated continuous presentation clock consumes a bounded verified snapshot
+buffer (one preceding and eight ahead); the worker remains the sole verifier.
+No timestamp debt accumulates during buffering. Boundary objects and evidence
+remain exact while guarded adjacent motion and continuous gait are interpolated.
+A separate damped camera follows rendered positions; window-filling HUD and
+fullscreen controls do not change other replay entries. The original observatory accepts optional round/actor URL
 parameters for the return link. Ashen asset provenance, actual event bookmarks
 and separate presentation evidence are described in the
 [presentation guide](docs/presentation/ex9/README.md) and

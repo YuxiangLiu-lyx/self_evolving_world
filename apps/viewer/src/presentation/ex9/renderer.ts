@@ -5,6 +5,7 @@ import type {
   V7Point,
   V7World,
 } from '@self-evolving-world/world-core';
+import { FollowCamera } from './camera.js';
 import { sprite } from './assets.js';
 import type { Art } from './assets.js';
 import {
@@ -24,13 +25,20 @@ export class ForestRenderer {
   private ground: HTMLCanvasElement | undefined;
   private terrain = '';
   private world: V7World | undefined;
-  private from = new Map<string, V7Point>();
-  private started = 0;
-  private gestures = false;
-  private animation = 0;
+  private next: V7World | undefined;
+  private moves = new Map<string, V7Point>();
+  private poses = new Map<string, V7Point>();
+  private strides = new Map<string, number>();
+  private facing = new Map<string, V7Point>();
+  private workBlend = new Map<string, number>();
+  private time = 0;
+  private active = false;
+  readonly rig = new FollowCamera();
+  get camera(): Camera {
+    return this.rig.view;
+  }
   private labels: { x: number; y: number; text: string; color: string }[] = [];
   private hits: { id: string; x: number; y: number; r: number }[] = [];
-  camera: Camera = { x: 13, y: 19, span: 16 };
   selected: Person = 'lin';
   follow = true;
   constructor(
@@ -38,33 +46,125 @@ export class ForestRenderer {
     private readonly mini: HTMLCanvasElement,
     private readonly art: Art,
   ) {}
-  setWorld(world: V7World, animate: boolean): void {
-    this.from.clear();
-    if (animate)
-      for (const actor of world.actors) {
-        const point = motionFrom(this.world, world, actor);
-        if (point) this.from.set(actor.id, point);
-      }
-    this.gestures = animate;
+  setWorld(world: V7World, next?: V7World, cut = false): void {
+    if (world !== this.world || next !== this.next) {
+      this.moves.clear();
+      if (next)
+        for (const actor of next.actors) {
+          const point = motionFrom(world, next, actor);
+          if (point)
+            this.moves.set(actor.id, {
+              x: actor.position.x - point.x,
+              y: actor.position.y - point.y,
+            });
+        }
+    }
     this.world = world;
-    this.started = performance.now();
-    this.draw();
+    this.next = next;
+    if (cut) {
+      this.poses.clear();
+      this.strides.clear();
+      this.facing.clear();
+      this.workBlend.clear();
+      this.focus();
+    }
   }
   focus(): void {
     const actor = this.world?.actors.find((a) => a.id === this.selected);
-    if (actor) {
-      this.camera.x = actor.position.x;
-      this.camera.y = actor.position.y - 1.8;
+    if (actor) this.rig.cut(this.poses.get(actor.id) ?? actor.position);
+  }
+  select(id: Person): boolean {
+    this.selected = id;
+    const point =
+      this.poses.get(id) ??
+      this.world?.actors.find((a) => a.id === id)?.position;
+    const distant =
+      !!point &&
+      Math.hypot(point.x - this.camera.x, point.y - this.camera.y) >
+        this.camera.span * 0.65;
+    if (distant) this.rig.cut(point);
+    this.follow = true;
+    return distant;
+  }
+  render(
+    fraction: number,
+    time: number,
+    seconds: number,
+    active: boolean,
+  ): void {
+    this.time = time;
+    this.active = active;
+    for (const actor of this.world?.actors ?? []) {
+      const movement = this.moves.get(actor.id),
+        point = {
+          x: actor.position.x + (movement?.x ?? 0) * fraction,
+          y: actor.position.y + (movement?.y ?? 0) * fraction,
+        },
+        previous = this.poses.get(actor.id);
+      if (previous) {
+        const distance = Math.hypot(point.x - previous.x, point.y - previous.y);
+        // Discontinuous or rejected paths never add imaginary walking distance.
+        if (distance < 0.5)
+          this.strides.set(
+            actor.id,
+            (this.strides.get(actor.id) ?? 0) + (distance * Math.PI * 2) / 0.65,
+          );
+      }
+      if (movement) this.facing.set(actor.id, movement);
+      this.poses.set(actor.id, point);
+      const action = this.poseAction(actor),
+        work =
+          !movement &&
+          !action.failed &&
+          [
+            'gather',
+            'process-willow',
+            'portable-insulation',
+            'build-shelter',
+            'twist-cord',
+          ].includes(action.kind);
+      const blend = this.workBlend.get(actor.id) ?? 0;
+      this.workBlend.set(
+        actor.id,
+        blend + (Number(work) - blend) * (1 - Math.exp(-18 * seconds)),
+      );
     }
+    this.rig.update(
+      seconds,
+      this.follow ? this.poses.get(this.selected) : undefined,
+      this.active ? this.moves.get(this.selected) : undefined,
+    );
+    this.draw();
+  }
+  private poseAction(actor: V7Actor): ReturnType<typeof currentAction> {
+    const world = this.world;
+    if (!world) throw new Error('Cannot animate without a verified frame.');
+    const nextActor = this.next?.actors.find((a) => a.id === actor.id);
+    // Preview the activity only; all objects, progress and outputs use the base frame.
+    return this.active && this.next && nextActor
+      ? currentAction(this.next, nextActor)
+      : currentAction(world, actor);
+  }
+  snapshot(): {
+    point: V7Point | undefined;
+    camera: Camera;
+    phase: number;
+    moving: boolean;
+    work: number;
+  } {
+    return {
+      point: this.poses.get(this.selected),
+      camera: { ...this.camera },
+      phase: this.strides.get(this.selected) ?? 0,
+      moving: this.active && this.moves.has(this.selected),
+      work: this.workBlend.get(this.selected) ?? 0,
+    };
   }
   pick(x: number, y: number): Person | undefined {
     return this.hits
       .map((h) => ({ ...h, distance: Math.hypot(h.x - x, h.y - y) }))
       .filter((h) => h.distance < h.r)
       .sort((a, b) => a.distance - b.distance)[0]?.id as Person | undefined;
-  }
-  dispose(): void {
-    cancelAnimationFrame(this.animation);
   }
   private makeGround(world: V7World): HTMLCanvasElement {
     const key = world.terrain.join('\n');
@@ -142,13 +242,12 @@ export class ForestRenderer {
     return ground;
   }
   draw = (): void => {
-    cancelAnimationFrame(this.animation);
     const world = this.world;
     if (!world) return;
     const rect = this.canvas.getBoundingClientRect(),
       width = rect.width,
       height = rect.height,
-      ratio = Math.min(2, devicePixelRatio);
+      ratio = devicePixelRatio || 1;
     if (!width || !height) return;
     if (
       this.canvas.width !== Math.round(width * ratio) ||
@@ -162,16 +261,6 @@ export class ForestRenderer {
     c.setTransform(ratio, 0, 0, ratio, 0, 0);
     c.fillStyle = '#17291e';
     c.fillRect(0, 0, width, height);
-    const mix = Math.min(1, (performance.now() - this.started) / 420);
-    if (this.follow) {
-      this.focus();
-      const old = this.from.get(this.selected),
-        actor = world.actors.find((a) => a.id === this.selected);
-      if (old && actor) {
-        this.camera.x += (old.x - actor.position.x) * (1 - mix);
-        this.camera.y += (old.y - actor.position.y) * (1 - mix);
-      }
-    }
     const scale = width / this.camera.span,
       p = (v: V7Point) => project(v, this.camera, width, height);
     const origin = p({ x: 0, y: 0 });
@@ -185,19 +274,7 @@ export class ForestRenderer {
     // Soft grading preserves visibility even during recorded darkness. It is a presentation light, not a world effect.
     c.fillStyle = '#20302222';
     c.fillRect(0, 0, width, height);
-    const poses = new Map<string, V7Point>();
-    for (const a of world.actors) {
-      const before = this.from.get(a.id);
-      poses.set(
-        a.id,
-        before
-          ? {
-              x: before.x + (a.position.x - before.x) * mix,
-              y: before.y + (a.position.y - before.y) * mix,
-            }
-          : a.position,
-      );
-    }
+    const poses = this.poses;
     const drawables: { y: number; draw: () => void }[] = [];
     this.hits = [];
     this.labels = [];
@@ -217,7 +294,7 @@ export class ForestRenderer {
       drawables.push({
         y: o.spatial.y,
         draw: () => {
-          this.object(c, o, world, scale, p);
+          this.object(c, o, scale, p);
         },
       });
     }
@@ -282,7 +359,7 @@ export class ForestRenderer {
       drawables.push({
         y: point.y,
         draw: () => {
-          this.person(c, a, point, world, scale, p, mix);
+          this.person(c, a, point, world, scale, p);
         },
       });
     }
@@ -318,8 +395,6 @@ export class ForestRenderer {
     c.fillStyle = vignette;
     c.fillRect(0, 0, width, height);
     this.drawMini(world, width, height);
-    if (mix < 1 && this.gestures)
-      this.animation = requestAnimationFrame(this.draw);
   };
   private shadow(
     c: CanvasRenderingContext2D,
@@ -352,7 +427,6 @@ export class ForestRenderer {
   private object(
     c: CanvasRenderingContext2D,
     o: V7Object,
-    world: V7World,
     scale: number,
     p: (v: V7Point) => V7Point,
   ): void {
@@ -364,12 +438,23 @@ export class ForestRenderer {
       o.kind.includes('tree') ||
       o.kind.includes('willow')
     ) {
-      const actor = world.actors.find((a) => a.id === this.selected);
+      const point = this.poses.get(this.selected),
+        screen = point ? p(point) : undefined,
+        tree = this.art.trees,
+        height = 3.1 * scale,
+        treeScale = height / tree.height,
+        left =
+          pos.x -
+          (o.id.length % 2 === 0 ? tree.width - tree.foot : tree.foot) *
+            treeScale;
       const obscures =
-        actor &&
-        Math.abs(actor.position.x - o.spatial.x) < 1.5 &&
-        actor.position.y < o.spatial.y &&
-        actor.position.y > o.spatial.y - 3;
+        point &&
+        screen &&
+        point.y < o.spatial.y &&
+        screen.x + 0.4 * scale > left &&
+        screen.x - 0.4 * scale < left + tree.width * treeScale &&
+        screen.y > pos.y - height &&
+        screen.y - 1.5 * scale < pos.y;
       c.save();
       c.globalAlpha = obscures ? 0.12 : 0.94;
       sprite(
@@ -574,25 +659,28 @@ export class ForestRenderer {
     world: V7World,
     scale: number,
     p: (v: V7Point) => V7Point,
-    mix: number,
   ): void {
     const pos = p(point),
-      action = currentAction(world, a),
-      moving = this.from.has(a.id) && mix < 1;
-    const old = this.from.get(a.id),
-      dx = old ? a.position.x - old.x : Math.cos(a.angle),
-      dy = old ? a.position.y - old.y : Math.sin(a.angle);
-    const side = Math.abs(dx) > Math.abs(dy) * 1.2,
-      back = !side && dy < 0;
-    const frame = moving
-      ? side
-        ? 3
-        : (back ? 5 : 1) + (Math.floor(mix * 4) % 2)
-      : side
-        ? 3
-        : back
-          ? 4
-          : 0;
+      action = this.poseAction(a),
+      moving = this.active && this.moves.has(a.id),
+      phase = this.strides.get(a.id) ?? 0,
+      direction = this.facing.get(a.id),
+      dx = direction?.x ?? Math.cos(a.angle),
+      dy = direction?.y ?? Math.sin(a.angle),
+      side = Math.abs(dx) > Math.abs(dy) * 1.2,
+      back = !side && dy < 0,
+      step = Math.sin(phase) >= 0 ? 0 : 1,
+      frame = moving
+        ? side
+          ? step
+            ? 7
+            : 3
+          : (back ? 5 : 1) + step
+        : side
+          ? 3
+          : back
+            ? 4
+            : 0;
     const art = this.art.people[a.id]?.[frame];
     if (!art) return;
     this.shadow(c, pos.x, pos.y, scale * 0.36);
@@ -604,11 +692,14 @@ export class ForestRenderer {
     const resting = action.kind === 'rest' && !action.failed;
     c.save();
     c.translate(pos.x, pos.y);
-    if (resting)
-      c.scale(
-        1,
-        0.8 + (this.gestures && mix < 1 ? 0.02 * Math.sin(mix * Math.PI) : 0),
-      );
+    const work = this.workBlend.get(a.id) ?? 0;
+    if (resting) c.scale(1, 0.8 + 0.01 * Math.sin(this.time * 2));
+    if (moving) {
+      c.translate(0, -scale * 0.025 * Math.abs(Math.sin(phase)));
+      c.rotate(0.018 * Math.sin(phase));
+    } else if (work > 0.01) {
+      c.rotate(work * 0.035 * Math.sin(this.time * Math.PI * 3));
+    }
     sprite(c, art, 0, 0, scale * 1.48, side && dx < 0);
     const mantle = ownedMantle(world, a.id, true)?.mantle;
     if (mantle) {
@@ -653,14 +744,7 @@ export class ForestRenderer {
     }
     c.restore();
     if (a.id === this.selected && this.camera.span < 28) {
-      const work =
-        [
-          'gather',
-          'process-willow',
-          'portable-insulation',
-          'build-shelter',
-        ].includes(action.kind) && !action.failed;
-      if (work) {
+      if (work > 0.01 && !action.failed && !moving) {
         c.strokeStyle = '#e0c99e';
         c.lineWidth = 3;
         c.beginPath();
@@ -668,11 +752,7 @@ export class ForestRenderer {
         c.lineTo(
           pos.x + scale * 0.42,
           pos.y -
-            scale *
-              (0.65 +
-                (this.gestures && mix < 1
-                  ? 0.09 * Math.sin(mix * Math.PI * 4)
-                  : 0)),
+            scale * (0.65 + work * 0.09 * Math.sin(this.time * Math.PI * 3)),
         );
         c.stroke();
       }
@@ -690,8 +770,17 @@ export class ForestRenderer {
   private drawMini(world: V7World, width: number, height: number): void {
     const c = this.mini.getContext('2d');
     if (!c) return;
-    const w = this.mini.width,
-      h = this.mini.height;
+    const ratio = devicePixelRatio || 1,
+      w = this.mini.clientWidth,
+      h = this.mini.clientHeight;
+    if (
+      this.mini.width !== Math.round(w * ratio) ||
+      this.mini.height !== Math.round(h * ratio)
+    ) {
+      this.mini.width = Math.round(w * ratio);
+      this.mini.height = Math.round(h * ratio);
+    }
+    c.setTransform(ratio, 0, 0, ratio, 0, 0);
     c.drawImage(this.makeGround(world), 0, 0, w, h);
     for (const a of world.actors) {
       c.fillStyle = PEOPLE[a.id as Person];
@@ -699,8 +788,8 @@ export class ForestRenderer {
       c.lineWidth = 1.5;
       c.beginPath();
       c.arc(
-        (a.position.x / world.config.width) * w,
-        (a.position.y / world.config.height) * h,
+        ((this.poses.get(a.id)?.x ?? a.position.x) / world.config.width) * w,
+        ((this.poses.get(a.id)?.y ?? a.position.y) / world.config.height) * h,
         a.id === this.selected ? 4.5 : 3,
         0,
         Math.PI * 2,

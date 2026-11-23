@@ -1,0 +1,54 @@
+{
+  "method": "Actual browser renderer diagnostics; only adjacent playing walking samples, no seeks, no buffering, unchanged speed, frame gap under 100 ms. Baseline foot ring sampled with static camera.",
+  "baselineInterRoundStallsMs": [
+    483.3000000000002, 500.0, 500.10000000000036, 500.0, 500.0, 500.0
+  ],
+  "newWalkingPairs": 784,
+  "boundaryPairs": 13,
+  "zeroMotionPairs": 0,
+  "maxPhaseError": 6.994405055138486e-15,
+  "maxWalkingFrameGapMs": 33.40000000000009,
+  "naturalPlaybackBufferFrames": 0,
+  "sourceSha256": {
+    "apps/viewer/src/presentation/ex9/assets.ts": "9d6e3e0da3c221db7d8961b02a9bced4ea010f9a07a496aa77a89fa47c0d0280",
+    "apps/viewer/src/presentation/ex9/bookmarks.ts": "21636f1b11013c8005e68035bcf3753855a3ddbf3ba4c448aa5f223eff5accfa",
+    "apps/viewer/src/presentation/ex9/camera.ts": "4ccf4b31e2220e4b80cca9dc1c90ca5d91a40952cf121995dc0c8f27a1c10c04",
+    "apps/viewer/src/presentation/ex9/main.ts": "6450d2f523e0225c546bda9a02ccb0c2f0eaa070bf6492abc2f6109b58003841",
+    "apps/viewer/src/presentation/ex9/model.ts": "028dd4032c3e77bcae0fca0c73ecde7328b8d592bd9404b1a8ffdfec563a8416",
+    "apps/viewer/src/presentation/ex9/playback.ts": "3a08ea9995392fe4a77fbf211dc80a9795b56066d1fb4187b9acbd15cdac42a8",
+    "apps/viewer/src/presentation/ex9/renderer.ts": "ead7e5fea86b32954e4e66a80c725fa70e979caea2b512e04c72b68d7e5aed5b",
+    "apps/viewer/src/presentation/ex9/style.css": "4355d82594b07089fa096db4dbd835dce43fea5e7a32754fc68f3f5535f3f5d6"
+  },
+  "validationRun": "5fcfdc04-d4d3-4721-9050-5c1d059ba5cd",
+  "videoDuration": "00:00:44.68",
+  "viewports": [
+    {
+      "cssWidth": 1440,
+      "cssHeight": 900,
+      "width": 1440,
+      "height": 900,
+      "dpr": 1
+    },
+    {
+      "cssWidth": 1920,
+      "cssHeight": 1080,
+      "width": 1920,
+      "height": 1080,
+      "dpr": 1
+    },
+    {
+      "cssWidth": 1440,
+      "cssHeight": 900,
+      "width": 2880,
+      "height": 1800,
+      "dpr": 2
+    }
+  ],
+  "recording": {
+    "rawSha256": "bf18c7eb7510b6ad39fa681707520bfed323e6557cdf28e777943f8c73aa788d",
+    "rawBytes": 24324737,
+    "encoding": "VP9 CRF 33; no resizing, interpolation or timeline edits",
+    "retainedSha256": "4b54c011bfacbb868c0e1d9f25024ad7464d8c82fd6ee199e7d4efea400bbc38",
+    "retainedBytes": 10268204
+  }
+}

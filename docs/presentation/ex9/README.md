@@ -15,8 +15,17 @@ model call, world continuation or historical archive write is involved.
 Select Lin, Moss or Sol to follow their real position. Drag the canvas, scroll to
 zoom, use Full map, or click the minimap. Arrow keys pan the focused canvas;
 plus/minus zoom. Pause, 1×/2×/4×, previous/next and the range slider select saved
-rounds. Speed changes playback delay, never simulation time. Inventory and
-individual mastery expand separately from the main picture.
+rounds. A continuous presentation clock drives movement, work and camera at 1×/2×/4×,
+without changing simulation time. The canvas fills the window; Fullscreen uses
+the browser fullscreen API. State & evidence and Milestones open optional drawers.
+Panning suspends follow. Nearby selection and zoom ease; distant selection,
+bookmarks and map jumps cut with a short fade.
+
+Pause freezes the current fractional pose; its HUD explicitly says which two
+saved rounds surround it. State/evidence and the original-replay link refer to
+the last exact boundary, never an interpolated inventory. Previous/next, slider
+and bookmarks restore exact saved boundaries. Press Play to resume without
+resetting the gait. Ordinary playback advances at 900 ms per round at 1×.
 
 | Round | Focus      | What actually happened                                                                       |
 | ----- | ---------- | -------------------------------------------------------------------------------------------- |
@@ -41,12 +50,18 @@ failure, including its historical diagnostic text.
 ## Presentation boundary
 
 The existing archive-owned worker verifies segment bytes and reconstructed state
-hashes. Only the requested immutable snapshot reaches the renderer. New requests
-supersede unfinished seeks. No new replay decoder, world kernel or AI service is
+hashes. A bounded buffer retains the current, preceding and up to eight upcoming verified
+snapshots, including the next file segment. New seeks supersede unfinished work;
+stale results cannot enter the current buffer. Missing data freezes presentation
+time with a buffering notice; verification errors stop playback. No new replay decoder, world kernel or AI service is
 introduced. Terrain textures are cached; sprite sheets are decoded and cropped
-once. Idle paused scenes do not run an endless animation loop.
+once. Paused scenes stop repainting after camera settling; the lightweight frame scheduler remains available for controls.
 
-Camera and animation are separate from world state. Adjacent successful recorded
+Camera and animation are separate from world state. One animation-frame clock
+preserves fractional time across speed changes. Gait phase accumulates actual
+rendered distance and work phase follows presentation time. The camera tracks
+rendered feet through a damped dead zone with bounded directional anticipation.
+Side steps reuse the atlas's two side poses with restrained procedural bobbing. Adjacent successful recorded
 movement is interpolated only if its distance fits the event and the swept disc
 is clear in both snapshots. Discontinuous seeks and uncertain transitions snap.
 Generic work and rest gestures illustrate an event, not additional production.
@@ -76,7 +91,9 @@ not imported.
 
 ## Evidence and limits
 
-[Acceptance record](acceptance.md) contains paired original/enhanced screenshots,
+[Continuous-motion acceptance](motion/README.md) retains the new dynamic recording,
+trajectory measurements and viewport comparisons. The original
+[acceptance record](acceptance.md) contains paired original/enhanced screenshots,
 a short actual browser recording and measured checks. These presentation artifacts
 live here, outside every historical experiment directory.
 
