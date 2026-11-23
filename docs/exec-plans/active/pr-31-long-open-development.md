@@ -28,7 +28,7 @@ A separate technical probe is allowed only if necessary, at most one 30-round ru
 prefer retained real usage plus offline request replay. It must never become formal
 experimental evidence. No probe has been launched.
 
-## Acceptance criteria and sequence
+## Acceptance criteria
 
 1. Audit ex10 context overflow, ex12 execution/cost evidence and current actual code.
 2. Implement opt-in bounded contexts, retrieval, complete request measurement/budget
