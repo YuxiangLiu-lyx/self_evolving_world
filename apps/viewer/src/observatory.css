@@ -440,6 +440,10 @@ a {
   .header-controls a {
     display: none;
   }
+  .header-controls #ashen-link {
+    display: inline;
+    font-size: 10px;
+  }
   .observer-card {
     padding: 15px;
   }

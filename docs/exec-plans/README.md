@@ -58,3 +58,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-26](completed/pr-26-incremental-observatory-replay.md): incremental verified viewer prefixes and post-merge large-archive loading repair.
 
 - [PR-28](completed/pr-28-responsive-replay.md): measured replay responsiveness, worker verification and reduced forest rendering work.
+
+- [PR-29](completed/pr-29-ex9-ashen-preview.md): independent Ashen-inspired ex9 replay with verified bookmarks, faithful equipment/work/interior states and separate presentation evidence.

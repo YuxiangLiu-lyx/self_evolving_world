@@ -1,0 +1,37 @@
+{
+  "environment": "macOS, Chromium via Playwright 1.65.0, 1440x1100, production Vite preview; no CPU throttling",
+  "measurements": [
+    {
+      "operation": "cold-open-79",
+      "durationMs": 1392
+    },
+    {
+      "operation": "cold-seek-519",
+      "durationMs": 820
+    },
+    {
+      "operation": "cold-seek-721",
+      "durationMs": 1308
+    },
+    {
+      "operation": "cached-seek-519",
+      "durationMs": 50
+    },
+    {
+      "operation": "six-second-playback-main-thread-heartbeat",
+      "samples": 365,
+      "p95GapMs": 17,
+      "maxGapMs": 17,
+      "finalRound": "531 / 1200"
+    }
+  ],
+  "errors": [],
+  "sources": {
+    "main.ts": "fb4b7d94544ab83e8a2d8340c9fe055be4561055c3b0c54cfe2e2d63bbd3921c",
+    "renderer.ts": "eb67d18a7d533385ac42a4c6f883c50c114cdd64794bdc3c3a2db9a609bd09ea",
+    "model.ts": "028dd4032c3e77bcae0fca0c73ecde7328b8d592bd9404b1a8ffdfec563a8416",
+    "assets.ts": "9d6e3e0da3c221db7d8961b02a9bced4ea010f9a07a496aa77a89fa47c0d0280",
+    "bookmarks.ts": "21636f1b11013c8005e68035bcf3753855a3ddbf3ba4c448aa5f223eff5accfa",
+    "style.css": "a82447b3f1594c653580bd8091de64787b65f980a02e250fee6913f742bbda8d"
+  }
+}

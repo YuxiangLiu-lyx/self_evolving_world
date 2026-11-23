@@ -35,6 +35,11 @@ pnpm dev
 
 Open [Local replay (after setup)](http://127.0.0.1:5173/?experiment=ex12) while `pnpm dev` is running on your computer. This loopback URL points to your own machine; it is not a public hosted demo. Seek the timeline, follow an agent, switch to its personal view and inspect recorded events. No API key is needed. `/classic.html` retains the original grid inspector; old experiments preserve their original rules. See [development setup](docs/DEVELOPMENT.md) and [collective protocol and recorded limitations](docs/COLLECTIVE_LIFE.md), and [live-run/resume instructions](docs/CONTINUOUS_WORLD.md) for more.
 
+The independent [EX9 Ashen-style preview (local, after setup)](http://127.0.0.1:5173/ashen.html)
+adds a close follow camera and real-event bookmarks for the shelter, mantle,
+cave entrance and equipment repair. It reads the original records without model
+calls. See the [presentation guide and visual evidence](docs/presentation/ex9/README.md).
+
 ## Development task entry
 
 The **code-development harness** is a TypeScript coordinator, separate from the simulated agents. It controls order and evidence; the current Codex conversation implements changes and performs visual and semantic review. It does not launch another autonomous coding service. Its two connected flows are:

@@ -1,0 +1,37 @@
+{
+  "repository": "https://github.com/YuxiangLiu-lyx/Ashen",
+  "commit": "557644e30e22797ed7494e4f52ba753886ef5006",
+  "reuse": "User-authorized reuse from their Ashen repository. Exact original image bytes retained; selected crops, chroma key and foot anchors are applied only at display time. No Ashen game code, maps, character identities, lore or world rules are imported.",
+  "files": [
+    {
+      "file": "materials.png",
+      "source": "dist/assets/v30/materials.png",
+      "sha256": "b688fb12ba6fd6f690409a72e8d9905dc69b9162aefbd068e76a72919a8f4597",
+      "bytes": 3607770
+    },
+    {
+      "file": "trees.png",
+      "source": "dist/assets/v4/world-props.png",
+      "sha256": "8cd2264f83a76578112db3e864afd75fb14000eaf27f79eded4bf6a31b3a08e4",
+      "bytes": 1795115
+    },
+    {
+      "file": "details.png",
+      "source": "dist/assets/v4/details-atlas.png",
+      "sha256": "398b8d19c7894837dde6f3044afd0f716d0c752ae69cf5b7515bbbfffc4ae97f",
+      "bytes": 1805911
+    },
+    {
+      "file": "field-people.png",
+      "source": "dist/assets/c1-story-world/field-npcs.png",
+      "sha256": "cfa1ebd6c8e139df1fe43a533549c5fc7ee6475ba6b7554fa76af828f4720701",
+      "bytes": 2071437
+    },
+    {
+      "file": "elder.png",
+      "source": "dist/assets/c1-story-world/underground-npcs.png",
+      "sha256": "a4f761904dee86d74e36fb9f74ae920fc3335bc1d980bc23d8b883dd51125c5c",
+      "bytes": 2010458
+    }
+  ]
+}

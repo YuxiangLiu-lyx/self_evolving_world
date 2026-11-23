@@ -1,0 +1,409 @@
+[
+  {
+    "tick": 71,
+    "actor": "lin",
+    "position": {
+      "x": 13,
+      "y": 21
+    },
+    "after": "cbc185ce055e49f19157f69fed2ebbfe3f145708a8bbdfb63e5de70acf1ea71a",
+    "event": {
+      "id": "event-71-moss-383",
+      "tick": 71,
+      "actor": "moss",
+      "type": "given",
+      "interface": "give",
+      "success": true,
+      "description": "Transferred 8 dry-grass to Lin.",
+      "position": {
+        "x": 13.65,
+        "y": 21
+      },
+      "target": "item-60-moss-327",
+      "data": {
+        "quantity": 8,
+        "resource": "dry-grass",
+        "item": "item-71-moss-382",
+        "recipient": "lin"
+      }
+    }
+  },
+  {
+    "tick": 76,
+    "actor": "lin",
+    "position": {
+      "x": 13,
+      "y": 21
+    },
+    "after": "c6ba06371baa9c7bca02cef2b5c4f01bd8d9a1b557a48fa934f1f98c61b887a5",
+    "event": {
+      "id": "event-76-lin-413",
+      "tick": 76,
+      "type": "shelter-build-progress",
+      "description": "Constructing shelter: 3 / 6 paid rounds.",
+      "position": {
+        "x": 13,
+        "y": 21
+      },
+      "actor": "lin",
+      "target": "shelter-74-lin-402",
+      "data": {
+        "operation": "shelter-work-74-lin-397",
+        "mode": "build",
+        "elapsed": 3,
+        "energy": 2
+      },
+      "interface": "build-shelter",
+      "success": true
+    }
+  },
+  {
+    "tick": 79,
+    "actor": "lin",
+    "position": {
+      "x": 13,
+      "y": 21
+    },
+    "after": "1b992bbfbe294c2b0d402b6fcc9c83ec12a600137bcdb55144ec3d1f941ddb97",
+    "event": {
+      "id": "event-79-world-432",
+      "tick": 79,
+      "type": "shelter-build-completed",
+      "description": "Completed paid shelter build; 160 service rounds remain. No construction reward.",
+      "position": {
+        "x": 13,
+        "y": 21
+      },
+      "actor": "lin",
+      "target": "shelter-74-lin-402",
+      "data": {
+        "operation": "shelter-work-74-lin-397",
+        "elapsed": 6,
+        "remainingService": 160
+      },
+      "interface": "build-shelter",
+      "success": true
+    }
+  },
+  {
+    "tick": 448,
+    "actor": "moss",
+    "position": {
+      "x": 6.61224562,
+      "y": 9.85229299
+    },
+    "after": "53755241de95b94bf8531415bf1335d2187ab3339c81f0abdd10b48ac50ca475",
+    "event": {
+      "id": "event-448-moss-2460",
+      "tick": 448,
+      "actor": "moss",
+      "type": "learning",
+      "interface": "request",
+      "success": true,
+      "description": "Started portable-insulation; 3 study rounds remain.",
+      "position": {
+        "x": 6.61224562,
+        "y": 9.85229299
+      },
+      "target": null,
+      "data": {
+        "ability": "portable-insulation",
+        "remaining": 3
+      }
+    }
+  },
+  {
+    "tick": 469,
+    "actor": "lin",
+    "position": {
+      "x": 23.3,
+      "y": 14.5
+    },
+    "after": "028fab8f70d3e53ee9d66640c8ed3d762fc141dea5b43363560284c57374bd0c",
+    "event": {
+      "id": "event-469-world-2579",
+      "tick": 469,
+      "type": "willow-work-completed",
+      "description": "Willow processing: work-completed. Paid 4 rounds; 0 remaining.",
+      "position": {
+        "x": 23.3,
+        "y": 14.5
+      },
+      "actor": "lin",
+      "target": "forest-willow-0",
+      "data": {
+        "mode": "strip",
+        "inputs": [
+          {
+            "item": "forest-willow-0",
+            "escrow": "willow-bundle-466-lin-2555",
+            "source": "forest-willow-0",
+            "resource": "willow-shoot-bundle",
+            "quantity": 1,
+            "mass": 1.2,
+            "moisture": 0.9,
+            "harvestedAt": 466
+          }
+        ],
+        "outputs": [
+          {
+            "item": "willow-product-469-world-2576",
+            "resource": "willow-bark",
+            "quantity": 2,
+            "mass": 0.3,
+            "moisture": 0.9
+          },
+          {
+            "item": "willow-product-469-world-2577",
+            "resource": "willow-bast",
+            "quantity": 1,
+            "mass": 0.5,
+            "moisture": 0.9
+          },
+          {
+            "item": "willow-product-469-world-2578",
+            "resource": "willow-offcut",
+            "quantity": 1,
+            "mass": 0.1,
+            "moisture": 0.9
+          }
+        ],
+        "elapsed": 4,
+        "remaining": 0
+      },
+      "interface": "process-willow",
+      "success": true
+    }
+  },
+  {
+    "tick": 518,
+    "actor": "lin",
+    "position": {
+      "x": 23.3,
+      "y": 14.5
+    },
+    "after": "50a89667d9b8c176aa6261d42e725df6fc780524c19a6b326033746463d0ca33",
+    "event": {
+      "id": "event-518-world-2986",
+      "tick": 518,
+      "type": "insulation-completed",
+      "description": "Portable insulation: completed. Paid work 5 rounds.",
+      "position": {
+        "x": 23.3,
+        "y": 14.5
+      },
+      "actor": "lin",
+      "target": "mantle-518-world-2985",
+      "data": {
+        "mode": "craft",
+        "inputs": [
+          {
+            "item": "willow-product-469-world-2576",
+            "escrow": "insulation-material-514-lin-2935",
+            "resource": "willow-bark",
+            "moisture": 1,
+            "mass": 0.3,
+            "quantity": 2,
+            "origin": "forest-willow-0"
+          },
+          {
+            "item": "willow-product-503-world-2831",
+            "escrow": "insulation-material-514-lin-2936",
+            "resource": "willow-bark",
+            "moisture": 1,
+            "mass": 0.3,
+            "quantity": 2,
+            "origin": "forest-willow-0"
+          },
+          {
+            "item": "willow-product-499-world-2787",
+            "escrow": "insulation-material-514-lin-2937",
+            "resource": "bast-cord",
+            "moisture": 1,
+            "mass": 0.5,
+            "quantity": 1,
+            "origin": "forest-willow-0"
+          },
+          {
+            "item": "willow-product-513-world-2925",
+            "escrow": "insulation-material-514-lin-2938",
+            "resource": "bast-cord",
+            "moisture": 0.9,
+            "mass": 0.5,
+            "quantity": 1,
+            "origin": "forest-willow-0"
+          }
+        ],
+        "elapsed": 5,
+        "condition": 160,
+        "mass": 2.2
+      },
+      "interface": "portable-insulation",
+      "success": true
+    }
+  },
+  {
+    "tick": 519,
+    "actor": "lin",
+    "position": {
+      "x": 23.3,
+      "y": 14.5
+    },
+    "after": "d1151be17074bdc5e17acf3bba80585548317fc60351b35de3afcd28e7cf8039",
+    "event": {
+      "id": "event-519-lin-2991",
+      "tick": 519,
+      "type": "insulation-equipped",
+      "description": "Portable insulation: equipped.",
+      "position": {
+        "x": 23.3,
+        "y": 14.5
+      },
+      "actor": "lin",
+      "target": "mantle-518-world-2985",
+      "data": {
+        "energy": 0.5
+      },
+      "interface": "portable-insulation",
+      "success": true
+    }
+  },
+  {
+    "tick": 721,
+    "actor": "sol",
+    "position": {
+      "x": 6,
+      "y": 30.1
+    },
+    "after": "e267d4ee8d8a64fe3037af4a2858c50903e53715ccd935dc342152c55b705f0e",
+    "event": {
+      "id": "event-721-sol-5274",
+      "tick": 721,
+      "actor": "sol",
+      "type": "moved",
+      "interface": "navigate",
+      "success": true,
+      "description": "Traveled 0.800 distance; spent 1.946 energy.",
+      "position": {
+        "x": 6,
+        "y": 30.1
+      },
+      "target": null,
+      "data": {
+        "distance": 0.8,
+        "effort": 1.9456,
+        "load": 4.2,
+        "destinationX": 6,
+        "destinationY": 29
+      }
+    }
+  },
+  {
+    "tick": 927,
+    "actor": "sol",
+    "position": {
+      "x": 23.86235121,
+      "y": 15.30742223
+    },
+    "after": "85fb7b31ea725e0775ea95eabdf3f444a0833859be81fc2b2cb596f35a6fb780",
+    "event": {
+      "id": "event-927-world-7012",
+      "tick": 927,
+      "type": "insulation-completed",
+      "description": "Portable insulation: completed. Paid work 2 rounds.",
+      "position": {
+        "x": 23.86235121,
+        "y": 15.30742223
+      },
+      "actor": "sol",
+      "target": "mantle-489-world-2713",
+      "data": {
+        "mode": "repair",
+        "inputs": [
+          {
+            "item": "willow-product-919-world-6957",
+            "escrow": "insulation-material-926-sol-7002",
+            "resource": "willow-bark",
+            "moisture": 1,
+            "mass": 0.3,
+            "quantity": 2,
+            "origin": "forest-willow-0"
+          },
+          {
+            "item": "item-524-sol-3035",
+            "escrow": "insulation-material-926-sol-7003",
+            "resource": "vine",
+            "moisture": 0.77976214,
+            "mass": 0.5,
+            "quantity": 1,
+            "origin": "forest-vine-2"
+          }
+        ],
+        "elapsed": 2,
+        "condition": 160,
+        "mass": 2.2
+      },
+      "interface": "portable-insulation",
+      "success": true
+    }
+  },
+  {
+    "tick": 930,
+    "actor": "sol",
+    "position": {
+      "x": 23.86235121,
+      "y": 15.30742223
+    },
+    "after": "1000a865c5a26566985347e5a0e8a63f09a65941736c1293701686cc44325745",
+    "event": {
+      "id": "event-930-world-7031",
+      "tick": 930,
+      "type": "willow-work-completed",
+      "description": "Willow processing: work-completed. Paid 3 rounds; 0 remaining.",
+      "position": {
+        "x": 23.86235121,
+        "y": 15.30742223
+      },
+      "actor": "sol",
+      "target": "willow-product-919-world-6958",
+      "data": {
+        "mode": "twist",
+        "inputs": [
+          {
+            "item": "willow-product-919-world-6958",
+            "escrow": "willow-material-928-sol-7019",
+            "source": "forest-willow-0",
+            "resource": "willow-bast",
+            "quantity": 1,
+            "mass": 0.5,
+            "moisture": 0.9,
+            "harvestedAt": 916
+          }
+        ],
+        "outputs": [
+          {
+            "item": "willow-product-930-world-7030",
+            "resource": "bast-cord",
+            "quantity": 1,
+            "mass": 0.5,
+            "moisture": 0.9
+          }
+        ],
+        "elapsed": 3,
+        "remaining": 0,
+        "operation": "willow-work-928-sol-7018",
+        "resolvedTarget": "willow-product-919-world-6958",
+        "originalReference": "item:willow-product-919-world-6958",
+        "actor": "sol",
+        "life": "{\"deaths\":0,\"lastDeath\":null,\"spawn\":{\"x\":14.5,\"y\":22.5},\"total\":3}",
+        "totalRounds": 3,
+        "paidRounds": 3,
+        "remainingRounds": 0,
+        "chargedEffort": 3,
+        "escrow": "willow-material-928-sol-7019"
+      },
+      "interface": "process-willow",
+      "success": true
+    }
+  }
+]
