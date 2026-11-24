@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { V7Event } from '@self-evolving-world/world-core';
+import type { V7Cursor, V7Event } from '@self-evolving-world/world-core';
 import type { ContinuousModelInput } from '../apps/simulator/src/continuous-provider.js';
 import {
   activityEpisodes,
@@ -9,6 +9,9 @@ import {
   cultureMetrics,
   environmentIndex,
   ordinaryCompound,
+  phraseSimilarity,
+  restStep,
+  sharingMatches,
   survivalInterface,
   termCandidates,
   transactional,
@@ -490,6 +493,34 @@ describe('auxiliary metrics', () => {
       survivalRounds: 3,
       share: 0.5,
       interfaces: ['eat', 'gather', 'rest'],
+      restRounds: 1,
+      shareWithoutRest: 2 / 6,
+      perAgent: [
+        {
+          actor: 'lin',
+          actorRounds: 2,
+          survivalRounds: 2,
+          restRounds: 0,
+          share: 1,
+          shareWithoutRest: 1,
+        },
+        {
+          actor: 'moss',
+          actorRounds: 2,
+          survivalRounds: 1,
+          restRounds: 1,
+          share: 0.5,
+          shareWithoutRest: 0,
+        },
+        {
+          actor: 'sol',
+          actorRounds: 2,
+          survivalRounds: 0,
+          restRounds: 0,
+          share: 0,
+          shareWithoutRest: 0,
+        },
+      ],
     });
   });
 
@@ -555,6 +586,567 @@ describe('auxiliary metrics', () => {
     expect(cultureMetrics(world(rounds)).symbolic.everyAgentAtLeastOne).toBe(
       true,
     );
+  });
+});
+
+/** Ideas the sharing detector finds in a text, per matching sentence. */
+const ideas = (value: string) =>
+  sharingMatches(value).map((s) => s.matches.map((m) => m.idea));
+
+describe('sharing expressions', () => {
+  // Exact texts from the ex15 replay (round = replay round of the action or first memory record).
+  it('classifies the ex15 candidate texts', () => {
+    // Kai, round 1, tell (written at round 1): a modest share is restraint at a common bush.
+    const kai1 =
+      "I know red berries provide 8 nutrition with no toxicity. I'll collect a modest share, then learn to exchange findings. I would welcome observations about food preparation and shelter.";
+    expect(sharingMatches(kai1)).toEqual([
+      {
+        sentence:
+          "I'll collect a modest share, then learn to exchange findings.",
+        matches: [
+          { idea: 'take-moderately', phrase: 'collect a modest share' },
+        ],
+      },
+    ]);
+    // Kai, round 1, plan note and preference: leaving a share counts; sharing evidence does not.
+    expect(
+      ideas(
+        'The observed berry source initially contains 12 units; collecting six would leave a share if stock remains unchanged.',
+      ),
+    ).toEqual([['leave-for-others']]);
+    expect(
+      ideas(
+        'Share useful evidence while distinguishing it from untested ideas.',
+      ),
+    ).toEqual([]);
+    // Kai, round 5, tell and preference.
+    expect(
+      ideas(
+        'This berry patch is empty now. I saw another berry patch near (8.66,14.19) at round 3; I will check it and take a modest share. Red berries are known to provide 8 nutrition with no toxicity.',
+      ),
+    ).toEqual([['take-moderately']]);
+    expect(
+      sharingMatches(
+        'Prefer known-safe food and leave some stock for others.',
+      )[0]?.matches,
+    ).toEqual([
+      { idea: 'leave-for-others', phrase: 'leave some stock for others' },
+    ]);
+    // Wren, round 9, tell (written at round 1 in Wren's first plan).
+    expect(
+      sharingMatches(
+        "I know meadow roots provide 14 nutrition and have zero toxicity. I'm collecting four from the patch near (10.1,12), leaving some for others. I'd like to investigate replenishing food together.",
+      ).map((s) => s.matches),
+    ).toEqual([
+      [{ idea: 'leave-for-others', phrase: 'leaving some for others' }],
+    ]);
+    // Lin has no new text at round 14. Its round-13 tell only asks to coordinate (negative);
+    // its round-13 preference states the coordination-instead-of-duplication idea.
+    expect(
+      ideas(
+        "I learned a single-person shelter method: it requires 13 branches, 4 vines and 6 bark, then 12 work rounds. No shelter built yet. I'll collect branches at (17.2,13.3). Has anyone located vines or bark? Sol, let's coordinate materials.",
+      ),
+    ).toEqual([]);
+    expect(
+      ideas(
+        'Coordinate finite material stocks rather than duplicating nearby shelter work.',
+      ),
+    ).toEqual([['coordinate-collection']]);
+    // Sol, round 14, message to Lin, intention and preference.
+    expect(
+      sharingMatches(
+        "I mastered a shared shelter method: two bays need 26 branches, 8 vines and 12 bark, plus 24 work rounds. Birch bark at (12.2,21.3) had 11 units at tick 13. I plan to collect 5, leaving 6 for your single bay. No vines located yet. Let's avoid starting construction until materials and a clear site are secured.",
+      ),
+    ).toEqual([
+      {
+        sentence: 'I plan to collect 5, leaving 6 for your single bay.',
+        matches: [
+          { idea: 'leave-for-others', phrase: 'leaving 6 for your single bay' },
+        ],
+      },
+    ]);
+    expect(
+      sharingMatches(
+        'Coordinate shelter materials with Lin, collect a modest bark supply without exhausting the source, maintain food and energy, and learn a reusable food-preparation skill.',
+      )[0]?.matches,
+    ).toEqual([
+      { idea: 'no-depletion', phrase: 'without exhausting the source' },
+    ]);
+    expect(
+      ideas('Coordinate scarce materials rather than duplicate collection.'),
+    ).toEqual([['coordinate-collection']]);
+    // Moss, round 14, tell: a plain quantity from the same bark is no sharing expression.
+    expect(
+      ideas(
+        "I saw birch bark at (12.2,21.3), stock 11; I'll collect 6 for shelter work. A branch held a 0.25 press load, flexibility 0.2; that does not establish roof safety. I'll test wetting next. No vines located yet.",
+      ),
+    ).toEqual([]);
+  });
+
+  it('rejects self-rationing, information sharing, non-interference and descriptions', () => {
+    for (const negative of [
+      // ex15 texts
+      'Gathering is limited to the observed stock; reserve berries for later rather than consuming the whole harvest.',
+      'Gather only observed stock. Requesting a method is not learning it or building a shelter.',
+      'Recover enough energy for safe work, share known food information, and personally learn the observation skill before choosing material trials.',
+      'Share the completed food-preparation trial honestly, then learn how to conduct a small root-cultivation experiment before committing any food or land to it.',
+      'Review the measured result before selecting further trials or sharing material-property claims.',
+      "I see your trial north of us, Ivo. I'll try one root farther northeast near (20,5.3), leaving your position alone.",
+      'Survival remains uncertain; please leave it undisturbed.',
+      'Secure a modest reserve of known-safe food, recover energy, and investigate a reusable way to make shelter without assuming materials or construction knowledge.',
+      'Prefer reusable skills and shared facilities with testable practical benefits.',
+      'Staying alive with tolerable risk, understanding through actual evidence, and making useful knowledge and everyday security easier to share.',
+      'Coordinate material ownership before committing to construction.',
+      // earlier archives
+      'Continue the current approach and coordinate evidence with Moss before duplicating food trials.',
+      'Search westward for food without exhausting my reserves.',
+      'Four owned berries are split between two exact stacks.',
+      'Please share what your tree inspection actually finds.',
+      // synthetic
+      "I won't leave any for others.",
+      'Do not exhaust yourself before the walk.',
+      'The patch is not depleted yet.',
+      "I'll split the branches for the roof.",
+    ])
+      expect(ideas(negative), negative).toEqual([]);
+  });
+
+  it('recognizes common sharing paraphrases', () => {
+    expect(
+      [
+        'Take only what you need.',
+        "Don't strip the bush.",
+        'Never take the last berry.',
+        "Let's split the berries between us.",
+        'We should share the roots.',
+        "I'll try collecting one more so our combined supply reaches six.",
+        'Avoid competing with others for already discussed supplies.',
+        'Please coordinate before collecting the same supply;',
+        'Maintain a modest food reserve rather than strip shared patches.',
+      ].map(ideas),
+    ).toEqual([
+      [['take-moderately']],
+      [['no-depletion']],
+      [['no-depletion']],
+      [['share-split']],
+      [['share-split']],
+      [['share-split']],
+      [['coordinate-collection']],
+      [['coordinate-collection']],
+      [['no-depletion']],
+    ]);
+    expect(
+      phraseSimilarity(
+        'leave some stock for others',
+        'leaving some for others',
+      ),
+    ).toBe(0.5);
+    expect(phraseSimilarity('take a modest share', 'take a modest share')).toBe(
+      1,
+    );
+  });
+
+  it('measures reuse by other people with authored rounds and message, speech and sign exposure', () => {
+    const say = (
+      r: CultureRound,
+      actor: string,
+      text: string,
+      id = 'tell',
+    ): CultureRound => {
+      r.actions[actor] = { interface: id, args: { text } };
+      return r;
+    };
+    const where = { lin: 0, moss: 1, sol: 40 };
+    const rounds = [
+      say(
+        round(1, { lin: 'tell', moss: 'wait', sol: 'wait' }, { where }),
+        'lin',
+        'Leave some berries for others.',
+      ),
+      round(3, idle, {
+        where,
+        memory: {
+          moss: { notes: ['Leave some roots for others too.'] },
+          sol: { notes: ['Leaving some berries for others is kind.'] },
+        },
+      }),
+      // Lin's message reaches Sol at round 4, after Sol wrote the tell it speaks at round 6.
+      round(4, idle, {
+        where,
+        events: [
+          message(4, 'lin', 'sol', 'Take only what you need from the bush.'),
+        ],
+      }),
+      {
+        ...say(
+          round(6, { lin: 'wait', moss: 'wait', sol: 'tell' }, { where }),
+          'sol',
+          'Take only what you need.',
+        ),
+        authored: { sol: 2 },
+      },
+      // Moss marks the ground at x = 1; Sol first stands within sight of it at round 8.
+      say(
+        round(7, { lin: 'wait', moss: 'mark', sol: 'wait' }, { where }),
+        'moss',
+        'Share the roots.',
+        'mark',
+      ),
+      round(8, idle, { where: { lin: 0, moss: 1, sol: 3 } }),
+      round(9, idle, {
+        where: { lin: 0, moss: 1, sol: 3 },
+        memory: { sol: { notes: ['We share roots here.'] } },
+      }),
+    ];
+    const metrics = cultureMetrics(world(rounds));
+    const s = metrics.sharing;
+    expect(
+      s.list.map((e) => [e.actor, e.round, e.authored, e.kind, e.communicated]),
+    ).toEqual([
+      ['lin', 1, 1, 'public', true],
+      ['sol', 6, 2, 'public', true],
+      ['moss', 3, 3, 'note', false],
+      ['sol', 3, 3, 'note', false],
+      ['lin', 4, 4, 'message', true],
+      ['moss', 7, 7, 'name', true],
+      ['sol', 9, 9, 'note', false],
+    ]);
+    expect(
+      s.reuseList.map((r) => [
+        r.actor,
+        r.authored,
+        r.idea,
+        r.closest.actor,
+        Number(r.closest.similarity.toFixed(2)),
+        r.similarWording,
+        r.exposure,
+      ]),
+    ).toEqual([
+      [
+        'moss',
+        3,
+        'leave-for-others',
+        'lin',
+        0.33,
+        false,
+        {
+          idea: 'leave-for-others',
+          actor: 'lin',
+          round: 1,
+          received: 1,
+          via: 'speech',
+        },
+      ],
+      // Sol was out of hearing range.
+      ['sol', 3, 'leave-for-others', 'lin', 0.67, true, null],
+      // Sol wrote its tell at round 2, so Lin's round-4 message is the later one and Sol is first.
+      ['lin', 4, 'take-moderately', 'sol', 1, true, null],
+      [
+        'sol',
+        9,
+        'share-split',
+        'moss',
+        1,
+        true,
+        {
+          idea: 'share-split',
+          actor: 'moss',
+          round: 7,
+          received: 8,
+          via: 'sign',
+        },
+      ],
+    ]);
+    expect(s.reuseList[3]?.otherExposure).toEqual({
+      idea: 'take-moderately',
+      actor: 'lin',
+      round: 4,
+      received: 4,
+      via: 'message',
+    });
+    expect(s).toMatchObject({
+      expressions: 7,
+      communicated: 4,
+      reuses: 4,
+      similarReuses: 3,
+      exposedReuses: 2,
+    });
+    expect(
+      s.ideas.map((i) => [
+        i.idea,
+        i.expressions,
+        i.firstUsers,
+        i.firstAuthored,
+        i.laterUsers,
+        i.exposedLaterUsers,
+      ]),
+    ).toEqual([
+      ['leave-for-others', 3, ['lin'], 1, ['moss', 'sol'], ['moss']],
+      ['take-moderately', 2, ['sol'], 2, ['lin'], []],
+      ['no-depletion', 0, [], null, [], []],
+      ['share-split', 2, ['moss'], 7, ['sol'], ['sol']],
+      ['coordinate-collection', 0, [], null, [], []],
+    ]);
+    const markdown = cultureMarkdown(metrics);
+    expect(markdown).toContain('### Sharing expressions');
+    expect(markdown).toContain('moss r7 via sign (r8)');
+
+    // Owner-only cares and views are detected in the private section only.
+    const secret = world(rounds);
+    const first = secret.rounds[1];
+    if (first)
+      first.memory = {
+        ...first.memory,
+        moss: {
+          ...first.memory.moss,
+          views: { lin: 'Lin leaves some for others.' },
+        },
+        sol: { ...first.memory.sol, cares: 'Never take the last berry.' },
+      };
+    const hidden = cultureMetrics(secret);
+    expect(hidden.sharing).toEqual(s);
+    expect(
+      hidden.privateMemory?.sharing.expressions.map((x) => [
+        x.actor,
+        x.field,
+        x.person,
+        x.matches.map((m) => m.idea),
+        x.exposure,
+      ]),
+    ).toEqual([
+      [
+        'moss',
+        'view',
+        'lin',
+        ['leave-for-others'],
+        {
+          idea: 'leave-for-others',
+          actor: 'lin',
+          round: 1,
+          received: 1,
+          via: 'speech',
+        },
+      ],
+      ['sol', 'cares', null, ['no-depletion'], null],
+    ]);
+  });
+});
+
+describe('rest as a default idle behavior', () => {
+  const rested = (
+    tick: number,
+    actor: string,
+    recovered: number,
+    mentalFactor = 1,
+  ) =>
+    event(tick, actor, 'rested', {
+      interface: 'rest',
+      data: { recovered, nominal: 4, mentalFactor, bonus: 0 },
+    });
+  const restWorld = (
+    unrecordedRestFactor = false,
+    starts = true,
+  ): CultureInput => ({
+    ...world([
+      round(
+        1,
+        { lin: 'rest', moss: 'rest', sol: 'navigate' },
+        {
+          // Lin's recovery is uncapped; Moss rests from a step without an energy condition.
+          events: [rested(1, 'lin', 4.0025, 1.000625), rested(1, 'moss', 4)],
+          restSteps: {
+            lin: { conditioned: true, target: 39 },
+            moss: { conditioned: false, target: null },
+          },
+          // Moss starts exactly at 75% of the cap, which counts as a high start.
+          ...(starts ? { energy: { lin: 20, moss: 30, sol: 25 } } : {}),
+        },
+      ),
+      round(
+        2,
+        { lin: 'rest', moss: 'gather', sol: 'rest' },
+        {
+          // The cap cut Lin's recovery: Lin began the round within one rest of full energy.
+          events: [
+            rested(2, 'lin', 1.5, 1.000625),
+            event(2, 'sol', 'failed', { interface: 'rest' }),
+          ],
+          restSteps: {
+            lin: { conditioned: true, target: 39 },
+            sol: { conditioned: true, target: 30 },
+          },
+          // Sol's need-conditioned rest still begins above 75% of the cap.
+          ...(starts ? { energy: { lin: 38.5, moss: 34, sol: 31 } } : {}),
+        },
+      ),
+    ]),
+    energy: { cap: 40, restRecovery: 4, unrecordedRestFactor },
+  });
+
+  it('reports both criteria with their own verdicts, per person and overall', () => {
+    const metrics = cultureMetrics(restWorld());
+    expect(metrics.rest).toMatchObject({
+      rests: 4,
+      idle: 2,
+      unconditioned: 1,
+      highEnergy: 1,
+      toFull: 2,
+      withStep: 4,
+      withRecovery: 3,
+      idleShare: 0.5,
+      default: true,
+      highStart: 3,
+      withStart: 4,
+      highStartShare: 0.75,
+      startDefault: true,
+      startShare: 0.75,
+    });
+    expect(metrics.rest.perAgent).toEqual([
+      {
+        actor: 'lin',
+        rests: 2,
+        idle: 1,
+        unconditioned: 0,
+        highEnergy: 1,
+        toFull: 2,
+        withStep: 2,
+        withRecovery: 2,
+        idleShare: 0.5,
+        default: true,
+        highStart: 1,
+        withStart: 2,
+        highStartShare: 0.5,
+        startDefault: true,
+      },
+      {
+        actor: 'moss',
+        rests: 1,
+        idle: 1,
+        unconditioned: 1,
+        highEnergy: 0,
+        toFull: 0,
+        withStep: 1,
+        withRecovery: 1,
+        idleShare: 1,
+        default: true,
+        highStart: 1,
+        withStart: 1,
+        highStartShare: 1,
+        startDefault: true,
+      },
+      {
+        actor: 'sol',
+        rests: 1,
+        idle: 0,
+        unconditioned: 0,
+        highEnergy: 0,
+        toFull: 0,
+        withStep: 1,
+        withRecovery: 0,
+        idleShare: 0,
+        // The criteria disagree for Sol.
+        default: false,
+        highStart: 1,
+        withStart: 1,
+        highStartShare: 1,
+        startDefault: true,
+      },
+    ]);
+    // The second survival share leaves the gate's share unchanged.
+    expect(metrics.survival).toMatchObject({
+      survivalRounds: 5,
+      restRounds: 4,
+      share: 5 / 6,
+      shareWithoutRest: 1 / 6,
+    });
+    const markdown = cultureMarkdown(metrics);
+    expect(markdown).toContain('Without `rest`');
+    expect(markdown).toContain('2 of 4 rests idle (50.0%');
+    expect(markdown).toContain('3 of 4 rests (75.0%); default: yes');
+  });
+
+  it('leaves the start-energy criterion undefined without reconstructed start energy', () => {
+    expect(cultureMetrics(restWorld(false, false)).rest).toMatchObject({
+      default: true,
+      highStart: null,
+      withStart: 0,
+      highStartShare: null,
+      startDefault: null,
+    });
+  });
+
+  it('skips the cap test when an unrecorded weather factor can lower recovery', () => {
+    expect(cultureMetrics(restWorld(true)).rest).toMatchObject({
+      idle: 1,
+      highEnergy: null,
+      withRecovery: 0,
+      default: false,
+    });
+  });
+
+  it('finds the plan step that produced a rest from the cursor after the round', () => {
+    const until = (value: number) => ({
+      path: 'self.energy',
+      comparison: 'gte' as const,
+      value,
+    });
+    const cursor = (
+      step: number,
+      repetition: number,
+      reason: string | null = null,
+      planUntil: number | null = null,
+    ): V7Cursor => ({
+      plan: {
+        intention: '',
+        steps: [
+          {
+            action: { interface: 'rest', args: {} },
+            repeat: 8,
+            until: until(39),
+            guard: null,
+          },
+          {
+            action: { interface: 'gather', args: { target: 'bush' } },
+            repeat: 1,
+            until: null,
+            guard: null,
+          },
+          {
+            action: { interface: 'rest', args: {} },
+            repeat: 3,
+            until: null,
+            guard: null,
+          },
+        ],
+        repeat: 1,
+        until: planUntil === null ? null : until(planUntil),
+        interrupts: [],
+        notes: [],
+        preferences: [],
+      },
+      step,
+      repetition,
+      cycle: 0,
+      startedAt: 0,
+      navigation: null,
+      reason,
+    });
+    const rest = { interface: 'rest', args: {} };
+    const conditioned = { conditioned: true, target: 39 };
+    const free = { conditioned: false, target: null };
+    // Still repeating the first step, then advanced past it.
+    expect(restStep(cursor(0, 2), rest)).toEqual(conditioned);
+    expect(restStep(cursor(1, 0), rest)).toEqual(conditioned);
+    // Repeating the last step; wrapped after it; stopped on it by a failure.
+    expect(restStep(cursor(2, 1), rest)).toEqual(free);
+    expect(restStep(cursor(0, 0), rest)).toEqual(free);
+    expect(restStep(cursor(2, 0, 'failed'), rest)).toEqual(free);
+    // A plan-level until on energy conditions every step.
+    expect(restStep(cursor(2, 1, null, 40), rest)).toEqual({
+      conditioned: true,
+      target: 40,
+    });
+    expect(restStep(cursor(1, 0), { interface: 'eat', args: {} })).toBeNull();
   });
 });
 
@@ -779,6 +1371,9 @@ describe('owner-only private memory', () => {
     expect(hidden.vocabulary.top.map((t) => t.term)).toEqual(['Stone Circle']);
     expect(hidden.norms.phraseEchoes).toBe(0);
     expect(hidden.beliefs.statements).toBe(0);
+    // The private views share berries; that sharing idea stays in the private section.
+    expect(hidden.privateMemory?.sharing.byIdea['share-split']).toBe(2);
+    expect(hidden.sharing).toEqual(open.sharing);
   });
 
   it('empties private memory in a retained request before it becomes environment', () => {
@@ -830,9 +1425,11 @@ describe('retained ex13 baseline', () => {
       'vocabulary',
       'activities',
       'norms',
+      'sharing',
       'beliefs',
       'relationships',
       'survival',
+      'rest',
       'nonTransactional',
       'symbolic',
       'privateMemory',
@@ -856,7 +1453,18 @@ describe('retained ex13 baseline', () => {
         responses: { pairs: 6 },
         transfers: { pairs: 0, reciprocity: null },
       },
-      survival: { actorRounds: 840, survivalRounds: 349 },
+      survival: { actorRounds: 840, survivalRounds: 349, restRounds: 199 },
+      rest: {
+        rests: 199,
+        idle: 44,
+        unconditioned: 3,
+        highEnergy: 44,
+        default: false,
+        highStart: 124,
+        withStart: 199,
+        startDefault: true,
+      },
+      sharing: { expressions: 5, communicated: 1 },
       nonTransactional: { messages: 17, nonTransactional: 0 },
       symbolic: { everyAgentAtLeastOne: false },
       privateMemory: null,
@@ -877,5 +1485,137 @@ describe('retained ex13 baseline', () => {
     expect(archiveCultureMetrics('experiment/ex13', 80).rounds.count).toBe(80);
     expect(cultureMarkdown(metrics)).toContain('## Culture metrics: ex13');
     expect(cultureMarkdown(metrics)).not.toContain('Private memory');
-  });
+    // Exact replay of 280 and 80 rounds for start energy takes several seconds.
+  }, 120_000);
+});
+
+describe('retained ex15 culture pilot', () => {
+  it('pins sharing expressions, rest and the survival share without rest', () => {
+    const metrics = archiveCultureMetrics('experiment/ex15');
+    // The gate's survival share is unchanged; the second share leaves out rest.
+    expect(metrics.survival).toMatchObject({
+      actorRounds: 420,
+      survivalRounds: 166,
+      restRounds: 115,
+    });
+    expect(metrics.survival.shareWithoutRest).toBeCloseTo(51 / 420);
+    expect(
+      metrics.survival.perAgent.map((a) => [
+        a.actor,
+        a.survivalRounds,
+        a.restRounds,
+      ]),
+    ).toEqual([
+      ['lin', 35, 28],
+      ['moss', 31, 20],
+      ['sol', 26, 17],
+      ['kai', 27, 19],
+      ['wren', 20, 15],
+      ['ivo', 27, 16],
+    ]);
+    // Every rest step stops at an energy target of 38-40 of 40. Criterion 1: 24 rests began
+    // within one rest of the cap, so rest is no default. Criterion 2: 65 rests began at 30 of 40
+    // or more, so rest is a default overall and for everyone but Lin.
+    expect(metrics.rest).toMatchObject({
+      rests: 115,
+      idle: 24,
+      unconditioned: 0,
+      highEnergy: 24,
+      toFull: 115,
+      withStep: 115,
+      withRecovery: 115,
+      default: false,
+      highStart: 65,
+      withStart: 115,
+      startDefault: true,
+    });
+    expect(
+      metrics.rest.perAgent.map((a) => [
+        a.actor,
+        a.highEnergy,
+        a.default,
+        a.highStart,
+        a.startDefault,
+      ]),
+    ).toEqual([
+      ['lin', 4, false, 12, false],
+      ['moss', 5, false, 11, true],
+      ['sol', 2, false, 9, true],
+      ['kai', 5, false, 12, true],
+      ['wren', 3, false, 9, true],
+      ['ivo', 5, false, 12, true],
+    ]);
+
+    const s = metrics.sharing;
+    expect(s).toMatchObject({
+      expressions: 31,
+      communicated: 9,
+      reuses: 23,
+      similarReuses: 10,
+      exposedReuses: 9,
+    });
+    const at = (actor: string, round: number) =>
+      s.list
+        .filter((e) => e.actor === actor && e.round === round)
+        .map((e) => [e.kind, e.authored, e.matches.map((m) => m.idea)]);
+    expect(at('kai', 1)).toEqual([
+      ['public', 1, ['take-moderately']],
+      ['note', 1, ['leave-for-others']],
+    ]);
+    expect(at('kai', 5)).toEqual([
+      ['public', 5, ['take-moderately']],
+      ['note', 5, ['leave-for-others']],
+    ]);
+    // Wren spoke at round 9 a tell written in its first plan, before hearing anyone.
+    expect(at('wren', 9)).toEqual([['public', 1, ['leave-for-others']]]);
+    expect(at('lin', 13)).toEqual([['note', 13, ['coordinate-collection']]]);
+    expect(at('lin', 14)).toEqual([]);
+    expect(at('sol', 14)).toEqual([
+      ['message', 14, ['leave-for-others']],
+      ['intention', 14, ['no-depletion']],
+      ['note', 14, ['coordinate-collection']],
+    ]);
+    expect(
+      s.ideas.map((i) => [i.idea, i.expressions, i.communicated, i.firstUsers]),
+    ).toEqual([
+      ['leave-for-others', 7, 3, ['kai', 'wren']],
+      ['take-moderately', 6, 2, ['kai']],
+      ['no-depletion', 5, 0, ['moss', 'wren']],
+      ['share-split', 1, 1, ['moss']],
+      ['coordinate-collection', 13, 3, ['lin']],
+    ]);
+    // Sol's round-41 message repeats Lin's round-40 message to Sol in similar words.
+    expect(
+      s.reuseList.find(
+        (r) => r.actor === 'sol' && r.kind === 'message' && r.round === 41,
+      ),
+    ).toMatchObject({
+      idea: 'coordinate-collection',
+      closest: { actor: 'lin', round: 40 },
+      similarWording: true,
+      exposure: { actor: 'lin', round: 40, via: 'message' },
+    });
+    // Kai's round-22 preference follows Wren's round-9 tell, which Kai heard.
+    expect(
+      s.reuseList.find((r) => r.actor === 'kai' && r.authored === 22),
+    ).toMatchObject({
+      idea: 'leave-for-others',
+      exposure: { actor: 'wren', round: 9, via: 'speech' },
+    });
+    // Owner-only cares and views carry three sharing ideas, none after a public one was heard.
+    expect(
+      metrics.privateMemory?.sharing.expressions.map((x) => [
+        x.actor,
+        x.round,
+        x.field,
+        x.matches.map((m) => m.idea),
+        x.exposure,
+      ]),
+    ).toEqual([
+      ['moss', 1, 'cares', ['share-split'], null],
+      ['wren', 1, 'cares', ['no-depletion'], null],
+      ['sol', 14, 'view', ['coordinate-collection'], null],
+    ]);
+    expect(cultureMarkdown(metrics)).toContain('### Sharing expressions');
+  }, 60_000);
 });

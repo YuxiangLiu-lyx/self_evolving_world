@@ -366,6 +366,29 @@ gains no `airHumidity`. Ex10's food tenths and reference prefixes are not instal
 - The exchange emits ex10's `preservation-progress` event for exposed food; a package
   that uses the representation declares it.
 
+## Culture metrics
+
+`pnpm metrics:culture` measures culture archives with deterministic rules; the full
+definitions are in the [metric definitions](presentation/culture-baseline.md#metric-definitions).
+Besides the measures above and gate G2 (survival share below 50% and a symbolic action by
+every person, unchanged), it reports:
+
+- **Sharing expressions:** sentences of spoken, sent or posted text and of plan notes and
+  intentions that match keyword rules for five ideas about common resources: leave some for
+  others, take only a modest share or what is needed, do not exhaust a source, share or pool,
+  and coordinate a finite stock instead of competing for it or duplicating its collection.
+  A **reuse** is a later expression of an idea by someone other than an earlier author, with
+  the most similar earlier phrase and the earliest receipt of the idea (message, speech within
+  the vision radius, council read or sign within sight) before the reuse was written. Spoken
+  text is dated by the first round of the plan that wrote it. Cares and views get the same
+  detection only in the private section.
+- **Rest as a default**, by two criteria side by side, each with its own verdict per person
+  and in total (default when at least half of the rests qualify): (1) the plan step has no
+  energy condition or the energy cap cut the recorded recovery (within one rest of full
+  energy); (2) the rest began, by exact replay, at or above 75% of the energy cap.
+- **Survival share without rest:** survival actor-rounds other than `rest` over all
+  actor-rounds, per person and in total, next to the survival share.
+
 ## Excluded vocabulary
 
 Nothing an ordinary agent can see contains _culture_, _cultural_, _belief_, _believe_,
