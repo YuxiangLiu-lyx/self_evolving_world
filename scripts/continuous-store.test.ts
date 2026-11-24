@@ -277,3 +277,34 @@ it('binds the long-run checkpoint to its fresh scope and frozen environment poli
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+it('binds the long-fixes checkpoint to its own frozen fixes and limits', async () => {
+  const { initialLongWorld } =
+    await import('../apps/simulator/src/long-scenario.js');
+  const root = mkdtempSync(resolve(tmpdir(), 'long-fixes-checkpoint-'));
+  try {
+    const state = newContinuousExecution(
+      'fixture',
+      'isolated-fixture',
+      initialLongWorld('long-ex1', 'long-fixes'),
+    );
+    expect(state.windowTarget).toBe(40);
+    const path = resolve(root, 'experiment/ex1/execution.json');
+    continuousAtomic(path, state);
+    expect(readContinuousExecution(root, 'ex1')).toEqual(state);
+    const altered = v7Clone(state);
+    altered.world.config.budgets.development = 15;
+    continuousAtomic(path, altered);
+    expect(() => readContinuousExecution(root, 'ex1')).toThrow(
+      'protected run configuration',
+    );
+    const untagged = v7Clone(state);
+    delete untagged.world.config.longDevelopment?.scenario;
+    continuousAtomic(path, untagged);
+    expect(() => readContinuousExecution(root, 'ex1')).toThrow(
+      'protected run configuration',
+    );
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

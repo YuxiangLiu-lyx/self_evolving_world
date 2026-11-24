@@ -66,3 +66,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-31: Long open development with bounded context](completed/pr-31-long-open-development.md).
 
 - [PR-32](completed/pr-32-lean-harness.md): lean branch/validate/PR workflow replacing the task coordinator, and removal of superseded code.
+
+- [PR-33](completed/pr-33-long-run-fixes.md): opt-in whole exact reads and prompt guidance, the long-fixes scenario, honest developer records and archive-only long-run metrics.

@@ -36,7 +36,9 @@
     "experiment:capture": "tsx scripts/experiment-cli.ts capture",
     "experiment:analysis": "tsx scripts/experiment-cli.ts analysis",
     "experiment:check": "tsx scripts/experiment-cli.ts check",
-    "analysis:check": "tsx scripts/experiment-cli.ts analyses"
+    "analysis:check": "tsx scripts/experiment-cli.ts analyses",
+    "metrics:long": "tsx scripts/long-metrics.ts",
+    "compat:long": "tsx scripts/long-compatibility.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

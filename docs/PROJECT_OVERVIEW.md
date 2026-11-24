@@ -2,7 +2,7 @@
 
 ## Vision
 
-Self-Evolving World explores how autonomous agents might interact in a shared world and how world capabilities could evolve under controlled review. Humans own product direction, rules, and acceptance; Codex helps implement the system. Future autonomous NPCs are distinct from the coding agent.
+Self-Evolving World explores how autonomous agents might interact in a shared world and how world capabilities could evolve under controlled review. Humans own product direction, rules, and acceptance; a coding agent (Codex through ex13, Claude Code since) helps implement the system and completes development handoffs. Future autonomous NPCs are distinct from the coding agent.
 
 The current focus is a stable, understandable foundation: base rules stay fixed during a run, and every state transition can be observed and replayed.
 

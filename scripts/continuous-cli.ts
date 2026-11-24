@@ -1,7 +1,9 @@
 import {
   initialLongWorld,
-  LONG_OBJECTIVE,
+  LONG_SCENARIOS,
+  longObjective,
 } from '../apps/simulator/src/long-scenario.js';
+import type { LongScenario } from '../apps/simulator/src/long-scenario.js';
 import { longPreflight } from './long-preflight.js';
 import { OPEN_OBJECTIVE } from './open-analysis.js';
 import {
@@ -52,7 +54,7 @@ import {
 } from './continuous-analysis.js';
 
 const USAGE = `Usage:
-  pnpm experiment:continuous -- new open|long|collective-a [seed-name]
+  pnpm experiment:continuous -- new open|long|long-fixes|collective-a
   pnpm experiment:continuous -- new collective-b exA
   pnpm experiment:continuous -- continue exN
   pnpm experiment:continuous -- develop exN validation-results/development.json
@@ -68,7 +70,7 @@ try {
   if (command === 'new') {
     const scenario = target;
     if (
-      !['open', 'long', 'collective-a', 'collective-b'].includes(
+      !['open', ...LONG_SCENARIOS, 'collective-a', 'collective-b'].includes(
         scenario ?? '',
       ) ||
       (scenario === 'collective-b'
@@ -79,12 +81,14 @@ try {
       throw new Error(USAGE);
     checkExperiments(root);
     const comparison = scenario?.startsWith('collective-') ?? false;
-    const long = scenario === 'long';
+    const long: LongScenario | undefined = LONG_SCENARIOS.find(
+      (s) => s === scenario,
+    );
     const arm = scenario === 'collective-a' ? 'A' : 'B';
     const genesis = comparison
       ? initialCollectiveWorld('collective-preflight', arm)
       : long
-        ? initialLongWorld()
+        ? initialLongWorld('long-preflight', long)
         : initialOpenWorld();
     const physicalHash = comparison
       ? continuousHash(collectivePhysicalGenesis(genesis))
@@ -130,7 +134,7 @@ try {
       comparison
         ? initialCollectiveWorld(`collective-${id}`, arm)
         : long
-          ? initialLongWorld(`long-${id}`)
+          ? initialLongWorld(`long-${id}`, long)
           : initialOpenWorld(`open-${id}`),
     );
     if (comparison) state.windowTarget = 200;
@@ -140,8 +144,8 @@ try {
       id,
       objective: comparison
         ? COLLECTIVE_OBJECTIVE
-        : long
-          ? LONG_OBJECTIVE
+        : state.world.config.longDevelopment
+          ? longObjective(state.world.config.longDevelopment)
           : OPEN_OBJECTIVE,
       schedule: 'continuous-v1',
       controller: 'chatgpt-plan',
@@ -243,6 +247,7 @@ try {
         budget: state.world.config.budgets,
         attempts: state.developments,
         declaration: {
+          developer: 'current-claude-conversation',
           packages: ['package-id@version'],
           paths: ['Every changed source or visual path'],
           assignments: { requester: 'implemented-interface' },

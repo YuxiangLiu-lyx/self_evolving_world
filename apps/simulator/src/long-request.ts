@@ -9,6 +9,24 @@ const world = `Review the entire batch using only this experiment registry and a
 Specify material/energy/time costs, prerequisites, dependencies, input/output conservation, exact references, work progress, interruption/resume/cancel/death/refund rules, ongoing processes, maintenance and real products/effects. No free stock, hidden-resource disclosure, consent or mastery. Actual participants must communicate and act independently. Code reuse must be recorded, not claimed as reinvention. Effects need observable events and reusable visual metadata; failed/incomplete actions cannot display success.
 Evaluate functional effects, experience and visuals separately. Short pleasure and slowly maintained satisfaction require real events, personal applicability, bounded amount/cap, decay/cooldown and functional deduplication. Verified information gain (including informative failure) may qualify; queries, requests, naming, registration and mastery never do. Familiar legitimate practice and social participation may sustain modest benefit; novelty is not compulsory. Physical comfort is capped at 10, basic nutrition is not reduced by mood. Never alter protected reward accounts, budget, goals or permissions. Established rules execute in code, not repeated model review. Development/review waiting does not advance the world.
 Return queries and result_json null, or queries=[] and result_json containing {reviews:[{actor,decision,ability,reason,specification,learning,experienceReview,visualReview}]}, exactly one per requester. decision reuse/develop/reject; ability existing ID for reuse otherwise null. learning existing duration for reuse, positive integer for develop, zero for reject. learning must be a JSON number, never a quoted string. actor, decision, reason, specification, experienceReview and visualReview are strings; ability is a string or null. Review all reasonable missing functions for development. No narrative outside the JSON.`;
+/** Opt-in addendum. Over all of ex13 an actor's next plan came after a median of 3 rounds (2 in rounds 0-79),
+ * and 54% of plans ran every step once (`pnpm metrics:long`). */
+export const PLAN_HORIZON_GUIDANCE =
+  '\nPlan horizon: every decision is a paid model response, while executing a plan is free. Prefer plans that cover the foreseeable routine for many rounds: give steps a repeat count with until (for example gather until an inventory amount, rest until energy is high), use plan repeat and until for cycles, and use guards and supplied interrupt events for conditions that should end the plan early. A single one-execution step is appropriate when its observed result decides what comes next.';
+/** Opt-in addendum. The ex13 World Agent reused 1 of 29 reviews, and 19 of its 28 developed
+ * interfaces were bound to one actor or item (`pnpm metrics:long`). */
+export const GENERAL_CAPABILITY_GUIDANCE =
+  '\nGenerality: before developing, check whether an existing capability already covers the function directly or through its arguments, and reuse it when it does. Develop each capability as a general operation that any applicable actor can learn, parameterized by target, material, quantity or mode. Do not bind an interface to one actor, one item instance or one specimen, and name it by function, never by actor. A request about a specific owned item becomes a general operation that takes that item as an argument. Prefer one capability with modes over separate narrow assessment, trial and diagnostic variants of the same activity. The smallest executable version is minimal in mechanism, not narrow in scope.';
+function guidance(input: LongInput) {
+  const chosen = input.longContext.guidance ?? [];
+  return input.longContext.role === 'ordinary'
+    ? chosen.includes('plan-horizon')
+      ? PLAN_HORIZON_GUIDANCE
+      : ''
+    : chosen.includes('general-capabilities')
+      ? GENERAL_CAPABILITY_GUIDANCE
+      : '';
+}
 export function longRequest(model: string, input: LongInput) {
   return {
     model,
@@ -17,7 +35,8 @@ export function longRequest(model: string, input: LongInput) {
     max_output_tokens: input.longContext.outputTokens,
     instructions:
       (input.longContext.role === 'ordinary' ? ordinary : world) +
-      '\nBatch up to four control queries. Each has section, search, ids:string[], offset>=0 and part>=0. Sections abilities/inventory/knowledge/projects/memory/state/observed; world may query only abilities. Exact IDs or text search; use empty search and ids for pagination. No implicit access outside this scope. Remaining query batches are explicit; when zero return a decision. Every model response, including retrieval and failure, consumes the shared budget.',
+      '\nBatch up to four control queries. Each has section, search, ids:string[], offset>=0 and part>=0. Sections abilities/inventory/knowledge/projects/memory/state/observed; world may query only abilities. Exact IDs or text search; use empty search and ids for pagination. No implicit access outside this scope. Remaining query batches are explicit; when zero return a decision. Every model response, including retrieval and failure, consumes the shared budget.' +
+      guidance(input),
     input: [{ role: 'user', content: JSON.stringify(input) }],
     text: {
       format: {

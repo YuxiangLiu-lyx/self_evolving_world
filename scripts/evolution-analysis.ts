@@ -1,3 +1,4 @@
+import { isDevelopmentReviewer } from '../apps/simulator/src/development-identity.js';
 import { isDeepStrictEqual } from 'node:util';
 import {
   acceptEvolutionProgram,
@@ -267,7 +268,7 @@ export function auditEvolution(state: EvolutionExecution): EvolutionRun {
           };
           assert(
             isDeepStrictEqual(d.barrier, barrier) &&
-              record(d).reviewer === 'current-codex-conversation',
+              isDevelopmentReviewer(record(d).reviewer),
             'development provenance mismatch',
           );
           acceptDevelopment(

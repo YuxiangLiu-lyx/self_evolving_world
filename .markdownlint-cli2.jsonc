@@ -12,5 +12,7 @@
     "test-results/**",
     "playwright-report/**",
     "validation-results/**",
+    // Claude Code import file: a single `@AGENTS.md` line by design.
+    "CLAUDE.md",
   ],
 }

@@ -113,10 +113,10 @@ export function selectChecks(
       affect(protocolVersions(file), `Runtime dependency: ${file}`);
       continue;
     }
-    // Validation and delivery tooling needs code checks only; run
+    // Validation, delivery and read-only metric tooling needs code checks only; run
     // `pnpm validate:audit` when a tooling change alters reconstruction or scenes.
     if (
-      /^scripts\/(validat|harness|check-|pr-policy|publish-pr|github|documentation|unit-reporter|experiment-review)/.test(
+      /^scripts\/(validat|harness|check-|pr-policy|publish-pr|github|documentation|unit-reporter|experiment-review|long-metrics|long-compatibility)/.test(
         file,
       ) ||
       /^\.github\//.test(file)

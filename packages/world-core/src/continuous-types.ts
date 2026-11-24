@@ -381,6 +381,15 @@ export interface V7Configuration {
     inputEstimateLimit: number;
     outputTokens: number;
     queriesPerDecision: number;
+    /** Opt-in: exact-id reads return whole records up to this many code units.
+     * Absent in ex13 and earlier, which keep 600-code-unit pages unchanged. */
+    exactRecordWidth?: number;
+    /** Opt-in prompt addenda, each separately switchable for ablation.
+     * Absent in ex13 and earlier, whose instructions stay unchanged. */
+    guidance?: ('plan-horizon' | 'general-capabilities')[];
+    /** Named opt-in variant of the long scenario, used to verify its frozen genesis.
+     * Absent in ex13, the baseline long scenario. */
+    scenario?: 'fixes';
     checkpoints: number[];
     cycle: number;
     pressureStart: number;

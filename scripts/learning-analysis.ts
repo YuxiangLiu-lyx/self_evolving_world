@@ -1,3 +1,4 @@
+import { isDevelopmentReviewer } from '../apps/simulator/src/development-identity.js';
 import { isDeepStrictEqual } from 'node:util';
 import {
   acceptLearningProgram,
@@ -255,7 +256,7 @@ export function auditLearning(state: LearningExecution): LearningRun {
           };
           assert(
             isDeepStrictEqual(d.barrier, barrier) &&
-              record(d).reviewer === 'current-codex-conversation',
+              isDevelopmentReviewer(record(d).reviewer),
             'development provenance mismatch',
           );
           acceptDevelopment(

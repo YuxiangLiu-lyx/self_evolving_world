@@ -145,6 +145,23 @@ describe('coevolution feasibility, disclosure and archive audit', () => {
     expect(accepted.phase).toBe('running');
     expect(accepted.rounds).toHaveLength(0);
     expect(accepted.developments).toHaveLength(1);
+    expect(accepted.developments[0]?.reviewer).toBe(
+      'current-codex-conversation',
+    );
+    const byClaude = acceptCDevelopment(
+      state,
+      {
+        barrierId: 'round-0-world-1',
+        tick: 0,
+        proposal,
+        notes:
+          'Inspected the simulated request, finite construction costs and shared effect. No host code or source changes; game time remains at zero.',
+      },
+      'current-claude-conversation',
+    );
+    expect(byClaude.developments[0]?.reviewer).toBe(
+      'current-claude-conversation',
+    );
     expect(() => acceptCDevelopment(accepted, {})).toThrow();
     expect(() =>
       acceptCDevelopment(state, {

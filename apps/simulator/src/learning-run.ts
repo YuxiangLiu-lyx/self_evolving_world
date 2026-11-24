@@ -1,3 +1,4 @@
+import type { DevelopmentReviewer } from './development-identity.js';
 import {
   lastLearningFrame,
   learningActions,
@@ -43,7 +44,7 @@ export interface DevelopmentResult {
   readonly barrier: DevelopmentBarrier;
   readonly reviews: readonly WorldReview[];
   readonly notes: string;
-  readonly reviewer: 'current-codex-conversation';
+  readonly reviewer: DevelopmentReviewer;
 }
 export interface LearningExecution {
   readonly version: 1;
@@ -113,6 +114,7 @@ export function budgetReviews(run: LearningRun): readonly WorldReview[] {
 export function acceptDevelopment(
   state: LearningExecution,
   input: unknown,
+  reviewer: DevelopmentReviewer = 'current-codex-conversation',
 ): LearningExecution {
   const data = record(input),
     b = state.barrier;
@@ -146,7 +148,7 @@ export function acceptDevelopment(
     barrier: null,
     developments: [
       ...state.developments,
-      { barrier: b, reviews, notes, reviewer: 'current-codex-conversation' },
+      { barrier: b, reviews, notes, reviewer },
     ],
   };
 }
