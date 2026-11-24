@@ -21,6 +21,7 @@ import type {
 import { forestExperienceSummary } from './forest-experience-context.js';
 import {
   compactLongInput,
+  longArgumentSignature,
   longRecentInterfaces,
   PAGE_ACCESS,
   PROJECTION_NOTE,
@@ -605,12 +606,13 @@ export function longOrdinaryInput(
       baseline: personalAbilities
         .filter((x) => x.authored)
         .map((x) =>
-          // Culture v2: an interface neither needed now nor used recently is summarized;
-          // its full contract stays readable by an exact abilities query.
+          // Culture v2: an interface neither needed now nor used recently is summarized
+          // with its argument signature; the full contract stays readable by exact id.
           compaction && !needed.has(x.id)
             ? {
                 id: x.id,
                 function: x.function,
+                args: longArgumentSignature(x.parameters),
                 ...(culture?.differentiation && !a.mastered.includes(x.id)
                   ? { mastered: false }
                   : {}),

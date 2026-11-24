@@ -1,4 +1,4 @@
-import type { V7Actor } from '@self-evolving-world/world-core';
+import type { V7Actor, V7Schema } from '@self-evolving-world/world-core';
 import { CATALOGUE_ACCESS } from './long-catalogue.js';
 
 /** Culture v2 (opt-in `longDevelopment.compaction`) lossless ordinary-input compaction.
@@ -12,6 +12,8 @@ export const PAGE_ACCESS =
 /** Per-result note of a reprojected retained query; packet.access already states it. */
 export const PROJECTION_NOTE =
   'Current authorized read with stable600 pages; original query/result retained unchanged in the call archive.';
+/** String limits at or above this are parsing protection and stay only in the exact record. */
+export const LONG_STRING_LIMIT = 200;
 /** One packet.access sentence for each compaction that applied to an input. */
 export const COMPACTION_ACCESS = {
   paging:
@@ -25,8 +27,52 @@ export const COMPACTION_ACCESS = {
   terrain:
     ' observation.terrain rows are "y:x:cells" strings: each character of cells is the terrain kind of one visible cell, at x, x+1, ... in row y.',
   abilities: (rounds: number) =>
-    ` abilities.baseline entries with only id and function summarize interfaces you neither used in the last ${String(rounds)} rounds nor need now; an exact abilities query by id returns the complete contract.`,
+    ` abilities.baseline entries with id, function and args summarize interfaces you neither used in the last ${String(rounds)} rounds nor need now. args lists the arguments in order: a bare name is a string; otherwise its type with any bounds (number>=lo, integer<=hi, integer lo..hi, and a bare lo..hi is a number range) or its choices a|b; ? marks an optional argument and "" means none. An exact abilities query by id returns the complete contract, including references and string limits of ${String(LONG_STRING_LIMIT)} or more code units.`,
 };
+const choice = (values: readonly unknown[]) =>
+  values.every((v) => typeof v === 'string' && /^[^\s|,:?{}[\]"]+$/.test(v))
+    ? values.join('|')
+    : values.map((v) => JSON.stringify(v)).join('|');
+/** Deterministic compact argument signature of a parameter schema, in schema order, for an
+ * interface summary: `target, mode: observe|press, intensity: 0..1`. Plain strings are bare
+ * names; long string limits, references and extra-property rules stay in the exact record.
+ * An interface without arguments gets "". */
+export function longArgumentSignature(schema: V7Schema): string {
+  const bounds = (s: V7Schema) =>
+    s.minimum !== undefined && s.maximum !== undefined
+      ? `${String(s.minimum)}..${String(s.maximum)}`
+      : s.minimum !== undefined
+        ? `>=${String(s.minimum)}`
+        : s.maximum !== undefined
+          ? `<=${String(s.maximum)}`
+          : '';
+  const type = (s: V7Schema): string => {
+    if (s.enum) return choice(s.enum);
+    if (s.type === 'object') return `{${fields(s)}}`;
+    if (s.type === 'array') return `[${s.items ? type(s.items) : ''}]`;
+    if (s.type === 'number' || s.type === 'integer') {
+      // A bare lo..hi is a number range; every other numeric form names its type.
+      const range = bounds(s);
+      return s.type === 'number' && range.includes('..')
+        ? range
+        : `${s.type}${range.includes('..') ? ' ' : ''}${range}`;
+    }
+    if (s.type === 'string')
+      return s.maxLength !== undefined && s.maxLength < LONG_STRING_LIMIT
+        ? `string<=${String(s.maxLength)}`
+        : '';
+    return s.type;
+  };
+  const fields = (s: V7Schema) =>
+    Object.entries(s.properties ?? {})
+      .map(([name, child]) => {
+        const label = `${name}${(s.required ?? []).includes(name) ? '' : '?'}`,
+          kind = type(child);
+        return kind ? `${label}: ${kind}` : label;
+      })
+      .join(', ');
+  return schema.type === 'object' ? fields(schema) : type(schema);
+}
 const SETTLED = new Set(['completed', 'stopped', 'cancelled']);
 const SETTLED_FIELDS = [
   'id',

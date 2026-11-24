@@ -1,11 +1,17 @@
 import { readFileSync } from 'node:fs';
 import { describe, expect, it, vi } from 'vitest';
 import { v7Clone, v7Observe } from '@self-evolving-world/world-core';
-import type { V7Cursor, V7World } from '@self-evolving-world/world-core';
+import type {
+  V7Ability,
+  V7Cursor,
+  V7Schema,
+  V7World,
+} from '@self-evolving-world/world-core';
 import type { V7Execution } from '../src/continuous-run.js';
 import {
   COMPACTION_ACCESS,
   compactLongInput,
+  longArgumentSignature,
   longDecodeTerrainRows,
   longTerrainRows,
 } from '../src/long-compaction.js';
@@ -77,8 +83,17 @@ describe('culture v2 genesis', () => {
         expect(full[0]?.value).toEqual(
           longVisibleAbilities(world, actor.id).find((a) => a.id === entry.id),
         );
-        expect(entry.function).toBe((full[0]?.value as Row).function);
+        const record = full[0]?.value as V7Ability;
+        expect(entry.function).toBe(record.function);
+        expect(entry.args).toBe(longArgumentSignature(record.parameters));
       }
+      const args = (id: string) => baseline.find((e) => e.id === id)?.args;
+      expect(args('navigate')).toBe('target, x: number, y: number');
+      expect(args('probe')).toBe(
+        'target, mode: observe|press|wet|heat, intensity: 0..1',
+      );
+      expect(args('give')).toBe('target, quantity: integer>=1, recipient');
+      expect(args('rest')).toBe('');
       expect(String(input.packet.access)).toContain(
         COMPACTION_ACCESS.abilities(25),
       );
@@ -328,6 +343,7 @@ describe('culture v2 compaction on the ex15 round-70 state', () => {
       id: 'drop',
       function: longVisibleAbilities(w, 'ivo').find((a) => a.id === 'drop')
         ?.function,
+      args: 'target, quantity: integer>=1',
     });
     // Needed now: every plan step and the current operation, used recently or not.
     for (const id of ['rest', 'navigate', 'probe', 'exchange'])
@@ -340,6 +356,49 @@ describe('culture v2 compaction on the ex15 round-70 state', () => {
     expect(read(w, 'ivo', exact('abilities', 'drop'))[0]?.value).toMatchObject({
       parameters: legacy.find((e) => e.id === 'drop')?.parameters,
     });
+  });
+
+  it('derives argument signatures deterministically from the schema', () => {
+    const schema: V7Schema = {
+      type: 'object',
+      properties: {
+        mode: { type: 'string', enum: ['start', 'resume'] },
+        code: { type: 'string', maxLength: 12 },
+        note: { type: 'string', maxLength: 200 },
+        level: { type: 'number', minimum: 0.1 },
+        cap: { type: 'number', maximum: 5 },
+        round: { type: 'integer', minimum: 1, maximum: 3 },
+        count: { type: 'integer' },
+        done: { type: 'boolean' },
+        pick: { type: 'number', enum: [1, 2] },
+        label: { type: 'string', enum: ['a b', 'c'] },
+        inputs: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              itemId: { type: 'string' },
+              quantity: { type: 'number', minimum: 0, maximum: 1 },
+            },
+            required: ['itemId'],
+          },
+        },
+      },
+      required: ['mode', 'code', 'note', 'level', 'cap', 'round'],
+      additionalProperties: false,
+    };
+    expect(longArgumentSignature(schema)).toBe(
+      'mode: start|resume, code: string<=12, note, level: number>=0.1, cap: number<=5, round: integer 1..3, count?: integer, done?: boolean, pick?: 1|2, label?: "a b"|"c", inputs?: [{itemId, quantity?: 0..1}]',
+    );
+    expect(
+      longArgumentSignature({ type: 'object', properties: {}, required: [] }),
+    ).toBe('');
+    // Every authored interface of the ex15 world has a signature naming all its arguments.
+    for (const ability of s.world.abilities.filter((a) => a.authored)) {
+      const signature = longArgumentSignature(ability.parameters);
+      for (const name of Object.keys(ability.parameters.properties ?? {}))
+        expect(signature).toContain(name);
+    }
   });
 
   it('adds explanations free of excluded words', () => {

@@ -30,6 +30,7 @@ import {
   parseLongDecision,
 } from '../apps/simulator/src/long-context.js';
 import { LONG_CULTURE_V2 } from '../apps/simulator/src/long-culture.js';
+import { initialLongWorld } from '../apps/simulator/src/long-scenario.js';
 import { longRequest } from '../apps/simulator/src/long-request.js';
 import { longRequestMeasure } from '../apps/simulator/src/long-tokens.js';
 import type { V7ReplayIndex, V7ReplaySegment } from './continuous-store.js';
@@ -118,6 +119,8 @@ interface Point {
   v2Packet: number;
   oldRetrieval: number;
   v2Retrieval: number;
+  oldInput: LongInput;
+  v2Input: LongInput;
 }
 function project(
   world: V7World,
@@ -127,12 +130,10 @@ function project(
   retrieval: LongRetrieval | undefined,
 ): Omit<Point, 'actor' | 'tick' | 'source' | 'recorded'> {
   const v2 = v2World(world);
-  const old = measure(
-      world,
-      model,
-      longOrdinaryInput(world, actor, cursor, retrieval),
-    ),
-    next = measure(v2, model, longOrdinaryInput(v2, actor, cursor, retrieval));
+  const oldInput = longOrdinaryInput(world, actor, cursor, retrieval),
+    v2Input = longOrdinaryInput(v2, actor, cursor, retrieval);
+  const old = measure(world, model, oldInput),
+    next = measure(v2, model, v2Input);
   return {
     old: old.inputEstimate,
     v2: next.inputEstimate,
@@ -140,6 +141,8 @@ function project(
       .inputEstimate,
     oldRetrieval: old.modules.retrieval ?? 0,
     v2Retrieval: next.modules.retrieval ?? 0,
+    oldInput,
+    v2Input,
   };
 }
 function fit(points: { x: number; y: number }[]) {
@@ -167,7 +170,8 @@ function main(archive: string) {
   const policy = execution.world.config.longDevelopment;
   if (!policy) throw new Error('Expected a long-development archive.');
   const { frames, rounds } = replayWorlds(archive);
-  const points: Point[] = [];
+  const points: Point[] = [],
+    decisions: { steps: string[]; point: Point }[] = [];
   const installs: string[] = [],
     mismatches: string[] = [];
   const order = new Map(execution.attempts.map((a, i) => [a.id, i]));
@@ -219,7 +223,10 @@ function main(archive: string) {
       installs.push(
         `${call.attempt.id} (tick ${String(tick)}) after ${(rounds[tick]?.registrations ?? []).slice(0, chosen).join(', ')}`,
       );
-    points.push({ actor, tick, source: call.attempt.id, recorded, ...row });
+    const point = { actor, tick, source: call.attempt.id, recorded, ...row };
+    points.push(point);
+    const steps = planSteps(call);
+    if (steps) decisions.push({ steps, point });
   }
   const pause = continuousRead<V7Execution>(
     join(
@@ -289,7 +296,11 @@ function main(archive: string) {
     '',
     ...attribution(pause),
     '',
-    ...windowStatistics(archive, rounds),
+    ...genesis(execution.model),
+    '',
+    ...windowStatistics(decisions, rounds),
+    '',
+    ...summarizedSteps(decisions),
   );
   console.log(out.join('\n'));
 }
@@ -343,28 +354,26 @@ function attribution(pause: V7Execution): string[] {
   return rows;
 }
 
+/** Interfaces of the plan an accepted ordinary call decided, or null for queries. */
+function planSteps(call: V7CallRecord): string[] | null {
+  if (call.attempt.status !== 'accepted' || !call.response) return null;
+  const { decision } = parseLongDecision(call.response.text);
+  if (!decision) return null;
+  const plan = JSON.parse(decision) as {
+    steps: { action: { interface: string } }[];
+  };
+  return plan.steps.map((s) => s.action.interface);
+}
 /** How recently the interface of each plan step had been used, from replay actions. */
 function windowStatistics(
-  archive: string,
+  decisions: { steps: string[]; point: Point }[],
   rounds: V7ReplaySegment['rounds'],
 ): string[] {
-  const plans: { actor: string; tick: number; steps: string[] }[] = [];
-  for (const f of readdirSync(join(archive, 'calls')).filter((f) =>
-    f.startsWith('ordinary-'),
-  )) {
-    const call = continuousRead<V7CallRecord>(join(archive, 'calls', f));
-    if (call.attempt.status !== 'accepted' || !call.response) continue;
-    const { decision } = parseLongDecision(call.response.text);
-    if (!decision) continue;
-    const plan = JSON.parse(decision) as {
-      steps: { action: { interface: string } }[];
-    };
-    plans.push({
-      actor: call.attempt.actor,
-      tick: call.attempt.tick,
-      steps: plan.steps.map((s) => s.action.interface),
-    });
-  }
+  const plans = decisions.map(({ steps, point }) => ({
+    actor: point.actor,
+    tick: point.tick,
+    steps,
+  }));
   const gaps = (before: (round: number, tick: number) => boolean) => {
     const found: number[] = [];
     let steps = 0;
@@ -392,6 +401,92 @@ function windowStatistics(
     '',
     `- ${String(strict.found.length)} of ${String(strict.steps)} plan steps use an interface the person had used in an earlier round; the last use was within 20 rounds for ${share(strict.found, 20)}, within 25 for ${share(strict.found, 25)} and within 40 for ${share(strict.found, 40)}.`,
     `- Counting the round that ended at the decision tick (as the window does): ${String(window.found.length)} steps; within 20: ${share(window.found, 20)}, 25: ${share(window.found, 25)}, 40: ${share(window.found, 40)}. experience.recent keeps 40 rounds.`,
+  ];
+}
+
+/** Genesis inputs: the ex15 culture genesis, the v2 genesis with full contracts (no
+ * compaction) and with compaction; `args` is what the argument signatures cost. */
+function genesis(model: string): string[] {
+  const ex15 = initialLongWorld('long-ex15', 'long-culture'),
+    v2 = initialLongWorld('long-ex16', 'long-culture-v2'),
+    full = v7Clone(v2);
+  delete full.config.longDevelopment?.compaction;
+  const size = (world: V7World, input: LongInput) =>
+    measure(world, model, input).inputEstimate;
+  const rows = [
+    'Genesis inputs (tick 0, no plan or retrieval):',
+    '',
+    '| Person | ex15 genesis | v2 full contracts | v2 summaries with args | of which args |',
+    '| --- | ---: | ---: | ---: | ---: |',
+  ];
+  for (const actor of v2.actors.map((a) => a.id)) {
+    const compacted = longOrdinaryInput(v2, actor),
+      bare = v7Clone(compacted);
+    for (const entry of (
+      bare.packet.abilities as { baseline: Record<string, unknown>[] }
+    ).baseline)
+      delete entry.args;
+    rows.push(
+      `| ${actor} | ${n0(size(ex15, longOrdinaryInput(ex15, actor)))} | ${n0(size(full, longOrdinaryInput(full, actor)))} | ${n0(size(v2, compacted))} | ${n0(size(v2, compacted) - size(v2, bare))} |`,
+    );
+  }
+  return rows;
+}
+/** Plan steps whose interface was outside the v2 full-contract set at that decision:
+ * authored ones are summaries, developed ones have no details. */
+function summarizedSteps(decisions: { steps: string[]; point: Point }[]) {
+  const count = {
+    authored: 0,
+    summary: 0,
+    read: 0,
+    developed: 0,
+    missing: 0,
+    legacy: 0,
+  };
+  let affected = 0;
+  for (const { steps, point } of decisions) {
+    const abilities = point.v2Input.packet.abilities as {
+      baseline: Record<string, unknown>[];
+      details: Record<string, unknown>[];
+    };
+    const legacy = (point.oldInput.packet.abilities as typeof abilities)
+      .details;
+    const read = new Set(
+      (
+        point.v2Input.retrieval as {
+          query?: { section: string; ids: string[] };
+        }[]
+      )
+        .filter((r) => r.query?.section === 'abilities')
+        .flatMap((r) => r.query?.ids ?? []),
+    );
+    let outside = false;
+    for (const step of steps) {
+      const base = abilities.baseline.find((e) => e.id === step);
+      if (base) {
+        count.authored += 1;
+        if ('parameters' in base) continue;
+        count.summary += 1;
+        if (read.has(step)) count.read += 1;
+        outside = true;
+      } else {
+        count.developed += 1;
+        if (abilities.details.some((d) => d.id === step)) continue;
+        count.missing += 1;
+        if (!legacy.some((d) => d.id === step)) count.legacy += 1;
+        outside = true;
+      }
+    }
+    if (outside) affected += 1;
+  }
+  const total = count.authored + count.developed;
+  const pct = (n: number, d: number) => `${n1((100 * n) / d)}%`;
+  return [
+    `Plan steps outside the v2 full-contract set at their decision (${String(decisions.length)} accepted plans, ${String(total)} steps):`,
+    '',
+    `- ${String(count.summary + count.missing)} steps (${pct(count.summary + count.missing, total)}) in ${String(affected)} of ${String(decisions.length)} decisions.`,
+    `- Authored: ${String(count.summary)} of ${String(count.authored)} steps (${pct(count.summary, count.authored)}) used an interface given only as a summary with args; ${String(count.read)} of them were read by exact id in that call's retrieval.`,
+    `- Developed: ${String(count.missing)} of ${String(count.developed)} steps (${pct(count.missing, count.developed)}) used an interface without details; ${String(count.legacy)} of these also had no details in the ex15 builder.`,
   ];
 }
 
