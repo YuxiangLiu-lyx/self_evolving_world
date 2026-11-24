@@ -9,6 +9,7 @@ import {
   LONG_CULTURE_V2,
 } from '../src/long-culture.js';
 import {
+  COMPACTION_REPLACEMENTS,
   longRequest,
   OPEN_GOAL_ORDINARY,
   VOICE_ORDINARY,
@@ -94,6 +95,9 @@ it('freezes both culture v2 scenarios as the culture genesis plus the v2 context
   expect(ex15.exactRecordWidth).toBe(4_000);
 });
 
+const [schemaSentence = '', summarySentence = ''] =
+  COMPACTION_REPLACEMENTS[0] ?? [];
+
 it('gives every person the open goal and their own leaning in the second person, without new symbolic guidance', () => {
   const world = initialLongWorld('long-ex16', 'long-culture-v2');
   const goal =
@@ -119,9 +123,7 @@ it('gives every person the open goal and their own leaning in the second person,
       ),
     ).toBe(true);
     expect(request.instructions.match(/You tend to value/g)).toHaveLength(1);
-    expect(request.instructions).toContain(
-      'summaries for the others; read a summarized interface by exact id before using it.',
-    );
+    expect(request.instructions).toContain(summarySentence);
     expect(`${request.instructions}${JSON.stringify(input)}`).not.toMatch(
       CULTURE_EXCLUDED_WORDS,
     );
@@ -142,10 +144,7 @@ it('gives every person the open goal and their own leaning in the second person,
           'Maintain health and tolerable risk, understand unknowns through evidence, develop reusable abilities and improve personal and shared living. Choose your own questions, projects and activities; none is required.',
           `${goal} You tend to value ${leaning}.`,
         )
-        .replace(
-          'Use the exact schemas supplied once under abilities.',
-          'Use the exact schemas supplied once under abilities: full contracts for interfaces you used recently or need now, summaries for the others; read a summarized interface by exact id before using it.',
-        ),
+        .replace(schemaSentence, summarySentence),
     );
   });
   // The v2 prompt adds no guidance about the symbolic interfaces beyond the ex15 prompt.

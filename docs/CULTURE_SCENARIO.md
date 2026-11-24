@@ -154,7 +154,21 @@ risk a rejected output, and rejected outputs count toward the stop rule.
 **Offline projection.** `npx tsx scripts/long-context-projection.ts` rebuilds every retained
 ex15 ordinary input with the current builder; the archive configuration reproduces all 147
 recorded estimates. It then rebuilds the same inputs with the v2 settings and fits the
-growth of rounds 0–70. PROJECTION_RESULT
+growth of rounds 0–70 by least squares.
+
+| Projection to round 250                                                   | Estimate |
+| ------------------------------------------------------------------------- | -------: |
+| Per-round maximum (48.0 per round)                                        |   19,100 |
+| Packet-only maximum (41.7 per round) plus 1.5 × largest retrieval (2,724) |   20,872 |
+| Highest single-person trend (Moss, 70.9 per round)                        |   23,650 |
+
+Every case stays below 24,000, but the single-person margin is small. A linear fit is
+pessimistic for bounded pages and optimistic for spikes: ex15's own maximum at round 70
+lay about 3,100 above its trend, and the same excess on the v2 per-round trend gives about
+22,200 at round 250. At round 70, v2 lowers the six estimates by 3–18%:
+Ivo 14,396 → 12,452 and Lin 8,721 → 7,153. At genesis it saves 870–910 per person. The
+reduction is largest early, because few interfaces have been used then. Later, recently
+used developed interfaces carry their details, so v2 grows at about the same rate as ex15.
 
 The byte guard rejects an input whose code-unit length times two exceeds
 `computation.inputBytes`. In ex15, inputs held between 2.55 and 3.31 code units per estimated
