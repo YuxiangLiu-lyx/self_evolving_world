@@ -1,0 +1,59 @@
+# ex14: Continuous World and Persistent Wellbeing
+
+## Scope and observation window
+
+Under the ex13 rules and seed, check whether whole exact reads, plan-horizon guidance and general-capability guidance lower per-agent token use and broaden developed capabilities; no particular invention or activity is required. Frozen ordinary/world/development attempt ceilings: 1800/100/8. Shared ordinary/world token ceiling: 1600000.
+
+Observed 64 of 80 target rounds. State: paused. Conversation development-handoff budget exhausted. This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.
+
+## Measured outcome
+
+| Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | Learned-interface successful rounds |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| lin | true | 100 | 91.9 | 9.71 | 10.60 | 3 | 4 |
+| moss | true | 100 | 80.4 | 9.80 | 9.51 | 2 | 0 |
+| sol | true | 100 | 78.4 | 9.58 | 9.82 | 2 | 0 |
+
+Requests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits. This fresh policy inherits no generated interfaces. The explicit authored allowlist, current-run package provenance, personal projects, verified knowledge, trials and persistent processes are retained separately in results.openDevelopment. Actor-written progress is a claim, not a physical outcome. Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.
+
+## Action distribution
+
+| Interface | Attempted | Successful rounds | Failed rounds |
+| --- | --- | --- | --- |
+| navigate | 46 | 46 | 0 |
+| gather | 11 | 11 | 0 |
+| probe | 12 | 12 | 0 |
+| eat | 13 | 13 | 0 |
+| rest | 77 | 77 | 0 |
+| request | 10 | 10 | 0 |
+| wait | 17 | 17 | 0 |
+| learn | 1 | 1 | 0 |
+| controlled-food-processing-trial | 5 | 4 | 1 |
+
+## Cost and limitations
+
+ordinary: 70 attempted calls, 1 failed/rejected; 501843 recorded input tokens and 32460 recorded output tokens; 1 attempts with unknown token usage; 956.2 elapsed seconds.
+
+world: 33 attempted calls, 0 failed/rejected; 144521 recorded input tokens and 20186 recorded output tokens; 0 attempts with unknown token usage; 706.7 elapsed seconds.
+
+8 pre-counted conversation development handoffs, 0 failed validation attempts. Current-conversation development handoffs are counted before work. Internal coding/reasoning calls, tokens and preparation/review costs are not directly metered; these unknown costs are not zero.
+
+## Evidence and reproduction
+
+Configuration and isolated survival feasibility are in configuration.json and preflight.json. The feasibility oracle and isolated extension fixtures never enter ordinary decision context. Every actual inference has an immutable calls/ record, including transport failures. replay.json indexes checksummed segments; source-history.json binds retained source, packages, tests and activation boundaries. The observatory reconstructs saved rounds; playback cannot advance the world.
+
+Run `pnpm experiment:check` and `pnpm test` to validate saved evidence. Open `/observatory.html?experiment=ex14` for the game view. Use the current task's development handoff to continue a pending barrier; do not allocate a replacement run or repeat an uncertain call.
+
+## Forest lifecycle and environment
+
+Model: gpt-6.1-sol. Seed: 20261123. Observed seasons: spring. Deaths and respawns are retained with exact evidence and prior plans in results.json. Full-state replay remains independent of rendering. Monetary cost and internal developer usage are unknown; recorded role-specific tokens below are measured. These formal events are distinct from isolated forest-lab fixtures.
+
+Lin: 0 deaths, 3 remaining lives.
+
+Moss: 0 deaths, 3 remaining lives.
+
+Sol: 0 deaths, 3 remaining lives.
+
+## Interpretation
+
+The current-conversation behavioral analysis accompanies this archive and traces actual problems, proposed functions, review, implementation, use and consequences. Shared object use is distinguished from explicit communication or consent. Novel names, proposals, installations and offspring counts are not happiness rewards. The observation window is resumable; completed capture is not world termination.

@@ -82,6 +82,12 @@ import { V7_BASE } from './continuous-base.js';
 import { V7_NATURE } from './continuous-nature.js';
 import { V7_MOSAIC } from './continuous-mosaic.js';
 import { v7Registry } from './continuous-registry.js';
+import { LONG_CULTIVATION } from './long-cultivation.js';
+import { LONG_FOOD_TRIAL } from './long-food-trial.js';
+import { LONG_WEATHER_BARRIER } from './long-weather-barrier.js';
+import { LONG_AIR_DRYING } from './long-air-drying.js';
+import { LONG_RESTING_MATERIAL } from './long-resting-material.js';
+import { LONG_CORDAGE } from './long-cordage.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -161,6 +167,12 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_PLUM_ASSESSMENT,
   LONG_MOSS_APPLE,
   LONG_BRANCH_ASSESSMENT,
+  LONG_CULTIVATION,
+  LONG_FOOD_TRIAL,
+  LONG_WEATHER_BARRIER,
+  LONG_AIR_DRYING,
+  LONG_RESTING_MATERIAL,
+  LONG_CORDAGE,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(

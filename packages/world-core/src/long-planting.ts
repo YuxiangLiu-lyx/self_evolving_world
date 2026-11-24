@@ -27,14 +27,24 @@ import type { CollectiveWork } from './collective-work.js';
 
 const ID = 'root-planting-trial';
 const REVISION = ID + '@1';
-const sync = (a: V7Actor, j: CollectiveWork) => {
-  a.extensionState['long:work:planting'] = v7Json(j);
+/** Which package owns a root trial: its plot revision and its personal work-state key. */
+export interface RootTrialKind {
+  revision: string;
+  stateKey: string;
+}
+const ROOT_TRIAL: RootTrialKind = {
+  revision: REVISION,
+  stateKey: 'long:work:planting',
+};
+const sync = (a: V7Actor, j: CollectiveWork, kind = ROOT_TRIAL) => {
+  a.extensionState[kind.stateKey] = v7Json(j);
 };
 export function stopRootPlanting(
   w: V7World,
   a: V7Actor,
   j: CollectiveWork,
   ground: boolean,
+  kind = ROOT_TRIAL,
 ) {
   workStop(
     w,
@@ -46,11 +56,12 @@ export function stopRootPlanting(
   const surface = w.objects.find((o) => o.id === j.preparedSurfaceId);
   if (surface?.data.activeWork === j.id) surface.data.activeWork = null;
   w.objects = w.objects.filter((o) => o.id !== j.target);
-  sync(a, j);
+  sync(a, j, kind);
 }
 export function executeRootPlanting(
   c: V7ActionContext,
   preparedSurfaceId?: string,
+  kind = ROOT_TRIAL,
 ) {
   const mode = c.action.args.mode;
   let j = workFind(c);
@@ -59,7 +70,7 @@ export function executeRootPlanting(
       throw new Error(
         'No personal unfinished planting work. Completed specimens cannot be cancelled into food.',
       );
-    stopRootPlanting(c.world, c.actor, j, false);
+    stopRootPlanting(c.world, c.actor, j, false, kind);
     return workResult(j);
   }
   if (!j) {
@@ -126,7 +137,7 @@ export function executeRootPlanting(
       },
       createdBy: c.actor.id,
       createdAt: c.world.tick,
-      revision: REVISION,
+      revision: kind.revision,
     };
     j.target = plot.id;
     c.world.objects.push(plot);
@@ -136,7 +147,7 @@ export function executeRootPlanting(
       const surface = c.world.objects.find((o) => o.id === preparedSurfaceId);
       if (surface) surface.data.activeWork = j.id;
       workPay(c, j, 0.5);
-      sync(c.actor, j);
+      sync(c.actor, j, kind);
       return workResult(j);
     }
   }
@@ -165,7 +176,7 @@ export function executeRootPlanting(
     if (error) {
       j.status = 'paused';
       j.reason = error;
-      sync(c.actor, j);
+      sync(c.actor, j, kind);
       c.emit(
         'prepared-placement-paused',
         error,
@@ -196,11 +207,11 @@ export function executeRootPlanting(
       (c.world.resources.find((r) => r.id === material.resource)?.properties
         ?.decay ?? 0);
   if (!material || material.quantity < 1 || expired) {
-    stopRootPlanting(c.world, c.actor, j, true);
+    stopRootPlanting(c.world, c.actor, j, true, kind);
     return workResult(j);
   }
   if (!workPay(c, j, 1)) {
-    sync(c.actor, j);
+    sync(c.actor, j, kind);
     return workResult(j);
   }
   plot.data.elapsed = j.completedWork;
@@ -241,21 +252,25 @@ export function executeRootPlanting(
       plot.id,
     );
   }
-  sync(c.actor, j);
+  sync(c.actor, j, kind);
   return workResult(j);
 }
-export function updateRootPlanting(w: V7World, ability = ID) {
+export function updateRootPlanting(
+  w: V7World,
+  ability = ID,
+  kind = ROOT_TRIAL,
+) {
   for (const j of collectiveJobs(w, ability).filter(
     (j) => j.status === 'active' || j.status === 'paused',
   )) {
     const a = w.actors.find((a) => a.id === j.owner);
     if (!a) continue;
     if (j.lastPaid < w.tick) j.status = 'paused';
-    sync(a, j);
+    sync(a, j, kind);
   }
-  if (ability !== ID) return;
+  if (ability !== ID && kind === ROOT_TRIAL) return;
   for (const o of w.objects.filter(
-    (o) => o.revision === REVISION && typeof o.data.plantedAt === 'number',
+    (o) => o.revision === kind.revision && typeof o.data.plantedAt === 'number',
   )) {
     const s = w.stacks.find(
       (s) => s.id === o.data.inputItem && s.reservedFor === o.id,
