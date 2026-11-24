@@ -121,7 +121,9 @@ export function initialLongWorld(
     policy.tokens = LONG_CULTURE.tokens;
     policy.tokenCeilings = LONG_CULTURE.tokenCeilings.map((c) => ({ ...c }));
     policy.checkpoints = [...LONG_CULTURE.checkpoints];
+    policy.transportRecovery = 'uncounted';
     world.config.budgets.development = LONG_CULTURE.developments;
+    world.config.budgets.world = LONG_CULTURE.worldCalls;
     world.config.experience.targetRounds = LONG_CULTURE.gate;
     const cultured = applyCulture(world, {
       ...CULTURE_OPTIONS,

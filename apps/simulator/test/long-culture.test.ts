@@ -97,7 +97,12 @@ it('freezes both culture scenarios on the ex13 rules and seed with their own bud
       culture: { ...CULTURE_OPTIONS, incentives },
     });
     expect(world.config.seed).toBe(20261123);
-    expect(world.config.budgets.development).toBe(15);
+    expect(world.config.budgets).toEqual({
+      ordinary: 1800,
+      world: 300,
+      development: 40,
+    });
+    expect(p.transportRecovery).toBe('uncounted');
     expect(world.config.experience?.targetRounds).toBe(80);
     expect(world.actors).toHaveLength(6);
     expect(longScenario(p)).toBe(scenario);
@@ -134,6 +139,7 @@ it('recovers the long-fixes genesis when the culture fields are reverted, except
     f = policy(fixes);
   delete p.culture;
   delete p.tokenCeilings;
+  delete p.transportRecovery;
   p.scenario = 'fixes';
   p.tokens = f.tokens;
   p.checkpoints = [...f.checkpoints];
@@ -141,6 +147,7 @@ it('recovers the long-fixes genesis when the culture fields are reverted, except
   p.difficultyStart = f.difficultyStart;
   p.growthFloor = f.growthFloor;
   reverted.config.budgets.development = fixes.config.budgets.development;
+  reverted.config.budgets.world = fixes.config.budgets.world;
   if (!reverted.config.experience || !reverted.config.development)
     throw new Error('Missing policy');
   reverted.config.experience.targetRounds =
@@ -149,6 +156,8 @@ it('recovers the long-fixes genesis when the culture fields are reverted, except
     reverted.config.development.baseline.filter(
       (id) => !EXPRESSION_INTERFACES.includes(id),
     );
+  expect(reverted.state.foodWater).toBe(1);
+  delete reverted.state.foodWater;
   expect(reverted.config).toEqual(fixes.config);
   // Same rules, terrain, resources and authored world; only the symbolic package,
   // the renewable commons food and the people differ.

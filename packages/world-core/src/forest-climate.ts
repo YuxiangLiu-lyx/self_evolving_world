@@ -26,8 +26,15 @@ export function forestEvent(
     success: true,
   });
 }
-/** One round is one simulation time unit. Time is deliberately accelerated relative to ecology. */
-export function forestClimate(world: V7World, position: V7Point) {
+/** One round is one simulation time unit. Time is deliberately accelerated relative to ecology.
+ * `airHumidity` is part of the climate wherever ex10's food moisture model is installed. The
+ * opt-in food water representation requests it explicitly (`airHumidity = true`) for its own
+ * exchange, so the climate that ordinary agents observe is unchanged in that scope. */
+export function forestClimate(
+  world: V7World,
+  position: V7Point,
+  airHumidity = false,
+) {
   const settings = world.config.forest;
   if (!settings)
     throw new Error(
@@ -84,7 +91,7 @@ export function forestClimate(world: V7World, position: V7Point) {
     temperature -= world.config.experience.exposure * (rain + wind);
   return {
     ...(pressure ? { pressure } : {}),
-    ...(world.state.foodPreservation === 1
+    ...(world.state.foodPreservation === 1 || airHumidity
       ? {
           airHumidity: v7RoundNumber(
             Math.max(0, Math.min(1, 0.65 + 0.2 * rain - 0.1 * wind)),

@@ -93,12 +93,43 @@ export function abandonedLongTransport(
   return { state, record };
 }
 
+/** Opt-in (`longDevelopment.transportRecovery: 'uncounted'`): a long-call pause whose
+ * failing ordinary call ended without any response but with transport evidence (for
+ * example `server_is_overloaded`) or was proved abandoned. Such a pause resumes without a
+ * development handoff; rejected model output, context or computation pauses stay counted. */
+export function uncountedTransportPause(
+  state: V7Execution,
+  record: V7CallRecord | null,
+): boolean {
+  const failure = state.attempts
+    .filter(
+      (a) =>
+        a.tick === state.world.tick &&
+        a.role === 'ordinary' &&
+        ['failed', 'rejected'].includes(a.status),
+    )
+    .at(-1);
+  return (
+    state.world.config.longDevelopment?.transportRecovery === 'uncounted' &&
+    state.phase === 'paused' &&
+    state.reason === LONG_CALL_PAUSE &&
+    state.barrier === null &&
+    !state.pendingCall &&
+    !state.attempts.some((a) => a.status === 'started') &&
+    state.world.tick < state.windowTarget &&
+    failure?.status === 'failed' &&
+    record?.attempt.id === failure.id &&
+    record.response === null &&
+    !!record.failureEvidence
+  );
+}
+
 /** A computation pause is unfinished work, never a new experiment or an actor-authored request. */
 export async function repairContinuousRun(
   root: string,
   id: string,
   abandonedPid?: number,
-): Promise<void> {
+): Promise<'transport' | 'development'> {
   const original = continuousCheckpoint(root, id);
   let abandoned: ReturnType<typeof abandonedLongTransport> | null = null;
   if (abandonedPid !== undefined) {
@@ -133,7 +164,18 @@ export async function repairContinuousRun(
     });
   }
   const state = abandoned?.state ?? original;
-  assertContinuousTechnicalRepair(state);
+  const failed = state.attempts
+    .filter((a) => a.tick === state.world.tick && a.role === 'ordinary')
+    .at(-1);
+  const uncounted = uncountedTransportPause(
+    state,
+    abandoned
+      ? abandoned.record
+      : failed
+        ? await continuousSink(root, id).findCall(failed.id)
+        : null,
+  );
+  if (!uncounted) assertContinuousTechnicalRepair(state);
   const reason = state.reason;
   // A failed browser capture must not prevent repairing its durable paused world.
   const directory = resolve(root, 'experiment', id);
@@ -200,10 +242,30 @@ export async function repairContinuousRun(
     worldHash: continuousHash(state.world),
     attemptsHash: continuousHash(state.attempts),
     target: state.windowTarget,
-    basis: 'Repair technical blockers and continue the same original run.',
+    basis: uncounted
+      ? 'Resume after a provider transport failure; the failed call is never resent and keeps its charge.'
+      : 'Repair technical blockers and continue the same original run.',
     actorRequest: false,
     modelCalls: 0,
+    ...(uncounted
+      ? { transportRecovery: true, developmentHandoff: false }
+      : {}),
   });
+  if (uncounted) {
+    const resumed = v7Clone(state);
+    resumed.phase = 'running';
+    resumed.reason = null;
+    await continuousSink(root, id).save(resumed);
+    const manifest = { ...record.manifest };
+    delete manifest.artifacts;
+    continuousAtomic(resolve(directory, 'manifest.json'), {
+      ...manifest,
+      status: 'running',
+      windowPhase: 'running',
+      files: [],
+    });
+    return 'transport';
+  }
   const next = v7Clone(state);
   if (!reason) throw new Error('Missing validated technical reason.');
   next.barrier = {
@@ -232,6 +294,7 @@ export async function repairContinuousRun(
     windowPhase: 'development',
     files: [],
   });
+  return 'development';
 }
 
 /** Refuse ambiguous calls, budget exhaustion, settled windows and actor review barriers. */

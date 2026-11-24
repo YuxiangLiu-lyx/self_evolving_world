@@ -214,6 +214,7 @@ export {
 
 export * from './open-foundation.js';
 export * from './open-physical.js';
+export * from './food-water.js';
 export * from './open-processes.js';
 export * from './open-projects.js';
 export { openPlants, openAnimals } from './open-ecology.js';

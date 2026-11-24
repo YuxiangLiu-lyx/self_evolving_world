@@ -402,6 +402,9 @@ export interface V7CultureOptions {
   density: number;
   /** Bounded satisfaction from being answered, two-way contact and noticed own work. */
   incentives: boolean;
+  /** General food water-content representation (ex10's reviewed moisture model without its
+   * apparatus), installed as `state.foodWater = 1`; no interface uses it at genesis. */
+  foodWater: boolean;
 }
 export interface V7Configuration {
   longDevelopment?: {
@@ -425,6 +428,10 @@ export interface V7Configuration {
      * attempt made while the world tick is below `through` (the calls that produce rounds
      * 1..through); the next reservation must fit or the run pauses. Absent in earlier runs. */
     tokenCeilings?: { through: number; tokens: number }[];
+    /** Opt-in: a pause caused by a provider transport failure of an ordinary call (no
+     * response) resumes through `repair` without a development handoff, so it does not use
+     * the handoff budget. Absent in earlier runs, where every repair is a counted handoff. */
+    transportRecovery?: 'uncounted';
     checkpoints: number[];
     cycle: number;
     pressureStart: number;

@@ -225,6 +225,7 @@ valid. Every retained handoff through ex13 was developed by Codex.
 `pnpm experiment:continuous -- new long-culture` and `new long-culture-incentives` start
 the opt-in culture scenarios on the ex13 rules and seed with the long-fixes options, six
 people, survival slack, symbolic interfaces, private memory and, in the second, bounded
-incentives. Their switches, budget mechanics (a 15-handoff development cap, a first window
-to round 80 under a 3,200,000-token ceiling, checkpoints 80, 150 and 250 and a
-10,000,000-token ledger) and limits are described in [Culture Scenario](CULTURE_SCENARIO.md).
+incentives. Their switches, budget mechanics (a 40-handoff development cap, 300 World Agent
+calls, uncounted transport recovery, a first window to round 80 under a 3,200,000-token
+ceiling, checkpoints 80, 150 and 250 and a 10,000,000-token ledger) and limits are
+described in [Culture Scenario](CULTURE_SCENARIO.md).

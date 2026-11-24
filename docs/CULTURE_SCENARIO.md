@@ -32,6 +32,7 @@ named genesis.
 | `slack`           | `true`                                    | D. Later pressure, higher growth floor, nearby food |
 | `density`         | `6`                                       | E. Number of people (3 keeps the ex13 actors)       |
 | `incentives`      | `false` (`true` in the incentive variant) | F. Bounded satisfaction sources                     |
+| `foodWater`       | `true`                                    | G. Food water representation (no interface)         |
 
 Both variants also carry the long-fixes options: `exactRecordWidth` 4000 and both
 guidance addenda. None of these fields exists in ex13, long-fixes or earlier archives.
@@ -40,7 +41,8 @@ guidance addenda. None of these fields exists in ex13, long-fixes or earlier arc
 
 Frozen at creation and never changed after the first call:
 
-- six people, a cumulative development cap of 15 handoffs;
+- six people, a cumulative development cap of 40 handoffs, 300 World Agent calls and the
+  long-scenario ceiling of 1,800 ordinary calls;
 - a first observation window ending at round 80; checkpoints 80, 150 and 250;
 - a shared ledger of 10,000,000 tokens;
 - `longDevelopment.tokenCeilings: [{ through: 80, tokens: 3_200_000 }]`: every attempt
@@ -50,6 +52,17 @@ Frozen at creation and never changed after the first call:
 
 `extend exN 250` then continues from round 80 under the 10,000,000 ledger with no
 configuration change: the ceiling no longer applies once the tick reaches 80.
+
+`longDevelopment.transportRecovery: 'uncounted'` (absent in every earlier run): when a
+pause is caused by an ordinary call that ended without any response but with recorded
+transport evidence (for example `server_is_overloaded`), or by a proved abandoned
+invocation, `repair exN` retains the pause under `technical-pauses/` and resumes the run
+without a development handoff. The failed call is never resent and keeps its charge in
+the ledger. Rejected model output, context and computation pauses still need a counted
+handoff, and a second failure in the same round still pauses the run.
+
+These numbers were checked against the measured E1 (ex14) rates; the derivation is in
+[PR #29](https://github.com/YuxiangLiu-lyx/self_evolving_world/pull/29).
 
 ## A. Voice and private memory
 
@@ -68,6 +81,11 @@ itself, is unchanged:
   the owner's packet as `memory.cares` and `memory.views`. Oversized values or views of
   unknown people reject the decision with one bounded correction. Updates apply when the
   plan starts and are recorded in the round memory, so replay reconstructs them.
+- **Metrics:** `pnpm metrics:culture` reports `cares` and `views` only in its separate,
+  owner-only `privateMemory` section: update counts, what each person holds, and private
+  view convergence, the similarity of different observers' views of the same person over
+  time. No public or transmission metric reads them; see the
+  [metric definitions](presentation/culture-baseline.md#private-memory-owner-only-culture-voice-only).
 
 ## B. Differentiation
 
@@ -124,7 +142,9 @@ beyond one round of action time and no energy or material cost:
 ## D. Slack
 
 `pressureStart` 220 → 300, `difficultyStart` 380 → 440 and `growthFloor` 0.3 → 0.6; the
-cycle, cold, rain and hazards are unchanged, so rounds 0–299 are mild. Each person has two
+cycle, cold, rain and hazards are unchanged, so rounds 0–299 are mild. Pressure starts at
+round 300, so the 80-round pilot and a main run to round 250 lie entirely in the mild
+period: neither observes behavior under seasonal pressure. Each person has two
 renewable berry bushes (capacity 20, growth interval 5) and two renewable root patches
 (capacity 20, interval 8) just outside their start, 24 commons sources in all. The
 [offline preflight](exec-plans/evidence/pr-36-culture-scenario/preflight.json) over 1,600
@@ -162,6 +182,65 @@ one event, and the rewarded person's own naming, marking, telling, inviting, que
 requests never qualify. Answered and two-way awards weigh with `closeness` like evidence
 exchange. Bookkeeping lives in world state, which ordinary inputs never show.
 
+## G. Food water representation
+
+`foodWater` makes ex10's reviewed food moisture model (`open-preservation-physics.ts`)
+available as a general representation that is not bound to ex10's drying tray, packages
+or interfaces. It sets `state.foodWater = 1`, which ordinary inputs never show, and adds
+no interface, event or rule. At genesis no food has a water composition and no object is a
+food surface, so a round is identical with and without the flag. It exists for interfaces
+developed later, such as air-drying food, which call the public API in
+`packages/world-core/src/food-water.ts` after their own reach, ownership and cost checks:
+
+| Function                                           | Effect                                                                                  |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| `foodWaterInitialize(world, stack)`                | Gives food its water composition                                                        |
+| `foodWaterSurfaceArea(world, surface, sample?)`    | Exposed area the surface offers now, or throws the reason                               |
+| `foodWaterExpose(world, stack, surface, prepared)` | Lays an unowned stack at the surface's centre                                           |
+| `foodWaterWithdraw(world, stack)`                  | Ends the exposure in place                                                              |
+| `foodWaterRead(stack)`                             | Water fraction, mass ratio, exposed area, preparation, decay rate and last exchange row |
+
+**Equations.** The environment runs ex10's per-tick exchange unchanged for every stack
+with a composition: evaporation toward an equilibrium water content set by air humidity,
+limited to 0.025 × area × a temperature factor, only for prepared food in a thin layer
+(mass at most 0.2 per unit area); rain × area × 0.01 added unless indoors or under an open
+refuge roof; decay multiplied by the opening damage and, for prepared food, by a
+water-fraction factor between 0.15 and 1.5. Air humidity uses ex10's formula
+(0.65 + 0.2 × rain − 0.1 × wind) for the exchange only, so the climate in ordinary inputs
+gains no `airHumidity`. Ex10's food tenths and reference prefixes are not installed.
+
+**Surfaces** (`{ kind: 'object', id }` or `{ kind: 'ground', x, y, area }`):
+
+- An object marked `data.foodSurface === true` that is not an enclosure, with the area of
+  its shape. It is obstructed by an overlapping solid, reserved or food-surface object
+  (open refuges only shade it), wears 0.01 per drying round only when it carries
+  `data.service`, is unusable at service 0, and shows ex10's `data.preservation` view
+  while food lies on it.
+- A circular ground footprint entirely inside the world, on firm ordinary ground (no
+  water, shallow-water or wet-bank cell and waterlogging at most 0.1 at its centre and
+  eight rim points, the rule of earlier ground drying sites), unobstructed in the same way.
+- One sample per surface: another exposed sample, an overlapping footprint or other loose
+  material on it gives area 0 until it is gone.
+- Exposure lasts while the food lies there. Picking it up, giving or moving it, or its
+  spoiling releases the surface. Withdrawal leaves the food in place, where it occupies
+  the surface until someone takes it.
+
+**Assumptions** (declared model choices, not measured knowledge):
+
+- Berry and root water fractions are 0.85 and 0.75 (ex10's version-1 assumption); other
+  foods are rejected rather than given an invented composition.
+- There is no moisture transfer between soil and food; wet ground only excludes footprints.
+- Unprepared whole food neither evaporates nor absorbs vapour, exactly as in ex10, but
+  still receives rain on its exposed area.
+- Preparation (opened and spread thin) is irreversible and carries ex10's persistent
+  opening damage 1.1.
+- As in ex10, the exposed area is the surface area, not the food's own spread, so callers
+  should choose footprints that match the batch.
+- Carried food keeps its composition and exchanges no water. Drying never sterilizes food
+  or removes toxins.
+- The exchange emits ex10's `preservation-progress` event for exposed food; a package
+  that uses the representation declares it.
+
 ## Excluded vocabulary
 
 Nothing an ordinary agent can see contains _culture_, _cultural_, _belief_, _believe_,
@@ -178,12 +257,18 @@ filtered. The World Agent keeps its existing satisfaction-source policy text.
 Ex7–ex13 requests and ex13 paused inputs are byte-identical (`pnpm compat:long`), and
 the ex13 and long-fixes genesis tests pass unchanged. Reverting the culture fields of the
 culture genesis recovers the long-fixes configuration, terrain, resources, authored
-objects, abilities and rules; only the symbolic package, the 24 commons sources and the
-people (count, starts, memory, tendencies, knowledge and mastery) differ.
+objects, abilities and rules; only the symbolic package, the 24 commons sources, the
+`foodWater` state flag and the people (count, starts, memory, tendencies, knowledge and
+mastery) differ. Ex10's tray rules, records and arithmetic are unchanged by the food
+water representation, and old records gain no field.
 
-- A name or mark of a carried item stays where it was made, with the item id.
-- Hearing ignores obstacles and does not interrupt plans unless `heard` is a chosen
+- Names and marks do not follow items: a name or mark of a carried item stays where it
+  was made, with the item id, when the item moves.
+- Hearing ignores obstacles: everyone within the vision radius hears spoken words, even
+  behind a solid object. Hearing does not interrupt plans unless `heard` is a chosen
   interrupt event.
+- Pressure starts at round 300, so runs that end by round 250 observe only the mild
+  period.
 - Answers through interfaces developed later do not count as evidence for `answered`.
 - Clustered starts make simultaneous conflicting gathers at one source more likely.
 - Estimated ordinary inputs grow from about 5,200 tokens at round 0 to about 6,100 after a

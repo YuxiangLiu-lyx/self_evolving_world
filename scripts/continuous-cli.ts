@@ -203,13 +203,15 @@ try {
       (extra === undefined ||
         (extra === '--abandoned-pid' && rest.length === 1))
     ) {
-      await repairContinuousRun(
+      const repaired = await repairContinuousRun(
         root,
         id,
         rest[0] === undefined ? undefined : Number(rest[0]),
       );
       console.log(
-        `${id}: technical pause retained; submit the counted development handoff with develop.`,
+        repaired === 'transport'
+          ? `${id}: transport failure retained; resuming without a development handoff.`
+          : `${id}: technical pause retained; submit the counted development handoff with develop.`,
       );
     } else throw new Error(USAGE);
     state = continuousCheckpoint(root, id);

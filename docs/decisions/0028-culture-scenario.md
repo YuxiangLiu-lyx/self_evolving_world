@@ -39,6 +39,16 @@ long-fixes.
   ledger; afterwards the run continues under the full ledger without a configuration change.
 - A fixed vocabulary never reaches ordinary agents; a test and the development validator
   guard it.
+- Before the first culture run, the frozen budgets became 300 World Agent calls and 40
+  development handoffs, and an opt-in `longDevelopment.transportRecovery: 'uncounted'` lets
+  `repair` resume a provider transport failure without a handoff. A handoff stays the unit
+  of reviewed code change; a transport failure needs no code, so counting it would only
+  shorten the observation.
+- Ex10's food water-content model becomes a general world representation behind a new
+  `foodWater` culture field: the reviewed ex10 equations, with general object and ground
+  surfaces instead of ex10 trays. No interface uses it at genesis; it gives later
+  developed drying or storage interfaces real physics to build on instead of a first
+  release that only reports missing physics.
 
 ## Alternatives and reasons
 
@@ -59,6 +69,9 @@ parsing, wellbeing trigger matching and the experience weighting key. Each is in
 compatibility digests and genesis tests confirm. Six people in one clearing raise the input
 size and the chance of conflicting simultaneous actions. The scenario remains an
 exploratory joint treatment; no single part's effect can be isolated from one run, which
-is why every part is separately switchable. No model-calling run has been made.
+is why every part is separately switchable. Uncounted transport recoveries make the
+handoff count a measure of code changes only; consecutive failures still pause the run.
+The food water representation adds guarded branches to ex10's physics module, inert
+without the flag. No model-calling run has been made.
 
 See the [design](../CULTURE_SCENARIO.md) and the [plan](../exec-plans/completed/pr-36-culture-scenario.md).

@@ -13,15 +13,25 @@ Stage 1 of the culture work adds an opt-in "culture" long-development condition 
 - R5 (D): Slack that reduces survival pressure (later pressure, higher growth floor, renewable food near the starts), with values documented and the offline preflight numbers reported.
 - R6 (E): Six people with nearby collision-free starts; the two-person object is optional.
 - R7 (F): Separately switched, bounded, decaying, deduplicated satisfaction for being answered or remembered, two-way contact and noticed own work, from real events only, never rewarding a specific behavior, queries, requests, naming, marking or telling as such, through the existing wellbeing machinery.
-- R8: Frozen budget mechanics: six people, 15 development handoffs, a first window to round 80, checkpoints 80, 150 and 250, a 10,000,000-token ledger and `tokenCeilings: [{ through: 80, tokens: 3_200_000 }]` enforced like the ledger; `extend exN 250` continues without a configuration change; the store accepts unchanged and rejects altered or untagged checkpoints.
+- R8: Frozen budget mechanics: six people, 15 development handoffs (raised to 40 by R11), a first window to round 80, checkpoints 80, 150 and 250, a 10,000,000-token ledger and `tokenCeilings: [{ through: 80, tokens: 3_200_000 }]` enforced like the ledger; `extend exN 250` continues without a configuration change; the store accepts unchanged and rejects altered or untagged checkpoints.
 - R9: Tests for each part, the excluded vocabulary over instructions and full inputs at round 0 and after symbolic actions, and ex7–ex13 compatibility digests compared after every protocol or prompt change.
 - R10: Documentation: `docs/CULTURE_SCENARIO.md`, ADR-0028, PRODUCT F-139, the DEVELOPMENT command row, ARCHITECTURE, this plan and its README entry.
+
+Follow-up requirements before E2 (requested after review; ex15 does not exist yet, so the frozen budgets can still change):
+
+- R11: Culture-scope budgets: 300 World Agent calls and a cumulative cap of 40 development handoffs; 1,800 ordinary calls, the 10,000,000-token ledger and the 3,200,000-token ceiling before round 80 are unchanged. Check the numbers against the measured E1 (ex14) rates and record the derivation in the PR.
+- R12: Opt-in `longDevelopment.transportRecovery: 'uncounted'` in the culture scope: `repair` resumes a provider transport failure (no response, recorded transport evidence, or a proved abandoned invocation) without a development handoff; every other pause stays counted and earlier runs are unchanged.
+- R13: ex10's food water-content model becomes a general world representation, not bound to ex10 apparatus, switched on by a culture field and used by no interface at genesis; ex10 behavior is byte-identical.
+- R14: `pnpm metrics:culture` reads private `cares` and `views` and reports them separately from public behavior, with a private-view convergence metric (how similar different people's views of the same person become over time); transmission metrics keep using public behavior only.
+- R15: Documentation states that pressure starts at round 300, so a run to round 250 lies wholly in the mild period, and lists unobstructed hearing and names and marks that do not follow items as limits.
+- R16: The observatory header link reads "Ashen-style replay (preview)"; the fix log states E1's 64-round comparison window and separates the effects of fix 2 and fix 3.
+- R17: If the CI Ashen recording test times out again after a rerun, compare its CI duration on main and on this branch and, with that evidence, raise its timeout to 180 seconds.
 
 ## Scope and exclusions
 
 In scope: world-core `expression*.ts` and guarded changes to the registry, plan parser, wellbeing matching, experience weighting and types; simulator `long-culture.ts`, `long-scenario.ts`, `long-context.ts`, `long-request.ts`, `long-tokens.ts` and the runner; the store, CLI, preflight, source validator and validation family prefix; the viewer sign visual, replay memory and actor colors; tests and documentation.
 
-Out of scope: any file under `experiment/`, starting any model-calling or random run, the World Agent prompt, the object that needs two people to move (skipped: it needs a new joint-action mechanism in the kernel), a Playwright scene for signs (no culture archive exists yet), and merging the PR.
+Out of scope: any file under `experiment/`, starting any model-calling or random run (E2 follows the merge in its own PR), the World Agent prompt, the object that needs two people to move (skipped: it needs a new joint-action mechanism in the kernel), a Playwright scene for signs (no culture archive exists yet), and merging the PR.
 
 ## Acceptance criteria
 

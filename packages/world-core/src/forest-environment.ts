@@ -261,7 +261,8 @@ export function forestEnvironment(world: V7World): void {
         stack.position = item.position;
       }
       rootWater(world, stack);
-      if (world.state.foodPreservation === 1)
+      // Ex10, or the opt-in food water representation; a no-op for food without its record.
+      if (world.state.foodPreservation === 1 || world.state.foodWater === 1)
         preservationExchange(world, stack);
       const resource = collectiveFoodProfile(world, stack),
         lifetime = resource?.properties?.decay ?? 0;

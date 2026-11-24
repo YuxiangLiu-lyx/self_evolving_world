@@ -31,6 +31,7 @@ export const CULTURE_OPTIONS: V7CultureOptions = {
   slack: true,
   density: 6,
   incentives: false,
+  foodWater: true,
 };
 /** Frozen budget mechanics of E2/E3: never changed after the first call. The first window
  * ends at round 80 under an additional 3,200,000-token ceiling; `extend exN 250` then
@@ -38,7 +39,10 @@ export const CULTURE_OPTIONS: V7CultureOptions = {
 export const LONG_CULTURE = {
   exactRecordWidth: 4000,
   guidance: ['plan-horizon', 'general-capabilities'] as const,
-  developments: 15,
+  /** Cumulative development handoffs; transport recoveries are not counted (`transportRecovery`). */
+  developments: 40,
+  /** World Agent call ceiling; ordinary calls keep the long-scenario ceiling of 1,800. */
+  worldCalls: 300,
   tokens: 10_000_000,
   gate: 80,
   checkpoints: [80, 150, 250],
@@ -253,6 +257,8 @@ export function applyCulture(
     development = world.config.development;
   if (!policy || !development) throw new Error('Missing long policy.');
   policy.culture = v7Clone(options);
+  // A representation only: food gains a water composition when a later interface uses it.
+  if (options.foodWater) world.state.foodWater = 1;
   if (options.slack) {
     policy.pressureStart = CULTURE_SLACK.pressureStart;
     policy.difficultyStart = CULTURE_SLACK.difficultyStart;
