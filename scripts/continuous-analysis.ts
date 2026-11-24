@@ -2,6 +2,7 @@ import { longObjective } from '../apps/simulator/src/long-scenario.js';
 import { longRequestMeasure } from '../apps/simulator/src/long-tokens.js';
 import { OPEN_OBJECTIVE, measureOpen } from './open-analysis.js';
 import { COLLECTIVE_OBJECTIVE } from '../apps/simulator/src/collective-scenario.js';
+import { countedDevelopments } from '../apps/simulator/src/collective-controller.js';
 import { measureCollective } from './collective-analysis.js';
 import {
   requestRevisionBoundaries,
@@ -289,6 +290,10 @@ export function measureContinuous(
       accepted: state.developments.filter((d) => d.status === 'accepted')
         .length,
       failed: state.developments.filter((d) => d.status === 'failed').length,
+      // Opt-in (culture v2): accepted empty handoffs do not use the handoff budget.
+      ...(state.world.config.longDevelopment?.emptyHandoffs
+        ? { counted: countedDevelopments(state.developments) }
+        : {}),
       internalModelCalls: null,
       inputTokens: null,
       outputTokens: null,
@@ -394,7 +399,7 @@ export function continuousReport(
     )
     .join(
       '\n',
-    )}\n\n## Cost and limitations\n\n${results.calls.map((c) => `${c.role}: ${String(c.attempts)} attempted calls, ${String(c.failedOrRejected)} failed/rejected; ${String(c.inputTokens)} recorded input tokens and ${String(c.outputTokens)} recorded output tokens; ${String(c.unknownUsageAttempts)} attempts with unknown token usage; ${(c.elapsedMs / 1000).toFixed(1)} elapsed seconds.`).join('\n\n')}\n\n${String(results.development.handoffs)} pre-counted conversation development handoffs, ${String(results.development.failed)} failed validation attempts. ${results.development.limitation}\n\n## Evidence and reproduction\n\nConfiguration and isolated survival feasibility are in configuration.json and preflight.json. The feasibility oracle and isolated extension fixtures never enter ordinary decision context. Every actual inference has an immutable calls/ record, including transport failures. replay.json indexes checksummed segments; source-history.json binds retained source, packages, tests and activation boundaries. The observatory reconstructs saved rounds; playback cannot advance the world.\n\nRun \`pnpm experiment:check\` and \`pnpm test\` to validate saved evidence. Open \`/observatory.html?experiment=${id}\` for the game view. Use the current task's development handoff to continue a pending barrier; do not allocate a replacement run or repeat an uncertain call.\n\n${forestSummary}## Interpretation\n\nThe current-conversation behavioral analysis accompanies this archive and traces actual problems, proposed functions, review, implementation, use and consequences. Shared object use is distinguished from explicit communication or consent. Novel names, proposals, installations and offspring counts are not happiness rewards. The observation window is resumable; completed capture is not world termination.\n`;
+    )}\n\n## Cost and limitations\n\n${results.calls.map((c) => `${c.role}: ${String(c.attempts)} attempted calls, ${String(c.failedOrRejected)} failed/rejected; ${String(c.inputTokens)} recorded input tokens and ${String(c.outputTokens)} recorded output tokens; ${String(c.unknownUsageAttempts)} attempts with unknown token usage; ${(c.elapsedMs / 1000).toFixed(1)} elapsed seconds.`).join('\n\n')}\n\n${String(results.development.handoffs)} pre-counted conversation development handoffs, ${String(results.development.failed)} failed validation attempts.${results.development.counted === undefined ? '' : ` ${String(results.development.counted)} of them use the development budget; accepted handoffs that installed no package and changed no runtime source do not.`} ${results.development.limitation}\n\n## Evidence and reproduction\n\nConfiguration and isolated survival feasibility are in configuration.json and preflight.json. The feasibility oracle and isolated extension fixtures never enter ordinary decision context. Every actual inference has an immutable calls/ record, including transport failures. replay.json indexes checksummed segments; source-history.json binds retained source, packages, tests and activation boundaries. The observatory reconstructs saved rounds; playback cannot advance the world.\n\nRun \`pnpm experiment:check\` and \`pnpm test\` to validate saved evidence. Open \`/observatory.html?experiment=${id}\` for the game view. Use the current task's development handoff to continue a pending barrier; do not allocate a replacement run or repeat an uncertain call.\n\n${forestSummary}## Interpretation\n\nThe current-conversation behavioral analysis accompanies this archive and traces actual problems, proposed functions, review, implementation, use and consequences. Shared object use is distinguished from explicit communication or consent. Novel names, proposals, installations and offspring counts are not happiness rewards. The observation window is resumable; completed capture is not world termination.\n`;
 }
 export function continuousArtifactFiles(
   manifest: Record<string, unknown>,

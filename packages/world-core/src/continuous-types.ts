@@ -447,7 +447,9 @@ export interface V7Configuration {
     compaction?: { version: 1; recentAbilityRounds: number };
     /** Opt-in (culture v2): a pause caused by rejected ordinary model output resumes through
      * `repair` without a development handoff; after `stopAfter` consecutive rejected
-     * ordinary outputs the run stops for review instead. Absent in ex15 and earlier. */
+     * ordinary outputs the run stops for review instead. The run counts rejected ordinary
+     * attempts across actors and rounds; an accepted ordinary attempt ends it and a
+     * transport failure neither extends nor ends it. Absent in ex15 and earlier. */
     rejectionRecovery?: { mode: 'uncounted'; stopAfter: number };
     /** Opt-in (culture v2): an accepted handoff that installs no package and changes no
      * runtime source (for example one that only closes a pause) does not use the handoff
