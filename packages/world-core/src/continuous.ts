@@ -89,6 +89,7 @@ import { LONG_AIR_DRYING } from './long-air-drying.js';
 import { LONG_RESTING_MATERIAL } from './long-resting-material.js';
 import { LONG_CORDAGE } from './long-cordage.js';
 import { LONG_FOOD_PREPARATION } from './long-food-preparation.js';
+import { LONG_SIMPLE_SHELTER } from './long-simple-shelter.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -175,6 +176,7 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_RESTING_MATERIAL,
   LONG_CORDAGE,
   LONG_FOOD_PREPARATION,
+  LONG_SIMPLE_SHELTER,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(
