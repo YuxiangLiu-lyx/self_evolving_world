@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   continuousRegistry,
   v7Clone,
@@ -13,6 +13,9 @@ import type {
 } from '@self-evolving-world/world-core';
 import { initialLongWorld } from '../src/long-scenario.js';
 import { CULTURE_EXCLUDED_WORDS } from '../src/long-culture.js';
+
+// Whole-world steps run slower on CI than locally; keep every test well inside this file's limit.
+vi.setConfig({ testTimeout: 30_000 });
 
 const id = 'bark-separation';
 const WAIT: V7Action = { interface: 'wait', args: {} };
