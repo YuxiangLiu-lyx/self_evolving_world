@@ -77,7 +77,10 @@ it('freezes both culture v2 scenarios as the culture genesis plus the v2 context
     const strip = (w: V7World) => {
       const c = v7Clone(w);
       const q = policy(c);
-      for (const field of V2_FIELDS) delete q[field];
+      delete q.compaction;
+      delete q.rejectionRecovery;
+      delete q.emptyHandoffs;
+      delete q.abilityTextLimit;
       delete q.scenario;
       delete q.culture?.goal;
       q.inputEstimateLimit = 0;
@@ -128,14 +131,13 @@ it('gives every person the open goal and their own leaning in the second person,
       CULTURE_EXCLUDED_WORDS,
     );
     // Apart from the goal, the leaning and the summary sentence, the prompt is the ex15 voice prompt.
+    const voiceContext: typeof input.longContext = { ...input.longContext };
+    delete voiceContext.goal;
+    delete voiceContext.leaning;
+    delete voiceContext.compaction;
     const v1 = longRequest('model', {
       ...input,
-      longContext: {
-        ...input.longContext,
-        goal: undefined,
-        leaning: undefined,
-        compaction: undefined,
-      },
+      longContext: voiceContext,
     }).instructions;
     expect(v1.startsWith(VOICE_ORDINARY)).toBe(true);
     expect(request.instructions).toBe(
