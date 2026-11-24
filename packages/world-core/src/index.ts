@@ -195,6 +195,9 @@ export { FOREST_ROUTE_INSPECTION } from './forest-route-inspection.js';
 export * from './forest-references.js';
 
 export * from './forest-experience.js';
+export * from './expression.js';
+export * from './expression-memory.js';
+export * from './expression-incentives.js';
 export { FOREST_INSULATION } from './forest-insulation.js';
 
 export { FOREST_FIRE, hearthSpatial } from './forest-fire.js';

@@ -134,6 +134,12 @@ export function v7Install(
         pkg.id === 'foundation-collective' &&
         pkg.scope === world.config.development?.scope
       ) &&
+      !(
+        world.config.longDevelopment?.culture &&
+        world.tick === 0 &&
+        pkg.id === 'foundation-expression' &&
+        pkg.scope === world.config.development?.scope
+      ) &&
       ability.authored
     )
       throw new Error(
@@ -261,7 +267,10 @@ export function v7Install(
         'Equivalent happiness sources cannot award again under another name.',
       );
     if (
-      !next.abilities.some((a) => a.id === source.interface) ||
+      // Only the authored culture foundation may derive interface-free evidence.
+      (source.derived
+        ? pkg.id !== 'foundation-expression' || source.interface !== ''
+        : !next.abilities.some((a) => a.id === source.interface)) ||
       [
         'requested',
         'learning',
@@ -308,9 +317,10 @@ export function v7Install(
         ].some(
           (trigger) =>
             !next.eventTypes?.includes(trigger.event) ||
-            !next.abilities.some(
-              (ability) => ability.id === trigger.interface,
-            ) ||
+            (!rule.derived &&
+              !next.abilities.some(
+                (ability) => ability.id === trigger.interface,
+              )) ||
             [
               'requested',
               'learning',

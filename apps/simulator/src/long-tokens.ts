@@ -72,3 +72,15 @@ export function longTokenBudget(state: {
       }
     : null;
 }
+/** The tightest opt-in additional ceiling that applies at the current tick, if any. It
+ * covers every attempt made while the tick is below `through`; absent in earlier runs. */
+export function longTokenCeiling(state: {
+  world: Pick<V7World, 'config' | 'tick'>;
+}): { through: number; tokens: number } | null {
+  const ceilings = (
+    state.world.config.longDevelopment?.tokenCeilings ?? []
+  ).filter((c) => state.world.tick < c.through);
+  return ceilings.length
+    ? ceilings.reduce((a, b) => (b.tokens < a.tokens ? b : a))
+    : null;
+}

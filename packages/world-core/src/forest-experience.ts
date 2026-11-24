@@ -154,14 +154,21 @@ export function forestExperienceAfterRound(
     const curious = events.some(
       (e) => e.type === 'information-confirmed' && e.data.qualified === true,
     );
-    const social = events.some(
-      (e) => e.type === 'finding-accepted' && e.data.qualified === true,
-    );
+    // The opt-in culture sources weigh like evidence exchange; absent elsewhere.
+    const social =
+      events.some(
+        (e) => e.type === 'finding-accepted' && e.data.qualified === true,
+      ) ||
+      rewards.some(
+        (e) => e.data.source === 'answered' || e.data.source === 'two-way',
+      );
+    // The culture scope names this tendency closeness; ex13 and long-fixes keep socialNeed.
+    const company = 'closeness' in traits ? 'closeness' : 'socialNeed';
     const weight = world.config.longDevelopment
       ? 1 +
         (Number(
           traits[
-            curious ? 'curiosity' : social ? 'socialNeed' : 'comfortPreference'
+            curious ? 'curiosity' : social ? company : 'comfortPreference'
           ] ?? 0.5,
         ) -
           0.5) *

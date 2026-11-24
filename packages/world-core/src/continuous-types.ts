@@ -145,6 +145,10 @@ export interface V7Memory {
   projects?: Record<string, V7Project>;
   knowledge?: Record<string, V7Knowledge>;
   abilityDetails?: string[];
+  /** Opt-in private memory (culture scope only): what the actor cares about, in its own words. */
+  cares?: string;
+  /** Opt-in private memory (culture scope only): how the actor sees particular people, most recent last. */
+  views?: { person: string; view: string; updatedAt: number }[];
 }
 /** Actor-authored plans are beliefs/intentions; evidence references are checked separately. */
 export interface V7Project {
@@ -253,6 +257,10 @@ export interface V7Plan {
   notes: string[];
   preferences: string[];
   projects?: V7Project[];
+  /** Opt-in private memory update; absent outside the culture scope and when omitted. */
+  cares?: string;
+  /** Opt-in private memory update: person id to view; an empty view forgets that person. */
+  views?: Record<string, string>;
 }
 export interface V7Cursor {
   plan: V7Plan;
@@ -373,6 +381,27 @@ export interface V7SatisfactionRule {
   participants?: 'actor' | 'participants';
   /** Keep overlapping rewards as their maximum; repetition uses a smaller amount within this window. */
   repeatWindow?: { rounds: number; amount: number };
+  /** Authored culture foundation only: the evidence is an interface-free event that the
+   * foundation derives from other people's real actions, so triggers match by event type
+   * with a null interface and `interface` is empty. Absent keeps historical matching. */
+  derived?: true;
+}
+/** Separately switchable parts of the opt-in culture scenario, so each can be ablated.
+ * Absent in ex13, long-fixes and every earlier archive. */
+export interface V7CultureOptions {
+  version: 1;
+  /** Ordinary prompt variant: own views and stories are free, and private memory fields exist. */
+  voice: boolean;
+  /** Spread personal tendencies, value leanings, starting knowledge and authored mastery. */
+  differentiation: boolean;
+  /** Authored name, mark, tell and invite interfaces with persistent signs. */
+  symbols: boolean;
+  /** Later pressure, a higher growth floor and renewable food near the starts. */
+  slack: boolean;
+  /** Number of people; 3 keeps the long-fixes actors and starts. */
+  density: number;
+  /** Bounded satisfaction from being answered, two-way contact and noticed own work. */
+  incentives: boolean;
 }
 export interface V7Configuration {
   longDevelopment?: {
@@ -389,7 +418,13 @@ export interface V7Configuration {
     guidance?: ('plan-horizon' | 'general-capabilities')[];
     /** Named opt-in variant of the long scenario, used to verify its frozen genesis.
      * Absent in ex13, the baseline long scenario. */
-    scenario?: 'fixes';
+    scenario?: 'fixes' | 'culture' | 'culture-incentives';
+    /** Opt-in culture scenario switches. Absent in ex13, long-fixes and earlier archives. */
+    culture?: V7CultureOptions;
+    /** Opt-in additional hard ceilings on the shared token ledger. Each applies to every
+     * attempt made while the world tick is below `through` (the calls that produce rounds
+     * 1..through); the next reservation must fit or the run pauses. Absent in earlier runs. */
+    tokenCeilings?: { through: number; tokens: number }[];
     checkpoints: number[];
     cycle: number;
     pressureStart: number;

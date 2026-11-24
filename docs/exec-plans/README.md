@@ -70,3 +70,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-33](completed/pr-33-long-run-fixes.md): opt-in whole exact reads and prompt guidance, the long-fixes scenario, honest developer records and archive-only long-run metrics.
 
 - [PR-35](completed/pr-35-culture-metrics.md): read-only rule-based culture metrics analyzer and the ex7–ex13 culture baseline.
+
+- [PR-36](completed/pr-36-culture-scenario.md): opt-in culture scenarios (`long-culture`, `long-culture-incentives`) with voice, differentiation, symbolic interfaces, slack, six people, optional incentives and a round-80 token ceiling.

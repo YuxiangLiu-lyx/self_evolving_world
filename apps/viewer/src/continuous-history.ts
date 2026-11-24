@@ -7,6 +7,7 @@ import {
   continuousRegistry,
   v7CanonicalNumbers,
   openSaveProjects,
+  expressionSaveMemory,
   v7Install,
   v7Clone,
   v7Step,
@@ -38,6 +39,8 @@ export interface SceneRound {
       intention?: string;
       collectiveIntent?: CollectiveIntent;
       projects?: V7Project[];
+      cares?: string;
+      views?: Record<string, string>;
     }
   >;
   events: V7World['events'];
@@ -134,6 +137,8 @@ export function incrementalSceneReplay(segment: SceneSegment) {
                   );
                 actor.collective.intent = v7Clone(m.collectiveIntent);
               }
+              if (m.cares !== undefined || m.views)
+                expressionSaveMemory(actor, m, world.tick);
               if (m.projects) openSaveProjects(actor, m.projects, world.tick);
               actor.memory.notes = m.notes;
               actor.memory.preferences = m.preferences;

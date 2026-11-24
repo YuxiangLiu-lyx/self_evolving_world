@@ -1,4 +1,5 @@
 import { openProjects } from './open-projects.js';
+import { expressionPersonal } from './expression-memory.js';
 import { forestBoundOperation } from './forest-operations.js';
 import { forestResolveAction } from './forest-references.js';
 import type {
@@ -57,10 +58,15 @@ export function v7ParsePlan(
   value: unknown,
   eventTypes?: readonly string[],
   allowProjects = false,
+  allowPersonal = false,
 ): V7Plan {
   const p = v7Record(value);
+  // The opt-in private memory fields are optional and accepted only when enabled.
+  const keys = Object.keys(p).filter(
+    (key) => !(allowPersonal && ['cares', 'views'].includes(key)),
+  );
   if (
-    Object.keys(p).sort().join(',') !==
+    keys.sort().join(',') !==
     (allowProjects && 'projects' in p
       ? 'intention,interrupts,notes,preferences,projects,repeat,steps,until'
       : 'intention,interrupts,notes,preferences,repeat,steps,until')
@@ -101,6 +107,7 @@ export function v7ParsePlan(
     ...(allowProjects && p.projects !== undefined
       ? { projects: openProjects(p.projects) }
       : {}),
+    ...(allowPersonal ? expressionPersonal(p) : {}),
   };
 }
 export function v7Cursor(plan: V7Plan, tick: number): V7Cursor {

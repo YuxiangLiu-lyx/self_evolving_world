@@ -3,6 +3,7 @@ import type { V7Review } from '@self-evolving-world/world-core';
 import { isDevelopmentReviewer } from '../apps/simulator/src/development-identity.js';
 import type { DevelopmentReviewer } from '../apps/simulator/src/development-identity.js';
 import { CONTINUOUS_VISUALS } from '../apps/viewer/src/continuous-visuals.js';
+import { CULTURE_EXCLUDED_WORDS } from '../apps/simulator/src/long-culture.js';
 import {
   existsSync,
   readFileSync,
@@ -395,6 +396,20 @@ export function validateContinuousDevelopment(
       )
     )
       throw new Error('Package visual implementation is absent.');
+    // Culture scope: developed interfaces must not hand ordinary agents a goal vocabulary.
+    if (
+      state.world.config.longDevelopment?.culture &&
+      CULTURE_EXCLUDED_WORDS.test(
+        JSON.stringify({
+          abilities: pkg.abilities,
+          events: pkg.events ?? [],
+          satisfaction: pkg.satisfaction.map((r) => r.name),
+        }),
+      )
+    )
+      throw new Error(
+        'Culture-scope interfaces, events and satisfaction names must not use the excluded vocabulary.',
+      );
     world = v7Install(world, registry, key);
   }
   const assigned: Record<string, string> = {};

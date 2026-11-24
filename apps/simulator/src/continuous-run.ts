@@ -5,7 +5,11 @@ import {
   longRetrieve,
   parseLongDecision,
 } from './long-context.js';
-import { longTokenBudget, longRequestMeasure } from './long-tokens.js';
+import {
+  longTokenBudget,
+  longTokenCeiling,
+  longRequestMeasure,
+} from './long-tokens.js';
 import { forestPlanArguments } from './forest-plan-arguments.js';
 import {
   collectiveAttention,
@@ -36,6 +40,8 @@ import {
   v7Install,
   V7ComputePause,
   collectiveSettle,
+  expressionArgumentIssue,
+  expressionSaveMemory,
 } from '@self-evolving-world/world-core';
 import type {
   V7World,
@@ -154,12 +160,20 @@ export function parseContinuousReviews(
     throw new Error('Every requester needs exactly one review.');
   return result;
 }
-function parsePlan(text: string, state: V7Execution) {
+function parsePlan(text: string, state: V7Execution, actor?: string) {
+  const culture = state.world.config.longDevelopment?.culture;
   const plan = v7ParsePlan(
     JSON.parse(text) as unknown,
     state.world.eventTypes,
     !!state.world.config.development,
+    !!culture?.voice,
   );
+  for (const person of Object.keys(plan.views ?? {}))
+    if (
+      person === actor ||
+      !state.world.actors.some((other) => other.id === person)
+    )
+      throw new Error('views keys must be the ids of other people.');
   if (text.length * 2 > state.world.config.computation.inputBytes)
     throw new V7ComputePause(
       'Plan input exceeds parsing protection; world paused.',
@@ -177,6 +191,10 @@ function parsePlan(text: string, state: V7Execution) {
         ability.parameters,
         step.action.args,
       );
+    const bounded = culture?.symbols
+      ? expressionArgumentIssue(step.action)
+      : null;
+    if (bounded) throw new Error(bounded);
     v7Validate(ability.parameters, step.action.args);
   }
   return plan;
@@ -222,7 +240,7 @@ function acceptCall(state: V7Execution, record: V7CallRecord): void {
       );
       if (record.attempt.role === 'ordinary')
         state.cursors[key] = v7Cursor(
-          parsePlan(result.decision ?? '', state),
+          parsePlan(result.decision ?? '', state, key),
           state.world.tick,
         );
       else {
@@ -384,6 +402,18 @@ async function invoke(
     await sink.checkpoint(state, state.reason);
     return;
   }
+  const ceiling = tokenBudget ? longTokenCeiling(state) : null;
+  if (
+    tokenBudget &&
+    ceiling &&
+    tokenBudget.used + reservation > ceiling.tokens
+  ) {
+    state.phase = 'paused';
+    state.reason = `Frozen token ceiling of ${String(ceiling.tokens)} before round ${String(ceiling.through)} cannot reserve the next complete attempt; world paused.`;
+    await sink.save(state);
+    await sink.checkpoint(state, state.reason);
+    return;
+  }
   if (
     (measure &&
       measure.inputEstimate >
@@ -459,7 +489,7 @@ async function invoke(
           );
         longRetrieve(state.world, actor, role, result.queries);
       } else if (role === 'ordinary') {
-        const plan = parsePlan(result.decision ?? '', state);
+        const plan = parsePlan(result.decision ?? '', state, actor);
         if (
           plan.steps.length > 6 ||
           (plan.projects?.length ?? 0) > 4 ||
@@ -740,7 +770,18 @@ export async function continueContinuousExecution(
             plan.projects
               ? { projects: plan.projects }
               : {}),
+            // Opt-in private memory, applied once when its plan starts.
+            ...(state.cursors[actor.id]?.startedAt === input.tick &&
+            plan.cares !== undefined
+              ? { cares: plan.cares }
+              : {}),
+            ...(state.cursors[actor.id]?.startedAt === input.tick && plan.views
+              ? { views: plan.views }
+              : {}),
           };
+          const entry = memory[actor.id];
+          if (entry?.cares !== undefined || entry?.views)
+            expressionSaveMemory(actor, entry, input.tick);
           const projects = memory[actor.id]?.projects;
           const intent = memory[actor.id]?.collectiveIntent;
           if (intent && actor.collective)

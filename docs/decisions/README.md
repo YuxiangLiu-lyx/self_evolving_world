@@ -59,3 +59,5 @@ For a material change to an accepted decision, create a new ADR and mark the old
 - [0026](0026-bounded-long-development.md): permission-scoped control retrieval, constant output envelope, durable shared token accounting and opt-in long-run pressure.
 
 - [0027](0027-lean-development-workflow.md): standalone branch/validate/PR workflow replacing the task coordinator; removal of retired run entry points.
+
+- [0028](0028-culture-scenario.md): opt-in culture scenario with separately switchable voice, differentiation, symbols, slack, density and derived-evidence incentives, plus a frozen early token ceiling.

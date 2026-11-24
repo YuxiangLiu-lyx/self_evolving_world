@@ -28,6 +28,7 @@ import {
   v7Step,
   continuousRegistry,
   openSaveProjects,
+  expressionSaveMemory,
   v7PrepareReplayCursors,
   v7FinishTasks,
 } from '@self-evolving-world/world-core';
@@ -592,6 +593,8 @@ export function reconstructContinuousSegment(
             );
           actor.collective.intent = v7Clone(memory.collectiveIntent);
         }
+        if (memory.cares !== undefined || memory.views)
+          expressionSaveMemory(actor, memory, world.tick);
         if (memory.projects)
           openSaveProjects(actor, memory.projects, world.tick);
         actor.memory.notes = memory.notes;

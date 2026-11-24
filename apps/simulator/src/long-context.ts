@@ -9,6 +9,8 @@ import {
   forestClimate,
   v7Record,
   v7String,
+  expressionSign,
+  EXPRESSION_REVISION,
 } from '@self-evolving-world/world-core';
 import type {
   V7World,
@@ -38,6 +40,8 @@ export interface LongInput {
     outputTokens: number;
     /** Present only when the opt-in prompt addenda are configured. */
     guidance?: ('plan-horizon' | 'general-capabilities')[];
+    /** Present only in the culture scope's ordinary prompt variant. */
+    voice?: true;
   };
   protocol: 'continuous-v1';
   tick: number;
@@ -320,6 +324,9 @@ function base(
         (retrieval?.tick === world.tick ? retrieval.batches : 0),
       outputTokens: policy.outputTokens,
       ...(policy.guidance?.length ? { guidance: [...policy.guidance] } : {}),
+      ...(role === 'ordinary' && policy.culture?.voice
+        ? { voice: true as const }
+        : {}),
     },
     protocol: world.protocol,
     tick: world.tick,
@@ -351,6 +358,28 @@ function compactAbility(a: V7World['abilities'][number], mastered: string[]) {
     mastered: mastered.includes(a.id),
   };
 }
+/** Compact nearby signs, nearest first; full records remain readable by exact id. */
+function signRecords(o: ReturnType<typeof publicObservation>) {
+  return o.objects
+    .filter(expressionSign)
+    .sort(
+      (x, y) =>
+        v7Distance(o.self.position, x.spatial) -
+          v7Distance(o.self.position, y.spatial) || (x.id < y.id ? -1 : 1),
+    )
+    .map((x) => ({
+      id: x.id,
+      value: {
+        kind: x.kind,
+        text: x.data.text ?? null,
+        by: x.data.by ?? null,
+        at: x.data.at ?? null,
+        position: { x: x.spatial.x, y: x.spatial.y },
+        ...(x.data.subject !== undefined ? { subject: x.data.subject } : {}),
+        ...(x.data.meeting !== undefined ? { meeting: x.data.meeting } : {}),
+      },
+    }));
+}
 export function longOrdinaryInput(
   world: V7World,
   id: string,
@@ -358,8 +387,13 @@ export function longOrdinaryInput(
   retrieval?: LongRetrieval,
 ): LongInput {
   const input = base(world, id, 'ordinary', retrieval),
+    culture = world.config.longDevelopment?.culture,
     o = publicObservation(world, id),
     a = o.self;
+  // Culture scope only: signs get their own section instead of crowding objects.
+  const physical = culture?.symbols
+    ? o.objects.filter((x) => !expressionSign(x))
+    : o.objects;
   const projects = Object.values(a.memory.projects ?? {}).sort(
     (a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0),
   );
@@ -431,7 +465,7 @@ export function longOrdinaryInput(
       actors: o.actors,
       terrain: o.terrain.map((p) => [p.x, p.y, p.kind]),
       objects: longPage(
-        ranked(o.objects, taskText).map((x) => ({
+        ranked(physical, taskText).map((x) => ({
           id: x.id,
           value: { seenAt: world.tick, object: x },
         })),
@@ -439,6 +473,7 @@ export function longOrdinaryInput(
         0,
         8,
       ),
+      ...(culture?.symbols ? { signs: longPage(signRecords(o), 0, 0, 6) } : {}),
       ground: longPage(
         o.stacks
           .filter((s) => s.owner === null)
@@ -464,6 +499,12 @@ export function longOrdinaryInput(
     ),
     memory: {
       tendencies: a.extensionState['long:tendencies'] ?? null,
+      ...(culture?.voice
+        ? { cares: a.memory.cares ?? null, views: a.memory.views ?? [] }
+        : {}),
+      ...(culture?.symbols
+        ? { heard: a.extensionState['expression:heard'] ?? [] }
+        : {}),
       offers: Object.fromEntries(
         Object.entries(world.state).filter(([key]) =>
           key.startsWith(`open:offer:${id}:`),
@@ -503,6 +544,7 @@ export function longOrdinaryInput(
       ),
       remembered: a.memory.objects
         .filter((m) => !o.objects.some((x) => x.id === m.object.id))
+        .filter((m) => !culture?.symbols || !expressionSign(m.object))
         .sort(
           (x, y) =>
             v7Distance(a.position, x.object.spatial) -
@@ -524,9 +566,17 @@ export function longOrdinaryInput(
         .filter((x) => x.authored)
         .map((x) => ({
           id: x.id,
+          // Culture scope only: the new symbolic verbs carry their function, and
+          // an authored interface not yet mastered says so.
+          ...(x.revision === EXPRESSION_REVISION
+            ? { function: x.function }
+            : {}),
           parameters: x.parameters,
           ...(Object.keys(x.references ?? {}).length
             ? { references: x.references }
+            : {}),
+          ...(culture?.differentiation && !a.mastered.includes(x.id)
+            ? { mastered: false }
             : {}),
         })),
       candidates: candidates.map((x) => compactAbility(x, a.mastered)),

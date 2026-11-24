@@ -219,3 +219,12 @@ A development declaration may name its `developer`: `current-codex-conversation`
 or `current-claude-conversation`. The accepted handoff records it. A named scenario
 such as long-fixes requires it; ex13 and earlier declarations never had it and stay
 valid. Every retained handoff through ex13 was developed by Codex.
+
+## Culture scenarios
+
+`pnpm experiment:continuous -- new long-culture` and `new long-culture-incentives` start
+the opt-in culture scenarios on the ex13 rules and seed with the long-fixes options, six
+people, survival slack, symbolic interfaces, private memory and, in the second, bounded
+incentives. Their switches, budget mechanics (a 15-handoff development cap, a first window
+to round 80 under a 3,200,000-token ceiling, checkpoints 80, 150 and 250 and a
+10,000,000-token ledger) and limits are described in [Culture Scenario](CULTURE_SCENARIO.md).
