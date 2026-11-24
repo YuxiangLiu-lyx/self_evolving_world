@@ -57,6 +57,10 @@ export interface V7DevelopmentAttempt {
   reason: string | null;
   /** The coding conversation that completed an accepted handoff; absent in ex13 and earlier. */
   developer?: DevelopmentReviewer;
+  /** Opt-in (`longDevelopment.emptyHandoffs: 'uncounted'`): `false` on an accepted handoff
+   * that installed no package and changed no runtime source, which does not use the
+   * handoff budget. Absent on every other handoff and in every archive. */
+  counted?: false;
   internalModelCalls: null;
   inputTokens: null;
   outputTokens: null;

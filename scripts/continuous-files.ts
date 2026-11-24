@@ -8,6 +8,7 @@ import {
 import {
   currentContinuousRuntimeMatches,
   captureContinuousBaseline,
+  emptyHandoff,
   validateContinuousDevelopment,
   saveContinuousSource,
 } from './continuous-source.js';
@@ -49,6 +50,11 @@ export function submitContinuousDevelopment(
     );
     const finished = resolved.developments.find((a) => a.id === attempt.id);
     if (finished && accepted.developer) finished.developer = accepted.developer;
+    if (
+      finished &&
+      emptyHandoff(state.world, accepted.packages, accepted.runtimeChanges)
+    )
+      finished.counted = false;
     saveContinuousSource(
       root,
       id,

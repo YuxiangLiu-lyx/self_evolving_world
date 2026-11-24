@@ -12,6 +12,7 @@ import type {
 } from '@self-evolving-world/world-core';
 import type {
   V7Execution,
+  V7DevelopmentAttempt,
   CollectiveAttention,
 } from './continuous-run-types.js';
 import type { CollectiveInput } from './collective-input.js';
@@ -46,13 +47,19 @@ export function collectivePhaseUsed(
   role: 'ordinary' | 'world' | 'development',
 ): number {
   const boundary = state.collectiveContinuation;
-  const records =
-    role === 'development'
-      ? state.developments.slice(boundary?.developments ?? 0)
-      : state.attempts
-          .slice(boundary?.attempts ?? 0)
-          .filter((a) => a.role === role);
-  return records.length;
+  return role === 'development'
+    ? countedDevelopments(state.developments.slice(boundary?.developments ?? 0))
+    : state.attempts
+        .slice(boundary?.attempts ?? 0)
+        .filter((a) => a.role === role).length;
+}
+/** Development handoffs that use the handoff budget. Every handoff is counted, including
+ * started and failed ones, except an accepted empty handoff recorded `counted: false`
+ * under the opt-in `longDevelopment.emptyHandoffs: 'uncounted'` (absent in every archive). */
+export function countedDevelopments(
+  developments: readonly V7DevelopmentAttempt[],
+): number {
+  return developments.filter((d) => d.counted !== false).length;
 }
 export function collectiveTokenBudget(state: V7Execution) {
   const p = state.world.config.collective;

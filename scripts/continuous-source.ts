@@ -1,5 +1,5 @@
 import { parseContinuousReviews } from '../apps/simulator/src/continuous-run.js';
-import type { V7Review } from '@self-evolving-world/world-core';
+import type { V7Ability, V7Review } from '@self-evolving-world/world-core';
 import { isDevelopmentReviewer } from '../apps/simulator/src/development-identity.js';
 import type { DevelopmentReviewer } from '../apps/simulator/src/development-identity.js';
 import { CONTINUOUS_VISUALS } from '../apps/viewer/src/continuous-visuals.js';
@@ -264,6 +264,37 @@ export function declaredDeveloper(
   return developer;
 }
 
+/** Opt-in (`longDevelopment.abilityTextLimit`): the first developed interface that
+ * serializes (`JSON.stringify`) to more code units than the frozen limit; `null` when every
+ * interface fits or no limit applies (ex15 and earlier). */
+export function abilityTextIssue(
+  world: V7Execution['world'],
+  abilities: readonly V7Ability[],
+): string | null {
+  const limit = world.config.longDevelopment?.abilityTextLimit;
+  if (limit === undefined) return null;
+  for (const ability of abilities) {
+    const length = JSON.stringify(ability).length;
+    if (length > limit)
+      return `Developed interface ${ability.id} serializes to ${String(length)} code units, above the frozen abilityTextLimit of ${String(limit)}; shorten its function, effects, costs or parameter text.`;
+  }
+  return null;
+}
+/** Opt-in (`longDevelopment.emptyHandoffs: 'uncounted'`): an accepted handoff that installs
+ * no package and changes no runtime source, for example one that only closes a technical
+ * pause, does not use the handoff budget. Failed submissions stay counted. */
+export function emptyHandoff(
+  world: V7Execution['world'],
+  packages: readonly string[],
+  runtimeChanges: readonly string[],
+): boolean {
+  return (
+    world.config.longDevelopment?.emptyHandoffs === 'uncounted' &&
+    packages.length === 0 &&
+    runtimeChanges.length === 0
+  );
+}
+
 /** Manifest-declared source changes, full tests and exact old-prefix replay replace the old five-file allowlist. */
 export function validateContinuousDevelopment(
   root: string,
@@ -278,6 +309,8 @@ export function validateContinuousDevelopment(
   review: string;
   validation: ContinuousSourceRevision['validation'];
   developer?: DevelopmentReviewer;
+  /** Runtime source paths changed since the previous retained revision. */
+  runtimeChanges: string[];
 } {
   const declaration = v7Record(input),
     packages = declaration.packages,
@@ -410,6 +443,8 @@ export function validateContinuousDevelopment(
       throw new Error(
         'Culture-scope interfaces, events and satisfaction names must not use the excluded vocabulary.',
       );
+    const tooLong = abilityTextIssue(state.world, pkg.abilities);
+    if (tooLong) throw new Error(`${key}: ${tooLong}`);
     world = v7Install(world, registry, key);
   }
   const assigned: Record<string, string> = {};
@@ -445,5 +480,6 @@ export function validateContinuousDevelopment(
       sha256: continuousHash(readFileSync(resolve(directory, log), 'utf8')),
     },
     ...(developer === undefined ? {} : { developer }),
+    runtimeChanges: changed,
   };
 }

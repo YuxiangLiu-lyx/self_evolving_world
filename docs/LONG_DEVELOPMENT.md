@@ -229,3 +229,29 @@ incentives. Their switches, budget mechanics (a 40-handoff development cap, 300 
 calls, uncounted transport recovery, a first window to round 80 under a 3,200,000-token
 ceiling, checkpoints 80, 150 and 250 and a 10,000,000-token ledger) and limits are
 described in [Culture Scenario](CULTURE_SCENARIO.md).
+
+The culture v2 scenarios (`long-culture-v2`, `long-culture-v2-incentives`) add three
+opt-in options, absent in ex15 and earlier, whose repair and handoff accounting stay
+unchanged:
+
+- `longDevelopment.rejectionRecovery: { mode: 'uncounted', stopAfter: 3 }`: a pause
+  caused by rejected ordinary model output resumes through `repair exN` like a transport
+  failure, with no development handoff. The rejected output never becomes an action and
+  keeps its charge; `technical-pauses/round-N/recovery.json` records
+  `rejectionRecovery: true` and `developmentHandoff: false`, and a later pause in the same
+  round is retained as `round-N-2`, `round-N-3` and so on. Consecutive rejected outputs
+  are the trailing run of ordinary attempts with status `rejected`, across actors and
+  rounds: an accepted ordinary attempt, including a query batch, ends the run, and a
+  transport failure neither extends nor ends it. When a rejection pause reaches
+  `stopAfter` consecutive rejected outputs, the run stops for review: `repair` refuses and
+  does not fall back to a counted handoff. A rejection still pauses after two failures of
+  one actor in a round and again at the next one after a resume, so each decision gets
+  three tries.
+- `longDevelopment.emptyHandoffs: 'uncounted'`: an accepted handoff that installs no
+  package and changes no runtime source (for example one that only closes a technical
+  pause) is recorded with `counted: false` and does not use the development budget.
+  Started, failed and installing handoffs stay counted, and every budget check and report
+  counts handoffs the same way.
+- `longDevelopment.abilityTextLimit: 3500`: development validation rejects a package any
+  of whose interfaces serializes to more than 3,500 code units, naming the interface, its
+  length and the limit. A rejected submission is a counted failed handoff.
