@@ -99,6 +99,7 @@ E1's gate is at most 4,500 tokens per agent per round; if rounds 0–39 are not 
 | Interfaces bound to one agent or item                                      | 0/6               | 2/9               | 5/12              |
 | Calls with unknown usage                                                   | 1                 | 3                 | 3                 |
 
+- **Culture metrics** (`pnpm metrics:culture -- experiment/ex14`): survival behavior took 55.2% of actor-rounds (ex13: 41.5% over 280 rounds); there were no messages and no symbolic actions; 2 terms were later used by another agent, neither through communication.
 - **Gates**: G1 (at most 4,500 tokens per agent per round) passed at 3,641. The round-40 gate passed at 3,337 against ex13's 5,962.
 - **What did not improve**: the follow-up share stayed above 50%, and no plan used interrupt events. Develop was still chosen in 8 of 11 reviews, so the handoff budget again ended the run.
 - **Handoffs**: three handoffs installed working general operations: a cultivation trial, a paired food exposure trial and resting-material arrangement. Three installed first releases that only report physics the world does not represent: branch geometry and wind direction for a wind screen, stone support geometry for air-drying, and strand and tension behavior for cordage. One handoff reassigned the existing cultivation operation because no propagation biology exists, and one recovered the overloaded call. Every handoff is recorded as `current-claude-conversation`.
