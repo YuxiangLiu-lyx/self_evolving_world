@@ -47,6 +47,8 @@ export function submitContinuousDevelopment(
       accepted.assignments,
       accepted.review,
     );
+    const finished = resolved.developments.find((a) => a.id === attempt.id);
+    if (finished && accepted.developer) finished.developer = accepted.developer;
     saveContinuousSource(
       root,
       id,

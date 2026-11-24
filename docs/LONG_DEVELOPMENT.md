@@ -181,3 +181,41 @@ still fail. Interrupted transport is reconciled only after the experiment proces
 worker are proved absent (`repair exN --abandoned-pid PID`); an unknown original invocation is never resent.
 Development validation records all failed submissions as well as accepted source
 boundaries. No repair silently resumes an exhausted token or call budget.
+
+## Opt-in run fixes and the long-fixes scenario
+
+Three options address ex13's costs. Each is absent from ex13 and earlier, whose
+genesis, configuration, requests and paused ordinary inputs stay byte-identical
+(checked with `pnpm compat:long` before and after every protocol or prompt change).
+
+- `longDevelopment.exactRecordWidth`: an exact-id read returns a whole record up to
+  that many code units for any requested part, and repeated whole reads in one
+  round are shown once. Proactive views, broad searches and larger records keep the
+  600-code-unit pages. In ex13, 163 continuation-part queries were issued, and 52 of
+  the 87 plans decided with no query batch left still held a partly read record.
+- `longDevelopment.guidance: ['plan-horizon']` tells ordinary actors that decisions
+  are paid while executing a plan is free, and suggests repeat, until, guards and
+  interrupt events. Over all of ex13 an actor's next plan came after a median of 3
+  rounds (2 in rounds 0–79; 9 in ex9), 54% of plans ran every step once, and no plan
+  used interrupt events.
+- `longDevelopment.guidance: ['general-capabilities']` asks the World Agent to reuse
+  first and to develop general, parameterized operations named by function. The
+  ex13 World Agent reused 1 of 29 reviews; 19 of 28 developed interfaces were bound
+  to one actor or item, 23 were mastered by at most one actor, and the 40-handoff
+  development budget ended ex13 at round 280.
+
+`pnpm experiment:continuous -- new long-fixes` starts the fix-verification run: the
+ex13 rules, seed and world with all three options (`exactRecordWidth` 4000), a
+development budget of 8 handoffs and a 1,600,000-token ceiling. The configuration
+carries `scenario: 'fixes'`, so its checkpoint is verified against this genesis, not
+ex13's. Its first window ends at round 40 for the comparison gate; `extend exN 80`
+continues it. `pnpm metrics:long -- experiment/exN [rounds]` reports the comparison
+metrics from retained files only. Tokens per agent per round are the known input
+plus output tokens of every ordinary and World Agent call before that round,
+divided by agents × rounds; calls with unknown usage are counted separately. Ex13's
+baseline is 6,632 for rounds 0–79 and 5,254 over all 280 rounds.
+
+A development declaration may name its `developer`: `current-codex-conversation`
+or `current-claude-conversation`. The accepted handoff records it. A named scenario
+such as long-fixes requires it; ex13 and earlier declarations never had it and stay
+valid. Every retained handoff through ex13 was developed by Codex.

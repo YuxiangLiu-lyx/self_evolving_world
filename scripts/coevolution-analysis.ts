@@ -1,3 +1,4 @@
+import { isDevelopmentReviewer } from '../apps/simulator/src/development-identity.js';
 import { isDeepStrictEqual } from 'node:util';
 import {
   acceptCoevolutionProgram,
@@ -334,7 +335,7 @@ export function auditCoevolution(state: CoevolutionExecution) {
         (attempts === 2 || needsDevelopment) &&
           !resolved &&
           isDeepStrictEqual(development.barrier, barrier) &&
-          record(development).reviewer === 'current-codex-conversation',
+          isDevelopmentReviewer(record(development).reviewer),
         'development provenance mismatch',
       );
       assert(

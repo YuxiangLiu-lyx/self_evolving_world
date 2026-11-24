@@ -36,6 +36,8 @@ export interface LongInput {
     actor: string;
     remainingQueryBatches: number;
     outputTokens: number;
+    /** Present only when the opt-in prompt addenda are configured. */
+    guidance?: ('plan-horizon' | 'general-capabilities')[];
   };
   protocol: 'continuous-v1';
   tick: number;
@@ -67,12 +69,16 @@ function ranked<T>(records: T[], query: string): T[] {
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .map((r) => r.value);
 }
-/** Whole records where possible; a large value is explicitly paged, never silently reinterpreted. */
+/** Whole records where possible; a large value is explicitly paged, never silently reinterpreted.
+ * `whole` is an opt-in exact-read width: a record no longer than it is returned complete,
+ * so reading one interface or project needs no continuation round trips. Records above it,
+ * and every call without it, keep the historical 600-code-unit pages byte for byte. */
 export function longPage(
   records: { id: string; value: unknown }[],
   offset = 0,
   part = 0,
   size = 4,
+  whole?: number,
 ) {
   // A part has one meaning everywhere, including proactive views and explicit queries.
   const width = 600;
@@ -82,7 +88,10 @@ export function longPage(
     next: offset + size < records.length ? offset + size : null,
     records: records.slice(offset, offset + size).map(({ id, value }) => {
       const json = text(value);
-      return json.length <= width
+      // Any requested part of a record within the exact-read width returns it whole;
+      // repeated whole reads in one round are collapsed by dedupeWholeReads.
+      return json.length <= width ||
+        (whole !== undefined && json.length <= whole)
         ? { id, value }
         : {
             id,
@@ -102,6 +111,52 @@ export function longPage(
           };
     }),
   };
+}
+export const WHOLE_READ_REPEAT =
+  'Already returned whole earlier in this round; no further parts exist.';
+/** Collapse repeated whole exact reads of one record within a round's retrieval.
+ * A no-op unless the opt-in exact-read width is configured. */
+export function dedupeWholeReads(world: V7World, results: unknown[]) {
+  if (world.config.longDevelopment?.exactRecordWidth === undefined)
+    return results;
+  const seen = new Set<string>();
+  const object = (v: unknown) =>
+    v && typeof v === 'object' && !Array.isArray(v)
+      ? (v as Record<string, unknown>)
+      : null;
+  return results.map((raw) => {
+    const result = object(raw),
+      query = object(result?.query);
+    if (
+      !result ||
+      !query ||
+      !Array.isArray(query.ids) ||
+      !query.ids.length ||
+      !Array.isArray(result.records)
+    )
+      return raw;
+    return {
+      ...result,
+      records: result.records.map((row: unknown) => {
+        const r = object(row);
+        if (!r || r.value === undefined || text(r.value).length <= 600)
+          return row;
+        const key = `${String(query.section)}:${String(r.id)}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          return row;
+        }
+        return { id: r.id, complete: WHOLE_READ_REPEAT };
+      }),
+    };
+  });
+}
+/** Empty unless the opt-in exact-read width is configured, keeping historical inputs unchanged. */
+export function exactReadAccess(world: V7World): string {
+  const whole = world.config.longDevelopment?.exactRecordWidth;
+  return whole === undefined
+    ? ''
+    : ` Exact-id queries return a complete record of up to ${String(whole)} code units as one value in a single result; larger records keep the paged form.`;
 }
 function entries(values: Record<string, unknown>) {
   return Object.entries(values).map(([id, value]) => ({ id, value }));
@@ -232,7 +287,15 @@ export function longRetrieve(
     }
     const result = {
       query,
-      ...longPage(found, query.offset, query.part, query.ids.length ? 1 : 3),
+      ...longPage(
+        found,
+        query.offset,
+        query.part,
+        query.ids.length ? 1 : 3,
+        query.ids.length
+          ? world.config.longDevelopment?.exactRecordWidth
+          : undefined,
+      ),
     };
     return catalogueRetrievalView(world, actor, [result])[0];
   });
@@ -256,13 +319,15 @@ function base(
         policy.queriesPerDecision -
         (retrieval?.tick === world.tick ? retrieval.batches : 0),
       outputTokens: policy.outputTokens,
+      ...(policy.guidance?.length ? { guidance: [...policy.guidance] } : {}),
     },
     protocol: world.protocol,
     tick: world.tick,
     catalogue: { interfaces: [], events: [] },
     packet: {},
-    retrieval: (retrieval?.tick === world.tick ? retrieval.results : []).map(
-      (raw) => {
+    retrieval: dedupeWholeReads(
+      world,
+      (retrieval?.tick === world.tick ? retrieval.results : []).map((raw) => {
         const result = v7Record(raw);
         if (!result.query) return raw;
         const { queries } = parseLongDecision(
@@ -274,7 +339,7 @@ function base(
           projection:
             'Current authorized read with stable600 pages; original query/result retained unchanged in the call archive.',
         };
-      },
+      }),
     ),
   };
 }
@@ -488,7 +553,8 @@ export function longOrdinaryInput(
       inheritSkills: false,
     },
     access:
-      'Omission is not absence. Query abilities, own inventory, knowledge, projects, memory, state or personally observed objects in batches. Ability search/list returns compact catalogue entries; use exact ids for full interface details and applicability. Search results are indexes. Exact queries return one record per offset. All paged records use600-code-unit fragments with zero-based part0..parts-1, consistently in proactive and queried views. Current-scope retained queries are reprojected using these stable pages; original results remain archived. Queries expose no hidden properties, other private records or historical capabilities. Queries do not perform physical trials or award experience.',
+      'Omission is not absence. Query abilities, own inventory, knowledge, projects, memory, state or personally observed objects in batches. Ability search/list returns compact catalogue entries; use exact ids for full interface details and applicability. Search results are indexes. Exact queries return one record per offset. All paged records use600-code-unit fragments with zero-based part0..parts-1, consistently in proactive and queried views. Current-scope retained queries are reprojected using these stable pages; original results remain archived. Queries expose no hidden properties, other private records or historical capabilities. Queries do not perform physical trials or award experience.' +
+      exactReadAccess(world),
   };
   return input;
 }

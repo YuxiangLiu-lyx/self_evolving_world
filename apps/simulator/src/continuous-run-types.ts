@@ -1,5 +1,6 @@
 import type { LongInput, LongRetrieval } from './long-context.js';
 import type { LongRequestMeasure } from './long-tokens.js';
+import type { DevelopmentReviewer } from './development-identity.js';
 import type {
   V7World,
   V7Project,
@@ -54,6 +55,8 @@ export interface V7DevelopmentAttempt {
   startedAt: string;
   finishedAt: string | null;
   reason: string | null;
+  /** The coding conversation that completed an accepted handoff; absent in ex13 and earlier. */
+  developer?: DevelopmentReviewer;
   internalModelCalls: null;
   inputTokens: null;
   outputTokens: null;

@@ -12,15 +12,15 @@ Every change runs `pnpm validate` before publication; CI runs the same command a
 
 [Executable scope rules](../scripts/validation-plan.ts) select checks from the actual changed paths:
 
-| Actual change                  | Selected checks                                                                                  |
-| ------------------------------ | ------------------------------------------------------------------------------------------------ |
-| Documentation only             | Documentation links and structure, formatting; no world reconstruction or screenshots            |
-| New experiment archive         | Deep reconstruction and browser state/visual checks for that archive; preservation of all others |
-| Protocol-owned runtime file    | All unit tests plus reconstruction and browser checks for that protocol's archives               |
-| Validation or delivery tooling | All unit tests only; run `pnpm validate:audit` when the change alters reconstruction or scenes   |
-| Shared viewer file             | Affected protocols' archives and scenes, including historical and mobile views                   |
-| Shared or unknown dependency   | Conservative expansion up to every archive                                                       |
-| Explicit audit                 | Every automated check, every archive and all scenes                                              |
+| Actual change                                                                           | Selected checks                                                                                  |
+| --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Documentation only                                                                      | Documentation links and structure, formatting; no world reconstruction or screenshots            |
+| New experiment archive                                                                  | Deep reconstruction and browser state/visual checks for that archive; preservation of all others |
+| Protocol-owned runtime file                                                             | All unit tests plus reconstruction and browser checks for that protocol's archives               |
+| Validation, delivery or read-only metric tooling (`long-metrics`, `long-compatibility`) | All unit tests only; run `pnpm validate:audit` when the change alters reconstruction or scenes   |
+| Shared viewer file                                                                      | Affected protocols' archives and scenes, including historical and mobile views                   |
+| Shared or unknown dependency                                                            | Conservative expansion up to every archive                                                       |
+| Explicit audit                                                                          | Every automated check, every archive and all scenes                                              |
 
 Protocol ownership follows file-name prefixes: `continuous-`, `forest-`, `open-`, `collective-`, `long-` and `material-` belong to the continuous protocol (version 7, ex7–ex13), which never imports grid-era modules; `coevolution-`, `evolution-`, `learning-`/`skill-`, `survival-`/`program-`, `synchronous-` and `random-` map to their grid versions; `world.ts` affects versions 1–6. Unknown paths expand scope.
 

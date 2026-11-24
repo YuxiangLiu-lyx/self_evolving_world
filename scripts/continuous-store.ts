@@ -1,4 +1,7 @@
-import { initialLongWorld } from '../apps/simulator/src/long-scenario.js';
+import {
+  initialLongWorld,
+  longScenario,
+} from '../apps/simulator/src/long-scenario.js';
 import { longTokenBudget } from '../apps/simulator/src/long-tokens.js';
 import { collectiveSettle } from '@self-evolving-world/world-core';
 import { initialCollectiveWorld } from '../apps/simulator/src/collective-scenario.js';
@@ -103,7 +106,10 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
     v7Signature(state.world.config) !==
       v7Signature(
         state.world.config.longDevelopment
-          ? initialLongWorld(`long-${id}`).config
+          ? initialLongWorld(
+              `long-${id}`,
+              longScenario(state.world.config.longDevelopment),
+            ).config
           : state.world.config.collective
             ? initialCollectiveWorld(
                 `collective-${id}`,

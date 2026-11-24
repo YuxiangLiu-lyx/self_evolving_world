@@ -1,3 +1,4 @@
+import type { DevelopmentReviewer } from './development-identity.js';
 import {
   lastCoevolutionFrame,
   coevolutionActions,
@@ -55,7 +56,7 @@ export interface CDevelopmentResult {
   readonly barrier: CDevelopmentBarrier;
   readonly proposal: CoevolutionProposal;
   readonly notes: string;
-  readonly reviewer: 'current-codex-conversation';
+  readonly reviewer: DevelopmentReviewer;
 }
 export interface CDevelopmentAttempt {
   readonly barrierId: string;
@@ -131,6 +132,7 @@ export function parseWorldCoevolution(answer: string): {
 export function acceptCDevelopment(
   state: CoevolutionExecution,
   input: unknown,
+  reviewer: DevelopmentReviewer = 'current-codex-conversation',
 ): CoevolutionExecution {
   const data = record(input),
     b = state.barrier;
@@ -170,7 +172,7 @@ export function acceptCDevelopment(
     barrier: null,
     developments: [
       ...state.developments,
-      { barrier: b, proposal, notes, reviewer: 'current-codex-conversation' },
+      { barrier: b, proposal, notes, reviewer },
     ],
   };
 }

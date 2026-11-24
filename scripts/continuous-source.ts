@@ -1,5 +1,7 @@
 import { parseContinuousReviews } from '../apps/simulator/src/continuous-run.js';
 import type { V7Review } from '@self-evolving-world/world-core';
+import { isDevelopmentReviewer } from '../apps/simulator/src/development-identity.js';
+import type { DevelopmentReviewer } from '../apps/simulator/src/development-identity.js';
 import { CONTINUOUS_VISUALS } from '../apps/viewer/src/continuous-visuals.js';
 import {
   existsSync,
@@ -243,6 +245,24 @@ export function sameDevelopmentBaseline(
     v7Signature(saved) === v7Signature({ ...current, source: saved.source })
   );
 }
+/** The coding conversation a declaration names. Named long scenarios must record it;
+ * ex13 and earlier declarations never did, and remain valid without it. */
+export function declaredDeveloper(
+  declaration: Record<string, unknown>,
+  world: V7Execution['world'],
+): DevelopmentReviewer | undefined {
+  const developer = declaration.developer;
+  if (developer !== undefined && !isDevelopmentReviewer(developer))
+    throw new Error(
+      'The developer must name the coding conversation that performed the work.',
+    );
+  if (developer === undefined && world.config.longDevelopment?.scenario)
+    throw new Error(
+      'Development in a named long scenario must record its developer.',
+    );
+  return developer;
+}
+
 /** Manifest-declared source changes, full tests and exact old-prefix replay replace the old five-file allowlist. */
 export function validateContinuousDevelopment(
   root: string,
@@ -256,6 +276,7 @@ export function validateContinuousDevelopment(
   reviews: V7Review[];
   review: string;
   validation: ContinuousSourceRevision['validation'];
+  developer?: DevelopmentReviewer;
 } {
   const declaration = v7Record(input),
     packages = declaration.packages,
@@ -273,6 +294,7 @@ export function validateContinuousDevelopment(
     throw new Error(
       'Development requires versioned packages, all changed source paths, requester assignments and a substantive implementation review.',
     );
+  const developer = declaredDeveloper(declaration, state.world);
   const baseline = continuousRead<{
     world: string;
     attempts: string;
@@ -407,5 +429,6 @@ export function validateContinuousDevelopment(
       path: log,
       sha256: continuousHash(readFileSync(resolve(directory, log), 'utf8')),
     },
+    ...(developer === undefined ? {} : { developer }),
   };
 }

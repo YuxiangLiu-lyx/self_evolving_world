@@ -116,8 +116,10 @@ describe('dependency-scoped acceptance plans', () => {
       Object.keys(archives),
     );
   });
-  it('runs only code checks for validation and delivery tooling', () => {
+  it('runs only code checks for validation, delivery and read-only metric tooling', () => {
     const selected = plan([
+      'scripts/long-compatibility.ts',
+      'scripts/long-metrics.ts',
       'scripts/pr-policy.ts',
       'scripts/publish-pr.ts',
       'scripts/validate.ts',

@@ -31,21 +31,23 @@ Merging is the default because the user authorized it; an explicit task-level "P
 
 See the [experiment archive guide](../experiment/README.md) for formats and analysis.
 
-| Command                                                          | Purpose                                                                                |
-| ---------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| `pnpm experiment:run -- [seed] [rounds]`                         | Seeded random synchronous run; allocates the next exN and never calls a model          |
-| `pnpm experiment:login`                                          | Local ChatGPT OAuth for model-calling runs                                             |
-| `pnpm experiment:continuous -- new open\|long\|collective-a`     | Allocate the next exN and run a continuous world until a development barrier or pause  |
-| `pnpm experiment:continuous -- new collective-b exA`             | Second collective arm, reusing arm A's preflighted physical baseline                   |
-| `pnpm experiment:continuous -- develop exN file.json`            | Submit the reviewed development for the pending barrier and continue                   |
-| `pnpm experiment:continuous -- continue exN`                     | Continue a saved checkpoint; uncertain calls are never resent                          |
-| `pnpm experiment:continuous -- extend exN rounds`                | Preserve the captured window and extend the observation horizon (explicit reuse only)  |
-| `pnpm experiment:continuous -- repair exN [--abandoned-pid PID]` | Turn a technical pause (computation, context, failed long call) into a counted handoff |
-| `pnpm experiment:capture -- exN`                                 | Capture or recapture screenshots and seal a finished simulation without new inference  |
-| `pnpm experiment:analysis -- file.json`                          | Validate and write the companion behavioral analysis                                   |
-| `pnpm experiment:check` / `pnpm analysis:check`                  | Check archive integrity and companion analyses                                         |
+| Command                                                                  | Purpose                                                                                      |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| `pnpm experiment:run -- [seed] [rounds]`                                 | Seeded random synchronous run; allocates the next exN and never calls a model                |
+| `pnpm experiment:login`                                                  | Local ChatGPT OAuth for model-calling runs                                                   |
+| `pnpm experiment:continuous -- new open\|long\|long-fixes\|collective-a` | Allocate the next exN and run a continuous world until a development barrier or pause        |
+| `pnpm experiment:continuous -- new collective-b exA`                     | Second collective arm, reusing arm A's preflighted physical baseline                         |
+| `pnpm experiment:continuous -- develop exN file.json`                    | Submit the reviewed development for the pending barrier and continue                         |
+| `pnpm experiment:continuous -- continue exN`                             | Continue a saved checkpoint; uncertain calls are never resent                                |
+| `pnpm experiment:continuous -- extend exN rounds`                        | Preserve the captured window and extend the observation horizon (explicit reuse only)        |
+| `pnpm experiment:continuous -- repair exN [--abandoned-pid PID]`         | Turn a technical pause (computation, context, failed long call) into a counted handoff       |
+| `pnpm experiment:capture -- exN`                                         | Capture or recapture screenshots and seal a finished simulation without new inference        |
+| `pnpm experiment:analysis -- file.json`                                  | Validate and write the companion behavioral analysis                                         |
+| `pnpm experiment:check` / `pnpm analysis:check`                          | Check archive integrity and companion analyses                                               |
+| `pnpm metrics:long -- experiment/exN [rounds]`                           | Cost and development metrics of a long-development archive, optionally before a round        |
+| `pnpm compat:long -- experiment/exN --write\|--compare digest.json`      | Fingerprint retained requests and paused inputs before and after a protocol or prompt change |
 
-When a continuous run reaches a development barrier, the command prints the barrier and exits. The current conversation implements the requested mechanism (see [Continuous World](CONTINUOUS_WORLD.md) and [Long Development](LONG_DEVELOPMENT.md)) and submits it with `develop`. Do not change controller, transport or policy source during a saved run; the source verifier rejects it. A finished window is captured automatically. Then write the analysis, run `pnpm validate` and publish.
+When a continuous run reaches a development barrier, the command prints the barrier and exits. The current conversation implements the requested mechanism (see [Continuous World](CONTINUOUS_WORLD.md) and [Long Development](LONG_DEVELOPMENT.md)) and submits it with `develop`; the declaration names its `developer` (`current-claude-conversation` for Claude Code). Do not change controller, transport or policy source during a saved run; the source verifier rejects it. A finished window is captured automatically. Then write the analysis, run `pnpm validate` and publish.
 
 Grid-era protocols (random v1, survival, learning, evolution, coevolution) remain replayable and validated, but new runs of them are retired; only seeded random runs and continuous scenarios can start.
 
