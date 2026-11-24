@@ -1,6 +1,6 @@
 # Execution Plans
 
-Plans help humans and agents track tasks, scope, progress, and evidence. Every PR needs a requirement summary recorded before implementation; small tasks may use a concise plan. PRODUCT remains the only feature status authority.
+Plans help humans and agents track scope, progress and evidence. Features and experiments need a plan written before implementation; small fixes may skip it (`Plan: none` in the PR). PRODUCT remains the only feature status authority.
 
 - [Active plans](active/README.md): work that has not completed acceptance.
 - [PR-27](completed/pr-27-ci-audit-headroom.md): measured CI headroom after replay optimization, preserving every check and an explicit full main audit.
@@ -33,7 +33,7 @@ Plans help humans and agents track tasks, scope, progress, and evidence. Every P
 
 ## Format and lifecycle
 
-Use `pr-NN-short-title.md` and include `Requirement summary`, numbered `Requirements` (`- R1: ...`), `Scope and exclusions`, `Acceptance criteria`, steps, results, unexecuted checks, limitations, and follow-up suggestions. See the [PR contract](../PULL_REQUESTS.md). Historical completed plans preserve their original format; new PRs and newly submitted work follow this contract. Create plans in active, update them during implementation, then move completed plans to completed and repair references.
+Use `pr-NN-short-title.md` and include `Requirement summary`, numbered `Requirements` (`- R1: ...`), `Scope and exclusions`, `Acceptance criteria`, and on completion the actual results, unexecuted checks and limitations. See the [PR contract](../PULL_REQUESTS.md). Historical completed plans preserve their original format; new PRs and newly submitted work follow this contract. Create plans in active, update them during implementation, then move completed plans to completed and repair references.
 
 Plans must distinguish intended validation from actual passing results. Explain any unavailable checks. Record commands, environment versions, outcomes, and key counts instead of copying full dependency logs. Historical records retain their original results even when translated.
 
@@ -64,3 +64,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-30](completed/pr-30-ex9-continuous-presentation.md): continuous ex9 game-view playback, verified lookahead, damped camera and measured motion acceptance.
 
 - [PR-31: Long open development with bounded context](completed/pr-31-long-open-development.md).
+
+- [PR-32](completed/pr-32-lean-harness.md): lean branch/validate/PR workflow replacing the task coordinator, and removal of superseded code.

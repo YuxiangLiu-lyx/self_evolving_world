@@ -7,11 +7,10 @@ required, and the joint changes are not a causal comparison.
 
 ## Frozen formal baseline
 
-The allocated archive is ex13. The run uses the existing coordinator
-with `experiment: {mode: "continuous", allocation: "new", scenario: "long-development-v1", basis: ...}`.
-The basis must quote the actual task authorization; the coordinator allocates the ID.
-Continue every ordinary stage automatically and handle development in the current
-conversation. No recursive model service or extra paid provider is used.
+The allocated archive is ex13. A new run uses
+`pnpm experiment:continuous -- new long`, which allocates the next ID. Ordinary
+stages continue automatically; development is handled in the current
+conversation and submitted with `develop exN file.json`. No recursive model service or extra paid provider is used.
 
 - Three independent people, Lin/Moss/Sol; 48 by 36 continuous forest, vision 5,
   existing distinct starts and resource distribution. No assigned occupations.
@@ -178,7 +177,7 @@ provider input was11045 tokens. These are different measures, not interchangeabl
 The two earlier explicit commentary/final-answer parsing repairs preserve the
 original failed streams and known/unknown charges. Only the opt-in long-run reader
 selects one completed final-answer message; ambiguous or unsupported responses
-still fail. Interrupted transport is reconciled only after the coordinator and
-worker are proved absent; an unknown original invocation is never resent.
+still fail. Interrupted transport is reconciled only after the experiment process and
+worker are proved absent (`repair exN --abandoned-pid PID`); an unknown original invocation is never resent.
 Development validation records all failed submissions as well as accepted source
 boundaries. No repair silently resumes an exhausted token or call budget.

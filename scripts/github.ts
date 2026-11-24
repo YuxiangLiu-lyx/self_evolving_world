@@ -1,5 +1,11 @@
 import { execFileSync } from 'node:child_process';
-import { REPOSITORY, type GithubRequest } from './publication.js';
+
+export const REPOSITORY = 'YuxiangLiu-lyx/self_evolving_world';
+export type GithubRequest = (
+  path: string,
+  method?: 'GET' | 'POST' | 'PATCH' | 'PUT',
+  body?: Readonly<Record<string, unknown>>,
+) => Promise<unknown>;
 
 /** Use existing credentials without exposing credential-helper output. */
 export function githubRequest(root: string): GithubRequest {
@@ -20,7 +26,7 @@ export function githubRequest(root: string): GithubRequest {
   }
   if (!token)
     throw new Error(
-      'GitHub credentials are unavailable. Task delivery is incomplete.',
+      'GitHub credentials are unavailable; set GITHUB_TOKEN or configure a Git HTTPS credential helper.',
     );
   return async (path, method = 'GET', data) => {
     const response = await fetch(
@@ -31,7 +37,6 @@ export function githubRequest(root: string): GithubRequest {
           Accept: 'application/vnd.github+json',
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
-          // This supported contract retains merge_commit_sha for independent confirmation.
           'X-GitHub-Api-Version': '2022-11-28',
         },
         ...(data ? { body: JSON.stringify(data) } : {}),
@@ -40,7 +45,7 @@ export function githubRequest(root: string): GithubRequest {
     );
     if (!response.ok)
       throw new Error(
-        `GitHub ${method} ${path} failed (${String(response.status)}). Task delivery is incomplete.`,
+        `GitHub ${method} ${path} failed (${String(response.status)}): ${(await response.text()).slice(0, 500)}`,
       );
     return response.json() as Promise<unknown>;
   };

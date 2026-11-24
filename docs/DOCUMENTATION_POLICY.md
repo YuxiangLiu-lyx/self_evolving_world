@@ -11,13 +11,13 @@
 | Task scope, implementation, and actual validation                | [Execution plans](exec-plans/README.md)                         |
 | Human explanation and first-run instructions                     | [PROJECT_OVERVIEW](PROJECT_OVERVIEW.md), [README](../README.md) |
 | Agent navigation and language policy                             | [AGENTS](../AGENTS.md)                                          |
-| Task validation, visual review, and completion gate              | [VALIDATION](VALIDATION.md)                                     |
+| Check selection, visual review and validation evidence           | [VALIDATION](VALIDATION.md)                                     |
 
 Experiment objectives, configurations, measured results and visualizations live in the [numbered archive](../experiment/README.md). These records describe individual runs; PRODUCT alone owns feature status.
 
 All repository content is in English. Conversations with the user remain in Chinese. Translation of historical records must preserve their original scope, results, and limitations rather than claiming current capabilities existed earlier.
 
-Requirement summaries, the PR requirement-to-change matrix, full-diff review, and current-head acceptance follow [PULL_REQUESTS](PULL_REQUESTS.md). Every requirement and changed file must be accounted for; green structural checks do not substitute for this semantic review.
+Requirement summaries, full-diff review and the PR description follow [PULL_REQUESTS](PULL_REQUESTS.md). Green structural checks do not substitute for semantic review.
 
 WORLD_FOUNDATION preserves version-1 semantics. Ordinary feature synchronization and world evolution must not rewrite its catalogue, base skills, or initial conditions. Keep future extension definitions and runtime discoveries separate. Wording corrections may clarify existing meaning; a different foundation requires explicit authorization and a separate versioned specification preserving the original.
 
@@ -26,7 +26,7 @@ WORLD_FOUNDATION preserves version-1 semantics. Ordinary feature synchronization
 1. New or changed functionality: update the corresponding Feature ID, status, acceptance criteria, and evidence in PRODUCT within the same PR.
 2. Changed module responsibilities, interfaces, or dependencies: update ARCHITECTURE and automated dependency rules. Mark future modules as Planned.
 3. Important architectural decisions: add an ADR or mark a previous decision as superseded. Preserve the decision history.
-4. Task completion: record real results, unexecuted checks, and limitations, then archive the plan. Never describe incomplete acceptance as passed. All tasks, including documentation edits, follow [validation](VALIDATION.md); documentation changes invalidate document/diff evidence, while matching dependency-bound world and visual checks remain reusable.
+4. Task completion: record real results, unexecuted checks and limitations in the plan, then move it to completed. Never describe incomplete acceptance as passed. All tasks, including documentation edits, run [validation](VALIDATION.md).
 5. Changed commands, environment versions, or reading paths: update README, the development workflow, and navigation. Do not duplicate feature status tables.
 
 ## Automated validation scope
@@ -45,4 +45,4 @@ Resolve local links relative to the containing file. Absolute paths, paths escap
 - Do new decisions explain alternatives, reasons, costs, and future effects?
 - Are unexecuted remote CI, branch protection, and human acceptance clearly identified?
 
-The [PR template](../.github/pull_request_template.md) includes these checks. Mark irrelevant documentation items as not applicable with a reason; do not create unrelated documentation changes.
+Do not create unrelated documentation changes.

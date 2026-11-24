@@ -30,7 +30,7 @@ physical state. Feature acceptance remains in [PRODUCT](PRODUCT.md).
 
 The world is a bounded two-dimensional grid, 16×12 by default, with origin `(0, 0)` at the top left. Agents have names, positions, and inventories. Items start on the ground. World dimensions and vision radius are configured at creation and remain fixed.
 
-In the original single-action API, each well-formed action from a known agent advances the logical tick by one. Successful actions, boundary collisions, and unsupported skill attempts all leave records. A tick counts actions, not elapsed seconds. Optional CLI experiments request one model decision per founding agent, or run bounded survival programs for 60 synchronous rounds; the browser never starts model requests.
+In the original single-action API, each well-formed action from a known agent advances the logical tick by one. Successful actions, boundary collisions, and unsupported skill attempts all leave records. A tick counts actions, not elapsed seconds. Earlier experiments requested one model decision per founding agent or ran bounded survival programs for 60 synchronous rounds; the browser never starts model requests.
 
 New offline experiments use the [simultaneous-round extension](SYNCHRONOUS_ROUNDS.md): all agents choose from their own round-start observations and commit together. One tick is one complete round; results distinguish rounds from total actions. Existing single-action demos and ex1 retain their original semantics.
 
@@ -54,7 +54,7 @@ Agents can move, collect items, and submit requests while the rules remain fixed
 
 ```mermaid
 flowchart LR
-    CLI[CLI example / bounded model experiment] --> Core[Fixed world core]
+    CLI[Experiment commands] --> Core[Fixed world core]
     Human[Manual controls] --> Viewer[Browser observatory]
     Viewer --> Core
     Core --> Snapshots[Read-only state and automatic vision]
@@ -63,14 +63,14 @@ flowchart LR
 ```
 
 - The **core** owns rules and transitions, with no UI, networking, or AI service dependency.
-- The **CLI** runs a fixed demo, a [seeded random experiment](../experiment/README.md) without external agents, or the separately invoked [one-round model experiment](ONE_ROUND_EXPERIMENT.md). The model experiment submits each agent's own observation to ChatGPT and validates its returned action before applying it.
+- The **experiment commands** run a [seeded random experiment](../experiment/README.md) without external agents or a model-driven continuous world; see the [development workflow](DEVELOPMENT.md#experiments).
 - The **classic inspector** displays the map, inventory, vision, and results, and supports interaction and replay. It loads a 12-action demo with three agents, then allows manual continuation.
 
 Module contracts are in [ARCHITECTURE](../ARCHITECTURE.md). Current feature status and evidence are maintained only in [PRODUCT](PRODUCT.md#current-scope).
 
 ## Observing and replaying
 
-Start the viewer using the [quick start](../README.md#five-minute-quick-start). Select an agent on the map or from the dropdown. Global view shows the whole world; agent vision hides entities outside the selected observation. The inspector always shows that agent's inventory and observation at the current frame.
+Start the viewer using the [quick start](../README.md#quick-start). Select an agent on the map or from the dropdown. Global view shows the whole world; agent vision hides entities outside the selected observation. The inspector always shows that agent's inventory and observation at the current frame.
 
 On `/classic.html`, use direction buttons or WASD to move, then collect items from the same cell. The current interface exposes move and pickup; legacy try records remain readable without a learning-attempt control. The timeline supports play, pause, speed changes, stepping, and seeking. Actions are disabled in historical frames; select **Latest frame** to continue.
 
@@ -84,7 +84,7 @@ The [survival-v1 extension](SURVIVAL_EXPERIMENT.md) adds satiety, cold, heat and
 
 ## Unattended NPC service (Planned)
 
-Existing entities have positions, inventories, and vision. The optional model experiments add a single decision opportunity or a bounded 60-round program controller to scripts and manual input. The continuous protocol separately provides persistent individual memory, goals and conditional tasks. An unattended production service remains outside the bounded experimental controllers.
+Existing entities have positions, inventories, and vision. Earlier model experiments added a single decision opportunity or a bounded 60-round program controller. The continuous protocol separately provides persistent individual memory, goals and conditional tasks. An unattended production service remains outside the bounded experimental controllers.
 
 ## Bounded World Agent and learning
 

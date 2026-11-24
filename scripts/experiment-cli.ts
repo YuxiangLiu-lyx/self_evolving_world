@@ -1,6 +1,5 @@
-import { requireTaskWorker } from './task-worker.js';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { writeFileSync } from 'node:fs';
+import { existsSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
   DEFAULT_SEED,
@@ -22,6 +21,13 @@ import {
   validateExperiment,
   writeExperimentJson,
 } from './experiments.js';
+import {
+  analysisPaths,
+  checkAnalyses,
+  parseAnalysis,
+  writeAnalysis,
+} from './experiment-review.js';
+import { readJson } from './validation.js';
 
 const root = process.cwd();
 const [command, ...args] = process.argv.slice(2).filter((arg) => arg !== '--');
@@ -78,8 +84,32 @@ try {
     console.log(
       `Experiment artifacts passed: ${ids.join(', ') || 'no recorded experiments'}.`,
     );
-  } else if (command === 'resume' && args.length === 1 && args[0]) {
-    requireTaskWorker(root, 'resume', args);
+  } else if (command === 'analyses' && args.length === 0) {
+    checkAnalyses(root);
+    console.log('Experiment companion analyses passed.');
+  } else if (command === 'analysis' && args.length === 1 && args[0]) {
+    const analysis = parseAnalysis(root, readJson(resolve(root, args[0])));
+    const paths = analysisPaths(analysis.experiment, analysis.taskId);
+    for (const path of Object.values(paths)) {
+      const tracked = spawnSync(
+        'git',
+        ['cat-file', '-e', `origin/main:${path}`],
+        {
+          cwd: root,
+          stdio: 'ignore',
+        },
+      );
+      if (tracked.status === 0)
+        throw new Error(
+          `Published analysis ${path} is preserved; choose a new analysis name.`,
+        );
+    }
+    writeAnalysis(root, analysis);
+    checkAnalyses(root);
+    console.log(`Wrote ${paths.markdown} and ${paths.json}.`);
+  } else if (command === 'capture' && args.length === 1 && args[0]) {
+    if (!existsSync(resolve(root, 'experiment', args[0], 'manifest.json')))
+      throw new Error(`Unknown experiment ${args[0]}.`);
     const { directory, manifest } = readExperiment(root, args[0], true);
     if (manifest.status === 'completed')
       throw new Error('Completed experiments cannot be overwritten.');
@@ -104,7 +134,6 @@ try {
       `Completed visual evidence for ${args[0]}; the saved simulation was preserved.`,
     );
   } else if (command === 'run' && args.length <= 2) {
-    requireTaskWorker(root, 'random', args);
     const seed = args[0] === undefined ? DEFAULT_SEED : Number(args[0]);
     const steps = args[1] === undefined ? DEFAULT_ROUNDS : Number(args[1]);
     validateParameters(seed, steps);
@@ -148,7 +177,7 @@ try {
       writeFileSync(resolve(directory, 'overview.svg'), chart);
       captureRecord(id, manifest);
       console.log(
-        `Saved ${id}: ${String(steps)} rounds / ${String(results.totalActions)} actions, ${String(results.framesChecked)} checked snapshots, ${String(results.invariantFailures)} invariant failures. Read experiment/${id}/report.md, then run full task validation and review.`,
+        `Saved ${id}: ${String(steps)} rounds / ${String(results.totalActions)} actions, ${String(results.framesChecked)} checked snapshots, ${String(results.invariantFailures)} invariant failures. Read experiment/${id}/report.md, write its behavioral analysis, then run pnpm validate.`,
       );
     } catch (error) {
       writeExperimentJson(manifestPath, {
@@ -160,7 +189,7 @@ try {
     }
   } else
     throw new Error(
-      'Usage: pnpm experiment:run -- [seed] [rounds] / pnpm experiment:resume -- exN / pnpm experiment:check',
+      'Usage: pnpm experiment:run -- [seed] [rounds] / pnpm experiment:capture -- exN / pnpm experiment:analysis -- analysis.json / pnpm experiment:check',
     );
 } catch (error) {
   console.error(error instanceof Error ? error.message : String(error));

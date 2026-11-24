@@ -2,29 +2,29 @@
 
 [![CI](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions/workflows/ci.yml)
 
-**Can autonomous agents discover needs, develop capabilities and change their world in ways that deliver lasting benefits?** This research project tests that question in a reproducible world. The latest run studies three independent people with bounded context, private projects and recurring environmental pressure. Each starts with isolated basic skills in a continuous 2D forest; materials, learning, communication and work have real costs.
+**Can autonomous agents discover what they need, develop new capabilities and change their world in ways that deliver lasting benefits?** This research project studies that question in a reproducible simulated world.
 
-**The mechanism:** agents act from private observations and request missing capabilities. A World Agent reviews functional equivalence, prerequisites, costs and effects. When implementation is needed, the world pauses and hands development to the current Codex conversation. Tested, versioned extensions become available; each actor must still learn and pay the execution costs. Requests and skill counts earn no reward. This is world-level learning, not model-weight training.
+Model-driven people live in a continuous 2D forest with finite food, materials, weather and finite lives. They start with a few basic skills and act only on private observations. Materials, learning, communication and work all cost something. When someone needs a capability that does not exist, they request it. A World Agent reviews the request's functional equivalence, prerequisites, costs and effects. If code is needed, the world pauses while a coding agent implements, tests and versions the extension. Each person must still learn it and pay to use it. Requests and skill counts earn no reward. This is world-level learning, not model-weight training.
 
-## What the experiments show
+## Results so far
 
-| Run                                                                            | Observation                                                                        | Measured outcome                                                                                                                                                                                                                                                                                               |
-| ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [ex13](docs/exec-plans/evidence/pr-31-long-open-development/final-results.md)  | 3 agents; paused at 280 / 1,600 rounds                                             | All alive. Paid material trials formed short dependency chains; Moss tested and then ate apples. Context was smaller, but queries used 48.7% of known tokens and the 40-development cap stopped the run. No sustained productivity gain was established.                                                       |
-| [ex11 / ex12](docs/exec-plans/evidence/pr-25-collective-life/final-results.md) | 3 groups × 6 members per arm; A stopped at 7 rounds, B at 37 then continued to 136 | All survived. Real material accumulation, voluntary refusal and one stone handover occurred; a tray remained half built. Token/engineering budgets prevented the matched 200-round comparison and 1,600-round horizon. No stable division of labor or sustained productivity gain was established.             |
-| [ex10](experiment/analyses/ex10/pr-24-open-development.md)                     | 3 agents, fresh skills; paused at 358 / 1,600 rounds                               | All alive. A material test resumed after 128 rounds; another actor learned a water capability, made a cup and collected water. Tiny-sample drying reduced deterioration, but no shelter or broad productivity gain was demonstrated. Context protection stopped the run with all 20 development attempts used. |
-| [ex9](experiment/analyses/ex9/pr-23-forest-experience.md)                      | 3 agents, 1,200 rounds; diet, slow mental state and seasonal pressure              | All survived. Five new capabilities were implemented; insulation, willow processing and recuperation were used by all three. Four mantles, two repairs and 25.82 restored health provide real benefits; learned fire and canopy were unused. 404/650 ordinary calls.                                           |
-| [ex6](experiment/analyses/ex6/pr-17-development-coevolution.md)                | 3 agents, 180 rounds; development goals and shared facilities                      | All survived. Agents consumed 41 cultivated meals and rested 26 times at another agent's platform: concrete supply and recovery benefits.                                                                                                                                                                      |
+| Run                                                                            | Setup                                                     | Outcome                                                                                                                                                                           |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [ex13](docs/exec-plans/evidence/pr-31-long-open-development/final-results.md)  | 3 agents, bounded context; paused at 280 / 1,600 rounds   | All alive. Paid material trials formed short dependency chains, and one agent tested and then ate apples. The 40-development cap stopped the run. No sustained productivity gain. |
+| [ex11 / ex12](docs/exec-plans/evidence/pr-25-collective-life/final-results.md) | 3 groups × 6 members per arm; stopped at 7 and 136 rounds | All survived. Real material accumulation, voluntary refusal and one stone handover occurred; a tray stayed half built. No stable division of labor.                               |
+| [ex10](experiment/analyses/ex10/pr-24-open-development.md)                     | 3 agents, fresh skills; paused at 358 / 1,600 rounds      | All alive. One agent learned a water capability, made a cup and collected water. Small-sample drying reduced deterioration. No shelter.                                           |
+| [ex9](experiment/analyses/ex9/pr-23-forest-experience.md)                      | 3 agents, 1,200 rounds; diet, mood and seasons            | All survived. Five capabilities were implemented. Insulation, willow processing and recuperation were used by all three; fire and canopy went unused.                             |
+| [ex6](experiment/analyses/ex6/pr-17-development-coevolution.md)                | 3 agents, 180 rounds; projects and shared facilities      | All survived. Agents ate 41 cultivated meals and rested 26 times at another agent's platform.                                                                                     |
 
-These are exploratory runs with different rules and goals, not causal comparisons. [The archive](experiment/README.md) retains configuration, events, replay, analysis and model-call records where applicable; authored starting abilities and isolated test fixtures are excluded from autonomous discoveries.
+These are exploratory runs with different rules, not causal comparisons. [The archive](experiment/README.md) keeps every run's configuration, events, replay, model calls and behavioral analysis.
 
-[![Actual ex13 replay at round 280: retained people and trial objects](experiment/ex13/final.png)](experiment/ex13/final.png)
+[![Saved ex13 state at round 280](experiment/ex13/final.png)](experiment/ex13/final.png)
 
-_Actual saved ex13 state at the 280-round development-budget boundary, viewable here without installation. Interactive replay runs locally after setup; it is read-only and makes no model calls._
+_The saved ex13 world at round 280._
 
-## Five-minute quick start
+## Quick start
 
-Use Node.js **24.22.2** and pnpm **10.34.9**, pinned in [.node-version](.node-version) and [package.json](package.json).
+Use Node.js **24.22.2** and pnpm **10.34.9** (pinned in [.node-version](.node-version) and [package.json](package.json)).
 
 ```bash
 git clone https://github.com/YuxiangLiu-lyx/self_evolving_world.git
@@ -34,104 +34,17 @@ pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Open [Local replay (after setup)](http://127.0.0.1:5173/?experiment=ex13) while `pnpm dev` is running on your computer. This loopback URL points to your own machine; it is not a public hosted demo. Seek the timeline, follow an agent, switch to its personal view and inspect recorded events. No API key is needed. `/classic.html` retains the original grid inspector; old experiments preserve their original rules. See [development setup](docs/DEVELOPMENT.md) and [collective protocol and recorded limitations](docs/COLLECTIVE_LIFE.md), and [live-run/resume instructions](docs/CONTINUOUS_WORLD.md) for more.
+Open <http://127.0.0.1:5173/?experiment=ex13> to replay a saved run locally. You can seek the timeline, follow an agent, switch to its personal view and inspect events. Replay is read-only, needs no API key and makes no model calls. `/ashen.html?experiment=ex13` and `/ashen.html` (ex9) are close-follow presentation views; see the [ex13](docs/presentation/ex13/README.md) and [ex9](docs/presentation/ex9/README.md) guides. `/classic.html` replays the early grid experiments.
 
-The [EX13 Ashen preview (local, after setup)](http://127.0.0.1:5173/ashen.html?experiment=ex13)
-shows the actual soil, residue, loose wrapping, nut-contact and apple-trial sequence.
-See its [event guide and recording](docs/presentation/ex13/README.md).
+## Repository
 
-The independent [EX9 Ashen-style preview (local, after setup)](http://127.0.0.1:5173/ashen.html)
-adds a close follow camera and real-event bookmarks for the shelter, mantle,
-cave entrance and equipment repair. It reads the original records without model
-calls. See the [presentation guide and visual evidence](docs/presentation/ex9/README.md).
+- [`packages/world-core/`](packages/world-core/): deterministic rules and versioned protocols, with no UI, I/O or model services.
+- [`apps/simulator/`](apps/simulator/): observations, model transport, plans and execution. [`apps/viewer/`](apps/viewer/): browser replay.
+- [`experiment/`](experiment/): retained runs and analyses. [`scripts/`](scripts/): experiment commands and validation.
+- [Project overview](docs/PROJECT_OVERVIEW.md) · [Feature status](docs/PRODUCT.md) · [Architecture](ARCHITECTURE.md) · [Decisions](docs/decisions/README.md) · [Continuous world](docs/CONTINUOUS_WORLD.md)
 
-## Development task entry
+## Development
 
-The **code-development harness** is a TypeScript coordinator, separate from the simulated agents. It controls order and evidence; the current Codex conversation implements changes and performs visual and semantic review. It does not launch another autonomous coding service. Its two connected flows are:
+Changes go through focused branches and PRs. `pnpm validate` runs only the checks that the changed files require, and CI must pass before merging; experiments always get a fresh, immutable `exN` with a behavioral analysis. See the [development workflow](docs/DEVELOPMENT.md) and the [agent guide](AGENTS.md).
 
-**Task execution and experiment branches.** Actual changed files determine the `code` (including documentation), `experiment` or `mixed` route. Explicit experiment configuration selects the runner; the requested task label never skips checks. Saved-data analysis can run without allocating an experiment.
-
-```mermaid
-flowchart TB
-    Intent[Intent + numbered plan] --> Prepare[Codex prepares code, docs or experiment]
-    Prepare --> Route[Actual files: code / experiment / mixed]
-    Route --> Run{Experiment requested?}
-    Run -->|No run| Targets{Analysis targets?}
-    Run -->|Yes| Allocate[Next exN or explicit reuse]
-    Allocate --> Mode{Experiment mode}
-    Mode -->|random| Random[Seeded run; no model calls]
-    Mode -->|survival| Survival[Bounded model programs]
-    Mode -->|Extensible protocols| World[Versioned world runner]
-    World -->|Development needed| Dev[Freeze + checkpoint; Codex implements and validates]
-    Dev -->|submit| World
-    World -->|Budget / failure| Pause[Checkpoint; stop world]
-    Pause -.->|Explicit valid resume| World
-    Random --> Evidence[Retained results + replay + visuals]
-    Survival --> Evidence
-    World -->|Complete| Evidence
-    Evidence --> Targets
-    Targets -->|Required| Analysis[Codex analyzes saved behavior]
-    Targets -->|None| Checks[Shared scoped validation and delivery below]
-    Analysis --> Checks
-    classDef conversation fill:#e8f2ff,stroke:#356ba6,color:#172b4d
-    classDef paused fill:#fff3cd,stroke:#9a7413,color:#493600
-    class Prepare,Dev,Analysis conversation
-    class Pause paused
-```
-
-Extensible protocols are `learning`, `evolution`, `coevolution` and `continuous`. The collective comparison is an adapter inside the continuous runner: allocate isolated A and B, retain each short window, then continue the same B checkpoint under its separately frozen allocation. It does not reset budgets or transfer unused A funds. Analysis targets combine new or changed experiment records with explicitly requested retrospective analyses. Blue nodes mark conversation work, handed over through version-bound JSON requests. Checkpoints preserve decisions and budgets; continuation does not reset exhausted budgets or blindly retry inference. Capture recovery reconstructs saved results without new model calls.
-
-**Shared acceptance and delivery.** Code, documentation, experiment-only and mixed tasks all pass the checks selected from actual dependencies. The default is guarded merge; local-only and PR-only require an explicit task-scoped exception.
-
-```mermaid
-%%{init: {'flowchart': {'nodeSpacing': 20, 'rankSpacing': 25, 'padding': 10}}}%%
-flowchart TB
-    Route{Actual change route?}
-    Route -->|Code / documentation| Checks
-    Route -->|Experiment only| Records[Validate experiment archives first]
-    Route -->|Mixed| Records
-    Records --> Checks
-    Checks[Impact plan: selected checks + dependency-bound evidence]
-    Checks -->|Passed| Review[Codex reviews new scenes, reused provenance, behavior and full diff]
-    Checks -->|Failed| Fix[Codex fixes findings]
-    Review -->|Mismatch| Fix
-    Fix -->|next: affected validation| Checks
-    Review -->|Passed| Policy{Recorded delivery policy}
-    Policy -->|Explicit local-only| Finish[Independent completion gate: policy-specific evidence and integration]
-    Policy -->|Publish| Commit[Reviewed commit + complete PR body]
-    Commit --> Publish[Publish PR; current quality + pr-policy]
-    Publish --> Comment[Codex exact-head COMMENT self-review]
-    Comment --> Current[Recheck remote review and current CI]
-    Current --> Delivery{Merge requested?}
-    Delivery -->|Explicit PR-only| Finish
-    Delivery -->|Default merge| Guard{Authority + exact head + no conflicts?}
-    Guard -->|Missing / failed| Stop[Stop; resolve failure or obtain actual authority]
-    Stop -.->|next: recheck prerequisites| Current
-    Guard -->|Passed| Merge[Connector merges reviewed head]
-    Merge --> Finish
-    Finish -->|Verified receipt| Done[Completed]
-    classDef conversation fill:#e8f2ff,stroke:#356ba6,color:#172b4d
-    classDef paused fill:#fff3cd,stroke:#9a7413,color:#493600
-    class Review,Fix,Commit,Comment,Merge conversation
-    class Stop paused
-```
-
-| Layer                                                                             | Responsibility                                                                                        |
-| --------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| [task.ts](scripts/task.ts) / [task-context.ts](scripts/task-context.ts)           | CLI entry; persist intent, versions, journals and evidence in `validation-results/`.                  |
-| [task-flow.ts](scripts/task-flow.ts)                                              | State machine; return structured work to this conversation and recheck prerequisites on continuation. |
-| [task-runtime.ts](scripts/task-runtime.ts)                                        | Invoke existing experiment, analysis, validation and delivery gates.                                  |
-| [task-entry.ts](scripts/task-entry.ts) / [task-worker.ts](scripts/task-worker.ts) | Route compatibility commands and guard internal workers against bypassing the coordinator.            |
-
-Start with `pnpm task -- start validation-results/intent.json`; continue with `submit`, `next` and `status`. [The harness guide](docs/TASK_HARNESS.md) defines the intent and response formats, including paused world-development handoffs.
-
-Source, plan or requirement changes invalidate acceptance; continuation rechecks prerequisites. Failed gates stop the task for explicit repair. GitHub COMMENT records this conversation's self-review, not independent approval; only the completion gate establishes completion. See [validation](docs/VALIDATION.md) and the [PR contract](docs/PULL_REQUESTS.md).
-
-## Code and further reading
-
-- [`packages/world-core/`](packages/world-core/): deterministic rules and versioned protocols; no UI, I/O or model services.
-- [`apps/simulator/`](apps/simulator/): observations, model transport, persistent plans and execution. [`apps/viewer/`](apps/viewer/): saved-world visualization.
-- [`scripts/`](scripts/): development harness and experiment evidence. [`experiment/`](experiment/): retained runs and analyses.
-- [Feature status](docs/PRODUCT.md) · [Architecture](ARCHITECTURE.md) · [Agent guide](AGENTS.md) · [Decisions](docs/decisions/README.md) · [Execution plans](docs/exec-plans/README.md).
-
-This remains a research prototype. Reviewed extensions use trusted code; unattended production operation and general rollback remain planned. Repository content is English; user conversations are Chinese.
+This is a research prototype. Repository content is in English.

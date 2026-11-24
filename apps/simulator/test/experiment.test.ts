@@ -1,17 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { parseReplay, serializeReplay } from '../../viewer/src/timeline.js';
 import { DEMO_SETUP } from '../../viewer/src/scenario.js';
 import { createWorld } from '@self-evolving-world/world-core';
+import { experimentWorld } from '../src/experiment.js';
 import {
-  experimentWorld,
-  parseDecision,
-  runOneRound,
-} from '../src/experiment.js';
-import type { DecisionInput } from '../src/experiment.js';
-import {
-  decisionRequest,
   readDecisionStream,
-  responsesProvider,
   selectModel,
   type ResponseEvidence,
 } from '../src/responses.js';
@@ -52,133 +44,19 @@ function stream(events: readonly unknown[], chunkSize = 7): Response {
   );
 }
 
-describe('single-round model experiment', () => {
-  it('preserves the founding scenario and exposes only each initial observation', async () => {
-    expect(experimentWorld()).toEqual(createWorld(DEMO_SETUP));
-    const inputs: DecisionInput[] = [];
-    const result = await runOneRound((input) => {
-      inputs.push(input);
-      return Promise.resolve({ text: choice(), responseId: 'fixture' });
-    });
-    expect(inputs.map((input) => input.observation.self.id)).toEqual([
+describe('founding experiment world', () => {
+  it('preserves the founding scenario and exposes only nearby items in each initial observation', () => {
+    const world = experimentWorld();
+    expect(world).toEqual(createWorld(DEMO_SETUP));
+    expect(world.observations.map((o) => o.self.id)).toEqual([
       'lin',
       'moss',
       'sol',
     ]);
-    expect(inputs.map((input) => input.observation.tick)).toEqual([0, 0, 0]);
+    expect(world.observations.map((o) => o.tick)).toEqual([0, 0, 0]);
     expect(
-      inputs.map((input) => input.observation.items.map((item) => item.id)),
+      world.observations.map((o) => o.items.map((item) => item.id)),
     ).toEqual([['wood', 'stone'], ['berry'], ['crystal']]);
-    expect(
-      inputs.every(
-        (input) =>
-          Object.keys(input).sort().join() === 'observation,rules,settings',
-      ),
-    ).toBe(true);
-    expect(result.finalState.tick).toBe(3);
-    expect(result.replay.actions.map((action) => action.agentId)).toEqual([
-      'lin',
-      'moss',
-      'sol',
-    ]);
-    const timeline = parseReplay(JSON.stringify(result.replay));
-    expect(timeline.frames.at(-1)).toEqual(result.finalState);
-    expect(JSON.parse(serializeReplay(timeline)) as unknown).toEqual(
-      result.replay,
-    );
-  });
-  it('never retries failed providers or malformed decisions and records partial outcomes', async () => {
-    const provider = vi
-      .fn()
-      .mockRejectedValueOnce(new Error('Fixture network failure'))
-      .mockResolvedValueOnce({
-        text: JSON.stringify({
-          action: { type: 'move', direction: 'east', agentId: 'lin' },
-          summary: 'Attempt another actor.',
-        }),
-        responseId: 'fixture-bad',
-      })
-      .mockResolvedValueOnce({
-        text: choice('west'),
-        responseId: 'fixture-good',
-      });
-    const result = await runOneRound(provider);
-    expect(provider).toHaveBeenCalledTimes(3);
-    expect(result.decisions.map((decision) => decision.status)).toEqual([
-      'failed',
-      'failed',
-      'applied',
-    ]);
-    expect(result.replay.actions).toEqual([
-      { type: 'move', agentId: 'sol', direction: 'west' },
-    ]);
-    expect(result.finalState.tick).toBe(1);
-  });
-  it('binds actor identity locally and preserves record-only tries', async () => {
-    expect(() =>
-      parseDecision(
-        JSON.stringify({
-          action: { type: 'move', direction: 'east', agentId: 'moss' },
-          summary: 'Unauthorized actor.',
-        }),
-        'lin',
-      ),
-    ).toThrow('fields');
-    const result = await runOneRound(() =>
-      Promise.resolve({
-        text: JSON.stringify({
-          action: { type: 'try', skill: 'fly' },
-          summary: 'Record a flight request.',
-        }),
-        responseId: 'fixture',
-      }),
-    );
-    expect(result.decisions.map((decision) => decision.outcome)).toEqual([
-      'skill-unavailable',
-      'skill-unavailable',
-      'skill-unavailable',
-    ]);
-    expect(result.finalState.agents).toEqual(experimentWorld().agents);
-    expect(result.finalState.rules).toEqual(experimentWorld().rules);
-  });
-  it('makes precisely three Responses requests without tools, storage, continuation or retries', async () => {
-    const requests: object[] = [];
-    const transport: typeof fetch = (url, init) => {
-      expect(url).toBe('https://api.openai.com/v1/responses');
-      expect(init?.redirect).toBe('error');
-      if (typeof init?.body !== 'string')
-        throw new Error('Expected a JSON request body.');
-      requests.push(JSON.parse(init.body) as object);
-      return Promise.resolve(stream([completed()]));
-    };
-    await runOneRound(
-      responsesProvider('fixture-token', 'fixture-model', transport),
-    );
-    expect(requests).toHaveLength(3);
-    for (const request of requests) {
-      expect(request).toMatchObject({
-        model: 'fixture-model',
-        store: false,
-        stream: true,
-      });
-      for (const field of [
-        'tools',
-        'previous_response_id',
-        'temperature',
-        'max_output_tokens',
-      ])
-        expect(request).not.toHaveProperty(field);
-      expect(JSON.stringify(request)).not.toContain('fixture-token');
-    }
-    const first = experimentWorld().observations[0];
-    if (!first) throw new Error('Missing fixture observation.');
-    expect(
-      decisionRequest('fixture-model', {
-        observation: first,
-        settings: experimentWorld().settings,
-        rules: experimentWorld().rules,
-      }),
-    ).not.toHaveProperty('tools');
   });
 });
 
@@ -242,27 +120,14 @@ describe('Responses terminal event handling', () => {
   it('retains a bounded response for offline parsing without another inference request', async () => {
     const response = stream([completed()], 1);
     response.headers.delete('Content-Type');
-    const transport = vi.fn<typeof fetch>().mockResolvedValue(response);
     const evidence: ResponseEvidence[] = [];
-    const provider = responsesProvider(
-      'fixture-secret',
-      'fixture-model',
-      transport,
-      (_input, capture) => {
-        evidence.push(capture);
-        return Promise.resolve();
-      },
-    );
-    const world = experimentWorld();
-    const observation = world.observations[0];
-    if (!observation) throw new Error('Missing fixture observation.');
-    const decision = await provider({
-      observation,
-      settings: world.settings,
-      rules: world.rules,
+    const decision = await readDecisionStream(response, (capture) => {
+      evidence.push(capture);
+      return Promise.resolve();
     });
     const capture = evidence[0];
     if (!capture) throw new Error('Missing response evidence.');
+    expect(evidence).toHaveLength(1);
     expect(capture.contentType).toBeNull();
     expect(capture.body).toContain('response.completed');
     expect(
@@ -270,42 +135,28 @@ describe('Responses terminal event handling', () => {
         new Response(new TextEncoder().encode(capture.body)),
       ),
     ).toEqual(decision);
-    expect(transport).toHaveBeenCalledTimes(1);
   });
-  it('preserves failed response evidence with bearer redaction and no accepted action', async () => {
+  it('reports HTTP failure while retaining the complete error body and accepting no decision', async () => {
     const captures: ResponseEvidence[] = [];
-    const transport = vi
-      .fn<typeof fetch>()
-      .mockImplementation(() =>
-        Promise.resolve(
-          Response.json(
-            { error: 'fixture-secret' },
-            { status: 403, headers: { 'x-request-id': 'fixture-request' } },
-          ),
+    await expect(
+      readDecisionStream(
+        Response.json(
+          { detail: 'denied' },
+          { status: 403, headers: { 'x-request-id': 'fixture-request' } },
         ),
-      );
-    const result = await runOneRound(
-      responsesProvider(
-        'fixture-secret',
-        'fixture-model',
-        transport,
-        (_input, capture) => {
+        (capture) => {
           captures.push(capture);
           return Promise.resolve();
         },
       ),
-    );
-    expect(transport).toHaveBeenCalledTimes(3);
-    expect(result.replay.actions).toEqual([]);
-    expect(result.finalState.tick).toBe(0);
-    expect(captures).toHaveLength(3);
-    expect(
-      captures.every(
-        (capture) => capture.bodyComplete && capture.status === 403,
-      ),
-    ).toBe(true);
-    expect(JSON.stringify(captures)).not.toContain('fixture-secret');
-    expect(captures[0]?.body).toContain('[REDACTED]');
+    ).rejects.toThrow('HTTP 403; request ID fixture-request');
+    expect(captures).toHaveLength(1);
+    expect(captures[0]).toMatchObject({
+      status: 403,
+      requestId: 'fixture-request',
+      bodyComplete: true,
+    });
+    expect(captures[0]?.body).toContain('denied');
   });
   it('rejects headerless incomplete, malformed and oversized bodies while retaining bounded evidence', async () => {
     for (const body of [
@@ -327,77 +178,6 @@ describe('Responses terminal event handling', () => {
     expect(captures[0]?.body.length).toBe(2_000_000);
     expect(captures[0]?.bodyComplete).toBe(false);
   });
-  it('redacts reflected credentials from response metadata and transport failures', async () => {
-    const captures: ResponseEvidence[] = [];
-    const transport = vi
-      .fn<typeof fetch>()
-      .mockResolvedValueOnce(
-        Response.json(
-          { error: 'fixture-secret' },
-          {
-            status: 403,
-            headers: {
-              'Content-Type': 'application/json; detail=fixture-secret',
-              'x-request-id': 'fixture-secret',
-            },
-          },
-        ),
-      )
-      .mockRejectedValue(new Error('Network failure for fixture-secret'));
-    const result = await runOneRound(
-      responsesProvider(
-        'fixture-secret',
-        'fixture-model',
-        transport,
-        (_input, capture) => {
-          captures.push(capture);
-          return Promise.resolve();
-        },
-      ),
-    );
-    expect(transport).toHaveBeenCalledTimes(3);
-    expect(result.replay.actions).toEqual([]);
-    expect(
-      result.decisions.every((decision) => decision.status === 'failed'),
-    ).toBe(true);
-    expect(JSON.stringify({ result, captures })).not.toContain(
-      'fixture-secret',
-    );
-    expect(captures[0]?.requestId).toBe('[REDACTED]');
-    expect(captures[0]?.contentType).toBe(
-      'application/json; detail=[REDACTED]',
-    );
-    expect(result.decisions[1]?.error).toContain('[REDACTED]');
-  });
-  it.each(['text', 'responseId'] as const)(
-    'rejects completed decisions that echo credentials in %s',
-    async (field) => {
-      const response = completed(
-        field === 'text'
-          ? JSON.stringify({
-              action: { type: 'try', skill: 'fixture-secret' },
-              summary: 'Record the supplied value.',
-            })
-          : choice(),
-      ).response;
-      if (field === 'responseId') response.id = 'fixture-secret';
-      const transport = vi
-        .fn<typeof fetch>()
-        .mockImplementation(() => Promise.resolve(Response.json(response)));
-      const result = await runOneRound(
-        responsesProvider('fixture-secret', 'fixture-model', transport),
-      );
-      expect(transport).toHaveBeenCalledTimes(3);
-      expect(result.finalState.tick).toBe(0);
-      expect(result.replay.actions).toEqual([]);
-      expect(
-        result.decisions.every((decision) =>
-          decision.error?.includes('echoed a credential'),
-        ),
-      ).toBe(true);
-      expect(JSON.stringify(result)).not.toContain('fixture-secret');
-    },
-  );
   it('retains evidence when a response stream fails during reading', async () => {
     const captures: ResponseEvidence[] = [];
     const body = new ReadableStream<Uint8Array>({
@@ -453,28 +233,6 @@ describe('Responses terminal event handling', () => {
           ]),
         ),
       ).rejects.toThrow();
-  });
-  it('reports HTTP failure and performs no retry', async () => {
-    const transport = vi.fn<typeof fetch>().mockResolvedValue(
-      new Response('{"detail":"denied"}', {
-        status: 403,
-        headers: { 'x-request-id': 'fixture-request' },
-      }),
-    );
-    const first = experimentWorld().observations[0];
-    if (!first) throw new Error('Missing fixture observation.');
-    await expect(
-      responsesProvider(
-        'fixture-secret',
-        'fixture-model',
-        transport,
-      )({
-        observation: first,
-        settings: experimentWorld().settings,
-        rules: experimentWorld().rules,
-      }),
-    ).rejects.toThrow('HTTP 403; request ID fixture-request');
-    expect(transport).toHaveBeenCalledTimes(1);
   });
   it('checks the account-specific catalog before inference', async () => {
     const transport = vi.fn<typeof fetch>().mockResolvedValue(

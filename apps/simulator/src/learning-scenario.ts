@@ -8,8 +8,6 @@ import type {
   WorldState,
 } from '@self-evolving-world/world-core';
 
-export const LEARNING_OBJECTIVE =
-  'Observe whether primitive-era actors request, learn and use generated resource-backed skills to improve health and survival under sustained hunger over 18 synchronous rounds; preserve real model evidence and a separate deterministic no-action control.';
 export function learningScenario(): {
   setup: WorldSetup;
   environment: LearningEnvironment;

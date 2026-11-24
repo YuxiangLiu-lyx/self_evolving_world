@@ -1,7 +1,7 @@
 # ADR-0013: Programmatic Task Continuation and Experiment Analysis
 
 - Date: 2026-11-09
-- Decision status: Accepted
+- Decision status: Superseded by [ADR-0027](0027-lean-development-workflow.md) (coordinator removed; analysis records retained)
 
 ## Context
 
@@ -23,6 +23,6 @@ Keeping another prose checklist would leave order and branching to memory. A wor
 
 Journals need recovery reconciliation, and state machines need failure/interruption tests. Shared current validation evidence permits only one coordinator execution at a time. File structure checks cannot prove honest review, authentic permission or causal correctness; humans/current Codex remain responsible for those judgments. Future experiment analyses propose changes for later authorization, not self-modification.
 
-See [the entry and protocol](../TASK_HARNESS.md), [validation criteria](../VALIDATION.md), [delivery contract](../PULL_REQUESTS.md), and [the migration plan](../exec-plans/completed/pr-13-programmatic-harness.md).
+See [validation criteria](../VALIDATION.md), [delivery contract](../PULL_REQUESTS.md), and [the migration plan](../exec-plans/completed/pr-13-programmatic-harness.md).
 
 [ADR-0014](0014-enforced-task-entry.md) subsequently closes legacy entry bypasses and adds auditable current-conversation GitHub self-review at the user's request. It preserves the judgment and authorization limits stated here.

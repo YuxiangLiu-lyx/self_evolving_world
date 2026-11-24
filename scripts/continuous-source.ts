@@ -1,4 +1,3 @@
-import { forestCheckpointRepair } from './forest-checkpoint-repair.js';
 import { parseContinuousReviews } from '../apps/simulator/src/continuous-run.js';
 import type { V7Review } from '@self-evolving-world/world-core';
 import { CONTINUOUS_VISUALS } from '../apps/viewer/src/continuous-visuals.js';
@@ -327,19 +326,7 @@ export function validateContinuousDevelopment(
   // These enforce experiment identity, authorization and exactly-once budgets rather than world design.
   const protectedPaths =
     /(^scripts\/continuous-|continuous-policy\.ts$|(continuous-(run|provider|input)|long-(context|request|tokens|scenario|pressure))\.ts$|packages\/world-core\/src\/world\.ts$|chatgpt-auth\.ts$|responses\.ts$|package\.json$|pnpm-lock\.yaml$)/;
-  if (
-    changed.some(
-      (p) =>
-        !current[p] ||
-        (protectedPaths.test(p) &&
-          !forestCheckpointRepair(
-            p,
-            previous.files[p] ?? '',
-            continuousHash(current[p]),
-            declaration.compatibilityRepair,
-          )),
-    )
-  )
+  if (changed.some((p) => !current[p] || protectedPaths.test(p)))
     throw new Error(
       'The run policy, controller, transport, source verifier and historical foundation require a separate run version. Source versions cannot be deleted.',
     );

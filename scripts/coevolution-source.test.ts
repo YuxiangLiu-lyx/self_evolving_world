@@ -1,27 +1,17 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import {
-  cpSync,
-  mkdtempSync,
+  copyFileSync,
   mkdirSync,
+  mkdtempSync,
   readFileSync,
   rmSync,
   writeFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import {
-  createCoevolutionRun,
-  acceptCoevolutionProgram,
-} from '@self-evolving-world/world-core';
-import { initialCoevolutionWorld } from '../apps/simulator/src/coevolution-scenario.js';
-import { newCoevolutionExecution } from '../apps/simulator/src/coevolution-run.js';
-import type { CoevolutionExecution } from '../apps/simulator/src/coevolution-run.js';
-import { worldCoevolutionInput } from '../apps/simulator/src/coevolution-input.js';
+import { readCoevolutionExecution } from './coevolution-analysis.js';
 import {
   readSourceHistory,
-  saveSourceHistory,
-  sourceRevision,
-  validateSourceExtension,
   sourceArtifactFiles,
 } from './coevolution-source.js';
 const roots: string[] = [];
@@ -29,50 +19,34 @@ afterEach(() => {
   for (const root of roots.splice(0))
     rmSync(root, { recursive: true, force: true });
 });
-function fixture() {
+const ARCHIVE = 'experiment/ex6';
+const state = readCoevolutionExecution(
+  JSON.parse(readFileSync(join(ARCHIVE, 'execution.json'), 'utf8')),
+);
+/** Copies only the retained source provenance of ex6 so a test can alter it without touching the archive. */
+function archive() {
   const root = mkdtempSync(join(tmpdir(), 'coevolution-source-'));
   roots.push(root);
-  for (const path of ['packages/world-core/src', 'apps/simulator/src'])
-    cpSync(join(process.cwd(), path), join(root, path), { recursive: true });
-  mkdirSync(join(root, 'experiment/ex1'), { recursive: true });
-  let run = createCoevolutionRun(initialCoevolutionWorld());
-  for (const agentId of ['lin', 'moss', 'sol'])
-    run = acceptCoevolutionProgram(run, {
-      agentId,
-      tick: 0,
-      call: 1,
-      code: null,
-      summary: 'Offline source-binding fixture only.',
-      project: null,
-    });
-  const state: CoevolutionExecution = {
-    ...newCoevolutionExecution('offline-fixture', 'simulated-test'),
-    phase: 'development',
-    programs: run.programs,
-    barrier: {
-      id: 'fixture-barrier',
-      tick: 0,
-      input: worldCoevolutionInput(run),
-      errors: ['Unsupported offline fixture effect'],
-      proposed: null,
-    },
+  const directory = join(root, ARCHIVE);
+  mkdirSync(directory, { recursive: true });
+  for (const name of [
+    'manifest.json',
+    'source-history.json',
+    'extension-validation-2.txt',
+    'extension-validation-3.txt',
+  ])
+    copyFileSync(join(ARCHIVE, name), join(directory, name));
+  const historyPath = join(directory, 'source-history.json');
+  const history = JSON.parse(readFileSync(historyPath, 'utf8')) as Record<
+    string,
+    unknown
+  >[];
+  const save = (value: unknown) => {
+    writeFileSync(historyPath, JSON.stringify(value));
   };
-  const revision = sourceRevision(
-    root,
-    state,
-    'Offline source-binding fixture; never ordinary model context.',
-  );
-  writeFileSync(
-    join(root, 'experiment/ex1/manifest.json'),
-    JSON.stringify({
-      version: 6,
-      provenance: { engineHash: revision.engineHash },
-    }),
-  );
-  saveSourceHistory(root, 'ex1', [revision]);
-  return { root, state, revision };
+  return { root, directory, history, save };
 }
-describe('versioned coevolution source handoff', () => {
+describe('versioned coevolution source provenance', () => {
   it('retains named implementation evidence while rejecting unrelated or duplicate archive paths', () => {
     expect(
       sourceArtifactFiles([
@@ -88,45 +62,31 @@ describe('versioned coevolution source handoff', () => {
     ])
       expect(() => sourceArtifactFiles(names)).toThrow(/artifact list/);
   });
-  it('binds retained engine bytes and the complete executed prefix', () => {
-    const { root, state, revision } = fixture();
-    expect(readSourceHistory(root, 'ex1', state)).toHaveLength(1);
-    saveSourceHistory(root, 'ex1', [{ ...revision, prefixHash: 'altered' }]);
-    expect(() => readSourceHistory(root, 'ex1', state)).toThrow(/prefix/);
-  });
-  it('blocks prompt or simulator changes before any validation command or inference', () => {
-    const { root, state } = fixture(),
-      path = join(root, 'apps/simulator/src/coevolution-provider.ts');
-    writeFileSync(
-      path,
-      readFileSync(path, 'utf8') + '\n// Changed fixture prompt.\n',
-    );
-    expect(() =>
-      validateSourceExtension(
-        root,
-        'ex1',
-        state,
-        'This proposed change must be rejected because it modifies a frozen model prompt.',
-      ),
-    ).toThrow(/new run/);
-  });
-  it('blocks runtime parameter tuning even inside an allowed interpreter file', () => {
-    const { root, state } = fixture(),
-      path = join(root, 'packages/world-core/src/coevolution-schema.ts');
-    writeFileSync(
-      path,
-      readFileSync(path, 'utf8').replace(
-        'initialSatiety: 80',
-        'initialSatiety: 100',
+  it('binds retained engine bytes, validation logs and the complete executed prefix', () => {
+    const { root, directory, history, save } = archive();
+    expect(readSourceHistory(root, 'ex6', state)).toHaveLength(3);
+    save(history.map((r, i) => (i ? r : { ...r, prefixHash: 'altered' })));
+    expect(() => readSourceHistory(root, 'ex6', state)).toThrow(/prefix/);
+    save(
+      history.map((r, i) =>
+        i === 1
+          ? {
+              ...r,
+              sources: {
+                ...(r.sources as Record<string, string>),
+                'apps/simulator/src/added.ts': '// Altered retained source.\n',
+              },
+            }
+          : r,
       ),
     );
-    expect(() =>
-      validateSourceExtension(
-        root,
-        'ex1',
-        state,
-        'This proposed change must be rejected because it changes a frozen survival parameter.',
-      ),
-    ).toThrow(/parameters/);
+    expect(() => readSourceHistory(root, 'ex6', state)).toThrow(
+      /Invalid retained source revision/,
+    );
+    save(history);
+    writeFileSync(join(directory, 'extension-validation-3.txt'), 'altered\n');
+    expect(() => readSourceHistory(root, 'ex6', state)).toThrow(
+      /validation evidence changed/,
+    );
   });
 });

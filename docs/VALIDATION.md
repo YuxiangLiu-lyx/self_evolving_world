@@ -1,48 +1,36 @@
-# Task Validation and Completion Gate
+# Validation
 
-Every development task, including documentation-only changes, must follow this workflow. The executor may be a developer or Codex; no additional user approval is required. Fix failures and continue until validation succeeds before declaring completion. Feature status remains in [PRODUCT](PRODUCT.md). Write repository review records in English and communicate with the user in Chinese.
+Every change runs `pnpm validate` before publication; CI runs the same command as the `quality` check. No validation command calls a model or resumes an experiment. Feature status remains in [PRODUCT](PRODUCT.md).
 
-## Execution sequence
+## What runs
 
-The [existing coordinator](TASK_HARNESS.md) owns preparation, validation, actual review, commit, PR and integration. `pnpm validate -- "task name"` derives a check plan from actual changes; `pnpm validate:audit -- "audit name"` explicitly selects everything and starts a fresh evidence domain. No validation command calls a model or resumes an experiment.
+`pnpm validate` compares the branch, working tree and untracked files with `origin/main` (CI uses the event's base SHA) and runs, in order: archive preservation, typecheck, lint, format, architecture boundaries and the complete unit suite (for any code change), reconstruction of the selected archives in two worker processes, companion-analysis checks, build, the selected Playwright scenes, and documentation checks. Selected tests reject skips, `.only` and expected failures. `pnpm validate:audit` selects everything.
 
-The runner records every check's reason, duration, dependency fingerprint, deep-rebuild count and `passed`, `reused` or `not-applicable` status. All selected checks must pass. Code changes retain the full unfiltered unit suite. Selected browser tests reject skips and expected failures; exclusions are represented in the plan rather than hidden skipped tests. `pnpm check` remains the comprehensive debugging pipeline but cannot complete a task.
+`validation-results/report.json` records each check as `passed`, `reused` or `not-applicable` with its reason and duration, plus the screenshot paths and hashes. Reconstruction and browser results are cached in `validation-results/cache/` by an input fingerprint (archive bytes, relevant runtime sources, validators, lockfile, Node and platform), so a rerun after an unrelated edit reuses them. CI starts with a fresh cache.
 
-At review, inspect each newly selected image and its behavior. Unchanged browser results may reuse authenticated prior actual reviews only when browser dependencies and retained pixel hashes match. The report names the originating run and reviewer. Missing, changed or unreviewed evidence requires inspection; a cached PASS string is insufficient. Always review the complete current diff against numbered requirements. New task/source/plan changes invalidate that diff review while retaining independently valid check receipts.
+## Check selection
 
-## Task harness routing
+[Executable scope rules](../scripts/validation-plan.ts) select checks from the actual changed paths:
 
-The task category remains descriptive, not permission to skip checks. [Executable scope rules](../scripts/validation-plan.ts) inspect committed, staged, unstaged, deleted and untracked paths against an explicit base SHA. Missing baselines fail closed. CI uses the event's base/before SHA, including main push validation.
+| Actual change                  | Selected checks                                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| Documentation only             | Documentation links and structure, formatting; no world reconstruction or screenshots            |
+| New experiment archive         | Deep reconstruction and browser state/visual checks for that archive; preservation of all others |
+| Protocol-owned runtime file    | All unit tests plus reconstruction and browser checks for that protocol's archives               |
+| Validation or delivery tooling | All unit tests only; run `pnpm validate:audit` when the change alters reconstruction or scenes   |
+| Shared viewer file             | Affected protocols' archives and scenes, including historical and mobile views                   |
+| Shared or unknown dependency   | Conservative expansion up to every archive                                                       |
+| Explicit audit                 | Every automated check, every archive and all scenes                                              |
 
-| Actual change                                       | Selected acceptance                                                                                                                |
-| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Documentation only                                  | Documentation links/structure, formatting, full-diff review and PR contract; no world reconstruction or historical screenshots     |
-| New experiment only                                 | Deep reconstruction and browser state/visual checks for the new archive; old archives receive complete batched preservation checks |
-| Isolated version/module                             | All unit tests plus affected protocol reconstruction/browser checks; unrelated versions are excluded                               |
-| Shared viewer                                       | Affected version loads, initial/intermediate/final state, representative desktop/mobile views and fixtures                         |
-| Shared world/replay/migration or unknown dependency | Conservative affected-version expansion, up to the full audit                                                                      |
-| PR description only                                 | Current PR contract and body freshness; no quality rerun                                                                           |
-| Explicit audit                                      | Every automated check, every archive and all current scenes; fresh local/CI evidence                                               |
+Protocol ownership follows file-name prefixes: `continuous-`, `forest-`, `open-`, `collective-`, `long-` and `material-` belong to the continuous protocol (version 7, ex7–ex13), which never imports grid-era modules; `coevolution-`, `evolution-`, `learning-`/`skill-`, `survival-`/`program-`, `synchronous-` and `random-` map to their grid versions; `world.ts` affects versions 1–6. Unknown paths expand scope.
 
-Known ownership currently separates continuous/forest, coevolution, evolution, learning, survival and founding dependencies. Unknown paths expand scope. Shared public entry points are conservative. Protocol fixtures remain separate from real experiment discoveries. Every new experiment still needs retained behavioral analysis; this task-routing change never authorizes inference or archive replacement.
+Archive preservation compares every committed file under `experiment/exN/` with the base tree, and rejects additions, even ignored ones. Only an explicit user reuse request recorded in the changed plan as `- Experiment reuse: exN — reason` (at least twenty characters) exempts that archive.
 
-Archive preservation uses one recursive Git tree inventory and in-process blob comparison, covering every original file plus actual directory entries (including ignored additions). Explicit user-authorized reuse remains governed by the [PR contract](PULL_REQUESTS.md#automatic-pr-delivery-for-every-task).
-
-`readExperiment` reads metadata without semantic acceptance. `checkExperimentIntegrity` checks the complete file set and artifact hashes. `validateExperiment` performs deep reconstruction or returns an authenticated result for identical inputs. Viewer builds and behavioral-analysis identity/binding checks never implicitly reconstruct. Completion checks verify the plan, receipts, dependency fingerprints and actual review; they never replay experiments again.
-
-Selected archive reconstructions run in at most two isolated local Node processes,
-starting with the newest archives. Each selected ID runs once; workers share this
-validation run's authenticated receipts and append-only reconstruction ledger.
-The parent verifies the current input and receipt before accepting a worker metric.
-A failure stops new scheduling, drains active work and fails acceptance. Browser
-checks then reuse matching reconstruction receipts while still loading and checking
-the selected scenes. This changes scheduling, not check coverage or CI timeouts;
-it performs no model calls. Failed worker checks record zero successful rebuilds;
-completed reconstruction counts remain auditable in the ledger.
+`readExperiment` reads metadata without semantic acceptance, `checkExperimentIntegrity` checks the file set and artifact hashes, and `validateExperiment` performs deep reconstruction or reuses a cached result for identical inputs.
 
 ## Visual review
 
-The game observatory is the primary page; `classic.html` preserves the original controls and protocol views. The planner selects relevant scenes from the catalogue below. Shared presentation changes cover affected historical adapters and mobile views; new archives add initial, midpoint, final and overview scenes. Unaffected scenes are not applicable or explicitly reused, never claimed as freshly captured. When adding pages or major interactions, extend the [scene list](../scripts/validation.ts) and browser tests instead of continuing to review only old pages.
+The game observatory is the primary page; `classic.html` preserves the original controls and protocol views. The planner selects relevant scenes from the catalogue below. Shared presentation changes cover affected historical adapters and mobile views; new archives add initial, midpoint, final and overview scenes. Unaffected scenes are not applicable or reused, never claimed as freshly captured. When adding pages or major interactions, extend the [scene list](../scripts/validation.ts) and browser tests instead of continuing to review only old pages.
 
 | Scene ID                         | Required content                                        | Review focus                                                                                            |
 | -------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
@@ -94,89 +82,21 @@ Add scenarios and expected outcomes for changed behavior. Import `test` from `ap
 
 ## Evidence and invalidation
 
-- `validation-results/tasks/<id>.json`: original/amended intent, derived route/version, command journal, evidence references and current structured handoff; excluded from source fingerprints.
-- `validation-results/report.json`: task name, run ID, source fingerprint, automated result, screenshot paths/hashes, and final state.
-- `validation-results/publication.json`: current delivery identity, policy, checks and merge result, written by task:publish after local review and commit.
-- `validation-results/completion.json`: independently verified final integration or explicit exception; failures record an error and return nonzero. New validation removes both prior delivery records.
-- `validation-results/tasks/<id>.json` also binds the accepted review hash and verified GitHub COMMENT URL, account, head, body digest and explicit non-independent provenance. Published delivery requires this current record; local-only remains offline.
-- `validation-results/review.json`: reviewer, per-image findings, behavior conclusions, and requirement/full-diff review, initially pending.
-- `playwright-report/index.html`: test details and attachments, opened with `pnpm exec playwright show-report`.
-- `test-results/`: screenshots, exported histories, and failure traces; browser summary in `browser-validation.json`.
+- `validation-results/report.json`: run ID, plan, check results, screenshot paths and hashes.
+- `validation-results/evidence/<run>/`: copies of the selected screenshots, kept across Playwright cleanup.
+- `validation-results/cache/`: fingerprint-keyed reconstruction and browser results for local reuse.
+- `playwright-report/index.html`: test details (`pnpm exec playwright show-report`); `test-results/`: raw screenshots, exported histories and failure traces.
 
-These local generated directories and the optional legacy model `experiment-results/` directory are ignored by Git. Only that legacy output is excluded from source fingerprints. Numbered offline records under `experiment/exN/` are tracked and fingerprinted; the harness checks their data, reports, charts, hashes and browser evidence. New validation replaces current task/diff evidence and retains valid dependency-scoped receipts. Archive the report, review, and browser attachments together if long-term retention is needed. Plans record readable conclusions and the environment instead of linking uncommitted temporary images. Plan edits require a current impact plan and renewed diff review; unchanged world/browser checks can be reused.
+These directories are ignored by Git. Any source edit changes the relevant fingerprints, so the next `pnpm validate` reruns exactly the affected reconstructions and browser checks. Automated checks do not prove that anyone looked at a screenshot; for viewer changes, inspect the listed images yourself and state what you found in the PR.
 
-The whole-task review fingerprint includes untracked files, documentation, tests, configuration, and the lockfile. It excludes dependencies, build outputs, evidence directories, system caches, and private `.env*` files; `.env.example` is included. Source symlinks are currently rejected. The current page does not depend on private environment variables; future use requires an explicit environment validation strategy.
+## Protocol-specific coverage
 
-The gate rejects failed/interrupted runs, missing or duplicate screenshots, missing/failed reviews, mismatched tasks/run IDs, and changed source or screenshots. It enforces the repository completion command and agent workflow, but cannot prove that a reviewer actually looked or prevent bypassing the workflow to commit directly. Never fabricate reviews.
-
-### Dependency and trust boundaries
-
-World receipts bind the complete selected archive, relevant runtime sources, validators, lockfile/manifests and actual Node/platform/architecture. Browser receipts additionally bind selected scenarios, viewer assets, browser tests/configuration and oracle inputs. Tooling or documentation changes do not rewrite frozen runtime snapshots. The global task fingerprint still prevents accepting a stale diff review.
-
-`validation-results/cache/` contains authenticated result receipts; `validation-results/evidence/` retains immutable selected screenshots across Playwright cleanup. `validation-results/receipt-key` is private, ignored and excluded from CI uploads. Local key access is the trust boundary, not protection against malicious repository code execution. CI starts fresh and independently executes its selected checks; it may reuse its own results within that workflow. Missing, corrupt, failed, foreign or mismatched receipts cause recomputation or block completion. Acceptance evidence never consists of a caller-supplied PASS.
+- **Learning (v4), evolution (v5), coevolution (v6):** reconstruct every recorded input, proposal, allocation, registry and body transition; their browser scenes are listed above. See [learning](SKILL_LEARNING_EXPERIMENT.md), [evolution](EVOLUTION_EXPERIMENT.md) and [coevolution](COEVOLUTION_EXPERIMENT.md).
+- **Continuous and forest (v7):** the forest-lab scenes in `REVIEW_SCENES` cover cave, building, food, experience, lives and requested mechanisms and are selected when forest behavior or presentation changes. [Open development](OPEN_DEVELOPMENT.md) adds registry isolation, physical probes and conserved processes; [collective life](COLLECTIVE_LIFE.md) adds member, group and generated-capability fixtures. Fixture output is never evidence of autonomous behavior; real archives receive their own replay checks and behavioral analysis.
+- **Pending capture:** `pnpm experiment:capture` reconstructs the saved simulation before launching Chromium; the pending receipt cannot satisfy completed-archive acceptance.
 
 ## Environment and failure handling
 
-Install the specified Node, pnpm, and Chromium using the [development workflow](DEVELOPMENT.md). Port 4173 is a dedicated test server that stops after testing; development on port 5173 is separate. For manual reproduction, run `pnpm build && pnpm preview`, then stop preview before validation to release the port.
+Install the pinned Node, pnpm and Chromium using the [development workflow](DEVELOPMENT.md). Port 4173 is the dedicated test server; development uses 5173. Fix every failure and rerun; do not skip selected tests, weaken assertions or substitute old screenshots. If a blocker cannot be resolved, report the work as incomplete.
 
-Fix every selected automated, visual, or behavior failure and rerun the affected workflow. Resolve browser installation, port, or environment problems before continuing. If a blocker cannot be resolved, report incomplete work instead of claiming success. Do not skip selected tests, weaken assertions, or substitute unbound old screenshots.
-
-CI runs the same automated validation on the [canonical repository](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions) and produces pending review. Each run uploads available reports, screenshots, and traces with 14-day retention, including failed runs. Download the complete artifact to preserve the report's relative evidence paths. There is no remote visual or semantic review service. GitHub protection is configured and verified separately under the [PR contract](PULL_REQUESTS.md#github-checks-and-merge-restrictions). The task executor performs actual visual and behavior review and references the plan and findings in the PR.
-
-The quality job has a twenty-five-minute total limit, including environment setup
-and evidence upload. Individual test deadlines and all selected assertions stay
-unchanged. Earlier removal of repeated compilation, eager segment reconstruction
-and redundant serialization established the [previous workload baseline](exec-plans/completed/pr-27-ci-audit-headroom.md).
-The larger EX13 delivery has 907 unit tests, 85 browser cases and 13 archives.
-After disabling Playwright's duplicate archive-sized raw diff attachment, its next
-CI run passed all reported assertions but reached the old fifteen-minute outer
-deadline during browser work. Units took 194.7s versus 131.7s on the preceding
-runner; ex12 reconstruction took 151.7s versus 101.7s, with one deep rebuild per
-archive in both runs. The [retained measurements](exec-plans/evidence/pr-31-long-open-development/ci-deadline.txt)
-justify total workload headroom, not a claimed performance improvement. Commit
-metadata, the complete harness diff review and dependency-bound evidence remain.
-Use the existing `workflow_dispatch` full audit to verify all archives and
-scenes; an expired job or missing check remains a failure, regardless of its
-earlier successful steps.
-
-## Learning protocol evidence
-
-Version-4 [learning experiments](SKILL_LEARNING_EXPERIMENT.md) require complete recorded call/input/output correspondence, bounded attempts, the exact round barrier, persisted executable registry and resource-backed survival reconstruction. Development is a task handoff before validation, not approval to bypass it. Tests include exact starvation timing, one-to-four-round learning, functional/same-batch reuse, generated execution, food/toxicity, tool costs/wear, reachable food, private observations, plan interruption and paused resumption. Every completed run receives the existing retained per-agent analysis and selected screenshot/semantic review with authenticated reuse where inputs match. The all-wait control is explicitly offline and is not a causal estimate.
-
-## Heterogeneous evolution evidence
-
-Version5 adds `evolution-browser` and `evolution-mobile` to current screenshot review. Its archive reconstructs every retained ordinary/world input and proposal, persistent finite allocations, registry and body transitions. Tests cover zero-stock persistence, generic new resource execution, nutritional conservation, unknown-property isolation, map reachability, safe batching and development resume. The short smoke is explicitly offline and never substitutes for real-model evidence. Scientific failures remain recorded outcomes; archive validity does not assert survival success.
-
-## Coevolution evidence
-
-Version6 adds `coevolution-browser` and `coevolution-mobile`: inspect energy/load, project text, persistent object markers, shared effects, and historical read-only behavior. [Protocol evidence](COEVOLUTION_EXPERIMENT.md#harness-evidence-and-review) includes deterministic feasibility, generated effects, finite resource coexistence, input-before-output processing, individual mastery, actual shared recovery, attempt budgets and replay/checkpoint correspondence. Archive validity may accept an explicitly budget-paused observation; never describe that as180 completed rounds. No fixture is real-model evidence, and no stage report becomes actor guidance.
-
-## Forest extension evidence
-
-The 45 explicitly labeled forest-lab scenes remain registered in `REVIEW_SCENES` and are selected when forest behavior or presentation is affected, or during an explicit full audit. They cover cave exterior/interior and collision overlays, paid building geometry, attention, food examination/sampling, event-grounded experience, respawn and the third death, requested shelter construction/refuge/expiry/maintenance, requested exercise/progress/relief/cancellation reachable/moved/blocked/unknown route evidence, neutral mood and actual meals, paid insulation and identity, finite fire, willow processing, and actual canopy drying/expiry, and paid health recuperation/progress/relief/cancellation. The validation report lists the complete current scene selection; unrelated changes do not select every scene. Inspect each newly selected image, especially doorway alignment, roof visibility, life counters and overlapping event labels. Unchanged images may reuse authenticated review with matching dependencies and pixel hashes. These authored fixtures do not establish autonomous adoption. Forest regressions include conserved inventory identities, persistent world and mastery, important memory, invalid ex7 event aliases, stale action references, locally alterable seasonal growth and the complete current-conversation development/reuse chain. Formal forest runs retain the existing full archive, call, source and behavioral analysis requirements and an explicit round-200 technical checkpoint.
-
-Fresh [open-development](OPEN_DEVELOPMENT.md) adds isolated A/B/A-resume registry checks, physical probes, reciprocal knowledge exchange, conserved persistent processes, scoped extension installation and exact input transport round trips. Additional browser fixtures exercise local hazards and requested material trials, apparatus, water handling and extraction. Their captured development evidence is retained beside the execution plan and reviewed at each counted handoff; it is distinct from the registered historical scene set and from formal agent behavior. A valid budget-paused archive does not establish completion of its target horizon or bounded context growth.
-
-[Collective life](COLLECTIVE_LIFE.md) adds `isolated-collective-ash-members` and
-`isolated-collective-birch-member`: inspect group colors, all eighteen selectable
-members, local meeting markers, personal records and readable task/intent state.
-These are authored mechanism fixtures. Actual A/B archives receive their own
-selected replay checks and behavioral analysis; fixture success is not evidence
-of voluntary coordination or autonomous development.
-
-The collective generated-capability fixtures additionally cover paid food work,
-shared shelter use, bark extraction, drying apparatus, non-ingestive samples,
-conserved material aggregation, fractional preparation surfaces and complete
-private inventory pages. Inspect real quantity/progress, component provenance,
-modeled-versus-measured geometry, stop/release behavior and dated read results.
-Neither a fixture's preset mastery nor its output counts as formal behavior.
-
-### Pending archive capture
-
-Capture reconstructs the saved simulation before launching Chromium and reuses
-an authenticated exact-input `experiment-capture` receipt inside the browser
-check. This keeps CPU reconstruction outside the browser interaction deadline.
-The pending receipt cannot satisfy completed-archive acceptance: final manifest,
-images and browser evidence require the separate `experiment` receipt and full
-integrity checks. Changed input or invalid provenance recomputes validation; the
-browser timeout and all assertions remain unchanged.
+CI runs on the [canonical repository](https://github.com/YuxiangLiu-lyx/self_evolving_world/actions) with a twenty-five-minute limit and uploads reports and screenshots for 14 days, including failed runs. A manual `workflow_dispatch` runs the full audit. Earlier workload measurements are retained in [PR-27](exec-plans/completed/pr-27-ci-audit-headroom.md) and the [ex13 CI deadline record](exec-plans/evidence/pr-31-long-open-development/ci-deadline.txt).

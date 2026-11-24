@@ -33,7 +33,7 @@ import {
   reconstructionMetrics,
   writeExperimentJson,
 } from './experiments.js';
-import { requiredScenes, sourceFingerprint } from './validation.js';
+import { requiredScenes } from './validation.js';
 import { experimentAssets } from './experiment-assets.js';
 
 describe('numbered experiment artifacts', () => {
@@ -152,12 +152,10 @@ describe('numbered experiment artifacts', () => {
     write('results.json', { invalid: true });
     expect(() => validateExperiment(root, 'ex1', true)).toThrow();
   });
-  it('validates reconstructed data and binds numbered visuals to task review and fingerprint', () => {
+  it('validates reconstructed data and binds numbered visuals to their recorded hashes', () => {
     expect(checkExperiments(root)).toEqual(['ex1']);
     expect(requiredScenes(root)).toContain('ex1-final');
-    const before = sourceFingerprint(root);
     writeFileSync(resolve(directory, 'final.png'), 'altered');
-    expect(sourceFingerprint(root)).not.toBe(before);
     expect(() => validateExperiment(root, 'ex1')).toThrow('hash mismatch');
   });
   it('reconstructs version-2 rounds and rejects schedule or batch corruption even with resealed hashes', () => {

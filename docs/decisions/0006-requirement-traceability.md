@@ -1,7 +1,7 @@
 # ADR-0006: Requirements, Complete Tests, and Current PR Reviews
 
 - Date: 2026-11-06
-- Decision status: Superseded in execution scope by [ADR-0020](0020-scoped-validation.md); actual review and delivery gates remain.
+- Decision status: Partially superseded by [ADR-0027](0027-lean-development-workflow.md) (numbered plan requirements retained; changed-file matrix removed)
 
 ## Context
 

@@ -1,16 +1,35 @@
 import { describe, expect, it } from 'vitest';
 import {
-  runSurvivalPrograms,
-  SURVIVAL_OBJECTIVE,
+  acceptProgram,
+  advanceProgramRound,
+  createProgramRun,
+  pendingPrograms,
+  PROGRAM_LIMITS,
+} from '@self-evolving-world/world-core';
+import {
+  initialSurvivalWorld,
+  programDecision,
+  programInput,
+} from '../apps/simulator/src/survival-run.js';
+import type {
+  ModelAttempt,
+  ProgramResponse,
 } from '../apps/simulator/src/survival-run.js';
 import { parseReplay, serializeReplay } from '../apps/viewer/src/timeline.js';
 import { measureSurvival, modelCallArchive } from './survival-analysis.js';
 
-async function fixture() {
-  let count = 0;
-  const { run, attempts } = await runSurvivalPrograms(
-    () =>
-      Promise.resolve({
+const OBJECTIVE = 'Offline fixture for survival archive validation only.';
+/** Builds a synthetic completed ledger offline; it never contacts a model. */
+function fixture() {
+  let run = createProgramRun(initialSurvivalWorld()),
+    count = 0;
+  const attempts: ModelAttempt[] = [];
+  while (run.frames.length <= PROGRAM_LIMITS.rounds) {
+    for (const agentId of pendingPrograms(run)) {
+      const input = programInput(run, agentId),
+        tick = input.observation.tick,
+        call = (run.cursors[agentId]?.calls ?? 0) + 1;
+      const response: ProgramResponse = {
         decision: {
           responseId: `fixture_${String(++count)}`,
           responseFormat: 'sse',
@@ -24,9 +43,24 @@ async function fixture() {
           requestId: null,
           contentType: 'text/event-stream',
         },
-      }),
-    () => Promise.resolve(),
-  );
+      };
+      const decision = programDecision(
+        response.decision.text,
+        agentId,
+        input.remainingRounds,
+      );
+      attempts.push({
+        agentId,
+        tick,
+        call,
+        input,
+        status: 'accepted',
+        response,
+      });
+      run = acceptProgram(run, { agentId, tick, call, ...decision });
+    }
+    run = advanceProgramRound(run);
+  }
   const replay = JSON.parse(
     serializeReplay({
       schedule: 'survival-v1',
@@ -37,17 +71,12 @@ async function fixture() {
   return { run, replay, ledger: modelCallArchive('fixture-model', attempts) };
 }
 describe('model experiment evidence reconstruction', () => {
-  it('round-trips code and vital history and independently measures calls and denials without inference', async () => {
-    const f = await fixture();
+  it('round-trips code and vital history and independently measures calls and denials without inference', () => {
+    const f = fixture();
     const parsed = parseReplay(JSON.stringify(f.replay));
     expect(parsed.frames).toEqual(f.run.frames);
     expect(parsed.programs).toEqual(f.run.programs);
-    const measurement = measureSurvival(
-      'ex3',
-      SURVIVAL_OBJECTIVE,
-      f.replay,
-      f.ledger,
-    );
+    const measurement = measureSurvival('ex3', OBJECTIVE, f.replay, f.ledger);
     expect(measurement.results).toMatchObject({
       externalModelCalls: 3,
       survivors: 3,
@@ -60,8 +89,8 @@ describe('model experiment evidence reconstruction', () => {
       ),
     ).toBe(true);
   });
-  it('rejects altered private observations, response code, attempt counts and incomplete HTTP evidence', async () => {
-    const f = await fixture();
+  it('rejects altered private observations, response code, attempt counts and incomplete HTTP evidence', () => {
+    const f = fixture();
     for (const mutate of [
       (ledger: Record<string, unknown>) => {
         ledger.attempts = [];
@@ -73,7 +102,7 @@ describe('model experiment evidence reconstruction', () => {
       const ledger = structuredClone(f.ledger);
       mutate(ledger);
       expect(() =>
-        measureSurvival('ex3', SURVIVAL_OBJECTIVE, f.replay, ledger),
+        measureSurvival('ex3', OBJECTIVE, f.replay, ledger),
       ).toThrow();
     }
     const first = f.ledger.attempts[0];
@@ -107,7 +136,7 @@ describe('model experiment evidence reconstruction', () => {
     ];
     for (const attempt of changed)
       expect(() =>
-        measureSurvival('ex3', SURVIVAL_OBJECTIVE, f.replay, {
+        measureSurvival('ex3', OBJECTIVE, f.replay, {
           ...f.ledger,
           attempts: [attempt, ...f.ledger.attempts.slice(1)],
         }),

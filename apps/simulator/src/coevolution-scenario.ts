@@ -8,8 +8,6 @@ import type {
   EStack,
   CSite,
 } from '@self-evolving-world/world-core';
-export const COEVOLUTION_OBJECTIVE =
-  'Observe whether three autonomous actors identify daily problems, request functional capabilities, and obtain sustained or shared benefits through costed world changes over a target of 180 synchronous rounds, retaining unsuccessful outcomes.';
 export const COEVOLUTION_SETUP: WorldSetup = {
   settings: { width: 24, height: 24, visionRadius: 5 },
   agents: [
@@ -17,11 +15,6 @@ export const COEVOLUTION_SETUP: WorldSetup = {
     { id: 'moss', name: 'Moss', position: { x: 14, y: 8 } },
     { id: 'sol', name: 'Sol', position: { x: 10, y: 12 } },
   ],
-};
-export const STARTING_REGIONS = {
-  lin: 'forest edge',
-  moss: 'riverbank',
-  sol: 'rocky grassland',
 };
 export function coevolutionEnvironment(): CoevolutionEnvironment {
   const terrain = Array.from({ length: 24 }, (_, y) =>

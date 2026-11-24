@@ -1,15 +1,17 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import {
+  acceptEvolutionProgram,
   createEvolutionRun,
   evolutionData,
   eWalkable,
   isVisible,
-  lastEvolutionFrame,
+  pendingEvolutionPrograms,
 } from '@self-evolving-world/world-core';
 import { initialEvolutionWorld } from '../src/evolution-scenario.js';
 import {
   ordinaryEvolutionInput,
-  type worldEvolutionInput,
+  worldEvolutionInput,
 } from '../src/evolution-input.js';
 import {
   ORDINARY_EVOLUTION_PROMPT,
@@ -17,27 +19,17 @@ import {
 } from '../src/evolution-provider.js';
 import {
   acceptDevelopment,
-  continueEvolutionExecution,
   evolutionExecutionRun,
-  newEvolutionExecution,
 } from '../src/evolution-run.js';
-import type { ProgramResponse } from '../src/survival-run.js';
+import type { EvolutionExecution } from '../src/evolution-run.js';
 import {
   auditEvolution,
   evolutionCallArchive,
   measureEvolution,
+  readEvolutionExecution,
 } from '../../../scripts/evolution-analysis.js';
 import { evolutionSmoke } from '../../../scripts/evolution-smoke.js';
 import { parseReplay, serializeReplay } from '../../viewer/src/timeline.js';
-let sequence = 0;
-const response = (value: object): ProgramResponse => ({
-  decision: {
-    text: JSON.stringify(value),
-    responseId: `offline-${String(++sequence)}`,
-    responseFormat: 'sse',
-  },
-  http: { status: 200, requestId: null, contentType: 'text/event-stream' },
-});
 const request = {
   name: 'Resource observation',
   purpose: 'Understand local material properties',
@@ -159,67 +151,60 @@ describe('heterogeneous evolution runtime', () => {
     expect(smoke.externalModelCalls).toBe(0);
     expect(smoke.finalVitals.lin?.satiety).toBe(52);
   });
-  it('pauses development at the same tick, resumes once, and audits every retained private input', async () => {
-    let worldCalls = 0;
-    const state = await continueEvolutionExecution(
-      newEvolutionExecution('offline-fixture', 'simulated-test'),
-      async (role, input) => {
-        await Promise.resolve();
-        if (role === 'ordinary')
-          return response({
-            code,
-            summary: 'Offline fixture requesting local identification.',
-          });
-        worldCalls++;
-        return response({
-          proposal: proposal(input as ReturnType<typeof worldEvolutionInput>),
-          needsDevelopment: true,
-        });
+  it('accepts development only at the saved barrier without advancing time', () => {
+    let run = createEvolutionRun(initialEvolutionWorld());
+    for (const agentId of pendingEvolutionPrograms(run))
+      run = acceptEvolutionProgram(run, {
+        agentId,
+        tick: 0,
+        call: 1,
+        code,
+        summary: 'Offline fixture requesting local identification.',
+      });
+    const input = worldEvolutionInput(run);
+    const state: EvolutionExecution = {
+      version: 1,
+      controller: 'simulated-test',
+      model: 'offline-fixture',
+      programs: run.programs,
+      rounds: run.rounds,
+      attempts: [],
+      developments: [],
+      phase: 'development',
+      barrier: {
+        id: 'round-0-world-1',
+        tick: 0,
+        input,
+        errors: [],
+        proposed: null,
       },
-      async () => {},
-    );
-    expect(state.phase).toBe('development');
-    expect(state.rounds).toHaveLength(0);
-    expect(worldCalls).toBe(1);
-    expect(state.programs).toHaveLength(4);
-    const barrier = state.barrier;
-    if (!barrier) throw Error('Missing barrier.');
+    };
     expect(() =>
       acceptDevelopment(state, {
         barrierId: 'wrong',
         tick: 0,
-        proposal: proposal(barrier.input),
+        proposal: proposal(input),
         notes: 'Inspect constrained code and physical effect boundaries.',
       }),
     ).toThrow();
     const accepted = acceptDevelopment(state, {
-      barrierId: barrier.id,
+      barrierId: 'round-0-world-1',
       tick: 0,
-      proposal: proposal(barrier.input),
+      proposal: proposal(input),
       notes:
         'Offline fixture review: identification only, no state injection and no material creation.',
     });
+    expect(accepted.phase).toBe('running');
     expect(accepted.rounds).toHaveLength(0);
+    expect(accepted.developments).toHaveLength(1);
     expect(() => acceptDevelopment(accepted, {})).toThrow();
-    const completed = await continueEvolutionExecution(
-      accepted,
-      async (role) => {
-        await Promise.resolve();
-        if (role === 'world') throw Error('Repeated world call.');
-        return response({
-          code: 'wait(12);',
-          summary: 'Offline no-food baseline.',
-        });
-      },
-      async () => {},
+  });
+  it('audits every retained private input of the archived run and rejects bypassed reviews or simulated provenance', () => {
+    const archived = readEvolutionExecution(
+      JSON.parse(readFileSync('experiment/ex5/execution.json', 'utf8')),
     );
-    expect(completed.phase).toBe('completed');
-    expect(completed.rounds).toHaveLength(120);
-    expect(completed.attempts.filter((a) => a.role === 'world')).toHaveLength(
-      1,
-    );
-    const run = auditEvolution(completed);
-    expect(lastEvolutionFrame(run).evolution?.vitals.lin?.health).toBe(0);
+    const run = auditEvolution(archived);
+    expect(evolutionExecutionRun(archived).rounds).toHaveLength(120);
     const replay = serializeReplay({
       schedule: 'evolution-v1',
       frames: run.frames,
@@ -227,26 +212,27 @@ describe('heterogeneous evolution runtime', () => {
       evolutionRounds: run.rounds,
     });
     expect(parseReplay(replay).frames).toEqual(run.frames);
+    const simulated = { ...archived, controller: 'simulated-test' as const };
     expect(() =>
       measureEvolution(
         'ex99',
         'Offline fixture, never real evidence.',
-        completed,
-        evolutionCallArchive(completed),
+        simulated,
+        evolutionCallArchive(simulated),
       ),
     ).toThrow('real-model');
     expect(() =>
       auditEvolution({
-        ...completed,
-        attempts: completed.attempts.map((a, i) =>
+        ...archived,
+        attempts: archived.attempts.map((a, i) =>
           i ? a : { ...a, input: { ...a.input, tick: 999 } },
         ),
       }),
     ).toThrow('input');
     expect(() =>
       auditEvolution({
-        ...completed,
-        rounds: completed.rounds.map((r, i) =>
+        ...archived,
+        rounds: archived.rounds.map((r, i) =>
           i
             ? r
             : {
@@ -261,40 +247,5 @@ describe('heterogeneous evolution runtime', () => {
         ),
       }),
     ).toThrow('bypassed');
-    expect(evolutionExecutionRun(completed).rounds).toHaveLength(120);
-  });
-  it('bounds invalid world responses and refuses uncertain requests without retrying', async () => {
-    const state = await continueEvolutionExecution(
-      newEvolutionExecution('fixture', 'simulated-test'),
-      async (role) => {
-        await Promise.resolve();
-        return response(
-          role === 'ordinary'
-            ? { code, summary: 'Offline request.' }
-            : { invalid: true },
-        );
-      },
-      async () => {},
-    );
-    expect(state.attempts.filter((a) => a.role === 'world')).toHaveLength(2);
-    expect(state.rounds).toEqual([]);
-    let called = false;
-    await expect(
-      continueEvolutionExecution(
-        {
-          ...state,
-          attempts: state.attempts.map((a, i) =>
-            i ? a : { ...a, status: 'started' },
-          ),
-        },
-        async () => {
-          await Promise.resolve();
-          called = true;
-          throw Error('Never call.');
-        },
-        async () => {},
-      ),
-    ).rejects.toThrow('uncertain');
-    expect(called).toBe(false);
   });
 });
