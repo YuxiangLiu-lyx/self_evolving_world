@@ -28,4 +28,17 @@ Out of scope: any change to earlier archives, the transport, the World Agent pro
 
 ## Results
 
-Pending.
+- R1: `new long-culture` allocated ex15 from merged `main` (only this plan committed on top) with no source change before the first call and no budget change after it.
+- R2: eight counted handoffs, all `current-claude-conversation` (declarations in `experiment/ex15/development/`):
+  - five developed packages, none a first release: `food-preparation@1` (Ivo), `simple-shelter@1` (Lin), `shared-shelter@1` (Sol), `cultivation-trial@1` (Wren) and `bark-separation@1` (Ivo);
+  - two counted recoveries after two rejected model outputs each (Kai at round 0, Sol at round 13);
+  - one failed submission (development-3: the shelter package declared a visual the viewer lacked), resubmitted as development-4;
+  - one closing recovery at round 70 (below).
+    No transport failure occurred, so uncounted transport recovery was never exercised.
+- R3: gate G2 is met on rounds 0–69: survival behavior took 39.5% of actor-rounds and every person used `tell` at least once. It cannot fail on rounds 0–79 (the largest possible survival share is 47.1%). The soft rule was not triggered (8 handoffs before round 80).
+- R4: not needed.
+- R5: **not run.** At round 70 the pre-inference guard refused Ivo's next decision: 14,396 estimated tokens against the frozen limit of 14,000. A lossless, disclosed, culture-gated compaction measured 12,674 with ex7–ex14 compatibility identical, but it changes `apps/simulator/src/long-context.ts`, which the source verifier protects mid-run ("require a separate run version"); unprotected modules save at most about 125 tokens without hidden truncation. Changing the verifier policy or starting a new run version needs the user's decision, so ex15 stops at round 70 and E3 cannot extend it. Development-8 was closed as an empty recovery so that the paused state could be captured; no model call followed.
+- R6: no stop condition of R6 occurred; 1,320,077 tokens were used in total.
+- R7: see the companion analysis in `experiment/analyses/ex15/` and `docs/presentation/run-report-e2-e4.md`.
+
+Unexecuted: E3 and E4 (E4 requires E3 to reach round 150).

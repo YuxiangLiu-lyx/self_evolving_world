@@ -52,7 +52,6 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-23](completed/pr-23-forest-experience.md): consistent execution, diet and sustained experience with a new real observation.
 
 - [PR-24](active/pr-24-open-development.md): fresh skill isolation and cumulative open development with a fixed real observation.
-- [PR-37](active/pr-37-culture-runs.md): E2 culture pilot and E3 main run (ex15, `long-culture`).
 
 - [PR-25](completed/pr-25-collective-life.md): eighteen-member collective life, private knowledge and bounded ex11/ex12 observations with preserved budget pauses.
 
@@ -75,3 +74,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-35](completed/pr-35-culture-metrics.md): read-only rule-based culture metrics analyzer and the ex7–ex13 culture baseline.
 
 - [PR-36](completed/pr-36-culture-scenario.md): opt-in culture scenarios (`long-culture`, `long-culture-incentives`) with voice, differentiation, symbolic interfaces, slack, six people, optional incentives and a round-80 token ceiling.
+
+- [PR-37](completed/pr-37-culture-runs.md): E2 culture pilot (ex15): six people, stopped at round 70 by the context guard, gate G2 met, 8 handoffs; E3 and E4 not run.
