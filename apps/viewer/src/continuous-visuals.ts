@@ -65,6 +65,26 @@ export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
       integrity = Number(o.data.integrity ?? 0);
     return `<rect x="-1" y="-1" width="2" height="2" fill="#c5ad7a" fill-opacity="${built ? String(0.15 + 0.5 * integrity) : '.08'}" stroke="#d4be90" stroke-width=".035" ${built ? '' : 'stroke-dasharray=".08 .06"'}/>${built ? '<path d="M-1-.7L1-.7M-1-.3L1-.3M-1 .1L1 .1M-1 .5L1 .5" stroke="#766349" stroke-width=".06"/>' : ''}<path d="M-.4 1.02H.4M0 1.32V1.08" stroke="#d5e4c2" stroke-width=".04"/><text y="-1.2" text-anchor="middle" fill="#fff0cf" font-size=".2">${built ? `Cover ${String(Math.round(integrity * 100))}%` : `Work ${String(Number(o.data.completedWork ?? 0))} / 8`}</text>`;
   },
+  // ex15 simple-shelter@1: footprint, ridge and installed roof courses; dashed until commissioned.
+  'simple-shelter': (o) => {
+    const shape = o.spatial.shape;
+    if (shape.kind !== 'rectangle') return '';
+    const w = shape.width,
+      h = shape.height,
+      stages = Array.isArray(o.data.installedIncrements)
+        ? o.data.installedIncrements.length
+        : 0,
+      coverage = Number(o.data.roofCoverage ?? 0),
+      done = o.data.status === 'commissioned',
+      courses = [0, 1, 2]
+        .slice(0, Math.round(coverage * 3))
+        .map(
+          (i) =>
+            `<path d="M${String(-w / 2)} ${String(-h / 4 + (i * h) / 6)}H${String(w / 2)}" stroke="#766349" stroke-width=".05"/>`,
+        )
+        .join('');
+    return `<rect x="${String(-w / 2)}" y="${String(-h / 2)}" width="${String(w)}" height="${String(h)}" fill="#c5ad7a" fill-opacity="${String(0.1 + 0.4 * coverage)}" stroke="#8d704e" stroke-width=".035" ${done ? '' : 'stroke-dasharray=".08 .06"'}/><path d="M${String(-w / 2)} ${String(-h / 2 + 0.05)}H${String(w / 2)}" stroke="#6e5639" stroke-width=".07"/>${courses}<text y="${String(-h / 2 - 0.2)}" text-anchor="middle" fill="#fff0cf" font-size=".2">${done ? 'Lean-to' : `Lean-to ${String(stages)} / 12`}</text>`;
+  },
   'lean-to-post': () =>
     '<circle r=".1" fill="#8d704e" stroke="#d6bd88" stroke-width=".02"/>',
   'stone-hearth': fireVisual,
