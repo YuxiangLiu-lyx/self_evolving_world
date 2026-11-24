@@ -174,3 +174,6 @@ export function simpleShelterPhysiology(
   );
   return ambient + m.avoidedChill;
 }
+
+/** The roof-ray geometry, reused per bay by later shelter packages without changing this rule. */
+export { roofed as simpleShelterRoofed };

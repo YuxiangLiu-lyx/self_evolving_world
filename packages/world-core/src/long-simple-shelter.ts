@@ -1124,3 +1124,21 @@ export const LONG_SIMPLE_SHELTER: V7Package = {
     }
   },
 };
+
+/** Staged-assembly machinery reused by later shelter packages; exporting it leaves simple-shelter@1 unchanged. */
+export type { Component as SimpleShelterComponent };
+export {
+  PLAN as SIMPLE_SHELTER_PLAN,
+  BUILT as SIMPLE_SHELTER_BUILT,
+  STAGES as SIMPLE_SHELTER_STAGES,
+  WEAR as SIMPLE_SHELTER_WEAR,
+  SOUND as SIMPLE_SHELTER_SOUND,
+  needs as simpleShelterNeeds,
+  components as simpleShelterComponents,
+  refresh as simpleShelterRefresh,
+  verify as simpleShelterVerify,
+  allocate as simpleShelterAllocate,
+  pieces as simpleShelterPieces,
+  install as simpleShelterInstall,
+  release as simpleShelterRelease,
+};
