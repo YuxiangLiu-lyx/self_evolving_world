@@ -1,6 +1,10 @@
 import { continuousRuntimeHash } from './continuous-source.js';
 import { describe, expect, it } from 'vitest';
-import { browserInput, selectChecks } from './validation-plan.js';
+import {
+  browserInput,
+  selectChecks,
+  toolingManifestChange,
+} from './validation-plan.js';
 import { experimentInput } from './validation-inputs.js';
 const archives = { ex1: 1, ex2: 2, ex3: 3, ex4: 4, ex5: 5, ex6: 6, ex7: 7 };
 const plan = (files: string[]) => selectChecks(files, archives, 'fixture-base');
@@ -118,6 +122,8 @@ describe('dependency-scoped acceptance plans', () => {
   });
   it('runs only code checks for validation, delivery and read-only metric tooling', () => {
     const selected = plan([
+      'scripts/culture-metrics.test.ts',
+      'scripts/culture-metrics.ts',
       'scripts/long-compatibility.ts',
       'scripts/long-metrics.ts',
       'scripts/pr-policy.ts',
@@ -128,6 +134,55 @@ describe('dependency-scoped acceptance plans', () => {
     expect(selected.code).toBe(true);
     expect(selected.experiments).toEqual([]);
     expect(selected.browserGroups).toEqual([]);
+  });
+  it('limits a package manifest to code checks only when it just adds or changes tooling scripts', () => {
+    const manifest = (scripts: Record<string, string>, extra = {}) =>
+      JSON.stringify({
+        name: 'x',
+        scripts,
+        devDependencies: { a: '1' },
+        ...extra,
+      });
+    const base = manifest({
+      build: 'pnpm -r build',
+      'metrics:long': 'tsx scripts/long-metrics.ts',
+    });
+    const added = manifest({
+      build: 'pnpm -r build',
+      'metrics:long': 'tsx scripts/long-metrics.ts',
+      'metrics:culture': 'tsx scripts/culture-metrics.ts',
+    });
+    expect(toolingManifestChange(base, added)).toBe(true);
+    expect(toolingManifestChange(added, base)).toBe(true);
+    for (const changed of [
+      manifest({ build: 'tsc', 'metrics:long': 'tsx scripts/long-metrics.ts' }),
+      manifest({
+        build: 'pnpm -r build',
+        'metrics:long': 'tsx scripts/long-metrics.ts',
+        run: 'tsx scripts/continuous-cli.ts',
+      }),
+      manifest(
+        {
+          build: 'pnpm -r build',
+          'metrics:long': 'tsx scripts/long-metrics.ts',
+        },
+        { devDependencies: { a: '2' } },
+      ),
+      base,
+      'not json',
+    ])
+      expect(toolingManifestChange(base, changed)).toBe(false);
+    const tooling = selectChecks(
+      ['package.json', 'scripts/culture-metrics.ts'],
+      archives,
+      'fixture-base',
+      false,
+      new Set(['package.json']),
+    );
+    expect(tooling.code).toBe(true);
+    expect(tooling.experiments).toEqual([]);
+    expect(tooling.browserGroups).toEqual([]);
+    expect(plan(['package.json']).experiments).toEqual(Object.keys(archives));
   });
   it('treats every newer continuous-family prefix as protocol 7 only', () => {
     for (const path of [

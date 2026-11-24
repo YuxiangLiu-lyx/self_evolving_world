@@ -70,3 +70,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-33](completed/pr-33-long-run-fixes.md): opt-in whole exact reads and prompt guidance, the long-fixes scenario, honest developer records and archive-only long-run metrics.
 
 - [PR-34](completed/pr-34-e1-fix-verification.md): E1 (ex14) fix-verification run: 64 rounds, 3,641 tokens per agent per round against ex13's 6,320, eight recorded handoffs.
+
+- [PR-35](completed/pr-35-culture-metrics.md): read-only rule-based culture metrics analyzer and the ex7–ex13 culture baseline.
