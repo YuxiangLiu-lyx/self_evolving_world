@@ -39,6 +39,49 @@ export const VOICE_ORDINARY = VOICE_REPLACEMENTS.reduce(
   },
   ordinary,
 );
+/** Culture v2 ordinary prompt: the voice prompt with an open goal. Health and safety stay
+ * required; what else to do or care about is the person's own. The person's value leaning
+ * is inserted after the goal (`openGoalPrompt`). Every other sentence is the voice prompt. */
+export const OPEN_GOAL_REPLACEMENTS: readonly (readonly [string, string])[] = [
+  [
+    'Maintain health and tolerable risk, understand unknowns through evidence, develop reusable abilities and improve personal and shared living. Choose your own questions, projects and activities; none is required.',
+    'Keep yourself healthy and safe; that is required. Beyond that, how you live, what you do and what you care about is up to you.',
+  ],
+];
+/** Culture v2 compaction: interfaces not used recently are summarized in the packet. */
+export const COMPACTION_REPLACEMENTS: readonly (readonly [string, string])[] = [
+  [
+    'Use the exact schemas supplied once under abilities.',
+    'Use the exact schemas supplied once under abilities: full contracts for interfaces you used recently or need now, summaries for the others; read a summarized interface by exact id before using it.',
+  ],
+];
+function replaced(
+  prompt: string,
+  replacements: readonly (readonly [string, string])[],
+) {
+  return replacements.reduce((text, [from, to]) => {
+    if (!text.includes(from))
+      throw new Error(`Missing legacy prompt phrase: ${from}`);
+    return text.replace(from, to);
+  }, prompt);
+}
+export const OPEN_GOAL_ORDINARY = replaced(
+  VOICE_ORDINARY,
+  OPEN_GOAL_REPLACEMENTS,
+);
+/** The open-goal prompt for one person: their leaning follows the goal, in the second person. */
+export function openGoalPrompt(input: LongInput): string {
+  const base = input.longContext.compaction
+    ? replaced(OPEN_GOAL_ORDINARY, COMPACTION_REPLACEMENTS)
+    : OPEN_GOAL_ORDINARY;
+  const goal = OPEN_GOAL_REPLACEMENTS[0]?.[1] ?? '';
+  return input.longContext.leaning
+    ? base.replace(
+        goal,
+        `${goal} You tend to value ${input.longContext.leaning}.`,
+      )
+    : base;
+}
 /** Opt-in addendum. Over all of ex13 an actor's next plan came after a median of 3 rounds (2 in rounds 0-79),
  * and 54% of plans ran every step once (`pnpm metrics:long`). */
 export const PLAN_HORIZON_GUIDANCE =
@@ -65,9 +108,11 @@ export function longRequest(model: string, input: LongInput) {
     max_output_tokens: input.longContext.outputTokens,
     instructions:
       (input.longContext.role === 'ordinary'
-        ? input.longContext.voice
-          ? VOICE_ORDINARY
-          : ordinary
+        ? input.longContext.goal === 'open'
+          ? openGoalPrompt(input)
+          : input.longContext.voice
+            ? VOICE_ORDINARY
+            : ordinary
         : world) +
       '\nBatch up to four control queries. Each has section, search, ids:string[], offset>=0 and part>=0. Sections abilities/inventory/knowledge/projects/memory/state/observed; world may query only abilities. Exact IDs or text search; use empty search and ids for pagination. No implicit access outside this scope. Remaining query batches are explicit; when zero return a decision. Every model response, including retrieval and failure, consumes the shared budget.' +
       guidance(input),

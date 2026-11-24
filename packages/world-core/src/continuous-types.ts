@@ -405,6 +405,10 @@ export interface V7CultureOptions {
   /** General food water-content representation (ex10's reviewed moisture model without its
    * apparatus), installed as `state.foodWater = 1`; no interface uses it at genesis. */
   foodWater: boolean;
+  /** Culture v2 ordinary prompt: health and safety are the only required goal, everything
+   * else is open, and the value leaning is stated to the person in the second person.
+   * Absent in ex15 and earlier, whose prompt stays unchanged. */
+  goal?: 'open';
 }
 export interface V7Configuration {
   longDevelopment?: {
@@ -421,7 +425,12 @@ export interface V7Configuration {
     guidance?: ('plan-horizon' | 'general-capabilities')[];
     /** Named opt-in variant of the long scenario, used to verify its frozen genesis.
      * Absent in ex13, the baseline long scenario. */
-    scenario?: 'fixes' | 'culture' | 'culture-incentives';
+    scenario?:
+      | 'fixes'
+      | 'culture'
+      | 'culture-incentives'
+      | 'culture-v2'
+      | 'culture-v2-incentives';
     /** Opt-in culture scenario switches. Absent in ex13, long-fixes and earlier archives. */
     culture?: V7CultureOptions;
     /** Opt-in additional hard ceilings on the shared token ledger. Each applies to every
@@ -432,6 +441,21 @@ export interface V7Configuration {
      * response) resumes through `repair` without a development handoff, so it does not use
      * the handoff budget. Absent in earlier runs, where every repair is a counted handoff. */
     transportRecovery?: 'uncounted';
+    /** Opt-in (culture v2): lossless ordinary-input compaction. Mastered interfaces used in
+     * the last `recentAbilityRounds` rounds (or needed now) carry full contracts; the rest
+     * carry summaries and stay readable by exact id. Absent in ex15 and earlier. */
+    compaction?: { version: 1; recentAbilityRounds: number };
+    /** Opt-in (culture v2): a pause caused by rejected ordinary model output resumes through
+     * `repair` without a development handoff; after `stopAfter` consecutive rejected
+     * ordinary outputs the run stops for review instead. Absent in ex15 and earlier. */
+    rejectionRecovery?: { mode: 'uncounted'; stopAfter: number };
+    /** Opt-in (culture v2): an accepted handoff that installs no package and changes no
+     * runtime source (for example one that only closes a pause) does not use the handoff
+     * budget. Absent in ex15 and earlier, where every handoff is counted. */
+    emptyHandoffs?: 'uncounted';
+    /** Opt-in (culture v2): every developed interface, as ordinary agents see it, must
+     * serialize to at most this many code units. Absent in ex15 and earlier. */
+    abilityTextLimit?: number;
     checkpoints: number[];
     cycle: number;
     pressureStart: number;

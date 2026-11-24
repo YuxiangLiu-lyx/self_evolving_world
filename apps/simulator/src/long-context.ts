@@ -21,6 +21,10 @@ import type {
 import { forestExperienceSummary } from './forest-experience-context.js';
 import { OPEN_GOAL } from './open-context.js';
 
+/** Culture v2 packet goal: health and safety are required, everything else is open. */
+export const OPEN_LIFE_GOAL =
+  'Keep yourself healthy and safe; that is required. Beyond that, how you live, what you do and what you care about is up to you.';
+
 export const LONG_CALL_PAUSE =
   'A long-development decision failed; its complete request, response or uncertainty and token charge are retained for current-conversation review.';
 
@@ -42,6 +46,11 @@ export interface LongInput {
     guidance?: ('plan-horizon' | 'general-capabilities')[];
     /** Present only in the culture scope's ordinary prompt variant. */
     voice?: true;
+    /** Culture v2 ordinary prompt only: the open goal and the person's value leaning. */
+    goal?: 'open';
+    leaning?: string;
+    /** Culture v2 only: the ordinary input carries summarized interfaces (compaction). */
+    compaction?: true;
   };
   protocol: 'continuous-v1';
   tick: number;
@@ -304,6 +313,15 @@ export function longRetrieve(
     return catalogueRetrievalView(world, actor, [result])[0];
   });
 }
+/** The person's one-word value leaning, if the scenario differentiates people. */
+function leaning(world: V7World, actor: string): { leaning?: string } {
+  const t = world.actors.find((a) => a.id === actor)?.extensionState[
+    'long:tendencies'
+  ];
+  const value =
+    t && typeof t === 'object' && !Array.isArray(t) ? t.leaning : undefined;
+  return typeof value === 'string' ? { leaning: value } : {};
+}
 function base(
   world: V7World,
   actor: string,
@@ -326,6 +344,12 @@ function base(
       ...(policy.guidance?.length ? { guidance: [...policy.guidance] } : {}),
       ...(role === 'ordinary' && policy.culture?.voice
         ? { voice: true as const }
+        : {}),
+      ...(role === 'ordinary' && policy.culture?.goal === 'open'
+        ? { goal: 'open' as const, ...leaning(world, actor) }
+        : {}),
+      ...(role === 'ordinary' && policy.compaction
+        ? { compaction: true as const }
         : {}),
     },
     protocol: world.protocol,
@@ -425,7 +449,7 @@ export function longOrdinaryInput(
   ).slice(0, 4);
   // Schemas occur only here, not again in the output schema. Baseline verbs use compact argument contracts.
   input.packet = {
-    goal: OPEN_GOAL,
+    goal: culture?.goal === 'open' ? OPEN_LIFE_GOAL : OPEN_GOAL,
     identity: { id, name: a.name },
     time: world.time,
     state: {
