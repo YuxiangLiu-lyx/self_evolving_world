@@ -48,6 +48,15 @@ export const LONG_CULTURE = {
   checkpoints: [80, 150, 250],
   tokenCeilings: [{ through: 80, tokens: 3_200_000 }],
 };
+/** The incentive control (E4): the culture world, seed and switches with incentives on, run
+ * for one 120-round window under smaller frozen limits so it can be compared with the first
+ * 120 rounds of the culture run. */
+export const LONG_CULTURE_INCENTIVES = {
+  developments: 16,
+  tokens: 4_000_000,
+  rounds: 120,
+  checkpoints: [80, 120],
+};
 /** Survival slack: later pressure, a higher growth floor and renewable food near the starts. */
 export const CULTURE_SLACK = {
   pressureStart: 300,

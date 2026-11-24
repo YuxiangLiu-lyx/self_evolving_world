@@ -323,7 +323,9 @@ it('binds both culture checkpoints to their frozen switches and budget mechanics
         'isolated-fixture',
         initialLongWorld('long-ex1', scenario),
       );
-      expect(state.windowTarget).toBe(80);
+      expect(state.windowTarget).toBe(
+        scenario === 'long-culture-incentives' ? 120 : 80,
+      );
       const path = resolve(root, 'experiment/ex1/execution.json');
       continuousAtomic(path, state);
       expect(readContinuousExecution(root, 'ex1')).toEqual(state);
@@ -334,7 +336,10 @@ it('binds both culture checkpoints to their frozen switches and budget mechanics
       expect(readContinuousExecution(root, 'ex1').windowTarget).toBe(250);
       for (const alter of [
         (s: typeof state) => {
-          s.world.config.budgets.development = 16;
+          s.world.config.budgets.development += 1;
+        },
+        (s: typeof state) => {
+          s.world.config.budgets.world += 1;
         },
         (s: typeof state) => {
           s.world.config.longDevelopment?.tokenCeilings?.splice(0, 1);

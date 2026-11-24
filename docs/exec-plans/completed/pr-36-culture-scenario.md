@@ -26,6 +26,7 @@ Follow-up requirements before E2 (requested after review; ex15 does not exist ye
 - R15: Documentation states that pressure starts at round 300, so a run to round 250 lies wholly in the mild period, and lists unobstructed hearing and names and marks that do not follow items as limits.
 - R16: The observatory header link reads "Ashen-style replay (preview)"; the fix log states E1's 64-round comparison window and separates the effects of fix 2 and fix 3.
 - R17: If the CI Ashen recording test times out again after a rerun, compare its CI duration on main and on this branch and, with that evidence, raise its timeout to 180 seconds.
+- R18: The incentive variant carries the E4 limits: one 120-round window, 16 development handoffs and a 4,000,000-token ledger, with everything else as in the culture variant.
 
 ## Scope and exclusions
 

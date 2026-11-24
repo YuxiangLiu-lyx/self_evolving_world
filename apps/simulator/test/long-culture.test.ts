@@ -91,27 +91,27 @@ it('freezes both culture scenarios on the ex13 rules and seed with their own bud
       scenario: incentives ? 'culture-incentives' : 'culture',
       exactRecordWidth: 4000,
       guidance: ['plan-horizon', 'general-capabilities'],
-      tokens: 10_000_000,
+      tokens: incentives ? 4_000_000 : 10_000_000,
       tokenCeilings: [{ through: 80, tokens: 3_200_000 }],
-      checkpoints: [80, 150, 250],
+      checkpoints: incentives ? [80, 120] : [80, 150, 250],
       culture: { ...CULTURE_OPTIONS, incentives },
     });
     expect(world.config.seed).toBe(20261123);
     expect(world.config.budgets).toEqual({
       ordinary: 1800,
       world: 300,
-      development: 40,
+      development: incentives ? 16 : 40,
     });
     expect(p.transportRecovery).toBe('uncounted');
-    expect(world.config.experience?.targetRounds).toBe(80);
+    expect(world.config.experience?.targetRounds).toBe(incentives ? 120 : 80);
     expect(world.actors).toHaveLength(6);
     expect(longScenario(p)).toBe(scenario);
     expect(longObjective(p)).toBe(objective);
     expect(world.revisions).toContain(EXPRESSION_REVISION);
     expect(
       newContinuousExecution('fixture', 'isolated-fixture', world).windowTarget,
-    ).toBe(80);
-    // The two variants differ only in the incentive switch and its rules.
+    ).toBe(incentives ? 120 : 80);
+    // The two variants differ only in the incentive switch, its rules and the frozen limits.
     const other = initialLongWorld(
       'long-ex15',
       incentives ? 'long-culture' : 'long-culture-incentives',
@@ -121,6 +121,10 @@ it('freezes both culture scenarios on the ex13 rules and seed with their own bud
       const q = policy(c);
       delete q.scenario;
       if (q.culture) q.culture.incentives = false;
+      q.tokens = 0;
+      q.checkpoints = [];
+      c.config.budgets.development = 0;
+      if (c.config.experience) c.config.experience.targetRounds = 0;
       c.satisfaction = c.satisfaction.filter((r) => !r.derived);
       c.eventTypes = (c.eventTypes ?? []).filter(
         (e) => !['acknowledged', 'reciprocated', 'work-noticed'].includes(e),

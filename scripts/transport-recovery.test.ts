@@ -145,7 +145,10 @@ it('treats a proved abandoned culture-scope invocation as a transport failure', 
     error: null,
     reservedTokens: 30000,
   });
-  s.pendingCall = { id: 'ordinary-1', input: longOrdinaryInput(s.world, 'lin') };
+  s.pendingCall = {
+    id: 'ordinary-1',
+    input: longOrdinaryInput(s.world, 'lin'),
+  };
   const r = abandonedLongTransport(s, {
     coordinatorPid: 1234,
     observedAt: '2026-11-24T00:01:00.000Z',

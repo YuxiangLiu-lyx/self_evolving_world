@@ -53,6 +53,11 @@ Frozen at creation and never changed after the first call:
 `extend exN 250` then continues from round 80 under the 10,000,000 ledger with no
 configuration change: the ceiling no longer applies once the tick reaches 80.
 
+`long-culture-incentives` is the incentive control for the first 120 rounds of a culture
+run. It keeps the same world, seed, switches, call ceilings and round-80 ceiling, but its
+frozen limits are smaller: one 120-round window (checkpoints 80 and 120), 16 development
+handoffs and a 4,000,000-token ledger.
+
 `longDevelopment.transportRecovery: 'uncounted'` (absent in every earlier run): when a
 pause is caused by an ordinary call that ended without any response but with recorded
 transport evidence (for example `server_is_overloaded`), or by a proved abandoned

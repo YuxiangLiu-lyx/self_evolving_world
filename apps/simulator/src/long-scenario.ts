@@ -6,7 +6,12 @@ import {
 } from '@self-evolving-world/world-core';
 import type { V7World } from '@self-evolving-world/world-core';
 import { initialOpenWorld } from './open-scenario.js';
-import { applyCulture, CULTURE_OPTIONS, LONG_CULTURE } from './long-culture.js';
+import {
+  applyCulture,
+  CULTURE_OPTIONS,
+  LONG_CULTURE,
+  LONG_CULTURE_INCENTIVES,
+} from './long-culture.js';
 
 export const LONG_OBJECTIVE =
   'Observe evidence-based open development, persistent projects, capability dependencies and actual benefits under frozen recurring pressures; no particular invention or activity is required.';
@@ -125,6 +130,12 @@ export function initialLongWorld(
     world.config.budgets.development = LONG_CULTURE.developments;
     world.config.budgets.world = LONG_CULTURE.worldCalls;
     world.config.experience.targetRounds = LONG_CULTURE.gate;
+    if (scenario === 'long-culture-incentives') {
+      policy.tokens = LONG_CULTURE_INCENTIVES.tokens;
+      policy.checkpoints = [...LONG_CULTURE_INCENTIVES.checkpoints];
+      world.config.budgets.development = LONG_CULTURE_INCENTIVES.developments;
+      world.config.experience.targetRounds = LONG_CULTURE_INCENTIVES.rounds;
+    }
     const cultured = applyCulture(world, {
       ...CULTURE_OPTIONS,
       incentives: scenario === 'long-culture-incentives',
