@@ -65,6 +65,26 @@ export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
       integrity = Number(o.data.integrity ?? 0);
     return `<rect x="-1" y="-1" width="2" height="2" fill="#c5ad7a" fill-opacity="${built ? String(0.15 + 0.5 * integrity) : '.08'}" stroke="#d4be90" stroke-width=".035" ${built ? '' : 'stroke-dasharray=".08 .06"'}/>${built ? '<path d="M-1-.7L1-.7M-1-.3L1-.3M-1 .1L1 .1M-1 .5L1 .5" stroke="#766349" stroke-width=".06"/>' : ''}<path d="M-.4 1.02H.4M0 1.32V1.08" stroke="#d5e4c2" stroke-width=".04"/><text y="-1.2" text-anchor="middle" fill="#fff0cf" font-size=".2">${built ? `Cover ${String(Math.round(integrity * 100))}%` : `Work ${String(Number(o.data.completedWork ?? 0))} / 8`}</text>`;
   },
+  // ex15 simple-shelter@1: footprint, ridge and installed roof courses; dashed until commissioned.
+  'simple-shelter': (o) => {
+    const shape = o.spatial.shape;
+    if (shape.kind !== 'rectangle') return '';
+    const w = shape.width,
+      h = shape.height,
+      stages = Array.isArray(o.data.installedIncrements)
+        ? o.data.installedIncrements.length
+        : 0,
+      coverage = Number(o.data.roofCoverage ?? 0),
+      done = o.data.status === 'commissioned',
+      courses = [0, 1, 2]
+        .slice(0, Math.round(coverage * 3))
+        .map(
+          (i) =>
+            `<path d="M${String(-w / 2)} ${String(-h / 4 + (i * h) / 6)}H${String(w / 2)}" stroke="#766349" stroke-width=".05"/>`,
+        )
+        .join('');
+    return `<rect x="${String(-w / 2)}" y="${String(-h / 2)}" width="${String(w)}" height="${String(h)}" fill="#c5ad7a" fill-opacity="${String(0.1 + 0.4 * coverage)}" stroke="#8d704e" stroke-width=".035" ${done ? '' : 'stroke-dasharray=".08 .06"'}/><path d="M${String(-w / 2)} ${String(-h / 2 + 0.05)}H${String(w / 2)}" stroke="#6e5639" stroke-width=".07"/>${courses}<text y="${String(-h / 2 - 0.2)}" text-anchor="middle" fill="#fff0cf" font-size=".2">${done ? 'Lean-to' : `Lean-to ${String(stages)} / 12`}</text>`;
+  },
   'lean-to-post': () =>
     '<circle r=".1" fill="#8d704e" stroke="#d6bd88" stroke-width=".02"/>',
   'stone-hearth': fireVisual,
@@ -90,6 +110,37 @@ export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
     return `<circle r=".5" fill="#cec5a0" fill-opacity=".12" stroke="#b0b68c" stroke-opacity=".5" stroke-width=".022" ${o.kind === 'stone-mosaic-work' ? 'stroke-dasharray=".06 .06"' : ''}/><g opacity="${o.kind === 'stone-mosaic-work' ? '.5' : '1'}">${stones}</g>${o.kind === 'stone-mosaic-work' ? `<text y="-.62" text-anchor="middle" fill="#f3dfb4" font-size=".19">${typeof o.data.elapsed === 'number' ? String(o.data.elapsed) : '?'} / 3</text>` : ''}`;
   },
   plant: source,
+  // ex15 cultivation-trial@1: a soil position, dashed while worked; the unit is drawn only while
+  // uncovered, a mound hides a covered one, and a sprout with verified stock only once established.
+  'cultivation-trial': (o, events) => {
+    const v = o.data.view;
+    // A plant later dispersed from an established trial is an ordinary plant.
+    if (!v || typeof v !== 'object' || Array.isArray(v))
+      return source(o, events);
+    const life = typeof v.lifecycle === 'string' ? v.lifecycle : '';
+    const worked = life === 'preparing' || life === 'placed';
+    const mound = ['planted', 'established', 'dead'].includes(life)
+      ? '<ellipse cy="-.02" rx=".17" ry=".08" fill="#5b4530"/>'
+      : '';
+    const unit =
+      v.unitVisible === true
+        ? `<path d="M-.13 0Q0-.07.13 0" stroke="${color(o.visual.accent)}" stroke-width=".06" stroke-linecap="round" fill="none"/>`
+        : '';
+    const dots = Array.from(
+      { length: Math.min(4, Number(v.harvestableStock ?? 0)) },
+      (_, i) =>
+        `<circle cx="${String(-0.15 + i * 0.1)}" cy=".08" r=".04" fill="${color(o.visual.accent)}"/>`,
+    ).join('');
+    const sprout =
+      life === 'established'
+        ? `<path d="M0-.04V-.26M0-.18Q-.13-.28-.17-.17M0-.22Q.13-.32.17-.21" stroke="#6aa152" stroke-width=".035" fill="none"/>${dots}`
+        : '';
+    const dead =
+      life === 'dead'
+        ? '<path d="M-.07-.13L.07-.01M.07-.13L-.07-.01" stroke="#8b8273" stroke-width=".03"/>'
+        : '';
+    return `<ellipse rx=".28" ry=".16" fill="#7a5f40" fill-opacity=".55" stroke="#a88b5f" stroke-width=".02" ${worked ? 'stroke-dasharray=".05 .04"' : ''}/>${mound}${unit}${sprout}${dead}`;
+  },
   animal: (o) =>
     `<ellipse rx=".4" ry=".2" fill="${color(o.visual.color)}"/><circle cx=".35" cy="-.06" r=".14" fill="${color(o.visual.color)}"/><path d="M-.25-.15L-.3-.3M-.25.15L-.3.3M.2-.15L.25-.3M.2.15L.25.3" stroke="${color(o.visual.color)}" stroke-width=".07"/>`,
   cave: (o) =>

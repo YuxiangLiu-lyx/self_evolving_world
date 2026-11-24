@@ -12,6 +12,8 @@ import {
   preservationReleaseSurface,
 } from './open-preservation-physics.js';
 import { refugePhysiology } from './open-shelter-exposure.js';
+import { simpleShelterPhysiology } from './long-shelter-exposure.js';
+import { sharedShelterPhysiology } from './long-shared-shelter-exposure.js';
 import { openConditions } from './open-physical.js';
 import { forestEvent, forestClimate, forestGrowth } from './forest-climate.js';
 export { forestEvent, forestClimate, forestGrowth } from './forest-climate.js';
@@ -337,10 +339,18 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
       : undefined;
   const exposure = shelterTemperature(
     before.temperature,
-    leanPhysiology(
+    sharedShelterPhysiology(
       world,
       actor,
-      refugePhysiology(world, actor, climate.temperature),
+      simpleShelterPhysiology(
+        world,
+        actor,
+        leanPhysiology(
+          world,
+          actor,
+          refugePhysiology(world, actor, climate.temperature),
+        ),
+      ),
     ),
     insulation,
     !!shelter,

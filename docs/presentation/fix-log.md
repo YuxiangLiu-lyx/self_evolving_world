@@ -122,6 +122,49 @@ Three log-backed events:
 
 This is one seed with three people, so the comparison is a case comparison, not a statistical result. The behavioral analysis is in [experiment/analyses/ex14](../../experiment/analyses/ex14/pr-34-e1-fix-verification.md).
 
+## 6. E2 (ex15): newly exposed problems
+
+E2 ran `new long-culture` as ex15: the ex13 rules, seed and world with six people and every culture switch on, under the frozen budgets of the [culture scenario](../CULTURE_SCENARIO.md#budget-mechanics). It paused at round 70 of the 80-round window with all six alive at health 100, after 159 calls and 1,320,077 tokens (3,143 per agent per round) and 8 counted handoffs. E3 (extending ex15 to round 250) and E4 (which requires E3 to reach round 150) were not run. The [run report](run-report-e2-e4.md) has the configuration, every handoff, all culture metrics against ex13 and ex14 and five log-backed events; the behavioral analysis is in [experiment/analyses/ex15](../../experiment/analyses/ex15/pr-37-culture-pilot.md). The four problems below are new; every fix is **proposed, not applied**.
+
+### 6a. Context growth reaches the pre-inference guard, and the fix is in a protected file
+
+- **Problem**: ex15 stopped at round 70 on context protection, before the round-80 checkpoint, and cannot continue under its own protocol.
+- **Evidence**:
+  - The guard estimated Ivo's next decision at 14,396 tokens against the frozen `inputEstimateLimit` of 14,000: packet 9,848 (observation 2,648, memory 2,409, abilities 2,146, execution 1,340), retained retrieval of two query batches 1,968, instructions 859. The other five people measured 8,721–10,272 ([development-8](../../experiment/ex15/development/development-8-declaration.json)).
+  - Inputs grew steadily: the first call of a decision (no retrieval) averaged about 6,100 estimated tokens in rounds 0–9 and about 9,300 in rounds 40–69, and Ivo's reached 12,174 at round 70. Average packet memory grew from about 400 to about 1,600 tokens and execution from about 200 to about 520; Ivo, with four mastered interfaces and long-running work records, had the largest packet. The scenario document expected about 6,100 after a few symbolic actions.
+  - A culture-gated, lossless and disclosed compaction of the ordinary packet (settled work records summarized with exact-query access, duplicate catalogue entries and page notes removed, contiguous parts joined) measured 12,674 for Ivo with ex7–ex14 compatibility digests identical. It changes `apps/simulator/src/long-context.ts`, which `scripts/continuous-source.ts` protects mid-run ("require a separate run version"). Changes limited to unprotected modules save at most about 125 tokens without dropping retained retrieval, which would be hidden truncation.
+- **Fix (proposed, not applied)**: a user decision between a new run version of the culture scenario that includes the compaction from its first call, and a verifier policy that admits a lossless, disclosed, scenario-gated packet change mid-run when every compatibility digest is unchanged.
+- **Metrics**: the largest per-person decision estimate at round 70 (14,396; below 14,000 required, 12,674 measured offline), ex7–ex14 compatibility digests, and the round reached before any context pause (70).
+
+### 6b. Whole exact reads do not cover long developed ability records
+
+- **Problem**: fix 2 removed continuation reads in ex14, but they returned in ex15 for the records of developed interfaces.
+- **Evidence**:
+  - 13 continuation-part queries (ex14: 0), 12 of them on developed abilities (`cultivation-trial` 8, `shared-shelter` 4; for example `ordinary-94`, `ordinary-147`, `ordinary-159`).
+  - 9 of the 25 plans decided with no query batch left still held a partly read record (ex14: 0 of 14; ex13 rounds 0–69: 24 of 32).
+  - Four of the five developed ability records were served in 7–9 pages of 600 code units (`simple-shelter` 8, `shared-shelter` 9, `cultivation-trial` 8, `bark-separation` 7), so each exceeds `exactRecordWidth` 4000; only `food-preparation` (3,259) was read whole.
+  - The cost is still small: follow-ups that answered continuation queries took 1.6–3.2% of ordinary-call input (ex13 rounds 0–69: 5.1–26.2%).
+- **Fix (proposed, not applied)**: either let exact reads of ability records use a larger width through a new scenario option (earlier archives unchanged), or check at handoff that a developed interface record fits 4,000 code units, with longer contracts split into a summary and an exact-id detail.
+- **Metrics**: continuation-part queries (13), plans decided with a partly read record (9/25) and the continuation share of ordinary input (1.6–3.2%), over the same rounds.
+
+### 6c. Rejected model output pauses consume counted handoffs
+
+- **Problem**: two consecutive rejected outputs in one decision pause the run, and the recovery is counted as a development handoff although nothing is developed. Uncounted transport recovery covers only calls that ended without a response.
+- **Evidence**:
+  - 8 of 147 ordinary outputs were rejected: the registered plan shape 4 times (`ordinary-19`, `-53`, `-64`, `-131`), the `message` argument `urgency` placed on a `tell` twice (`ordinary-13`, `-57`), malformed JSON once (`ordinary-12`) and a tell longer than 240 characters once (`ordinary-52`).
+  - Four single rejections were fixed by the one bounded correction (`ordinary-20`, `-58`, `-65`, `-132`). Two pairs paused the run: Kai at round 0 (`ordinary-12`, `-13`, recovered by development-1) and Sol at round 13 (`ordinary-52`, `-53`, development-6). Each recovery installed nothing and changed no source.
+- **Fix (proposed, not applied)**: treat a pause after rejected model output like the uncounted transport recovery (retain it under `technical-pauses/`, keep both charges and resume with a fresh decision without a handoff, still stopping on a repeat for the same person in the same round), and name the offending field in the bounded correction, for example that `urgency` belongs to `message`.
+- **Metrics**: counted handoffs spent on rejection pauses (2 of 8) and rejected outputs per ordinary call (8/147, 5.4%).
+
+### 6d. A failed handoff submission consumes a counted handoff
+
+- **Problem**: a submission that the handoff validator rejects still counts, because handoffs are counted before work.
+- **Evidence**: development-3 (round 8) submitted `simple-shelter@1` with a declared `simple-shelter` visual component that the viewer did not yet implement. The validator ran typecheck, the architecture check, the full test suite and the build, and reconstructed every saved round, before its cheap structural check rejected the package with "Package visual implementation is absent" (`scripts/continuous-source.ts`). Development-4 resubmitted the same package with a small viewer drawing. The round-8 review therefore used two of the eight counted handoffs.
+- **Fix (proposed, not applied)**: a non-counting pre-submission check that runs the structural checks (declared visual components, the excluded vocabulary, declared source paths) before the expensive commands, or counting only accepted submissions.
+- **Metrics**: failed submissions per installed package (1 failed against 5 packages) and handoffs per installed package (8 for 5).
+
+Together, 6a, 6c and 6d account for four of the eight handoffs: two rejection pauses, one failed submission and one closing recovery, none of which installed a package.
+
 ## Limitations
 
 - Fixes 2–4 are turned on together in E1, so one run cannot separate their effects causally; section 5 attributes them by mechanism only. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.

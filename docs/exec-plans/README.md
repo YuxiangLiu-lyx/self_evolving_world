@@ -74,3 +74,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-35](completed/pr-35-culture-metrics.md): read-only rule-based culture metrics analyzer and the ex7–ex13 culture baseline.
 
 - [PR-36](completed/pr-36-culture-scenario.md): opt-in culture scenarios (`long-culture`, `long-culture-incentives`) with voice, differentiation, symbolic interfaces, slack, six people, optional incentives and a round-80 token ceiling.
+
+- [PR-37](completed/pr-37-culture-runs.md): E2 culture pilot (ex15): six people, stopped at round 70 by the context guard, gate G2 met, 8 handoffs; E3 and E4 not run.
