@@ -1,7 +1,7 @@
 # ADR-0014: Enforced Task Entry and Auditable Self-review
 
 - Date: 2026-11-09
-- Decision status: Accepted
+- Decision status: Superseded by [ADR-0027](0027-lean-development-workflow.md)
 - Refines: [ADR-0013](0013-programmatic-task-harness.md)
 
 ## Context
@@ -20,4 +20,4 @@ Documentation-only cautions leave the command bypass open. Independent review ag
 
 The command guards prevent accidental alternate-entry bypass, not deliberate repository/state modification or direct credential use. Structure and remote provenance cannot prove honest visual inspection or causal correctness. Those judgments remain with the current conversation and human architectural acceptance. A review can update PR metadata and require a CI rerun under the existing strict freshness rule; that is an incomplete state, never a reason to waive checks.
 
-See [the protocol](../TASK_HARNESS.md) and [the execution plan](../exec-plans/completed/pr-14-enforced-task-entry.md).
+See [the protocol](0027-lean-development-workflow.md) and [the execution plan](../exec-plans/completed/pr-14-enforced-task-entry.md).

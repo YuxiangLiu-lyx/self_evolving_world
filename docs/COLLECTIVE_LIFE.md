@@ -106,11 +106,11 @@ handoff; absent context details are unknown rather than proof of absence.
 
 ## Recovery and evidence
 
-The existing task intent accepts `comparison: "collective-life-v1"` only for a new
-continuous experiment. Its coordinator allocates the next two IDs sequentially,
-returns normal development handoffs and preserves B's short archive through the
-existing observation-window extension. It does not launch a second task service
-or a recursive development model. World time stops during review and development.
+`pnpm experiment:continuous -- new collective-a` allocates arm A; `new collective-b exA`
+allocates arm B with A's preflighted physical baseline. Both return normal
+development handoffs, and `extend exB rounds` preserves B's short archive through
+the observation-window extension. No second task service or recursive development
+model is launched. World time stops during review and development.
 Both arms retain independent package scopes and raw journals. Checkpoints occur
 every 200 rounds and at pauses. Current-source and archive validation still gate
 delivery.

@@ -1,5 +1,4 @@
-import { readDecisionStream } from './responses.js';
-import type { ProgramInput, ProgramResponse } from './survival-run.js';
+import type { ProgramInput } from './survival-run.js';
 
 export function programRequest(model: string, input: ProgramInput): object {
   return {
@@ -25,53 +24,5 @@ export function programRequest(model: string, input: ProgramInput): object {
         },
       },
     },
-  };
-}
-export function programProvider(
-  token: string,
-  model: string,
-  transport: typeof fetch = fetch,
-) {
-  return async (input: ProgramInput): Promise<ProgramResponse> => {
-    const redact = (value: string) => value.replaceAll(token, '[REDACTED]');
-    try {
-      const response = await transport('https://api.openai.com/v1/responses', {
-        method: 'POST',
-        redirect: 'error',
-        signal: AbortSignal.timeout(90_000),
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          Accept: 'text/event-stream',
-        },
-        body: JSON.stringify(programRequest(model, input)),
-      });
-      const decision = await readDecisionStream(response);
-      if (decision.text.includes(token) || decision.responseId.includes(token))
-        throw new Error(
-          'Response echoed a credential; no program was accepted.',
-        );
-      return {
-        decision,
-        http: {
-          status: response.status,
-          requestId:
-            response.headers.get('x-request-id') === null
-              ? null
-              : redact(response.headers.get('x-request-id') ?? ''),
-          contentType:
-            response.headers.get('content-type') === null
-              ? null
-              : redact(response.headers.get('content-type') ?? ''),
-        },
-      };
-    } catch (error) {
-      throw new Error(
-        redact(
-          error instanceof Error ? error.message : 'Program transport failed.',
-        ),
-        { cause: error },
-      );
-    }
   };
 }

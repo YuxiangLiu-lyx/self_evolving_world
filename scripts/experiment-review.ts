@@ -9,11 +9,22 @@ import { resolve } from 'node:path';
 import { isDeepStrictEqual } from 'node:util';
 import { experimentFiles, readExperiment } from './experiments.js';
 import { hashFile, object, readJson } from './validation.js';
-import { experimentId, text } from './task-context.js';
+
+export function text(value: unknown, name: string): string {
+  if (typeof value !== 'string' || !value.trim())
+    throw new Error(`Missing ${name}.`);
+  return value;
+}
+export function experimentId(value: unknown): string {
+  const id = text(value, 'experiment ID');
+  if (!/^ex[1-9]\d*$/.test(id)) throw new Error('Invalid experiment ID.');
+  return id;
+}
 
 export interface ExperimentAnalysis {
   readonly version: 1;
   readonly experiment: string;
+  /** Analysis name, also the companion file stem (historically the task ID). */
   readonly taskId: string;
   readonly reviewer: string;
   readonly artifacts: Readonly<Record<string, string>>;

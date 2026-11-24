@@ -43,9 +43,9 @@ All decisions use the same start snapshot. World review, validation and any conv
 
 ## Run and continue
 
-Use the [unified task entry](TASK_HARNESS.md) with an explicitly authorized `experiment: {mode: "evolution", allocation: "new", basis: ...}`. `pnpm experiment:evolution` is a guarded compatibility alias. The worker first runs a 12-round offline integration smoke, verifies existing archives and authenticates, then exclusively allocates the next exN. Configuration and core/simulator source hashes bind the running checkpoint.
+New runs of this protocol are retired (see [ADR-0027](decisions/0027-lean-development-workflow.md)); its archives remain validated and replayable without inference. The original run procedure is preserved in git history. When ex5 ran, the worker first ran a 12-round offline integration smoke, verified existing archives and authenticated, then exclusively allocated the next exN. Configuration and core/simulator source hashes bind the running checkpoint.
 
-Before each external call, persist `started`; persist response/parse results and accepted programs before advancing. Saved accepted decisions are reused. Two unsuccessful world attempts or an explicit development request return a structured `development` handoff to this conversation. Submit `{barrierId,tick,proposal,notes}` through the task response; no game tick passes during this work. Unknown interrupted call outcomes or changed execution source block continuation, rather than repeating inference or rewriting conditions. Existing capture-only recovery remains available after simulation. Failures and deaths are retained.
+Before each external call, persist `started`; persist response/parse results and accepted programs before advancing. Saved accepted decisions are reused. Two unsuccessful world attempts or an explicit development request return a structured `development` handoff to this conversation. The conversation submitted `{barrierId,tick,proposal,notes}`; no game tick passes during this work. Unknown interrupted call outcomes or changed execution source block continuation, rather than repeating inference or rewriting conditions. Existing capture-only recovery remains available after simulation. Failures and deaths are retained.
 
 ## Archive, replay and limits
 

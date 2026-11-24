@@ -10,7 +10,7 @@ import { longTokenBudget } from '../apps/simulator/src/long-tokens.js';
 import {
   abandonedLongTransport,
   assertContinuousTechnicalRepair,
-} from './task-continuous-repair.js';
+} from './continuous-repair.js';
 it('charges an abandoned invocation as unknown, preserves work and requires both coordinator and worker absence', () => {
   const s = newContinuousExecution(
     'fixture',

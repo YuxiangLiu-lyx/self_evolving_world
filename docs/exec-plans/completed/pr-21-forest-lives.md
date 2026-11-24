@@ -56,7 +56,7 @@ The first formal entry encountered an expired OAuth access token before allocati
 
 ### Formal round-17 development barrier
 
-The fixed-seed ex8 run uses gpt-6.1-sol and seed 20261120. Sol's real first request added two-round wildlife attention and bounded nature appreciation after two-round personal study. Development-1 passed 382 tests and its exact prefix. The checkpoint reader incorrectly required legacy configuration; the [source-hash-bound compatibility guard](../../../scripts/forest-checkpoint-repair.ts) permits only the disclosed exact before/after repairs. It accepts the registered forest or legacy configuration, not arbitrary changed settings. Original source, raw calls and the paused world remain intact.
+The fixed-seed ex8 run uses gpt-6.1-sol and seed 20261120. Sol's real first request added two-round wildlife attention and bounded nature appreciation after two-round personal study. Development-1 passed 382 tests and its exact prefix. The checkpoint reader incorrectly required legacy configuration; the source-hash-bound compatibility guard (`scripts/forest-checkpoint-repair.ts`, removed in PR-32) permits only the disclosed exact before/after repairs. It accepts the registered forest or legacy configuration, not arbitrary changed settings. Original source, raw calls and the paused world remain intact.
 
 ### Formal round-166 technical barrier
 

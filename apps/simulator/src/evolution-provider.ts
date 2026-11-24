@@ -1,5 +1,3 @@
-import { readDecisionStream } from './responses.js';
-import type { ProgramResponse } from './survival-run.js';
 import type {
   OrdinaryEvolutionInput,
   WorldEvolutionInput,
@@ -104,57 +102,5 @@ export function evolutionRequest(
         schema,
       },
     },
-  };
-}
-export type EvolutionProvider = (
-  role: 'ordinary' | 'world',
-  input: OrdinaryEvolutionInput | WorldEvolutionInput,
-) => Promise<ProgramResponse>;
-export function evolutionProvider(
-  token: string,
-  model: string,
-  transport: typeof fetch = fetch,
-): EvolutionProvider {
-  return async (role, input) => {
-    const redact = (s: string) => s.replaceAll(token, '[REDACTED]');
-    try {
-      const response = await transport('https://api.openai.com/v1/responses', {
-        method: 'POST',
-        redirect: 'error',
-        signal: AbortSignal.timeout(90_000),
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          Accept: 'text/event-stream',
-        },
-        body: JSON.stringify(evolutionRequest(model, role, input)),
-      });
-      const decision = await readDecisionStream(response);
-      if (decision.text.includes(token) || decision.responseId.includes(token))
-        throw new Error('Response echoed a credential; no decision accepted.');
-      return {
-        decision,
-        http: {
-          status: response.status,
-          requestId:
-            response.headers.get('x-request-id') === null
-              ? null
-              : redact(response.headers.get('x-request-id') ?? ''),
-          contentType:
-            response.headers.get('content-type') === null
-              ? null
-              : redact(response.headers.get('content-type') ?? ''),
-        },
-      };
-    } catch (error) {
-      throw new Error(
-        redact(
-          error instanceof Error
-            ? error.message
-            : 'Evolution transport failed.',
-        ),
-        { cause: error },
-      );
-    }
   };
 }

@@ -23,27 +23,10 @@ import {
 } from '../src/learning-provider.js';
 import {
   acceptDevelopment,
-  continueLearningExecution,
   learningExecutionRun,
-  newLearningExecution,
 } from '../src/learning-run.js';
 import type { LearningExecution } from '../src/learning-run.js';
-import type { ProgramResponse } from '../src/survival-run.js';
 
-function response(value: object): ProgramResponse {
-  return {
-    decision: {
-      text: JSON.stringify(value),
-      responseId: 'test-response',
-      responseFormat: 'sse',
-    },
-    http: {
-      status: 200,
-      requestId: 'fixture',
-      contentType: 'text/event-stream',
-    },
-  };
-}
 const request = {
   name: 'Nourishment',
   purpose: 'Use owned edible resources to restore satiety',
@@ -166,90 +149,70 @@ describe('bounded learning experiment control', () => {
     expect(learn.cursors.lin?.remaining).toEqual([]);
     expect(ordinaryLearningInput(learn, 'lin').learnedSkills).toHaveLength(1);
   });
-  it('persists a development barrier without a game tick, resumes it once and never repeats model decisions', async () => {
-    let ordinaryCalls = 0,
-      worldCalls = 0;
-    const saved: LearningExecution[] = [];
-    const state = await continueLearningExecution(
-      newLearningExecution('fixture', 'simulated-test'),
-      async (role, input) => {
-        await Promise.resolve();
-        if (role === 'ordinary') {
-          ordinaryCalls++;
-          return response({
-            code: learnCode,
-            summary: 'Request useful functionality.',
-          });
-        }
-        worldCalls++;
-        return response({
-          reviews: reviews(input as ReturnType<typeof worldLearningInput>),
-          needsDevelopment: true,
-        });
+  it('accepts development only at the saved barrier without a game tick and rejects altered reconstructed actions', () => {
+    let run = createLearningRun(initialLearningWorld());
+    for (const id of pendingLearningPrograms(run))
+      run = acceptLearningProgram(run, {
+        agentId: id,
+        tick: 0,
+        call: 1,
+        code: learnCode,
+        summary: 'Request useful functionality.',
+      });
+    const input = worldLearningInput(run);
+    const state: LearningExecution = {
+      version: 1,
+      controller: 'simulated-test',
+      model: 'fixture',
+      programs: run.programs,
+      rounds: run.rounds,
+      attempts: [],
+      developments: [],
+      phase: 'development',
+      barrier: {
+        id: 'round-0-world-1',
+        tick: 0,
+        input,
+        errors: [],
+        proposed: null,
       },
-      async (s) => {
-        await Promise.resolve();
-        saved.push(structuredClone(s));
-      },
-    );
-    expect(ordinaryCalls).toBe(3);
-    expect(worldCalls).toBe(1);
-    expect(state.phase).toBe('development');
+    };
     expect(lastLearningFrame(learningExecutionRun(state)).tick).toBe(0);
-    expect(saved.some((s) => s.attempts.at(-1)?.status === 'started')).toBe(
-      true,
-    );
-    const b = state.barrier;
-    if (!b) throw Error('Missing development barrier.');
     expect(() =>
       acceptDevelopment(state, {
         barrierId: 'stale',
         tick: 0,
-        reviews: reviews(b.input),
+        reviews: reviews(input),
         notes: 'Reviewed bounded syntax and resource enforcement.',
       }),
     ).toThrow();
     const accepted = acceptDevelopment(state, {
-      barrierId: b.id,
-      tick: b.tick,
-      reviews: reviews(b.input),
+      barrierId: 'round-0-world-1',
+      tick: 0,
+      reviews: reviews(input),
       notes:
         'Inspected generated code and fixed-resource runtime; no host code or direct vital assignments.',
     });
+    expect(accepted.phase).toBe('running');
     expect(accepted.rounds).toHaveLength(0);
+    expect(accepted.developments).toHaveLength(1);
     expect(() => acceptDevelopment(accepted, {})).toThrow();
-    const completed = await continueLearningExecution(
-      accepted,
-      async (role) => {
-        await Promise.resolve();
-        if (role === 'world')
-          throw Error('Unexpected repeated World Agent call.');
-        ordinaryCalls++;
-        return response({
-          code: 'wait(3);',
-          summary: 'Controlled no-food baseline after learning.',
-        });
-      },
-      async () => {},
-    );
-    expect(completed.phase).toBe('completed');
-    expect(completed.rounds).toHaveLength(18);
-    expect(completed.developments).toHaveLength(1);
-    expect(completed.attempts.filter((a) => a.role === 'world')).toHaveLength(
-      1,
+    const advanced = advanceLearningRound(
+      run,
+      reviews(input) as Parameters<typeof advanceLearningRound>[1],
     );
     expect(
-      completed.attempts.filter((a) => a.role === 'ordinary' && a.tick === 0),
-    ).toHaveLength(3);
-    expect(
-      lastLearningFrame(learningExecutionRun(completed)).learning?.vitals.lin
-        ?.health,
-    ).toBe(0);
+      reconstructLearningRun(
+        initialLearningWorld(),
+        advanced.programs,
+        advanced.rounds,
+      ).frames,
+    ).toEqual(advanced.frames);
     expect(() =>
       reconstructLearningRun(
         initialLearningWorld(),
-        completed.programs,
-        completed.rounds.map((r, n) =>
+        advanced.programs,
+        advanced.rounds.map((r, n) =>
           n
             ? r
             : {
@@ -262,43 +225,5 @@ describe('bounded learning experiment control', () => {
         ),
       ),
     ).toThrow('disagree');
-  });
-  it('bounds invalid World Agent retries and blocks uncertain interrupted requests', async () => {
-    let worldCalls = 0;
-    const state = await continueLearningExecution(
-      newLearningExecution('fixture', 'simulated-test'),
-      async (role) => {
-        await Promise.resolve();
-        if (role === 'ordinary')
-          return response({
-            code: learnCode,
-            summary: 'Request functionality.',
-          });
-        worldCalls++;
-        return response({ bad: 'unsafe/invalid review' });
-      },
-      async () => {},
-    );
-    expect(worldCalls).toBe(2);
-    expect(state.phase).toBe('development');
-    expect(state.rounds).toEqual([]);
-    let called = false;
-    await expect(
-      continueLearningExecution(
-        {
-          ...state,
-          attempts: state.attempts.map((a, n) =>
-            n === 0 ? { ...a, status: 'started' } : a,
-          ),
-        },
-        async () => {
-          await Promise.resolve();
-          called = true;
-          throw Error('Never call.');
-        },
-        async () => {},
-      ),
-    ).rejects.toThrow('uncertain');
-    expect(called).toBe(false);
   });
 });

@@ -13,9 +13,9 @@ describe('dependency-scoped acceptance plans', () => {
     expect(
       experimentInput('apps/viewer/src/continuous-visuals.ts', 'ex7', 7),
     ).toBe(true);
-    expect(
-      experimentInput('scripts/forest-checkpoint-repair.ts', 'ex8', 7),
-    ).toBe(true);
+    expect(experimentInput('scripts/continuous-source.ts', 'ex8', 7)).toBe(
+      true,
+    );
     expect(experimentInput('apps/viewer/src/style.css', 'ex3', 3)).toBe(false);
   });
   it('separates acceptance tools and package scripts from frozen runtime identity', () => {
@@ -102,20 +102,39 @@ describe('dependency-scoped acceptance plans', () => {
     expect(selected.experiments).not.toContain('ex1');
   });
   it('expands shared replay and unknown dependencies, including explicit audits', () => {
-    for (const path of [
-      'packages/world-core/src/world.ts',
-      'apps/viewer/src/timeline.ts',
-      'unknown-setting.json',
-    ])
+    for (const path of ['apps/viewer/src/timeline.ts', 'unknown-setting.json'])
       expect(plan([path]).experiments).toEqual(Object.keys(archives));
+    expect(plan(['packages/world-core/src/world.ts']).experiments).toEqual([
+      'ex1',
+      'ex2',
+      'ex3',
+      'ex4',
+      'ex5',
+      'ex6',
+    ]);
     expect(selectChecks([], archives, 'base', true).experiments).toEqual(
       Object.keys(archives),
     );
   });
-  it('does not start browser validation for a PR contract implementation change', () => {
-    const selected = plan(['scripts/pr-policy.ts', 'scripts/publication.ts']);
+  it('runs only code checks for validation and delivery tooling', () => {
+    const selected = plan([
+      'scripts/pr-policy.ts',
+      'scripts/publish-pr.ts',
+      'scripts/validate.ts',
+      'scripts/validation.ts',
+    ]);
     expect(selected.code).toBe(true);
+    expect(selected.experiments).toEqual([]);
     expect(selected.browserGroups).toEqual([]);
+  });
+  it('treats every newer continuous-family prefix as protocol 7 only', () => {
+    for (const path of [
+      'packages/world-core/src/open-process.ts',
+      'packages/world-core/src/long-planting.ts',
+      'apps/simulator/src/collective-controller.ts',
+      'packages/world-core/src/material-lots.ts',
+    ])
+      expect(plan([path]).experiments).toEqual(['ex7']);
   });
 });
 

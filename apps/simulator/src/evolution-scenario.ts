@@ -8,8 +8,6 @@ import type {
   ESite,
   EStack,
 } from '@self-evolving-world/world-core';
-export const EVOLUTION_OBJECTIVE =
-  'Observe heterogeneous autonomous survival and persistent World Agent-designed resource, ecology and mechanic growth across four actors over120 synchronous rounds, retaining failures, deaths, exploration and actual individual experience.';
 export const STARTING_REGIONS = {
   lin: 'fruit-potential forest',
   moss: 'riverbank',

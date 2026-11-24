@@ -13,7 +13,7 @@ import { renewableAccessToken } from '../apps/simulator/src/chatgpt-renewal.js';
 import { prepareContinuousWindow } from './continuous-window.js';
 import { resolve } from 'node:path';
 import { writeFileSync } from 'node:fs';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { initialOpenWorld } from '../apps/simulator/src/open-scenario.js';
 import { openPreflight } from './open-preflight.js';
 import type { V7World } from '@self-evolving-world/world-core';
@@ -25,7 +25,7 @@ import {
   issueContinuousDevelopment,
 } from '../apps/simulator/src/continuous-run.js';
 import type { V7Execution } from '../apps/simulator/src/continuous-run.js';
-import { requireTaskWorker } from './task-worker.js';
+import { repairContinuousRun } from './continuous-repair.js';
 import { allocateExperiment, checkExperiments } from './experiments.js';
 import {
   continuousAtomic,
@@ -37,7 +37,10 @@ import {
   continuousHash,
 } from './continuous-store.js';
 import type { V7ReplaySegment } from './continuous-store.js';
-import { continuousCheckpoint } from './continuous-files.js';
+import {
+  continuousCheckpoint,
+  submitContinuousDevelopment,
+} from './continuous-files.js';
 import {
   saveContinuousSource,
   captureContinuousBaseline,
@@ -48,27 +51,36 @@ import {
   continuousReport,
 } from './continuous-analysis.js';
 
+const USAGE = `Usage:
+  pnpm experiment:continuous -- new open|long|collective-a [seed-name]
+  pnpm experiment:continuous -- new collective-b exA
+  pnpm experiment:continuous -- continue exN
+  pnpm experiment:continuous -- develop exN validation-results/development.json
+  pnpm experiment:continuous -- extend exN rounds
+  pnpm experiment:continuous -- repair exN [--abandoned-pid PID]`;
+
 const root = process.cwd();
+const [command, target, extra, ...rest] = process.argv
+  .slice(2)
+  .filter((a) => a !== '--');
 try {
-  const context = requireTaskWorker(
-    root,
-    'continuous',
-    process.argv.slice(2).filter((a) => a !== '--'),
-  );
-  if (!context.experiment)
-    throw new Error('Missing experiment allocation journal.');
-  let id = context.experiment.id,
-    state: V7Execution,
-    token: string | undefined;
-  if (!id) {
+  let id: string, state: V7Execution, token: string | undefined;
+  if (command === 'new') {
+    const scenario = target;
+    if (
+      !['open', 'long', 'collective-a', 'collective-b'].includes(
+        scenario ?? '',
+      ) ||
+      (scenario === 'collective-b'
+        ? !/^ex[1-9]\d*$/.test(extra ?? '')
+        : extra) ||
+      rest.length
+    )
+      throw new Error(USAGE);
     checkExperiments(root);
-    const comparison =
-      context.intent.experiment.mode === 'continuous' &&
-      context.intent.experiment.comparison;
-    const long =
-      context.intent.experiment.mode === 'continuous' &&
-      context.intent.experiment.scenario === 'long-development-v1';
-    const arm = context.comparison?.stage === 'A' ? 'A' : 'B';
+    const comparison = scenario?.startsWith('collective-') ?? false;
+    const long = scenario === 'long';
+    const arm = scenario === 'collective-a' ? 'A' : 'B';
     const genesis = comparison
       ? initialCollectiveWorld('collective-preflight', arm)
       : long
@@ -83,12 +95,12 @@ try {
       reusedFrom?: string;
       stationary?: ReturnType<typeof longPreflight>;
     };
-    if (comparison && arm === 'B' && context.comparison?.a) {
+    if (scenario === 'collective-b' && extra) {
       const prior = continuousRead<typeof preflight>(
-        resolve(root, 'experiment', context.comparison.a, 'preflight.json'),
+        resolve(root, 'experiment', extra, 'preflight.json'),
       );
       const priorWorld = continuousRead<V7World>(
-        resolve(root, 'experiment', context.comparison.a, 'initial.json'),
+        resolve(root, 'experiment', extra, 'initial.json'),
       );
       if (
         prior.physicalHash !== physicalHash ||
@@ -99,7 +111,7 @@ try {
         throw new Error(
           'The second arm must preserve the actually preflighted physical baseline.',
         );
-      preflight = { ...prior, reusedFrom: context.comparison.a };
+      preflight = { ...prior, reusedFrom: extra };
     } else
       preflight = {
         baseline: openPreflight(1600, genesis),
@@ -109,11 +121,6 @@ try {
     token = await renewableAccessToken();
     const model = await selectModel(token, 'gpt-6.1-sol');
     id = allocateExperiment(root);
-    context.experiment.id = id;
-    continuousAtomic(
-      resolve(root, 'validation-results/tasks', `${context.intent.id}.json`),
-      context,
-    );
     const directory = resolve(root, 'experiment', id),
       git = (...args: string[]) =>
         execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
@@ -164,17 +171,36 @@ try {
       state,
       'Initial open-development-v1 fresh policy, inheritSkills=false, with only the explicit authored baseline. No historical generated skills, objects, rewards or mastery. Offline policies and composition fixtures are excluded from ordinary inputs.',
     );
+    console.log(`Allocated ${id} (${scenario ?? ''}).`);
   } else {
-    const previous = continuousRead<Record<string, unknown>>(
-      resolve(root, 'experiment', id, 'manifest.json'),
-    );
-    if (
-      previous.status === 'completed' &&
-      context.intent.experiment.mode === 'continuous' &&
-      context.intent.experiment.allocation === 'reuse' &&
-      context.intent.experiment.rounds !== undefined
-    )
-      prepareContinuousWindow(root, id, context.intent.experiment.rounds);
+    if (!target || !/^ex[1-9]\d*$/.test(target)) throw new Error(USAGE);
+    id = target;
+    if (command === 'continue' && !extra) {
+      // Resume the saved checkpoint; uncertain calls are never resent.
+    } else if (command === 'develop' && extra && !rest.length)
+      submitContinuousDevelopment(
+        root,
+        id,
+        continuousRead<unknown>(resolve(root, extra)),
+      );
+    else if (command === 'extend' && extra && !rest.length) {
+      const rounds = Number(extra);
+      if (!Number.isSafeInteger(rounds) || rounds < 1) throw new Error(USAGE);
+      prepareContinuousWindow(root, id, rounds);
+    } else if (
+      command === 'repair' &&
+      (extra === undefined ||
+        (extra === '--abandoned-pid' && rest.length === 1))
+    ) {
+      await repairContinuousRun(
+        root,
+        id,
+        rest[0] === undefined ? undefined : Number(rest[0]),
+      );
+      console.log(
+        `${id}: technical pause retained; submit the counted development handoff with develop.`,
+      );
+    } else throw new Error(USAGE);
     state = continuousCheckpoint(root, id);
   }
   const directory = resolve(root, 'experiment', id),
@@ -266,8 +292,16 @@ try {
       ].sort(),
     });
     console.log(
-      `${id}: ${state.phase} at round ${String(state.world.tick)}; raw evidence retained. The existing coordinator will capture and review the observation.`,
+      `${id}: ${state.phase} at round ${String(state.world.tick)}; raw evidence retained. Capturing replay screenshots.`,
     );
+    const capture = spawnSync('pnpm', ['experiment:capture', '--', id], {
+      cwd: root,
+      stdio: 'inherit',
+    });
+    if (capture.status !== 0)
+      throw new Error(
+        `Capture failed for ${id}; the simulation is preserved. Fix the failure and run pnpm experiment:capture -- ${id}.`,
+      );
   }
 } catch (error) {
   console.error(

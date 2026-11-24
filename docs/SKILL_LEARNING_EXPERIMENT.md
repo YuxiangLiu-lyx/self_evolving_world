@@ -47,9 +47,9 @@ Model calls use the existing ChatGPT-plan OAuth/Responses transport, a 90-second
 
 ## Run and continue
 
-Record explicit `experiment.mode: "learning"`, `allocation: "new"` and actual instruction basis in a [task intent](TASK_HARNESS.md). No seed or horizon override is supported. Continue through `pnpm task -- next ID`; `pnpm experiment:learning` is a guarded compatibility entry for the same recorded task. The next `exN` is allocated exclusively once. Explicit reuse retains the existing capture-only exception contract; it cannot rerun inference or overwrite a completed archive.
+New runs of this protocol are retired (see [ADR-0027](decisions/0027-lean-development-workflow.md)); its archives remain validated and replayable without inference. The original run procedure is preserved in git history. The record below documents how ex4's development handoffs were formatted.
 
-When the coordinator returns `step: "development"`, inspect the supplied barrier and save a result in `validation-results/`:
+A development handoff supplied the barrier, and the conversation saved a result such as:
 
 ```json
 {
@@ -60,7 +60,7 @@ When the coordinator returns `step: "development"`, inspect the supplied barrier
 }
 ```
 
-`reviews` must contain exactly every pending applicant's actual structured decision, never an empty approval shortcut. Submit the common handoff binding with `kind: "development"` and `file` pointing to that result. The program validates it, persists the implementation response without advancing a round, and continues the saved execution. A stale barrier, changed source or incomplete response fails closed. Capture recovery remains `pnpm experiment:resume -- exN` and cannot call a model.
+`reviews` must contain exactly every pending applicant's actual structured decision, never an empty approval shortcut. The program validated it, persisted the implementation response without advancing a round, and continued the saved execution. A stale barrier, changed source or incomplete response failed closed. Capture recovery remains `pnpm experiment:capture -- exN` and cannot call a model.
 
 ## Evidence and limits
 

@@ -1,7 +1,7 @@
 # ADR-0011: Default Guarded Merge and Final Completion
 
 - Date: 2026-11-08
-- Decision status: Accepted
+- Decision status: Partially superseded by [ADR-0027](0027-lean-development-workflow.md) (default merge retained; completion gate removed)
 - Supersedes: the PR-only delivery portion of [ADR-0010](0010-synchronous-rounds-and-pr-delivery.md)
 
 ## Context

@@ -1,9 +1,26 @@
 import { describe, expect, it } from 'vitest';
 import {
-  continueLearningExecution,
-  newLearningExecution,
+  acceptLearningProgram,
+  advanceLearningRound,
+  createLearningRun,
+  lastLearningFrame,
+  learningActions,
+  learningData,
+  pendingLearningPrograms,
+  LEARNING_LIMITS,
+} from '@self-evolving-world/world-core';
+import type { WorldReview } from '@self-evolving-world/world-core';
+import { initialLearningWorld } from '../apps/simulator/src/learning-scenario.js';
+import {
+  parseOrdinaryLearning,
+  parseWorldLearning,
 } from '../apps/simulator/src/learning-run.js';
 import type {
+  LearningAttempt,
+  LearningExecution,
+} from '../apps/simulator/src/learning-run.js';
+import type { ProgramResponse } from '../apps/simulator/src/survival-run.js';
+import {
   ordinaryLearningInput,
   worldLearningInput,
 } from '../apps/simulator/src/learning-input.js';
@@ -22,61 +39,111 @@ const request = {
   conditions: 'Owned food with positive quantity',
   expectedEffect: 'Spend the resource and apply nutrition and toxicity',
 };
-async function simulation() {
-  let calls = 0;
-  return continueLearningExecution(
-    newLearningExecution('offline-fixture', 'simulated-test'),
-    (role, input) => {
-      calls++;
-      const world = input as ReturnType<typeof worldLearningInput>,
-        actor = input as ReturnType<typeof ordinaryLearningInput>;
-      const result =
-        role === 'world'
-          ? {
-              needsDevelopment: false,
-              reviews: world.requests.map((r) => ({
-                agentId: r.agentId,
-                decision: 'create',
-                reason: 'One round to learn direct consumption.',
-                prerequisites: ['Owned edible food'],
-                learningRounds: 1,
-                skillId: null,
-                specification: {
-                  name: 'Nourish',
-                  description: 'Consume a finite owned food unit.',
-                  parameters: ['food'],
-                  code: 'consume("food",1);',
-                },
-              })),
-            }
-          : {
-              code:
-                actor.observation.tick === 0
-                  ? `learn(${JSON.stringify(request)});`
-                  : actor.observation.tick === 1
-                    ? `move("east",1); pickup("${actor.observation.self.id}-fruit"); use("skill-1",{"food":"${actor.observation.self.id}-fruit"});`
-                    : `wait(${String(Math.min(3, actor.remainingRounds))});`,
-              summary: 'Offline fixture: request, acquire, consume, then wait.',
-            };
-      return Promise.resolve({
-        decision: {
-          text: JSON.stringify(result),
-          responseId: `fixture-${String(calls)}`,
-          responseFormat: 'sse',
-        },
-        http: {
-          status: 200,
-          requestId: null,
-          contentType: 'text/event-stream',
-        },
-      });
+function completed(value: object, id: number): ProgramResponse {
+  return {
+    decision: {
+      text: JSON.stringify(value),
+      responseId: `fixture-${String(id)}`,
+      responseFormat: 'sse',
     },
-    () => Promise.resolve(),
-  );
+    http: { status: 200, requestId: null, contentType: 'text/event-stream' },
+  };
+}
+/** Builds a synthetic completed ledger offline; it never contacts a model. */
+function simulation(): LearningExecution {
+  let run = createLearningRun(initialLearningWorld()),
+    calls = 0;
+  const attempts: LearningAttempt[] = [];
+  while (lastLearningFrame(run).tick < LEARNING_LIMITS.rounds) {
+    const tick = lastLearningFrame(run).tick;
+    for (const actor of pendingLearningPrograms(run)) {
+      const input = ordinaryLearningInput(run, actor),
+        call = (run.cursors[actor]?.calls ?? 0) + 1;
+      const response = completed(
+        {
+          code:
+            tick === 0
+              ? `learn(${JSON.stringify(request)});`
+              : tick === 1
+                ? `move("east",1); pickup("${actor}-fruit"); use("skill-1",{"food":"${actor}-fruit"});`
+                : `wait(${String(Math.min(3, input.remainingRounds))});`,
+          summary: 'Offline fixture: request, acquire, consume, then wait.',
+        },
+        ++calls,
+      );
+      attempts.push({
+        role: 'ordinary',
+        actor,
+        tick,
+        call,
+        input,
+        status: 'accepted',
+        response,
+      });
+      run = acceptLearningProgram(run, {
+        agentId: actor,
+        tick,
+        call,
+        ...parseOrdinaryLearning(response.decision.text, actor, tick),
+      });
+    }
+    let reviews: readonly WorldReview[] = [];
+    if (
+      learningActions(run).some(
+        (a) =>
+          a.type === 'learn' &&
+          learningData(lastLearningFrame(run)).vitals[a.agentId]?.health !== 0,
+      )
+    ) {
+      const input = worldLearningInput(run);
+      const response = completed(
+        {
+          needsDevelopment: false,
+          reviews: input.requests.map((r) => ({
+            agentId: r.agentId,
+            decision: 'create',
+            reason: 'One round to learn direct consumption.',
+            prerequisites: ['Owned edible food'],
+            learningRounds: 1,
+            skillId: null,
+            specification: {
+              name: 'Nourish',
+              description: 'Consume a finite owned food unit.',
+              parameters: ['food'],
+              code: 'consume("food",1);',
+            },
+          })),
+        },
+        ++calls,
+      );
+      reviews = parseWorldLearning(response.decision.text).reviews;
+      attempts.push({
+        role: 'world',
+        actor: 'world',
+        tick,
+        call: attempts.filter((a) => a.role === 'world').length + 1,
+        input,
+        status: 'accepted',
+        response,
+      });
+    }
+    run = advanceLearningRound(run, reviews);
+  }
+  return {
+    version: 1,
+    controller: 'simulated-test',
+    model: 'offline-fixture',
+    programs: run.programs,
+    rounds: run.rounds,
+    attempts,
+    developments: [],
+    phase: 'completed',
+    barrier: null,
+  };
 }
 describe('learning archive evidence', () => {
-  it('reconstructs real effects from synthetic decisions and rejects wrong input, reviews, provenance and templates', async () => {
-    const simulated = await simulation(),
+  it('reconstructs real effects from synthetic decisions and rejects wrong input, reviews, provenance and templates', () => {
+    const simulated = simulation(),
       run = auditLearning(simulated);
     expect(run.frames.at(-1)?.learning?.skills).toHaveLength(1);
     expect(

@@ -8,17 +8,9 @@ The local simulator uses the official [Sign in with ChatGPT token-sharing flow](
 
 This uses subscription entitlement, subject to account availability and plan limits. It is not unlimited inference or a claim about the user's billing balance. The [preview contract](https://developers.openai.com/siwc/token-sharing-open-source/preview-limitations) requires non-stored streaming requests and limits supported parameters. Only completed ordinary assistant output is accepted. Authentication/model-catalog success alone is not inference success.
 
-```bash
-pnpm experiment:login
-# First record explicit survival intent using the unified task entry.
-pnpm task -- start validation-results/intent.json
-# The structured preparation response advances the existing task.
-pnpm experiment:survival
-pnpm experiment:check
-pnpm dev
-```
+New runs of this protocol are retired (see [ADR-0027](decisions/0027-lean-development-workflow.md)); its archives remain validated and replayable without inference. The original run procedure is preserved in git history. Use `pnpm experiment:check` to validate ex3 and `pnpm dev` to replay it.
 
-Login opens the user's browser and verifies identity and granted scopes. Credentials stay outside the repository under the user's private application configuration directory. An expired authorization must be renewed with the login command. The [unified task](TASK_HARNESS.md) must record explicit `mode: "survival"`, allocation and instruction basis before execution. The compatibility experiment command continues that task and rejects missing context; it builds the current viewer, checks previous archives, verifies authorization/catalogue access and exclusively allocates the next exN. Never invoke it again just to view a completed run. Select the run in **Experiment archive** or use its `?experiment=exN` URL.
+Login opens the user's browser and verifies identity and granted scopes. Credentials stay outside the repository under the user's private application configuration directory. An expired authorization must be renewed with the login command. Select the run in **Experiment archive** or use its `?experiment=exN` URL.
 
 ## Survival-v1 rules
 
@@ -48,7 +40,7 @@ Each move repeats a cardinal one-cell intent for its integer duration; wait repe
 
 The application binds the actor ID locally and provides only that actor's observation, vital signs, previous program/outcome and public configuration. The model selects durations. It is asked to cover the horizon within five attempted requests and to include one diagnostic learning request in its first program. A new request is eligible only after the previous program ends. Every request, including failure or invalid output, consumes one of five attempts per actor: at most 15 for the founding population. A failed/invalid response waits for that round; later eligible calls remain within the cap. After exhaustion, uncovered rounds explicitly use wait fallback and are counted separately from model-controlled rounds.
 
-The attempt ledger is written before each request and after each outcome. There are no transport-level retries. An interrupted request remains visible; inference cannot be resumed in the same archive. Browser capture can be resumed from a complete saved simulation with `pnpm experiment:resume -- exN`; this never calls the model. A failed simulation must be investigated and cannot pass acceptance by inventing missing output.
+The attempt ledger is written before each request and after each outcome. There are no transport-level retries. An interrupted request remains visible; inference cannot be resumed in the same archive. Browser capture can be resumed from a complete saved simulation with `pnpm experiment:capture -- exN`; this never calls the model. A failed simulation must be investigated and cannot pass acceptance by inventing missing output.
 
 ## Replay and validation
 
@@ -56,4 +48,4 @@ Replay version 3 contains initial conditions, survival configuration, the ordere
 
 The archive also retains model-calls.json: exact request template, per-call private input, attempt status, bounded completed ordinary response and HTTP metadata. Credentials and reasoning traces are excluded. Repository tooling verifies response-to-program correspondence, inputs against the actual round-start observation, exact reconstructed replay, the mild vital trajectory, item conservation, occupancy, outcomes and file hashes. Browser checks inspect each actor at initial/middle/final frames, verify export invariance and decode saved images. These checks establish consistent client evidence, not provider cryptographic attestation.
 
-Ordinary build, test, replay and CI commands never run inference. The original one-round command and random experiment command retain their existing semantics. See [ADR-0012](decisions/0012-survival-programs.md) and [architecture](../ARCHITECTURE.md).
+Ordinary build, test, replay and CI commands never run inference. The random experiment command retains its existing semantics; the one-round command was removed in PR-32. See [ADR-0012](decisions/0012-survival-programs.md) and [architecture](../ARCHITECTURE.md).

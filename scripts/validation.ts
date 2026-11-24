@@ -1,10 +1,6 @@
 import type { CheckPlan } from './validation-plan.js';
-import {
-  verifyValidationReport,
-  type CheckResult,
-} from './validation-evidence.js';
 import { createHash } from 'node:crypto';
-import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { experimentIds, EXPERIMENT_SCENES } from './experiments.js';
 import type { TaskRoute } from './harness.js';
@@ -164,19 +160,27 @@ export interface Evidence {
   readonly sha256: string;
 }
 
+export interface CheckResult {
+  id: string;
+  reason: string;
+  status: 'passed' | 'reused' | 'not-applicable' | 'failed';
+  durationMs: number;
+  deepRebuilds: number;
+  input?: string;
+  originRun?: string;
+}
+
+/** Local record of one `pnpm validate` run; CI reruns its own checks. */
 export interface ValidationReport {
-  readonly version: 1;
+  readonly version: 2;
   readonly runId: string;
-  readonly task: string;
-  sourceHash: string;
   readonly startedAt: string;
-  readonly url: string;
-  status: 'running' | 'failed' | 'awaiting-review' | 'passed';
+  status: 'running' | 'failed' | 'passed';
   browserTests: number;
   evidence: Evidence[];
   route?: TaskRoute;
   plan?: CheckPlan;
-  checks?: CheckResult[];
+  checks: CheckResult[];
   error?: string;
 }
 
@@ -207,52 +211,8 @@ export function requiredScenes(root: string, plan?: CheckPlan): string[] {
   ];
 }
 
-const ignoredDirectories = new Set([
-  '.git',
-  'node_modules',
-  'dist',
-  'coverage',
-  '.pnpm-store',
-  'test-results',
-  'playwright-report',
-  'validation-results',
-  'experiment-results',
-]);
-
 export function hashFile(path: string): string {
   return createHash('sha256').update(readFileSync(path)).digest('hex');
-}
-
-/** Includes untracked source and docs; no dependency on an existing Git commit. */
-export function sourceFingerprint(root: string): string {
-  const hash = createHash('sha256');
-  const visit = (directory: string): void => {
-    for (const entry of readdirSync(directory, { withFileTypes: true }).sort(
-      (a, b) => a.name.localeCompare(b.name, 'en'),
-    )) {
-      if (
-        ignoredDirectories.has(entry.name) ||
-        entry.name === '.DS_Store' ||
-        entry.name.endsWith('.tsbuildinfo') ||
-        (entry.name.startsWith('.env') && entry.name !== '.env.example')
-      )
-        continue;
-      const path = resolve(directory, entry.name);
-      if (entry.isDirectory()) visit(path);
-      else if (entry.isFile()) {
-        hash.update(relative(root, path).split(sep).join('/'));
-        hash.update('\0');
-        hash.update(hashFile(path));
-        hash.update('\0');
-      } else {
-        throw new Error(
-          `Validation cannot fingerprint a source symlink: ${path}`,
-        );
-      }
-    }
-  };
-  visit(root);
-  return hash.digest('hex');
 }
 
 export function object(value: unknown): Record<string, unknown> {
@@ -325,84 +285,4 @@ export function browserEvidence(
     return { id, path: shot.path, sha256: hashFile(path) };
   });
   return { tests: report.tests, evidence };
-}
-
-/** Structural completion gate; an honest visual judgment still requires looking. */
-export function completionErrors(
-  root: string,
-  task: string,
-  rawReport: unknown,
-  rawReview: unknown,
-): string[] {
-  try {
-    const report = object(rawReport);
-    const review = object(rawReview);
-    const errors: string[] = [];
-    const plan = report.plan as CheckPlan | undefined;
-    const scenes = requiredScenes(root, plan);
-    try {
-      verifyValidationReport(root, report as unknown as ValidationReport);
-    } catch (error) {
-      errors.push(error instanceof Error ? error.message : String(error));
-    }
-    if (
-      report.version !== 1 ||
-      !nonempty(report.runId) ||
-      report.task !== task ||
-      !nonempty(task)
-    ) {
-      errors.push(
-        'Report does not belong to this task. Run pnpm validate with the task name.',
-      );
-    }
-    if (report.status !== 'awaiting-review' && report.status !== 'passed') {
-      errors.push('Selected automated validation has not passed.');
-    }
-    if (
-      typeof report.browserTests !== 'number' ||
-      !Number.isSafeInteger(report.browserTests) ||
-      report.browserTests < (scenes.length ? 1 : 0)
-    )
-      errors.push('Missing successful browser tests.');
-    if (report.sourceHash !== sourceFingerprint(root))
-      errors.push('Source changed after validation. Rerun pnpm validate.');
-    if (review.runId !== report.runId || !nonempty(review.reviewer))
-      errors.push('Missing reviewer or review belongs to an older run.');
-    if (!Array.isArray(report.evidence) || !Array.isArray(review.visual))
-      throw new Error('Missing visual evidence/review.');
-    const evidence = report.evidence.map(object);
-    const visual = review.visual.map(object);
-    if (evidence.length !== scenes.length || visual.length !== scenes.length)
-      errors.push('Every required screenshot must be reviewed.');
-    for (const id of scenes) {
-      const shots = evidence.filter((entry) => entry.id === id);
-      const reviews = visual.filter((entry) => entry.id === id);
-      const shot = shots[0];
-      const item = reviews[0];
-      if (
-        shots.length !== 1 ||
-        shot === undefined ||
-        hashFile(artifactPath(root, shot.path)) !== shot.sha256
-      ) {
-        errors.push(`Missing or changed screenshot: ${id}`);
-      }
-      if (
-        reviews.length !== 1 ||
-        item?.verdict !== 'pass' ||
-        !nonempty(item.notes)
-      )
-        errors.push(`Visual review not passed: ${id}`);
-    }
-    const behavior = object(review.behavior);
-    if (behavior.verdict !== 'pass' || !nonempty(behavior.notes))
-      errors.push('Behavior review has not passed.');
-    const requirements = object(review.requirements);
-    if (requirements.verdict !== 'pass' || !nonempty(requirements.notes))
-      errors.push('Requirement and full-diff review has not passed.');
-    return errors;
-  } catch (error) {
-    return [
-      `Incomplete validation evidence: ${error instanceof Error ? error.message : String(error)}`,
-    ];
-  }
 }

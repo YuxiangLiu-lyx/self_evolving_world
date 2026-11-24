@@ -5,11 +5,10 @@ import type {
   WorldState,
 } from '@self-evolving-world/world-core';
 import { experimentWorld } from './experiment.js';
-import type { ExperimentResult } from './experiment.js';
+import type { ExperimentReplay } from './experiment.js';
 
 export const RANDOM_POLICY = 'xorshift32-observation-v1';
 export const DEFAULT_SEED = 20261107;
-export const DEFAULT_STEPS = 480;
 
 export function validateParameters(seed: number, steps: number): void {
   if (!Number.isSafeInteger(seed) || seed < 1 || seed > 0xffffffff)
@@ -37,7 +36,7 @@ function choose<T>(values: readonly T[], random: () => number): T {
 
 export interface RandomRun {
   readonly frames: readonly WorldState[];
-  readonly replay: ExperimentResult['replay'];
+  readonly replay: ExperimentReplay;
 }
 
 export function runRandomWorld(seed: number, steps: number): RandomRun {

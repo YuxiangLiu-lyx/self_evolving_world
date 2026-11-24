@@ -1,7 +1,7 @@
 # ADR-0007: Keep Model Decisions in a Bounded CLI Adapter
 
 - Date: 2026-11-07
-- Status: Accepted
+- Status: Superseded by [ADR-0027](0027-lean-development-workflow.md) (one-round runner removed; OAuth and Responses transport retained)
 
 ## Context
 
@@ -23,4 +23,4 @@ A continuous agent loop would require scheduling, goals, memory and usage contro
 
 The CLI is a single-account proof of concept with manual reauthorization and no automatic token refresh. It duplicates the small application scenario; a test compares it with the founding viewer setup to detect drift without coupling production applications. Model outputs may fail; failures remain in the record and cannot become successful acceptance. CI uses network fixtures and does not consume plan inference. Live access depends on the user's actual grant and service response.
 
-This decision does not change core rules, base skills, observation semantics or replay versions. Continuous NPC control, broader account lifecycle support and additional providers require separate plans. See [architecture](../../ARCHITECTURE.md), [usage](../ONE_ROUND_EXPERIMENT.md), and the [execution plan](../exec-plans/completed/pr-07-three-agent-decision.md).
+This decision does not change core rules, base skills, observation semantics or replay versions. Continuous NPC control, broader account lifecycle support and additional providers require separate plans. See [architecture](../../ARCHITECTURE.md), and the [execution plan](../exec-plans/completed/pr-07-three-agent-decision.md).

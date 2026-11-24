@@ -1,23 +1,13 @@
 import {
-  acceptProgram,
-  advanceProgramRound,
-  createProgramRun,
   createSurvivalWorld,
   parseBehaviorCode,
-  pendingPrograms,
   PROGRAM_LIMITS,
 } from '@self-evolving-world/world-core';
-import type {
-  ProgramRecord,
-  ProgramRun,
-  WorldState,
-} from '@self-evolving-world/world-core';
+import type { ProgramRun, WorldState } from '@self-evolving-world/world-core';
 import { experimentWorld } from './experiment.js';
 import type { ModelDecision } from './experiment.js';
 import { record, string } from './remote-data.js';
 
-export const SURVIVAL_OBJECTIVE =
-  'Verify ChatGPT plan-funded behavior programs for three agents over 60 synchronous survival rounds, with at most five calls per agent, mild conditions and every learning request denied without a World Agent.';
 export function initialSurvivalWorld(): WorldState {
   const initial = experimentWorld();
   return createSurvivalWorld({
@@ -78,65 +68,4 @@ export function programDecision(
     throw new Error('Program summary must contain 1-240 characters.');
   parseBehaviorCode(code, agentId, remaining);
   return { code, summary };
-}
-export async function runSurvivalPrograms(
-  provider: (input: ProgramInput) => Promise<ProgramResponse>,
-  persist: (
-    attempts: readonly ModelAttempt[],
-    run: ProgramRun,
-  ) => Promise<void>,
-): Promise<{ run: ProgramRun; attempts: readonly ModelAttempt[] }> {
-  let run = createProgramRun(initialSurvivalWorld());
-  const attempts: ModelAttempt[] = [];
-  while (run.frames.length <= PROGRAM_LIMITS.rounds) {
-    // Network requests may be sequential; every actor still observes the same round-start world.
-    for (const agentId of pendingPrograms(run)) {
-      const input = programInput(run, agentId);
-      const call = (run.cursors[agentId]?.calls ?? 0) + 1;
-      const started: ModelAttempt = {
-        agentId,
-        tick: input.observation.tick,
-        call,
-        input,
-        status: 'started',
-      };
-      const index = attempts.push(started) - 1;
-      // Persist before inference. Interrupted attempts remain consumed and cannot be silently resumed.
-      await persist(attempts, run);
-      let response: ProgramResponse | undefined;
-      let program: ProgramRecord;
-      try {
-        response = await provider(input);
-        const decision = programDecision(
-          response.decision.text,
-          agentId,
-          input.remainingRounds,
-        );
-        program = { agentId, tick: started.tick, call, ...decision };
-        attempts[index] = { ...started, status: 'accepted', response };
-      } catch (error) {
-        const message =
-          error instanceof Error ? error.message : 'Program request failed.';
-        program = {
-          agentId,
-          tick: started.tick,
-          call,
-          code: null,
-          summary:
-            'No accepted program. Wait for this round; the attempted call consumed budget.',
-        };
-        attempts[index] = {
-          ...started,
-          status: response ? 'rejected' : 'failed',
-          ...(response ? { response } : {}),
-          error: message,
-        };
-      }
-      run = acceptProgram(run, program);
-      await persist(attempts, run);
-    }
-    run = advanceProgramRound(run);
-    await persist(attempts, run);
-  }
-  return { run, attempts: Object.freeze(attempts) };
 }

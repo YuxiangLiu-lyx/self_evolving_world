@@ -59,7 +59,14 @@ export const toolchainInput = (p: string): boolean =>
 /** Conservative protocol ownership. Shared files and unknown names affect every version. */
 export function protocolVersions(path: string): readonly number[] {
   const name = path.split('/').at(-1) ?? '';
-  if (/^(continuous|forest)-|^continuous\.ts$/.test(name)) return [7];
+  // The continuous family never imports the grid-family modules below.
+  if (
+    /^(continuous|forest|open|collective|long|material)-|^continuous\.ts$/.test(
+      name,
+    )
+  )
+    return [7];
+  if (name === 'world.ts') return [1, 2, 3, 4, 5, 6];
   if (/^coevolution[-.]/.test(name)) return [6];
   if (/^evolution[-.]/.test(name)) return [5, 6];
   if (/^(learning[-.]|skill-)/.test(name)) return [4, 5, 6];
@@ -86,9 +93,7 @@ export function experimentInput(
     toolchainInput(path) ||
     // Archive validators also consume these viewer-side replay/visual registries.
     (version <= 6 && path === 'apps/viewer/src/timeline.ts') ||
-    (version === 7 &&
-      (path === 'apps/viewer/src/continuous-visuals.ts' ||
-        path === 'scripts/forest-checkpoint-repair.ts')) ||
+    (version === 7 && path === 'apps/viewer/src/continuous-visuals.ts') ||
     (path.startsWith('scripts/') &&
       !path.endsWith('.test.ts') &&
       /(?:experiments|analysis|source|store|preflight|smoke|validation-(?:cache|inputs))\.ts$/.test(
