@@ -59,6 +59,6 @@ Out of scope:
   - the survival share is 39.5%, or 12.1% without rest.
 - **R9:** CULTURE_SCENARIO (Culture v2, Culture metrics), LONG_DEVELOPMENT, ARCHITECTURE, PRODUCT F-140, ADR-0029 and the command tables.
 
-**Validation:** `pnpm validate` on macOS with Node 24.22.2. VALIDATE_SUMMARY
+**Validation:** `pnpm validate` on macOS with Node 24.22.2. It passed archive preservation, typecheck, lint, format, architecture, 163 unit test files with 946 tests, reconstruction of ex1–ex15, analysis, build, documentation checks and 86 browser tests. The viewer is unchanged.
 
 **Not verified:** no model-calling run uses v2 yet. The projection replays ex15's queries, so it cannot count the extra exact reads that summarized interfaces may cause.
