@@ -33,6 +33,24 @@ export const CULTURE_OPTIONS: V7CultureOptions = {
   incentives: false,
   foodWater: true,
 };
+/** Culture v2 switches: the culture switches plus the open-goal ordinary prompt. */
+export const CULTURE_V2_OPTIONS: V7CultureOptions = {
+  ...CULTURE_OPTIONS,
+  goal: 'open',
+};
+/** Frozen context and handoff mechanics of the culture v2 run, which otherwise keeps the
+ * culture budgets, checkpoints and ceilings. `inputBytes` is raised with the estimate limit
+ * because ex15 inputs held up to 3.31 code units per estimated token, so the historical
+ * 120,000-byte guard (60,000 code units) would bind near 18,000 tokens instead. */
+export const LONG_CULTURE_V2 = {
+  inputEstimateLimit: 24_000,
+  exactRecordWidth: 6_000,
+  inputBytes: 200_000,
+  /** Window for full mastered-interface contracts; see docs/CULTURE_SCENARIO.md. */
+  recentAbilityRounds: 25,
+  rejectionStop: 3,
+  abilityTextLimit: 3_500,
+};
 /** Frozen budget mechanics of E2/E3: never changed after the first call. The first window
  * ends at round 80 under an additional 3,200,000-token ceiling; `extend exN 250` then
  * continues under the 10,000,000-token ledger. */

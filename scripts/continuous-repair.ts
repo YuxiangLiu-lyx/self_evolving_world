@@ -3,6 +3,7 @@ import {
   longWorldInput,
 } from '../apps/simulator/src/long-context.js';
 import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { countedDevelopments } from '../apps/simulator/src/collective-controller.js';
 import { resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { v7Clone } from '@self-evolving-world/world-core';
@@ -93,15 +94,9 @@ export function abandonedLongTransport(
   return { state, record };
 }
 
-/** Opt-in (`longDevelopment.transportRecovery: 'uncounted'`): a long-call pause whose
- * failing ordinary call ended without any response but with transport evidence (for
- * example `server_is_overloaded`) or was proved abandoned. Such a pause resumes without a
- * development handoff; rejected model output, context or computation pauses stay counted. */
-export function uncountedTransportPause(
-  state: V7Execution,
-  record: V7CallRecord | null,
-): boolean {
-  const failure = state.attempts
+/** The last failed or rejected ordinary attempt of the current round. */
+function currentOrdinaryFailure(state: V7Execution) {
+  return state.attempts
     .filter(
       (a) =>
         a.tick === state.world.tick &&
@@ -109,18 +104,134 @@ export function uncountedTransportPause(
         ['failed', 'rejected'].includes(a.status),
     )
     .at(-1);
+}
+/** A durable long-call pause with no barrier or unsettled call, inside the window. */
+function settledLongCallPause(state: V7Execution): boolean {
   return (
-    state.world.config.longDevelopment?.transportRecovery === 'uncounted' &&
     state.phase === 'paused' &&
     state.reason === LONG_CALL_PAUSE &&
     state.barrier === null &&
     !state.pendingCall &&
     !state.attempts.some((a) => a.status === 'started') &&
-    state.world.tick < state.windowTarget &&
+    state.world.tick < state.windowTarget
+  );
+}
+
+/** Opt-in (`longDevelopment.transportRecovery: 'uncounted'`): a long-call pause whose
+ * failing ordinary call ended without any response but with transport evidence (for
+ * example `server_is_overloaded`) or was proved abandoned. Such a pause resumes without a
+ * development handoff; rejected model output, context or computation pauses stay counted
+ * unless `rejectionRecovery` is also set. */
+export function uncountedTransportPause(
+  state: V7Execution,
+  record: V7CallRecord | null,
+): boolean {
+  const failure = currentOrdinaryFailure(state);
+  return (
+    state.world.config.longDevelopment?.transportRecovery === 'uncounted' &&
+    settledLongCallPause(state) &&
     failure?.status === 'failed' &&
     record?.attempt.id === failure.id &&
     record.response === null &&
     !!record.failureEvidence
+  );
+}
+
+/** Consecutive rejected ordinary outputs: the trailing run, in attempt order across all
+ * actors and rounds, of ordinary attempts whose model output was rejected. An accepted
+ * ordinary attempt (including a read-only query batch) ends the run. A transport `failed`
+ * attempt has no model output, so it neither extends nor ends the run; World Agent
+ * attempts and development handoffs are ignored. */
+export function consecutiveRejectedOutputs(state: V7Execution): number {
+  let run = 0;
+  for (const attempt of [...state.attempts].reverse()) {
+    if (attempt.role !== 'ordinary') continue;
+    if (attempt.status === 'accepted') break;
+    if (attempt.status === 'rejected') run += 1;
+  }
+  return run;
+}
+
+/** Opt-in (`longDevelopment.rejectionRecovery`): the number of consecutive rejected
+ * ordinary outputs when a long-call pause caused by a rejected output has reached
+ * `stopAfter`, at which point the run stops for review; otherwise `null`. Such a pause is
+ * never resumed by `repair`, and never becomes a counted technical handoff. */
+export function rejectionReviewStop(state: V7Execution): number | null {
+  const policy = state.world.config.longDevelopment?.rejectionRecovery;
+  if (
+    !policy ||
+    state.phase !== 'paused' ||
+    state.reason !== LONG_CALL_PAUSE ||
+    currentOrdinaryFailure(state)?.status !== 'rejected'
+  )
+    return null;
+  const run = consecutiveRejectedOutputs(state);
+  return run >= policy.stopAfter ? run : null;
+}
+
+/** Opt-in (`longDevelopment.rejectionRecovery: { mode: 'uncounted' }`): a long-call pause
+ * whose failing ordinary call returned a response that was rejected by validation, with
+ * fewer than `stopAfter` consecutive rejected ordinary outputs. Such a pause resumes
+ * without a development handoff: the rejected output never becomes an action, keeps its
+ * charge, and the actor decides again with the retained validation error. */
+export function uncountedRejectionPause(
+  state: V7Execution,
+  record: V7CallRecord | null,
+): boolean {
+  const policy = state.world.config.longDevelopment?.rejectionRecovery;
+  const failure = currentOrdinaryFailure(state);
+  return (
+    policy?.mode === 'uncounted' &&
+    settledLongCallPause(state) &&
+    failure?.status === 'rejected' &&
+    record?.attempt.id === failure.id &&
+    record.response !== null &&
+    consecutiveRejectedOutputs(state) < policy.stopAfter
+  );
+}
+
+/** The repair a paused run receives: an uncounted transport or rejection resume, or a
+ * counted technical development handoff. A rejection pause that reached the stop rule is
+ * refused and never falls back to a counted handoff. */
+export function technicalRepairKind(
+  state: V7Execution,
+  record: V7CallRecord | null,
+): 'transport' | 'rejection' | 'development' {
+  const stopped = rejectionReviewStop(state);
+  if (stopped !== null)
+    throw new Error(
+      `The run stops for review after ${String(stopped)} consecutive rejected ordinary outputs (rejectionRecovery.stopAfter ${String(state.world.config.longDevelopment?.rejectionRecovery?.stopAfter)}); repair neither resumes it nor issues a technical development handoff.`,
+    );
+  if (uncountedTransportPause(state, record)) return 'transport';
+  if (uncountedRejectionPause(state, record)) return 'rejection';
+  assertContinuousTechnicalRepair(state);
+  return 'development';
+}
+
+/** The retained directory of this technical pause. A round keeps one pause; with the opt-in
+ * `rejectionRecovery`, a later pause in the same round (after an uncounted resume) is kept
+ * as `round-N-2`, `round-N-3`, ... unless one of them already retained this exact state. */
+export function technicalPausePrefix(
+  directory: string,
+  state: V7Execution,
+): string {
+  const base = `technical-pauses/round-${String(state.world.tick)}`;
+  if (!existsSync(resolve(directory, base))) return base;
+  if (state.world.config.longDevelopment?.rejectionRecovery)
+    for (let index = 2; ; index += 1) {
+      const previous = index === 2 ? base : `${base}-${String(index - 1)}`;
+      const recovery = resolve(directory, previous, 'recovery.json');
+      if (
+        !existsSync(recovery) ||
+        continuousRead<{ attemptsHash?: unknown }>(recovery).attemptsHash ===
+          continuousHash(state.attempts)
+      )
+        break;
+      const next = `${base}-${String(index)}`;
+      if (!existsSync(resolve(directory, next))) return next;
+    }
+  throw new Error(
+    'Technical pause already retained; inspect its recovery before repeating.',
   );
 }
 
@@ -129,7 +240,7 @@ export async function repairContinuousRun(
   root: string,
   id: string,
   abandonedPid?: number,
-): Promise<'transport' | 'development'> {
+): Promise<'transport' | 'rejection' | 'development'> {
   const original = continuousCheckpoint(root, id);
   let abandoned: ReturnType<typeof abandonedLongTransport> | null = null;
   if (abandonedPid !== undefined) {
@@ -167,7 +278,7 @@ export async function repairContinuousRun(
   const failed = state.attempts
     .filter((a) => a.tick === state.world.tick && a.role === 'ordinary')
     .at(-1);
-  const uncounted = uncountedTransportPause(
+  const kind = technicalRepairKind(
     state,
     abandoned
       ? abandoned.record
@@ -175,7 +286,7 @@ export async function repairContinuousRun(
         ? await continuousSink(root, id).findCall(failed.id)
         : null,
   );
-  if (!uncounted) assertContinuousTechnicalRepair(state);
+  const uncounted = kind !== 'development';
   const reason = state.reason;
   // A failed browser capture must not prevent repairing its durable paused world.
   const directory = resolve(root, 'experiment', id);
@@ -190,11 +301,7 @@ export async function repairContinuousRun(
     throw new Error(
       'Technical repair metadata does not identify the retained run.',
     );
-  const prefix = `technical-pauses/round-${String(state.world.tick)}`;
-  if (existsSync(resolve(directory, prefix)))
-    throw new Error(
-      'Technical pause already retained; inspect its recovery before repeating.',
-    );
+  const prefix = technicalPausePrefix(directory, state);
   mkdirSync(resolve(directory, prefix), { recursive: true });
   // Immutable calls, segments, source snapshots and existing checkpoints stay at their original paths.
   const retained: Record<string, string> = {};
@@ -242,14 +349,25 @@ export async function repairContinuousRun(
     worldHash: continuousHash(state.world),
     attemptsHash: continuousHash(state.attempts),
     target: state.windowTarget,
-    basis: uncounted
-      ? 'Resume after a provider transport failure; the failed call is never resent and keeps its charge.'
-      : 'Repair technical blockers and continue the same original run.',
+    basis:
+      kind === 'transport'
+        ? 'Resume after a provider transport failure; the failed call is never resent and keeps its charge.'
+        : kind === 'rejection'
+          ? 'Resume after rejected model output; the rejected output never becomes an action and keeps its charge, and the actor decides again with the retained validation error.'
+          : 'Repair technical blockers and continue the same original run.',
     actorRequest: false,
     modelCalls: 0,
-    ...(uncounted
+    ...(kind === 'transport'
       ? { transportRecovery: true, developmentHandoff: false }
-      : {}),
+      : kind === 'rejection'
+        ? {
+            rejectionRecovery: true,
+            consecutiveRejectedOutputs: consecutiveRejectedOutputs(state),
+            stopAfter:
+              state.world.config.longDevelopment?.rejectionRecovery?.stopAfter,
+            developmentHandoff: false,
+          }
+        : {}),
   });
   if (uncounted) {
     const resumed = v7Clone(state);
@@ -264,7 +382,7 @@ export async function repairContinuousRun(
       windowPhase: 'running',
       files: [],
     });
-    return 'transport';
+    return kind;
   }
   const next = v7Clone(state);
   if (!reason) throw new Error('Missing validated technical reason.');
@@ -324,7 +442,9 @@ export function assertContinuousTechnicalRepair(state: V7Execution): void {
     state.pendingCall ||
     state.attempts.some((a) => a.status === 'started') ||
     state.world.tick >= state.windowTarget ||
-    state.developments.length >= state.world.config.budgets.development ||
+    countedDevelopments(state.developments) >=
+      state.world.config.budgets.development ||
+    rejectionReviewStop(state) !== null ||
     (state.barrier &&
       (Object.keys(state.barrier.requests).length ||
         state.barrier.reviews.length)) ||

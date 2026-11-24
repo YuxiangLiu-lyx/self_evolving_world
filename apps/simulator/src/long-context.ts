@@ -19,7 +19,19 @@ import type {
   V7Ability,
 } from '@self-evolving-world/world-core';
 import { forestExperienceSummary } from './forest-experience-context.js';
+import {
+  compactLongInput,
+  longArgumentSignature,
+  longJustMastered,
+  longRecentInterfaces,
+  PAGE_ACCESS,
+  PROJECTION_NOTE,
+} from './long-compaction.js';
 import { OPEN_GOAL } from './open-context.js';
+
+/** Culture v2 packet goal: health and safety are required, everything else is open. */
+export const OPEN_LIFE_GOAL =
+  'Keep yourself healthy and safe; that is required. Beyond that, how you live, what you do and what you care about is up to you.';
 
 export const LONG_CALL_PAUSE =
   'A long-development decision failed; its complete request, response or uncertainty and token charge are retained for current-conversation review.';
@@ -42,6 +54,11 @@ export interface LongInput {
     guidance?: ('plan-horizon' | 'general-capabilities')[];
     /** Present only in the culture scope's ordinary prompt variant. */
     voice?: true;
+    /** Culture v2 ordinary prompt only: the open goal and the person's value leaning. */
+    goal?: 'open';
+    leaning?: string;
+    /** Culture v2 only: the ordinary input carries summarized interfaces (compaction). */
+    compaction?: true;
   };
   protocol: 'continuous-v1';
   tick: number;
@@ -110,8 +127,7 @@ export function longPage(
                     'Part out of range; use zero-based part0 through parts-1.',
                 }
               : {}),
-            access:
-              'Stable600-code-unit pages, zero-based part; concatenate all parts before parsing. Use the same exact id for continuation.',
+            access: PAGE_ACCESS,
           };
     }),
   };
@@ -304,6 +320,15 @@ export function longRetrieve(
     return catalogueRetrievalView(world, actor, [result])[0];
   });
 }
+/** The person's one-word value leaning, if the scenario differentiates people. */
+function leaning(world: V7World, actor: string): { leaning?: string } {
+  const t = world.actors.find((a) => a.id === actor)?.extensionState[
+    'long:tendencies'
+  ];
+  const value =
+    t && typeof t === 'object' && !Array.isArray(t) ? t.leaning : undefined;
+  return typeof value === 'string' ? { leaning: value } : {};
+}
 function base(
   world: V7World,
   actor: string,
@@ -327,6 +352,12 @@ function base(
       ...(role === 'ordinary' && policy.culture?.voice
         ? { voice: true as const }
         : {}),
+      ...(role === 'ordinary' && policy.culture?.goal === 'open'
+        ? { goal: 'open' as const, ...leaning(world, actor) }
+        : {}),
+      ...(role === 'ordinary' && policy.compaction
+        ? { compaction: true as const }
+        : {}),
     },
     protocol: world.protocol,
     tick: world.tick,
@@ -343,8 +374,7 @@ function base(
         const projected = longRetrieve(world, actor, role, queries)[0];
         return {
           ...v7Record(projected),
-          projection:
-            'Current authorized read with stable600 pages; original query/result retained unchanged in the call archive.',
+          projection: PROJECTION_NOTE,
         };
       }),
     ),
@@ -407,16 +437,36 @@ export function longOrdinaryInput(
   const currentStep = cursor?.plan.steps[cursor.step];
   const bound = v7Record(a.extensionState['execution:operation'] ?? {});
   const boundAction = v7Record(v7Record(bound.operation ?? {}).action ?? {});
+  // Culture v2 (compaction) only: every plan step replaces the current step, the
+  // last-mastered heuristic is dropped, and interfaces used in the recent window or
+  // mastered this round (about to be used) are added.
+  const compaction = world.config.longDevelopment?.compaction;
   const needed = new Set([
     ...(typeof boundAction.interface === 'string'
       ? [boundAction.interface]
       : []),
-    ...a.mastered
-      .filter((id) => !world.config.development?.baseline.includes(id))
-      .slice(-1),
-    ...(currentStep ? [currentStep.action.interface] : []),
+    ...(compaction
+      ? []
+      : a.mastered
+          .filter((id) => !world.config.development?.baseline.includes(id))
+          .slice(-1)),
+    ...(compaction
+      ? (cursor?.plan.steps ?? []).map((s) => s.action.interface)
+      : currentStep
+        ? [currentStep.action.interface]
+        : []),
     ...(a.learning ? [a.learning.ability] : []),
     ...(cursor?.operation ? [cursor.operation.action.interface] : []),
+    ...(compaction
+      ? [
+          ...longRecentInterfaces(
+            a,
+            world.tick,
+            compaction.recentAbilityRounds,
+          ),
+          ...longJustMastered(world, id),
+        ]
+      : []),
   ]);
   const personalAbilities = longVisibleAbilities(world, id);
   const candidates = ranked(
@@ -425,7 +475,7 @@ export function longOrdinaryInput(
   ).slice(0, 4);
   // Schemas occur only here, not again in the output schema. Baseline verbs use compact argument contracts.
   input.packet = {
-    goal: OPEN_GOAL,
+    goal: culture?.goal === 'open' ? OPEN_LIFE_GOAL : OPEN_GOAL,
     identity: { id, name: a.name },
     time: world.time,
     state: {
@@ -564,21 +614,34 @@ export function longOrdinaryInput(
       total: world.abilities.length,
       baseline: personalAbilities
         .filter((x) => x.authored)
-        .map((x) => ({
-          id: x.id,
-          // Culture scope only: the new symbolic verbs carry their function, and
-          // an authored interface not yet mastered says so.
-          ...(x.revision === EXPRESSION_REVISION
-            ? { function: x.function }
-            : {}),
-          parameters: x.parameters,
-          ...(Object.keys(x.references ?? {}).length
-            ? { references: x.references }
-            : {}),
-          ...(culture?.differentiation && !a.mastered.includes(x.id)
-            ? { mastered: false }
-            : {}),
-        })),
+        .map((x) =>
+          // Culture v2: an interface neither needed now nor used recently is summarized
+          // with its argument signature; the full contract stays readable by exact id.
+          compaction && !needed.has(x.id)
+            ? {
+                id: x.id,
+                function: x.function,
+                args: longArgumentSignature(x.parameters),
+                ...(culture?.differentiation && !a.mastered.includes(x.id)
+                  ? { mastered: false }
+                  : {}),
+              }
+            : {
+                id: x.id,
+                // Culture scope only: the new symbolic verbs carry their function, and
+                // an authored interface not yet mastered says so.
+                ...(x.revision === EXPRESSION_REVISION
+                  ? { function: x.function }
+                  : {}),
+                parameters: x.parameters,
+                ...(Object.keys(x.references ?? {}).length
+                  ? { references: x.references }
+                  : {}),
+                ...(culture?.differentiation && !a.mastered.includes(x.id)
+                  ? { mastered: false }
+                  : {}),
+              },
+        ),
       candidates: candidates.map((x) => compactAbility(x, a.mastered)),
       details: personalAbilities
         .filter((x) => !x.authored && needed.has(x.id))
@@ -606,6 +669,7 @@ export function longOrdinaryInput(
       'Omission is not absence. Query abilities, own inventory, knowledge, projects, memory, state or personally observed objects in batches. Ability search/list returns compact catalogue entries; use exact ids for full interface details and applicability. Search results are indexes. Exact queries return one record per offset. All paged records use600-code-unit fragments with zero-based part0..parts-1, consistently in proactive and queried views. Current-scope retained queries are reprojected using these stable pages; original results remain archived. Queries expose no hidden properties, other private records or historical capabilities. Queries do not perform physical trials or award experience.' +
       exactReadAccess(world),
   };
+  if (compaction) compactLongInput(input, compaction.recentAbilityRounds);
   return input;
 }
 export function longWorldInput(

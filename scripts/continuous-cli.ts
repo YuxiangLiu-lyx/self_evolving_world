@@ -27,7 +27,12 @@ import {
   issueContinuousDevelopment,
 } from '../apps/simulator/src/continuous-run.js';
 import type { V7Execution } from '../apps/simulator/src/continuous-run.js';
-import { repairContinuousRun } from './continuous-repair.js';
+import {
+  consecutiveRejectedOutputs,
+  rejectionReviewStop,
+  repairContinuousRun,
+} from './continuous-repair.js';
+import { countedDevelopments } from '../apps/simulator/src/collective-controller.js';
 import { allocateExperiment, checkExperiments } from './experiments.js';
 import {
   continuousAtomic,
@@ -54,7 +59,7 @@ import {
 } from './continuous-analysis.js';
 
 const USAGE = `Usage:
-  pnpm experiment:continuous -- new open|long|long-fixes|long-culture|long-culture-incentives|collective-a
+  pnpm experiment:continuous -- new open|long|long-fixes|long-culture|long-culture-incentives|long-culture-v2|long-culture-v2-incentives|collective-a
   pnpm experiment:continuous -- new collective-b exA
   pnpm experiment:continuous -- continue exN
   pnpm experiment:continuous -- develop exN validation-results/development.json
@@ -208,10 +213,14 @@ try {
         id,
         rest[0] === undefined ? undefined : Number(rest[0]),
       );
+      const recovered =
+        repaired === 'rejection' ? continuousCheckpoint(root, id) : null;
       console.log(
         repaired === 'transport'
           ? `${id}: transport failure retained; resuming without a development handoff.`
-          : `${id}: technical pause retained; submit the counted development handoff with develop.`,
+          : recovered
+            ? `${id}: rejected model output retained (${String(consecutiveRejectedOutputs(recovered))} consecutive; the run stops for review at ${String(recovered.world.config.longDevelopment?.rejectionRecovery?.stopAfter)}); resuming without a development handoff.`
+            : `${id}: technical pause retained; submit the counted development handoff with develop.`,
       );
     } else throw new Error(USAGE);
     state = continuousCheckpoint(root, id);
@@ -255,6 +264,9 @@ try {
         barrier: state.barrier,
         budget: state.world.config.budgets,
         attempts: state.developments,
+        ...(state.world.config.longDevelopment?.emptyHandoffs
+          ? { countedHandoffs: countedDevelopments(state.developments) }
+          : {}),
         declaration: {
           developer: 'current-claude-conversation',
           packages: ['package-id@version'],
@@ -308,6 +320,11 @@ try {
     console.log(
       `${id}: ${state.phase} at round ${String(state.world.tick)}; raw evidence retained. Capturing replay screenshots.`,
     );
+    const stopped = rejectionReviewStop(state);
+    if (stopped !== null)
+      console.log(
+        `${id}: the run stops for review after ${String(stopped)} consecutive rejected ordinary outputs; repair will not resume it or issue a technical development handoff.`,
+      );
     const capture = spawnSync('pnpm', ['experiment:capture', '--', id], {
       cwd: root,
       stdio: 'inherit',

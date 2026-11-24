@@ -8,10 +8,12 @@ it removes suppressors and provides carriers, and it never tells agents what to 
 say, value or believe in. No particular outcome is required; this is an exploratory
 condition, not a causal comparison. See [ADR-0028](decisions/0028-culture-scenario.md).
 
-| Command                                                     | Scenario tag         | Incentives |
-| ----------------------------------------------------------- | -------------------- | ---------- |
-| `pnpm experiment:continuous -- new long-culture`            | `culture`            | off        |
-| `pnpm experiment:continuous -- new long-culture-incentives` | `culture-incentives` | on         |
+| Command                                                        | Scenario tag            | Incentives |
+| -------------------------------------------------------------- | ----------------------- | ---------- |
+| `pnpm experiment:continuous -- new long-culture`               | `culture`               | off        |
+| `pnpm experiment:continuous -- new long-culture-incentives`    | `culture-incentives`    | on         |
+| `pnpm experiment:continuous -- new long-culture-v2`            | `culture-v2`            | off        |
+| `pnpm experiment:continuous -- new long-culture-v2-incentives` | `culture-v2-incentives` | on         |
 
 Both variants have the same physical genesis; they differ only in the incentive switch,
 its three satisfaction rules and their event names. Checkpoints are verified against the
@@ -63,11 +65,129 @@ pause is caused by an ordinary call that ended without any response but with rec
 transport evidence (for example `server_is_overloaded`), or by a proved abandoned
 invocation, `repair exN` retains the pause under `technical-pauses/` and resumes the run
 without a development handoff. The failed call is never resent and keeps its charge in
-the ledger. Rejected model output, context and computation pauses still need a counted
-handoff, and a second failure in the same round still pauses the run.
+the ledger. In `long-culture`, rejected model output, context and computation pauses still
+need a counted handoff, and a second failure in the same round still pauses the run. Culture
+v2 also resumes rejection pauses without a handoff (see [Culture v2](#culture-v2)).
 
 These numbers were checked against the measured E1 (ex14) rates; the derivation is in
 [PR #29](https://github.com/YuxiangLiu-lyx/self_evolving_world/pull/29).
+
+## Culture v2
+
+`long-culture-v2` and `long-culture-v2-incentives` are the run version that follows the ex15
+pilot ([ADR-0029](decisions/0029-culture-v2.md)). Each is the matching culture genesis,
+with the same world, seed, switches, budgets, checkpoints and ceilings, plus these fields.
+None of them exists in ex15 or any earlier archive.
+
+| Field                                | Value                                     | Effect                                                        |
+| ------------------------------------ | ----------------------------------------- | ------------------------------------------------------------- |
+| `culture.goal`                       | `'open'`                                  | Open-goal ordinary prompt with the person's leaning           |
+| `longDevelopment.compaction`         | `{ version: 1, recentAbilityRounds: 25 }` | Lossless ordinary-input compaction                            |
+| `longDevelopment.inputEstimateLimit` | 24,000 (ex15: 14,000)                     | Pre-inference context guard                                   |
+| `longDevelopment.exactRecordWidth`   | 6,000 (ex15: 4,000)                       | Whole exact reads                                             |
+| `computation.inputBytes`             | 200,000 (ex15: 120,000)                   | Byte guard, raised so the token guard binds first (see below) |
+| `longDevelopment.rejectionRecovery`  | `{ mode: 'uncounted', stopAfter: 3 }`     | Rejection pauses resume without a handoff; stop after three   |
+| `longDevelopment.emptyHandoffs`      | `'uncounted'`                             | A handoff that installs nothing is not counted                |
+| `longDevelopment.abilityTextLimit`   | 3,500                                     | Developed interfaces serialize to at most 3,500 code units    |
+
+**Two factors change at once.** Compared with ex15, the v2 run changes both the context and
+the ordinary prompt. A difference between the runs cannot be attributed to either factor
+alone, and one seed gives a case comparison, not a statistical result.
+
+### Open-goal prompt
+
+The ex15 prompt began with a goal list: maintain health and tolerable risk, understand
+unknowns through evidence, develop reusable abilities, and improve personal and shared
+living. All six people in ex15 wrote cares that paraphrased it. None ever referred to their
+leaning, which existed only as a `tendencies` field. The v2 prompt replaces the list with:
+
+> Keep yourself healthy and safe; that is required. Beyond that, how you live, what you do and
+> what you care about is up to you. You tend to value _leaning_.
+
+The leaning (freedom, belonging, beauty, fairness, mastery or calm) is inserted for each
+person; the `tendencies` field keeps it too. The packet's `goal` field carries the same two
+sentences, without the leaning. Every other sentence is the ex15 voice prompt. It adds no
+guidance about `name`, `mark`, `tell` or `invite` and contains no excluded word.
+
+### Context compaction
+
+`longDevelopment.compaction` changes only ordinary inputs, and nothing is hidden: everything
+moved out of the packet is either still in the same input or one exact query away, with
+the same permissions. Each compaction that applies adds one sentence to `packet.access`
+saying what it did (`apps/simulator/src/long-compaction.ts`).
+
+1. **Paging notes once.** Paged records no longer repeat their page note, and reprojected
+   retrieval results no longer repeat their projection note; `packet.access` states both.
+2. **Already in retrieval.** A packet record, ability candidate or detail whose content is
+   verified to equal, or to be an exact part of, a record already in the same input's
+   retrieval becomes `{id, inRetrieval: true}`. A personal `mastered` flag is kept.
+3. **Joined fragments.** Consecutive fragments of one exact record in retrieval are joined
+   in order into one fragment listing `joinedParts`.
+4. **Settled work.** In `execution.activeState`, completed, stopped or cancelled `:work:`
+   records keep their identity, ability, mode, status, target, products and last payment,
+   marked `settled: true`. An exact `state` query returns the full record. Active and
+   paused work, bindings, reserved items and pointers stay complete.
+5. **Terrain rows.** Visible terrain is a list of `"y:x:cells"` strings, one character per
+   cell for each run of consecutive visible cells in a row, instead of `[x, y, kind]` tuples.
+6. **Recent-use window.** An authored interface keeps its full contract only if it is
+   needed now or was used recently. Every other interface becomes a summary
+   `{id, function, args}` whose `args` names the arguments in order, with types, bounds
+   and choices. Long string limits and references stay in the exact record, which an
+   abilities query by id returns. Developed interfaces get full details under the same
+   rule; otherwise they appear only as compact candidates.
+   - "Needed now" means the bound operation, any step of the current plan, the current
+     learning or operation, or an interface the person mastered this round.
+   - "Used recently" means it appears as an action in the person's `experience.recent`
+     history within the last 25 rounds.
+
+   The ex15 heuristic that always detailed the most recently mastered developed interface
+   is dropped.
+
+**Why 25 rounds.** In ex15, 65 accepted plans had 301 steps. 208 of those steps used an
+interface the person had used in an earlier round. The last use was within 20 rounds for
+88.0% of them, within 25 rounds for 93.8% and within 40 rounds for 98.6%. The history
+keeps 40 rounds; 25 covers almost all reuse while summarizing what has gone unused for a
+long time. Summaries name their arguments because 63 of the 277 authored-interface steps
+would have used a summarized interface. Without names, each of those would need a read or
+risk a rejected output, and rejected outputs count toward the stop rule.
+
+**Offline projection.** `npx tsx scripts/long-context-projection.ts` rebuilds every retained
+ex15 ordinary input with the current builder; the archive configuration reproduces all 147
+recorded estimates. It then rebuilds the same inputs with the v2 settings and fits the
+growth of rounds 0–70 by least squares.
+
+| Projection to round 250                                                   | Estimate |
+| ------------------------------------------------------------------------- | -------: |
+| Per-round maximum (48.0 per round)                                        |   19,100 |
+| Packet-only maximum (41.7 per round) plus 1.5 × largest retrieval (2,724) |   20,872 |
+| Highest single-person trend (Moss, 70.9 per round)                        |   23,650 |
+
+Every case stays below 24,000, but the single-person margin is small. A linear fit is
+pessimistic for bounded pages and optimistic for spikes: ex15's own maximum at round 70
+lay about 3,100 above its trend, and the same excess on the v2 per-round trend gives about
+22,200 at round 250. At round 70, v2 lowers the six estimates by 3–18%:
+Ivo 14,396 → 12,452 and Lin 8,721 → 7,153. At genesis it saves 870–910 per person. The
+reduction is largest early, because few interfaces have been used then. Later, recently
+used developed interfaces carry their details, so v2 grows at about the same rate as ex15.
+
+The byte guard rejects an input whose code-unit length times two exceeds
+`computation.inputBytes`. In ex15, inputs held between 2.55 and 3.31 code units per estimated
+token, so the historical 120,000 bytes (60,000 code units) would bind near 18,000 tokens.
+200,000 bytes (100,000 code units) leaves the 24,000-token guard binding.
+
+### Handoff counting
+
+A handoff remains the unit of reviewed code change, and in v2 only such changes are counted.
+
+- A pause after rejected ordinary output resumes through `repair` without a handoff, as a
+  transport failure does.
+- An accepted handoff that installs no package and changes no runtime source is recorded but
+  not counted.
+- After three consecutive rejected ordinary outputs, the run stops for review instead.
+
+See [LONG_DEVELOPMENT](LONG_DEVELOPMENT.md) for the exact rules. The development validator
+rejects any developed interface that serializes to more than 3,500 code units, so a
+6,000-code-unit exact read always returns it whole.
 
 ## A. Voice and private memory
 
@@ -245,6 +365,29 @@ gains no `airHumidity`. Ex10's food tenths and reference prefixes are not instal
   or removes toxins.
 - The exchange emits ex10's `preservation-progress` event for exposed food; a package
   that uses the representation declares it.
+
+## Culture metrics
+
+`pnpm metrics:culture` measures culture archives with deterministic rules; the full
+definitions are in the [metric definitions](presentation/culture-baseline.md#metric-definitions).
+Besides the measures above and gate G2 (survival share below 50% and a symbolic action by
+every person, unchanged), it reports:
+
+- **Sharing expressions:** sentences of spoken, sent or posted text and of plan notes and
+  intentions that match keyword rules for five ideas about common resources: leave some for
+  others, take only a modest share or what is needed, do not exhaust a source, share or pool,
+  and coordinate a finite stock instead of competing for it or duplicating its collection.
+  A **reuse** is a later expression of an idea by someone other than an earlier author, with
+  the most similar earlier phrase and the earliest receipt of the idea (message, speech within
+  the vision radius, council read or sign within sight) before the reuse was written. Spoken
+  text is dated by the first round of the plan that wrote it. Cares and views get the same
+  detection only in the private section.
+- **Rest as a default**, by two criteria side by side, each with its own verdict per person
+  and in total (default when at least half of the rests qualify): (1) the plan step has no
+  energy condition or the energy cap cut the recorded recovery (within one rest of full
+  energy); (2) the rest began, by exact replay, at or above 75% of the energy cap.
+- **Survival share without rest:** survival actor-rounds other than `rest` over all
+  actor-rounds, per person and in total, next to the survival share.
 
 ## Excluded vocabulary
 

@@ -5,6 +5,7 @@ import {
 import { longTokenBudget } from '../apps/simulator/src/long-tokens.js';
 import { collectiveSettle } from '@self-evolving-world/world-core';
 import { initialCollectiveWorld } from '../apps/simulator/src/collective-scenario.js';
+import { countedDevelopments } from '../apps/simulator/src/collective-controller.js';
 import { OPEN_CONFIG } from '../apps/simulator/src/open-scenario.js';
 import { FOREST_EXPERIENCE_CONFIG } from '../apps/simulator/src/forest-experience-scenario.js';
 import { FOREST_CONFIG } from '../apps/simulator/src/forest-scenario.js';
@@ -164,7 +165,10 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
       throw new Error(
         'Recorded model attempts exceed the fixed shared budget.',
       );
-  if (state.developments.length > state.world.config.budgets.development)
+  if (
+    countedDevelopments(state.developments) >
+    state.world.config.budgets.development
+  )
     throw new Error(
       'Recorded development handoffs exceed their fixed shared budget.',
     );
@@ -222,13 +226,15 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
       const attempts = short
         ? state.attempts.slice(0, split)
         : state.attempts.slice(split);
+      const handoffSplit = boundary?.developments ?? state.developments.length;
       for (const role of ['ordinary', 'world', 'development'] as const) {
         const count =
           role === 'development'
-            ? short
-              ? (boundary?.developments ?? state.developments.length)
-              : state.developments.length -
-                (boundary?.developments ?? state.developments.length)
+            ? countedDevelopments(
+                short
+                  ? state.developments.slice(0, handoffSplit)
+                  : state.developments.slice(handoffSplit),
+              )
             : attempts.filter((a) => a.role === role).length;
         const limit = short
           ? policy.shortBudgets[role]
@@ -331,7 +337,7 @@ export function continuousSink(root: string, id: string): V7Sink {
       );
       if (record.tick % 20 === 0)
         console.log(
-          `${id}: ${String(record.tick)}/${String(state.windowTarget)} rounds; ${String(state.attempts.length)} model attempts; ${String(state.developments.length)} development handoffs; ${state.phase}`,
+          `${id}: ${String(record.tick)}/${String(state.windowTarget)} rounds; ${String(state.attempts.length)} model attempts; ${String(state.developments.length)} development handoffs${state.world.config.longDevelopment?.emptyHandoffs ? ` (${String(countedDevelopments(state.developments))} counted)` : ''}; ${state.phase}`,
         );
       return Promise.resolve();
     },
@@ -427,6 +433,11 @@ export function continuousStage(state: V7Execution) {
       ordinary: state.attempts.filter((a) => a.role === 'ordinary').length,
       world: state.attempts.filter((a) => a.role === 'world').length,
       developmentHandoffs: state.developments.length,
+      ...(state.world.config.longDevelopment?.emptyHandoffs
+        ? {
+            countedDevelopmentHandoffs: countedDevelopments(state.developments),
+          }
+        : {}),
       developmentInternalModelCalls: null,
     },
     revisions: state.world.revisions,
