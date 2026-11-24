@@ -48,11 +48,12 @@ export const OPEN_GOAL_REPLACEMENTS: readonly (readonly [string, string])[] = [
     'Keep yourself healthy and safe; that is required. Beyond that, how you live, what you do and what you care about is up to you.',
   ],
 ];
-/** Culture v2 compaction: interfaces not used recently are summarized in the packet. */
+/** Culture v2 compaction: interfaces not used recently are summarized in the packet with
+ * their argument signature (`longArgumentSignature`). */
 export const COMPACTION_REPLACEMENTS: readonly (readonly [string, string])[] = [
   [
     'Use the exact schemas supplied once under abilities.',
-    'Use the exact schemas supplied once under abilities: full contracts for interfaces you used recently or need now, summaries for the others; read a summarized interface by exact id before using it.',
+    'Use the exact schemas supplied once under abilities: full contracts for interfaces you used recently or need now, and for the others summaries that name their arguments; read the exact record by id for references and long string limits.',
   ],
 ];
 function replaced(
