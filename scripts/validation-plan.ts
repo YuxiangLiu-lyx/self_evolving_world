@@ -34,6 +34,45 @@ export const GROUP_FILES: Readonly<Record<string, readonly string[]>> = {
   historical: ['continuous.spec.ts'],
 };
 const allGroups = Object.keys(GROUP_FILES);
+/** Validation, delivery and read-only metric tooling. */
+const TOOLING =
+  /^scripts\/(validat|harness|check-|pr-policy|publish-pr|github|documentation|unit-reporter|experiment-review|long-metrics|long-compatibility|culture-metrics)/;
+const record = (value: unknown): Record<string, unknown> | null =>
+  value && typeof value === 'object' && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+/**
+ * Whether a `package.json` change only adds, changes or removes `scripts` entries that run
+ * read-only tooling (`tsx scripts/<tool>.ts`). Any other manifest change keeps conservative scope.
+ */
+export function toolingManifestChange(before: string, after: string): boolean {
+  const parse = (text: string) => {
+    try {
+      return record(JSON.parse(text));
+    } catch {
+      return null;
+    }
+  };
+  const a = parse(before);
+  const b = parse(after);
+  if (!a || !b) return false;
+  const rest = (v: Record<string, unknown>) =>
+    JSON.stringify({ ...v, scripts: undefined });
+  const sa = record(a.scripts) ?? {};
+  const sb = record(b.scripts) ?? {};
+  const tool = (v: unknown) =>
+    v === undefined ||
+    (typeof v === 'string' &&
+      TOOLING.test(/^tsx (scripts\/[\w-]+\.ts)$/.exec(v)?.[1] ?? ''));
+  const changed = [...new Set([...Object.keys(sa), ...Object.keys(sb)])].filter(
+    (k) => sa[k] !== sb[k],
+  );
+  return (
+    rest(a) === rest(b) &&
+    changed.length > 0 &&
+    changed.every((k) => tool(sa[k]) && tool(sb[k]))
+  );
+}
 /** Published story JSON is a viewer input; screenshots and prose remain evidence. */
 export const presentationInput = (path: string): boolean =>
   /^docs\/presentation\/ex[1-9]\d*\/story\.json$/.test(path);
@@ -48,6 +87,8 @@ export function selectChecks(
   archives: Readonly<Record<string, number>>,
   base: string,
   audit = false,
+  /** Changed files whose content diff is known to touch only tooling, such as `package.json`. */
+  tooling: ReadonlySet<string> = new Set(),
 ): CheckPlan {
   const deep = new Set<string>(),
     groups = new Set<string>(),
@@ -115,12 +156,7 @@ export function selectChecks(
     }
     // Validation, delivery and read-only metric tooling needs code checks only; run
     // `pnpm validate:audit` when a tooling change alters reconstruction or scenes.
-    if (
-      /^scripts\/(validat|harness|check-|pr-policy|publish-pr|github|documentation|unit-reporter|experiment-review|long-metrics|long-compatibility)/.test(
-        file,
-      ) ||
-      /^\.github\//.test(file)
-    )
+    if (TOOLING.test(file) || /^\.github\//.test(file) || tooling.has(file))
       continue;
     if (
       /^scripts\/(continuous|coevolution|evolution|learning|survival|synchronous|experiment)-/.test(
@@ -195,11 +231,29 @@ export function makePlan(
       ),
     ),
   ];
+  const files = taskRoute(root, base).files;
+  const manifest = (): boolean => {
+    try {
+      return toolingManifestChange(
+        execFileSync('git', ['show', `${base}:package.json`], {
+          cwd: root,
+          encoding: 'utf8',
+          stdio: ['ignore', 'pipe', 'ignore'],
+        }),
+        readFileSync(resolve(root, 'package.json'), 'utf8'),
+      );
+    } catch {
+      return false;
+    }
+  };
   return selectChecks(
-    taskRoute(root, base).files,
+    files,
     Object.fromEntries(ids.map((id) => [id, archiveVersion(root, id)])),
     base,
     audit,
+    new Set(
+      files.includes('package.json') && manifest() ? ['package.json'] : [],
+    ),
   );
 }
 export function browserSelection(): {

@@ -68,3 +68,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-32](completed/pr-32-lean-harness.md): lean branch/validate/PR workflow replacing the task coordinator, and removal of superseded code.
 
 - [PR-33](completed/pr-33-long-run-fixes.md): opt-in whole exact reads and prompt guidance, the long-fixes scenario, honest developer records and archive-only long-run metrics.
+
+- [PR-35](completed/pr-35-culture-metrics.md): read-only rule-based culture metrics analyzer and the ex7–ex13 culture baseline.
