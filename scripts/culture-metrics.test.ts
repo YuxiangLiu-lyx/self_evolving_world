@@ -943,7 +943,10 @@ describe('rest as a default idle behavior', () => {
       interface: 'rest',
       data: { recovered, nominal: 4, mentalFactor, bonus: 0 },
     });
-  const restWorld = (unrecordedRestFactor = false): CultureInput => ({
+  const restWorld = (
+    unrecordedRestFactor = false,
+    starts = true,
+  ): CultureInput => ({
     ...world([
       round(
         1,
@@ -955,6 +958,8 @@ describe('rest as a default idle behavior', () => {
             lin: { conditioned: true, target: 39 },
             moss: { conditioned: false, target: null },
           },
+          // Moss starts exactly at 75% of the cap, which counts as a high start.
+          ...(starts ? { energy: { lin: 20, moss: 30, sol: 25 } } : {}),
         },
       ),
       round(
@@ -970,13 +975,15 @@ describe('rest as a default idle behavior', () => {
             lin: { conditioned: true, target: 39 },
             sol: { conditioned: true, target: 30 },
           },
+          // Sol's need-conditioned rest still begins above 75% of the cap.
+          ...(starts ? { energy: { lin: 38.5, moss: 34, sol: 31 } } : {}),
         },
       ),
     ]),
     energy: { cap: 40, restRecovery: 4, unrecordedRestFactor },
   });
 
-  it('counts idle rests from unconditioned steps and cap-cut recoveries, per person', () => {
+  it('reports both criteria with their own verdicts, per person and overall', () => {
     const metrics = cultureMetrics(restWorld());
     expect(metrics.rest).toMatchObject({
       rests: 4,
@@ -988,6 +995,11 @@ describe('rest as a default idle behavior', () => {
       withRecovery: 3,
       idleShare: 0.5,
       default: true,
+      highStart: 3,
+      withStart: 4,
+      highStartShare: 0.75,
+      startDefault: true,
+      startShare: 0.75,
     });
     expect(metrics.rest.perAgent).toEqual([
       {
@@ -1000,6 +1012,11 @@ describe('rest as a default idle behavior', () => {
         withStep: 2,
         withRecovery: 2,
         idleShare: 0.5,
+        default: true,
+        highStart: 1,
+        withStart: 2,
+        highStartShare: 0.5,
+        startDefault: true,
       },
       {
         actor: 'moss',
@@ -1011,6 +1028,11 @@ describe('rest as a default idle behavior', () => {
         withStep: 1,
         withRecovery: 1,
         idleShare: 1,
+        default: true,
+        highStart: 1,
+        withStart: 1,
+        highStartShare: 1,
+        startDefault: true,
       },
       {
         actor: 'sol',
@@ -1022,6 +1044,12 @@ describe('rest as a default idle behavior', () => {
         withStep: 1,
         withRecovery: 0,
         idleShare: 0,
+        // The criteria disagree for Sol.
+        default: false,
+        highStart: 1,
+        withStart: 1,
+        highStartShare: 1,
+        startDefault: true,
       },
     ]);
     // The second survival share leaves the gate's share unchanged.
@@ -1034,7 +1062,17 @@ describe('rest as a default idle behavior', () => {
     const markdown = cultureMarkdown(metrics);
     expect(markdown).toContain('Without `rest`');
     expect(markdown).toContain('2 of 4 rests idle (50.0%');
-    expect(markdown).toContain('Default: yes');
+    expect(markdown).toContain('3 of 4 rests (75.0%); default: yes');
+  });
+
+  it('leaves the start-energy criterion undefined without reconstructed start energy', () => {
+    expect(cultureMetrics(restWorld(false, false)).rest).toMatchObject({
+      default: true,
+      highStart: null,
+      withStart: 0,
+      highStartShare: null,
+      startDefault: null,
+    });
   });
 
   it('skips the cap test when an unrecorded weather factor can lower recovery', () => {
@@ -1416,7 +1454,16 @@ describe('retained ex13 baseline', () => {
         transfers: { pairs: 0, reciprocity: null },
       },
       survival: { actorRounds: 840, survivalRounds: 349, restRounds: 199 },
-      rest: { rests: 199, idle: 44, unconditioned: 3, highEnergy: 44 },
+      rest: {
+        rests: 199,
+        idle: 44,
+        unconditioned: 3,
+        highEnergy: 44,
+        default: false,
+        highStart: 124,
+        withStart: 199,
+        startDefault: true,
+      },
       sharing: { expressions: 5, communicated: 1 },
       nonTransactional: { messages: 17, nonTransactional: 0 },
       symbolic: { everyAgentAtLeastOne: false },
@@ -1438,7 +1485,8 @@ describe('retained ex13 baseline', () => {
     expect(archiveCultureMetrics('experiment/ex13', 80).rounds.count).toBe(80);
     expect(cultureMarkdown(metrics)).toContain('## Culture metrics: ex13');
     expect(cultureMarkdown(metrics)).not.toContain('Private memory');
-  });
+    // Exact replay of 280 and 80 rounds for start energy takes several seconds.
+  }, 120_000);
 });
 
 describe('retained ex15 culture pilot', () => {
@@ -1465,8 +1513,9 @@ describe('retained ex15 culture pilot', () => {
       ['wren', 20, 15],
       ['ivo', 27, 16],
     ]);
-    // Every rest step stops at an energy target of 38-40 of 40; 24 rests began within one
-    // rest of the cap, so rest is not a default idle behavior by the criterion.
+    // Every rest step stops at an energy target of 38-40 of 40. Criterion 1: 24 rests began
+    // within one rest of the cap, so rest is no default. Criterion 2: 65 rests began at 30 of 40
+    // or more, so rest is a default overall and for everyone but Lin.
     expect(metrics.rest).toMatchObject({
       rests: 115,
       idle: 24,
@@ -1476,14 +1525,25 @@ describe('retained ex15 culture pilot', () => {
       withStep: 115,
       withRecovery: 115,
       default: false,
+      highStart: 65,
+      withStart: 115,
+      startDefault: true,
     });
-    expect(metrics.rest.perAgent.map((a) => [a.actor, a.highEnergy])).toEqual([
-      ['lin', 4],
-      ['moss', 5],
-      ['sol', 2],
-      ['kai', 5],
-      ['wren', 3],
-      ['ivo', 5],
+    expect(
+      metrics.rest.perAgent.map((a) => [
+        a.actor,
+        a.highEnergy,
+        a.default,
+        a.highStart,
+        a.startDefault,
+      ]),
+    ).toEqual([
+      ['lin', 4, false, 12, false],
+      ['moss', 5, false, 11, true],
+      ['sol', 2, false, 9, true],
+      ['kai', 5, false, 12, true],
+      ['wren', 3, false, 9, true],
+      ['ivo', 5, false, 12, true],
     ]);
 
     const s = metrics.sharing;
@@ -1557,5 +1617,5 @@ describe('retained ex15 culture pilot', () => {
       ['sol', 14, 'view', ['coordinate-collection'], null],
     ]);
     expect(cultureMarkdown(metrics)).toContain('### Sharing expressions');
-  });
+  }, 60_000);
 });

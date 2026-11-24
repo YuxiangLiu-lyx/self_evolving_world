@@ -262,9 +262,10 @@ every person, unchanged), it reports:
   the vision radius, council read or sign within sight) before the reuse was written. Spoken
   text is dated by the first round of the plan that wrote it. Cares and views get the same
   detection only in the private section.
-- **Rest as a default:** a rest is idle when its plan step has no energy condition or the
-  energy cap cut its recorded recovery (the person was within one rest of full energy); rest
-  acts as a default when idle rests are at least half of all rests.
+- **Rest as a default**, by two criteria side by side, each with its own verdict per person
+  and in total (default when at least half of the rests qualify): (1) the plan step has no
+  energy condition or the energy cap cut the recorded recovery (within one rest of full
+  energy); (2) the rest began, by exact replay, at or above 75% of the energy cap.
 - **Survival share without rest:** survival actor-rounds other than `rest` over all
   actor-rounds, per person and in total, next to the survival share.
 

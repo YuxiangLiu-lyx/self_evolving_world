@@ -13,14 +13,19 @@ import type {
 import type { ContinuousModelInput } from '../apps/simulator/src/continuous-provider.js';
 import { continuousRequest } from '../apps/simulator/src/continuous-provider.js';
 import type { V7Execution } from '../apps/simulator/src/continuous-run.js';
-import { continuousRead } from './continuous-store.js';
+import {
+  continuousRead,
+  reconstructContinuousSegment,
+} from './continuous-store.js';
 import type { V7ReplayIndex, V7ReplaySegment } from './continuous-store.js';
 
 /*
  * Deterministic, rule-based culture metrics (E0) of a continuous-family archive (ex7 onward),
  * computed from retained files only: replay segments for actions, events, memory and plans,
  * execution.json for the final catalogue, initial.json and the first retained ordinary call
- * of each actor for the authored prompt. No model is called and nothing is written to the archive.
+ * of each actor for the authored prompt. Each segment is also replayed exactly (checked against
+ * its recorded hashes) only to read every actor's energy at the start of each round.
+ * No model is called and nothing is written to the archive.
  * Owner-only private memory (`cares`, `views`) is reported in its own section and is never read
  * by a public metric. Every rule is documented in docs/presentation/culture-baseline.md.
  */
@@ -41,6 +46,11 @@ export const PRIVATE_SAMPLE_INTERVAL = 10;
 export const SURVIVAL_INTERFACES = ['gather', 'eat', 'rest'];
 /** Rest acts as a default idle behavior when at least this share of rest actor-rounds is idle rest. */
 export const REST_DEFAULT_SHARE = 0.5;
+/**
+ * A rest begun at or above this share of the energy cap is not need-driven: three quarters of the
+ * cap still pays for many rounds of ordinary work (30 of 40 is about 18 moves at 1.6 energy).
+ */
+export const REST_HIGH_START = 0.75;
 /** A rest step that rests until energy reaches at least this share of the cap rests to (nearly) full. */
 export const REST_TO_FULL = 0.9;
 /** Two sharing phrases have similar wording at or above this Jaccard similarity of their folded content words. */
@@ -151,6 +161,8 @@ export interface CultureRound {
   authored?: Record<string, number>;
   /** Energy condition of the actor-decided plan step that produced each actor's `rest`. */
   restSteps?: Record<string, RestStep>;
+  /** Each actor's energy at the start of the round, from exact replay; absent in synthetic rounds. */
+  energy?: Record<string, number>;
 }
 /** How a plan step that rests depends on the actor's own energy. */
 export interface RestStep {
@@ -513,11 +525,11 @@ export interface CultureMetrics {
    */
   modelLabels: null;
 }
-/** Idle-rest counts of one person or of everyone. */
+/** Rest counts of one person or of everyone under two criteria, each with its own verdict. */
 export interface RestCounts {
   /** Submitted `rest` actor-rounds. */
   rests: number;
-  /** Rests from a plan step with no energy condition, or begun at high energy; each rest once. */
+  /** Criterion 1: rests from a plan step with no energy condition, or cut by the cap; each once. */
   idle: number;
   /** Rests whose producing step has no condition on the person's energy. */
   unconditioned: number;
@@ -529,13 +541,22 @@ export interface RestCounts {
   withStep: number;
   withRecovery: number;
   idleShare: number | null;
+  /** Criterion 1 verdict: idle rests are at least `REST_DEFAULT_SHARE` of rests; null without rests. */
+  default: boolean | null;
+  /** Criterion 2: rests begun at or above `REST_HIGH_START` of the cap; null without start energy. */
+  highStart: number | null;
+  /** Rests with a reconstructed start energy: criterion 2's base. */
+  withStart: number;
+  highStartShare: number | null;
+  /** Criterion 2 verdict: high-start rests are at least `REST_DEFAULT_SHARE` of them. */
+  startDefault: boolean | null;
 }
 export interface RestMetrics extends RestCounts {
   criterion: string;
+  startCriterion: string;
   defaultShare: number;
+  startShare: number;
   toFullShare: number;
-  /** Whether idle rests are at least `REST_DEFAULT_SHARE` of rests; null without rests. */
-  default: boolean | null;
   perAgent: (RestCounts & { actor: string })[];
 }
 /** Contract a later model labeler would satisfy; this module neither implements nor calls one. */
@@ -1794,11 +1815,13 @@ function survivalMetric(c: Context): CultureMetrics['survival'] {
 }
 
 export const REST_CRITERION = `Idle rest: a submitted rest whose producing plan step has no condition on the person's energy, or whose recorded recovery the energy cap cut (the person began the round within one nominal rest of the cap). Rest acts as a default idle behavior when idle rests are at least ${String(REST_DEFAULT_SHARE * 100)}% of rests.`;
+export const REST_START_CRITERION = `High-start rest: a submitted rest begun, by exact replay, with energy at or above ${String(REST_HIGH_START * 100)}% of the cap. Rest acts as a default when high-start rests are at least ${String(REST_DEFAULT_SHARE * 100)}% of rests with a known start energy.`;
 
 /**
- * Whether `rest` is chosen without an energy need. A rest is idle when its plan step has no energy
- * condition, or when the energy cap cut its recorded recovery: recovery below the uncapped amount
- * (nominal times mental factor) means the person was already within one rest of full energy.
+ * Whether `rest` is chosen without an energy need, by two criteria. Criterion 1: a rest is idle
+ * when its plan step has no energy condition, or when the energy cap cut its recorded recovery
+ * (recovery below nominal times mental factor: already within one rest of full energy).
+ * Criterion 2: a rest begun at or above `REST_HIGH_START` of the cap, from exact replay.
  */
 function restMetric(c: Context): RestMetrics {
   const energy = c.input.energy;
@@ -1811,6 +1834,8 @@ function restMetric(c: Context): RestMetrics {
     let toFull = 0;
     let withStep = 0;
     let withRecovery = 0;
+    let highStart = 0;
+    let withStart = 0;
     for (const round of c.input.rounds)
       for (const actor of actors) {
         if (round.actions[actor]?.interface !== 'rest') continue;
@@ -1848,7 +1873,16 @@ function restMetric(c: Context): RestMetrics {
           if (high) highEnergy++;
         }
         if (free || high) idle++;
+        const start = round.energy?.[actor];
+        if (start !== undefined && energy) {
+          withStart++;
+          if (start >= REST_HIGH_START * energy.cap - 1e-9) highStart++;
+        }
       }
+    const verdict = (share: number | null) =>
+      share === null ? null : share >= REST_DEFAULT_SHARE;
+    const idleShare = ratio(idle, rests);
+    const highStartShare = ratio(highStart, withStart);
     return {
       rests,
       idle,
@@ -1857,17 +1891,21 @@ function restMetric(c: Context): RestMetrics {
       toFull,
       withStep,
       withRecovery,
-      idleShare: ratio(idle, rests),
+      idleShare,
+      default: verdict(idleShare),
+      highStart: withStart ? highStart : null,
+      withStart,
+      highStartShare,
+      startDefault: verdict(highStartShare),
     };
   };
-  const all = counts(c.agents);
   return {
     criterion: REST_CRITERION,
+    startCriterion: REST_START_CRITERION,
     defaultShare: REST_DEFAULT_SHARE,
+    startShare: REST_HIGH_START,
     toFullShare: REST_TO_FULL,
-    ...all,
-    default:
-      all.idleShare === null ? null : all.idleShare >= REST_DEFAULT_SHARE,
+    ...counts(c.agents),
     perAgent: c.agents.map((actor) => ({ actor, ...counts([actor]) })),
   };
 }
@@ -2470,38 +2508,49 @@ export function cultureInput(archive: string, through?: number): CultureInput {
       throw new Error(`Replay segment integrity failed: ${part.path}`);
     const segment = JSON.parse(source.toString('utf8')) as V7ReplaySegment;
     worlds.push(segment.initial);
-    for (const r of segment.rounds)
-      if (through === undefined || r.tick <= through)
-        rounds.push({
-          tick: r.tick,
-          actions: r.actions,
-          events: r.events,
-          memory: r.memory,
-          intentions: Object.fromEntries(
-            Object.entries(r.tasks).flatMap(([actor, cursor]) => {
-              if (own(actor, cursor)) return [[actor, cursor.plan.intention]];
-              harness.add(cursor.plan.intention);
-              return [];
-            }),
-          ),
-          // A round's retained cursor is the one that produced its action (state after the round).
-          authored: Object.fromEntries(
-            Object.entries(r.tasks).map(([actor, cursor]) => [
-              actor,
-              cursor.startedAt + 1,
-            ]),
-          ),
-          restSteps: Object.fromEntries(
-            Object.entries(r.tasks).flatMap(([actor, cursor]) => {
-              const action = r.actions[actor];
-              const step =
-                action?.interface === 'rest' && own(actor, cursor)
-                  ? restStep(cursor, action)
-                  : null;
-              return step ? [[actor, step]] : [];
-            }),
-          ),
-        });
+    const kept = segment.rounds.filter(
+      (r) => through === undefined || r.tick <= through,
+    );
+    // Exact replay (each round checked against its recorded hashes) gives the world before
+    // every kept round; only energy is read from it.
+    const frames = kept.length
+      ? reconstructContinuousSegment({ ...segment, rounds: kept })
+      : [];
+    kept.forEach((r, i) =>
+      rounds.push({
+        tick: r.tick,
+        actions: r.actions,
+        events: r.events,
+        memory: r.memory,
+        energy: Object.fromEntries(
+          (frames[i]?.actors ?? []).map((a) => [a.id, a.vitals.energy]),
+        ),
+        intentions: Object.fromEntries(
+          Object.entries(r.tasks).flatMap(([actor, cursor]) => {
+            if (own(actor, cursor)) return [[actor, cursor.plan.intention]];
+            harness.add(cursor.plan.intention);
+            return [];
+          }),
+        ),
+        // A round's retained cursor is the one that produced its action (state after the round).
+        authored: Object.fromEntries(
+          Object.entries(r.tasks).map(([actor, cursor]) => [
+            actor,
+            cursor.startedAt + 1,
+          ]),
+        ),
+        restSteps: Object.fromEntries(
+          Object.entries(r.tasks).flatMap(([actor, cursor]) => {
+            const action = r.actions[actor];
+            const step =
+              action?.interface === 'rest' && own(actor, cursor)
+                ? restStep(cursor, action)
+                : null;
+            return step ? [[actor, step]] : [];
+          }),
+        ),
+      }),
+    );
   }
   const world = execution.world;
   // Authored prompt: the instructions and packet of each actor's first retained ordinary request.
@@ -2887,21 +2936,25 @@ function sharingMarkdown(m: CultureMetrics): string[] {
   ];
 }
 
+const yesNo = (v: boolean | null) => (v === null ? '–' : v ? 'yes' : 'no');
 const restLine = (r: RestMetrics) =>
-  `- Rest as a default idle behavior: ${String(r.idle)} of ${String(r.rests)} rests idle (${percent(r.idleShare)}: ${String(r.unconditioned)} from steps without an energy condition, ${r.highEnergy === null ? 'high-energy test unavailable' : `${String(r.highEnergy)} begun within one rest of the energy cap`}); ${String(r.toFull)} came from steps that rest until at least ${String(r.toFullShare * 100)}% of the cap. Default: ${r.default === null ? '–' : r.default ? 'yes' : 'no'} (threshold ${String(r.defaultShare * 100)}%).`;
+  `- Rest as a default idle behavior, criterion 1 (no energy condition or cap-cut recovery): ${String(r.idle)} of ${String(r.rests)} rests idle (${percent(r.idleShare)}: ${String(r.unconditioned)} from steps without an energy condition, ${r.highEnergy === null ? 'high-energy test unavailable' : `${String(r.highEnergy)} begun within one rest of the energy cap`}); default: ${yesNo(r.default)}. Criterion 2 (start energy at or above ${String(r.startShare * 100)}% of the cap): ${r.highStart === null ? 'start energy unavailable' : `${String(r.highStart)} of ${String(r.withStart)} rests (${percent(r.highStartShare)})`}; default: ${yesNo(r.startDefault)}. Threshold ${String(r.defaultShare * 100)}% for both. ${String(r.toFull)} rests came from steps that rest until at least ${String(r.toFullShare * 100)}% of the cap.`;
 
 /** Per-person rest and survival table. */
 function restMarkdown(m: CultureMetrics): string[] {
   if (!m.rest.rests) return [];
   return [
-    `Rest criterion: ${m.rest.criterion}`,
+    `Rest criterion 1: ${m.rest.criterion}`,
+    '',
+    `Rest criterion 2: ${m.rest.startCriterion}`,
     '',
     table(
       [
         'Person',
         'Actor-rounds',
         'Rests',
-        'Idle rests (no energy condition / high energy)',
+        'Criterion 1: idle (no energy condition / cap-cut), default',
+        `Criterion 2: begun at ≥${String(m.rest.startShare * 100)}% of cap, default`,
         `Rests to at least ${String(m.rest.toFullShare * 100)}% of cap`,
         'Survival share',
         'Without rest',
@@ -2913,7 +2966,10 @@ function restMarkdown(m: CultureMetrics): string[] {
           String(a.actorRounds),
           String(a.restRounds),
           r
-            ? `${String(r.idle)} (${String(r.unconditioned)} / ${r.highEnergy === null ? '–' : String(r.highEnergy)}) ${percent(r.idleShare)}`
+            ? `${String(r.idle)} (${String(r.unconditioned)} / ${r.highEnergy === null ? '–' : String(r.highEnergy)}) ${percent(r.idleShare)}, ${yesNo(r.default)}`
+            : '–',
+          r && r.highStart !== null
+            ? `${String(r.highStart)} of ${String(r.withStart)} ${percent(r.highStartShare)}, ${yesNo(r.startDefault)}`
             : '–',
           r ? String(r.toFull) : '–',
           percent(a.share),
