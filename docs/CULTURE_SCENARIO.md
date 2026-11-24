@@ -8,10 +8,12 @@ it removes suppressors and provides carriers, and it never tells agents what to 
 say, value or believe in. No particular outcome is required; this is an exploratory
 condition, not a causal comparison. See [ADR-0028](decisions/0028-culture-scenario.md).
 
-| Command                                                     | Scenario tag         | Incentives |
-| ----------------------------------------------------------- | -------------------- | ---------- |
-| `pnpm experiment:continuous -- new long-culture`            | `culture`            | off        |
-| `pnpm experiment:continuous -- new long-culture-incentives` | `culture-incentives` | on         |
+| Command                                                        | Scenario tag            | Incentives |
+| -------------------------------------------------------------- | ----------------------- | ---------- |
+| `pnpm experiment:continuous -- new long-culture`               | `culture`               | off        |
+| `pnpm experiment:continuous -- new long-culture-incentives`    | `culture-incentives`    | on         |
+| `pnpm experiment:continuous -- new long-culture-v2`            | `culture-v2`            | off        |
+| `pnpm experiment:continuous -- new long-culture-v2-incentives` | `culture-v2-incentives` | on         |
 
 Both variants have the same physical genesis; they differ only in the incentive switch,
 its three satisfaction rules and their event names. Checkpoints are verified against the
@@ -68,6 +70,66 @@ handoff, and a second failure in the same round still pauses the run.
 
 These numbers were checked against the measured E1 (ex14) rates; the derivation is in
 [PR #29](https://github.com/YuxiangLiu-lyx/self_evolving_world/pull/29).
+
+## Culture v2
+
+`long-culture-v2` and `long-culture-v2-incentives` are the run version that follows the ex15
+pilot ([ADR-0029](decisions/0029-culture-v2.md)). Each is the matching culture genesis,
+with the same world, seed, switches, budgets, checkpoints and ceilings, plus these fields.
+None of them exists in ex15 or any earlier archive.
+
+| Field                                | Value                                     | Effect                                                        |
+| ------------------------------------ | ----------------------------------------- | ------------------------------------------------------------- |
+| `culture.goal`                       | `'open'`                                  | Open-goal ordinary prompt with the person's leaning           |
+| `longDevelopment.compaction`         | `{ version: 1, recentAbilityRounds: 25 }` | Lossless ordinary-input compaction                            |
+| `longDevelopment.inputEstimateLimit` | 24,000 (ex15: 14,000)                     | Pre-inference context guard                                   |
+| `longDevelopment.exactRecordWidth`   | 6,000 (ex15: 4,000)                       | Whole exact reads                                             |
+| `computation.inputBytes`             | 200,000 (ex15: 120,000)                   | Byte guard, raised so the token guard binds first (see below) |
+| `longDevelopment.rejectionRecovery`  | `{ mode: 'uncounted', stopAfter: 3 }`     | Rejection pauses resume without a handoff; stop after three   |
+| `longDevelopment.emptyHandoffs`      | `'uncounted'`                             | A handoff that installs nothing is not counted                |
+| `longDevelopment.abilityTextLimit`   | 3,500                                     | Developed interfaces serialize to at most 3,500 code units    |
+
+**Two factors change at once.** Compared with ex15, the v2 run changes both the context and
+the ordinary prompt. A difference between the runs cannot be attributed to either factor
+alone, and one seed gives a case comparison, not a statistical result.
+
+### Open-goal prompt
+
+The ex15 prompt began with a goal list: maintain health and tolerable risk, understand
+unknowns through evidence, develop reusable abilities, and improve personal and shared
+living. All six people in ex15 wrote cares that paraphrased it. None ever referred to their
+leaning, which existed only as a `tendencies` field. The v2 prompt replaces the list with:
+
+> Keep yourself healthy and safe; that is required. Beyond that, how you live, what you do and
+> what you care about is up to you. You tend to value _leaning_.
+
+The leaning (freedom, belonging, beauty, fairness, mastery or calm) is inserted for each
+person; the `tendencies` field keeps it too. The packet's `goal` field carries the same two
+sentences, without the leaning. Every other sentence is the ex15 voice prompt. It adds no
+guidance about `name`, `mark`, `tell` or `invite` and contains no excluded word.
+
+### Context compaction
+
+COMPACTION_DETAILS
+
+The byte guard rejects an input whose code-unit length times two exceeds
+`computation.inputBytes`. In ex15, inputs held between 2.55 and 3.31 code units per estimated
+token, so the historical 120,000 bytes (60,000 code units) would bind near 18,000 tokens.
+200,000 bytes (100,000 code units) leaves the 24,000-token guard binding.
+
+### Handoff counting
+
+A handoff remains the unit of reviewed code change, and in v2 only such changes are counted.
+
+- A pause after rejected ordinary output resumes through `repair` without a handoff, as a
+  transport failure does.
+- An accepted handoff that installs no package and changes no runtime source is recorded but
+  not counted.
+- After three consecutive rejected ordinary outputs, the run stops for review instead.
+
+See [LONG_DEVELOPMENT](LONG_DEVELOPMENT.md) for the exact rules. The development validator
+rejects any developed interface that serializes to more than 3,500 code units, so a
+6,000-code-unit exact read always returns it whole.
 
 ## A. Voice and private memory
 

@@ -54,7 +54,7 @@ import {
 } from './continuous-analysis.js';
 
 const USAGE = `Usage:
-  pnpm experiment:continuous -- new open|long|long-fixes|long-culture|long-culture-incentives|collective-a
+  pnpm experiment:continuous -- new open|long|long-fixes|long-culture|long-culture-incentives|long-culture-v2|long-culture-v2-incentives|collective-a
   pnpm experiment:continuous -- new collective-b exA
   pnpm experiment:continuous -- continue exN
   pnpm experiment:continuous -- develop exN validation-results/development.json

@@ -61,3 +61,5 @@ For a material change to an accepted decision, create a new ADR and mark the old
 - [0027](0027-lean-development-workflow.md): standalone branch/validate/PR workflow replacing the task coordinator; removal of retired run entry points.
 
 - [0028](0028-culture-scenario.md): opt-in culture scenario with separately switchable voice, differentiation, symbols, slack, density and derived-evidence incentives, plus a frozen early token ceiling.
+
+- [0029](0029-culture-v2.md): culture v2 run version with lossless context compaction, an open-goal prompt, uncounted rejection and empty handoffs, and a developed-interface size limit.
