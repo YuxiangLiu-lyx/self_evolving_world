@@ -339,3 +339,11 @@ includes the package only when `longDevelopment.culture` enables it. The simulat
 add the culture packet sections and prompt variant only in that scope, and `long-tokens.ts`
 reports the frozen early token ceiling enforced by the runner. See
 [ADR-0028](docs/decisions/0028-culture-scenario.md) and the [design](docs/CULTURE_SCENARIO.md).
+
+The culture v2 tags reuse that path. `long-compaction.ts` rewrites a finished v2 ordinary
+input losslessly: every moved item stays in the same input or one exact query away.
+`long-context.ts` chooses full or argument-naming summary contracts from the actor's
+recent-use history. `continuous-repair.ts` resumes rejection pauses without a handoff and
+enforces the consecutive-rejection stop. The development store marks empty handoffs as
+uncounted, and `countedDevelopments` is the only budget count. Each behavior runs only when
+its `longDevelopment` field is present. See [ADR-0029](docs/decisions/0029-culture-v2.md).
