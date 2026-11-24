@@ -4,6 +4,8 @@ import { join } from 'node:path';
 import { EXPRESSION_MEMORY } from '@self-evolving-world/world-core';
 import type {
   V7Action,
+  V7Condition,
+  V7Cursor,
   V7Event,
   V7Point,
   V7World,
@@ -37,6 +39,12 @@ export const ACTION_ECHO_WINDOW = 10;
 export const PRIVATE_SAMPLE_INTERVAL = 10;
 /** Base interfaces that always count as survival behavior. */
 export const SURVIVAL_INTERFACES = ['gather', 'eat', 'rest'];
+/** Rest acts as a default idle behavior when at least this share of rest actor-rounds is idle rest. */
+export const REST_DEFAULT_SHARE = 0.5;
+/** A rest step that rests until energy reaches at least this share of the cap rests to (nearly) full. */
+export const REST_TO_FULL = 0.9;
+/** Two sharing phrases have similar wording at or above this Jaccard similarity of their folded content words. */
+export const SHARING_SIMILARITY = 0.5;
 /** Interface id or name words that concern food, water, warmth or shelter (prefix match). */
 export const SURVIVAL_WORDS = [
   'food',
@@ -136,6 +144,20 @@ export interface CultureRound {
   memory: Record<string, CultureMemory>;
   /** Plan intentions from the retained task cursors, for archives whose memory lacks them. */
   intentions: Record<string, string>;
+  /**
+   * First round of the plan that produced each actor's action (its cursor start plus one), so text
+   * spoken from a plan step is dated when it was written; absent in synthetic rounds.
+   */
+  authored?: Record<string, number>;
+  /** Energy condition of the actor-decided plan step that produced each actor's `rest`. */
+  restSteps?: Record<string, RestStep>;
+}
+/** How a plan step that rests depends on the actor's own energy. */
+export interface RestStep {
+  /** Whether the step's `until` or `guard`, or the plan's `until`, reads the actor's energy. */
+  conditioned: boolean;
+  /** The energy an `until` on energy (`gte` or `gt`) rests toward, else null. */
+  target: number | null;
 }
 /** Everything the metrics read, so unit tests can supply synthetic worlds. */
 export interface CultureInput {
@@ -152,6 +174,11 @@ export interface CultureInput {
   rounds: CultureRound[];
   /** Whether the archive's scope offers private memory (culture `voice`); detected from the archive. */
   voice?: boolean;
+  /**
+   * Energy cap and base rest recovery from the configuration. `unrecordedRestFactor` is set when an
+   * installed weather lean-to can lower rest recovery by a factor no event records.
+   */
+  energy?: { cap: number; restRecovery: number; unrecordedRestFactor: boolean };
 }
 /** Actor-authored text: messages and public reports, plan intentions, notes, project ids and given names. */
 export interface Utterance {
@@ -199,6 +226,101 @@ export interface NormStatement extends Statement {
 export interface BeliefStatement extends Statement {
   type: 'causal' | 'supernatural';
   citations: { actor: string; round: number }[];
+}
+/** Ideas of restraint in, or sharing of, common resources; each idea has its own patterns. */
+export const SHARING_IDEAS = [
+  'leave-for-others',
+  'take-moderately',
+  'no-depletion',
+  'share-split',
+  'coordinate-collection',
+] as const;
+export type SharingIdea = (typeof SHARING_IDEAS)[number];
+export const SHARING_DESCRIPTIONS: Record<SharingIdea, string> = {
+  'leave-for-others': 'leave part of a source for other people',
+  'take-moderately': 'take only a modest share or what is needed',
+  'no-depletion': 'do not exhaust, strip or empty a source',
+  'share-split': 'share, split or pool a resource',
+  'coordinate-collection':
+    'coordinate a finite stock instead of competing for it or duplicating its collection',
+};
+export interface SharingMatch {
+  idea: SharingIdea;
+  /** The matched words, or for `coordinate-collection` the clause around the coordination word. */
+  phrase: string;
+}
+/** One sentence of an utterance that expresses at least one sharing idea. */
+export interface SharingExpression {
+  actor: string;
+  /** Round the text appeared: when it was spoken or sent, or first recorded in memory. */
+  round: number;
+  /** First round of the plan that wrote it; a plan's spoken step can be written rounds earlier. */
+  authored: number;
+  kind: Kind;
+  recipient: string | null;
+  /** A message, public speech or a name or mark: text another person can receive. */
+  communicated: boolean;
+  text: string;
+  matches: SharingMatch[];
+}
+/** How a person could have received an earlier communicated sharing expression. */
+export interface SharingExposure {
+  idea: SharingIdea;
+  /** Author and round of the received expression. */
+  actor: string;
+  round: number;
+  /** Round of receipt: the message, the speech within the vision radius or the first sight of the sign. */
+  received: number;
+  via: 'message' | 'speech' | 'council' | 'sign';
+}
+/** A sharing idea expressed by a person after another person had already expressed it. */
+export interface SharingReuse {
+  idea: SharingIdea;
+  actor: string;
+  round: number;
+  authored: number;
+  kind: Kind;
+  phrase: string;
+  /** The earlier expression of the idea by another person with the most similar phrase. */
+  closest: {
+    actor: string;
+    round: number;
+    authored: number;
+    kind: Kind;
+    phrase: string;
+    similarity: number;
+  };
+  similarWording: boolean;
+  /** Earliest receipt, before the reuse was written, of the same idea from another person. */
+  exposure: SharingExposure | null;
+  /** Earliest receipt, before the reuse was written, of another sharing idea from another person. */
+  otherExposure: SharingExposure | null;
+}
+export interface SharingIdeaSummary {
+  idea: SharingIdea;
+  description: string;
+  expressions: number;
+  communicated: number;
+  people: string[];
+  /** People who wrote the idea in its first authored round. */
+  firstUsers: string[];
+  firstAuthored: number | null;
+  /** Other people who expressed it in a later authored round. */
+  laterUsers: string[];
+  /** Later users who had received it from another person before their first later expression. */
+  exposedLaterUsers: string[];
+}
+/** A sharing expression in owner-only private memory; never part of a public metric. */
+export interface PrivateSharingExpression {
+  actor: string;
+  round: number;
+  field: 'cares' | 'view';
+  /** The viewed person of a view, else null. */
+  person: string | null;
+  text: string;
+  matches: SharingMatch[];
+  /** Earliest receipt, before the write, of one of its ideas from another person's public text. */
+  exposure: SharingExposure | null;
 }
 /** Convergence of different observers' current views of the same person at the end of one window. */
 export interface ViewConvergenceSample {
@@ -272,6 +394,11 @@ export interface PrivateMemoryMetrics {
     samples: CaresSimilaritySample[];
     trend: PrivateTrend<CaresSimilaritySample>;
   };
+  /** Sharing ideas in cares and views, detected like the public ones but kept here. */
+  sharing: {
+    expressions: PrivateSharingExpression[];
+    byIdea: Record<SharingIdea, number>;
+  };
 }
 export interface CultureMetrics {
   archive: string;
@@ -309,6 +436,23 @@ export interface CultureMetrics {
     privateStatements: number;
     list: NormStatement[];
   };
+  /**
+   * Sharing or restraint ideas about common resources in actor-authored public and plan text, and
+   * their reuse by other people with the exposure that could explain it. Cares and views are excluded.
+   */
+  sharing: {
+    expressions: number;
+    communicated: number;
+    /** Expressions of an idea written after another person had expressed it. */
+    reuses: number;
+    similarReuses: number;
+    exposedReuses: number;
+    similarityThreshold: number;
+    ideas: SharingIdeaSummary[];
+    list: SharingExpression[];
+    reuseList: SharingReuse[];
+    limitations: string[];
+  };
   beliefs: {
     statements: number;
     causal: number;
@@ -328,7 +472,21 @@ export interface CultureMetrics {
     survivalRounds: number;
     share: number | null;
     interfaces: string[];
+    /** Submitted `rest` actor-rounds, all counted in `survivalRounds`. */
+    restRounds: number;
+    /** Survival actor-rounds other than `rest` over all actor-rounds; a second value, not the gate. */
+    shareWithoutRest: number | null;
+    perAgent: {
+      actor: string;
+      actorRounds: number;
+      survivalRounds: number;
+      restRounds: number;
+      share: number | null;
+      shareWithoutRest: number | null;
+    }[];
   };
+  /** Whether `rest` is chosen without an energy need, by the idle-rest criterion. */
+  rest: RestMetrics;
   nonTransactional: {
     messages: number;
     nonTransactional: number;
@@ -354,6 +512,31 @@ export interface CultureMetrics {
    * statements. It is never implemented or called here; the field stays null.
    */
   modelLabels: null;
+}
+/** Idle-rest counts of one person or of everyone. */
+export interface RestCounts {
+  /** Submitted `rest` actor-rounds. */
+  rests: number;
+  /** Rests from a plan step with no energy condition, or begun at high energy; each rest once. */
+  idle: number;
+  /** Rests whose producing step has no condition on the person's energy. */
+  unconditioned: number;
+  /** Rests whose recovery the energy cap cut; null when recovery cannot be read exactly. */
+  highEnergy: number | null;
+  /** Rests from a step that rests until energy reaches at least `REST_TO_FULL` of the cap. */
+  toFull: number;
+  /** Rests with a retained producing step, and with a recorded recovery: the two tests' bases. */
+  withStep: number;
+  withRecovery: number;
+  idleShare: number | null;
+}
+export interface RestMetrics extends RestCounts {
+  criterion: string;
+  defaultShare: number;
+  toFullShare: number;
+  /** Whether idle rests are at least `REST_DEFAULT_SHARE` of rests; null without rests. */
+  default: boolean | null;
+  perAgent: (RestCounts & { actor: string })[];
 }
 /** Contract a later model labeler would satisfy; this module neither implements nor calls one. */
 export interface CultureLabeler {
@@ -696,6 +879,329 @@ export function beliefStatements(
   return out;
 }
 
+/*
+ * Sharing and restraint about common resources. Every rule is an English keyword pattern over one
+ * sentence; a match is a candidate expression, not an interpretation. Plain quantity reports
+ * ("I'm collecting four"), self-rationing of one's own food ("reserve berries for later") and
+ * sharing information ("share measured findings") are deliberately not matched.
+ */
+const re = (source: string) => new RegExp(source, 'i');
+/** One word token: letters, digits, apostrophes and hyphens. */
+const W = String.raw`[\w’'-]+`;
+/** Nouns of food, materials and the places that hold them. */
+const RESOURCE = String.raw`(?:food|meals?|berr(?:y|ies)|roots?|nuts?|fruits?|resources?|suppl(?:y|ies)|stocks?|stores?|reserves?|harvests?|materials?|bark|vines?|branch(?:es)?|wood|stones?|water|patch(?:es)?|bush(?:es)?|shrubs?|plants?|trees?|sources?|commons|yields?)`;
+const RESOURCE_WORD = re(String.raw`\b${RESOURCE}\b`);
+/** Nouns of information: sharing these is sharing knowledge, not a resource. */
+const INFO =
+  /\b(?:findings?|evidence|information|info|observations?|results?|knowledge|locations?|requirements?|limits?|methods?|ideas?|reports?|plans?|details?|news|data|notes?|measure\w*|views?|stor(?:y|ies)|experiences?|thoughts?|lessons?|skills?|techniques?|recipes?|specifications?|coordinates?|positions?|names?|words?|status|claims?|propert(?:y|ies)|limitations?|inspections?|assessments?|tests?|trials?|experiments?|answers?|questions?|updates?|preparation|separation|process(?:es|ing)?|finds)\b/i;
+/** The people something is left for. */
+const OTHERS = String.raw`(?:others|other\s+people|everyone|everybody|the\s+others|you|your|them|neighbou?rs|whoever|the\s+group|anyone\s+else|someone\s+else)`;
+const LEAVE = String.raw`\bleav(?:e|es|ing)\b`;
+const TAKE = String.raw`(?:take|takes|taking|took|collect|collects|collecting|gather|gathers|gathering|harvest|harvests|harvesting|pick|picks|picking)`;
+const COUNT = String.raw`(?:\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)`;
+/** A negation just before a match reverses leaving, taking modestly or sharing. */
+const NEGATED =
+  /\b(?:not|never|won['’]t|don['’]t|didn['’]t|can['’]t|cannot|refus\w*|stop\w*)\s+(?:\w+\s+)?$/i;
+/** Up to three object words after a verb, stopping at punctuation and clause conjunctions. */
+const OBJECT = String.raw`(?:\s+(?!(?:and|or|but|then|while|to|so)\b)${W}){0,3}`;
+/** Depleting oneself or one's energy is not depleting a source. */
+const SELF_OBJECT =
+  /^\s*(?:yourself|myself|ourselves|themselves|himself|herself|my\b|one['’]s\b)|\b(?:energy|strength)\b/i;
+/** "share the observed source" reports a finding; an observed, confirmed or known object is information. */
+const REPORTED =
+  /\b(?:observed|confirmed|known|reported|seen|located|visible|measured|tested|verified|latest|current)\b|^\s*(?:what|how|where|when|why|whether|if)\b/i;
+/** A determiner or amount word before `share` makes it the noun of "leave a share", not the verb. */
+const SHARE_NOUN =
+  /\b(?:a|an|the|my|our|your|their|his|her|its|modest|fair|small|equal|substantial|reasonable|own|large|big|generous)\s+$/i;
+/** A resource word that is not the first part of a compound such as `food-preparation`. */
+const RESOURCE_HEAD = String.raw`${RESOURCE}(?![\w’'-])`;
+const words3 = (value: string) => value.split(/\s+/).slice(0, 3).join(' ');
+const negated = (sentence: string, m: RegExpExecArray) =>
+  NEGATED.test(sentence.slice(0, m.index));
+const after = (sentence: string, m: RegExpExecArray) =>
+  sentence.slice(m.index + m[0].length);
+/** Clause around a match: between the nearest comma, semicolon or clause conjunction on each side. */
+function clause(sentence: string, m: RegExpExecArray): string {
+  const before = sentence.slice(0, m.index);
+  const cut = /(?:,|;|\bwhile\b|\bthen\b)\s*/gi;
+  let start = 0;
+  for (const c of before.matchAll(cut)) start = c.index + c[0].length;
+  const rest = sentence.slice(m.index);
+  const end = /,|;/.exec(rest);
+  return sentence
+    .slice(start, m.index + (end ? end.index : rest.length))
+    .trim()
+    .replace(/[.!?]$/, '');
+}
+interface SharingRule {
+  idea: SharingIdea;
+  pattern: RegExp;
+  reject?: (sentence: string, m: RegExpExecArray) => boolean;
+  phrase?: (sentence: string, m: RegExpExecArray) => string;
+}
+/*
+ * `coordinate-collection` needs, besides a coordination word, a finite or common stock ("scarce
+ * materials", "the same supply"), a contrast with collecting or with duplicating a collection, or
+ * doubt that more remains ("rather than assume more remains").
+ */
+const SCARCE = re(
+  String.raw`\b(?:scarce|finite|limited|shared|common|same)\s+(?:${W}\s+){0,2}?${RESOURCE}\b`,
+);
+/** Collecting itself, as an act or its noun. */
+const COLLECTING = String.raw`(?:collect\w*|gather\w*|harvest\w*)`;
+/** Contrast with collecting: "before collecting the same supply". */
+const NOT_COLLECTING = re(
+  String.raw`\b(?:rather\s+than|instead\s+of|before|not)\s+(?:${W}\s+){0,2}?${COLLECTING}`,
+);
+/** Contrast with duplicating or competing: "rather than duplicate others' collection". */
+const NOT_DUPLICATING = re(
+  String.raw`\b(?:rather\s+than|instead\s+of|without|before|not)\s+(?:${W}\s+){0,2}?(?:duplicat\w*|compet\w*|doubl\w*)((?:\s+${W}){0,3})`,
+);
+/** The coordinated object is a resource or a collection: "coordinate additional collection". */
+const COORDINATED_STOCK = re(
+  String.raw`\bcoordinat\w*\s+(?:${W}\s+){0,3}?(?:${RESOURCE_HEAD}|${COLLECTING})`,
+);
+const ASSUME_MORE = re(
+  String.raw`\brather\s+than\s+assum\w*\s+(?:${W}\s+){0,2}?(?:remain\w*|fresh|new|more|additional|extra)\b`,
+);
+export const SHARING_RULES: readonly SharingRule[] = [
+  // "leave some stock for others", "leaving 6 for your single bay"
+  {
+    idea: 'leave-for-others',
+    pattern: re(
+      String.raw`${LEAVE}(?:\s+${W}){0,4}?\s+for\s+${OTHERS}\b${OBJECT}`,
+    ),
+    reject: negated,
+  },
+  // "would leave a share", "leaving a substantial share", "leave the rest"
+  {
+    idea: 'leave-for-others',
+    pattern: re(
+      String.raw`${LEAVE}\s+(?:(?:a|an|some|the|their|its)\s+)?(?:(?:substantial|fair|good|decent|small|reasonable|large|big|generous)\s+)?(?:share|portion|remainder|rest)\b`,
+    ),
+    reject: negated,
+  },
+  // "leaving the other currently visible root"
+  {
+    idea: 'leave-for-others',
+    pattern: re(
+      String.raw`${LEAVE}\s+(?:the\s+)?(?:other|others|remaining|last)\b(?:\s+${W}){0,3}?\s+${RESOURCE}\b`,
+    ),
+    reject: negated,
+  },
+  // "6 remain at the birch for your planned collection"
+  {
+    idea: 'leave-for-others',
+    pattern: re(
+      String.raw`\b(?:some|enough|plenty|part|half|the\s+rest|the\s+remainder|${COUNT})\s+(?:${W}\s+){0,2}?remain(?:s|ing)?\b[^.;]{0,40}?\bfor\s+${OTHERS}\b${OBJECT}`,
+    ),
+  },
+  // "collect a modest share", "use modest quantities"
+  {
+    idea: 'take-moderately',
+    pattern: re(
+      String.raw`\b(?:${TAKE}|use|uses|using|keep|keeps|keeping)\s+(?:(?:a|an|my|our|your|their|his|her|only|just)\s+)*(?:modest|moderate|fair|small|limited|reasonable|equal)\s+(?:share|portion|part|amount|quantity|quantities|harvests?)\b`,
+    ),
+    reject: negated,
+  },
+  // "modest harvests", "modest material collection", "a fair share"
+  {
+    idea: 'take-moderately',
+    pattern: re(
+      String.raw`\b(?:modest|moderate|fair|limited)\s+(?:(?:material|food|bark|vine|root|berry)\s+)?(?:shares?|portions?|harvests?|collections?|gathering|takes?)\b`,
+    ),
+    reject: negated,
+  },
+  // "take what you need", "gather only what is needed"
+  {
+    idea: 'take-moderately',
+    pattern: re(
+      String.raw`\b(?:${TAKE}|eat|eating)\s+(?:only\s+|just\s+)?(?:what|as\s+much\s+as)\s+(?:i|we|you|they|he|she|one|each\s+${W}|is|are)\s+(?:${W}\s+)?(?:needs?|needed|can\s+eat|will\s+eat|can\s+use|will\s+use)\b`,
+    ),
+    reject: negated,
+  },
+  // "collect only four"; "gather only observed stock" names no amount and does not match
+  {
+    idea: 'take-moderately',
+    pattern: re(
+      String.raw`\b${TAKE}\s+(?:only|just|no\s+more\s+than|at\s+most)\s+(?:${COUNT}|a\s+few|a\s+little|a\s+couple|some|part|half|a\s+share|a\s+portion)\b`,
+    ),
+    reject: negated,
+  },
+  // "without exhausting shared sources"
+  {
+    idea: 'no-depletion',
+    pattern: re(
+      String.raw`\bwithout\s+(?:exhausting|depleting|emptying|stripping|draining|using\s+up|over-?harvesting|clearing\s+out|wiping\s+out)\b(${OBJECT})`,
+    ),
+    reject: (s, m) => SELF_OBJECT.test(`${m[1] ?? ''} ${words3(after(s, m))}`),
+  },
+  // "rather than strip shared patches", "don't strip the bush"; participles ("not depleted") describe
+  {
+    idea: 'no-depletion',
+    pattern: re(
+      String.raw`\b(?:not|never|don['’]t|do\s+not|rather\s+than|instead\s+of|avoid(?:s|ing)?)\s+(?:to\s+)?(?:strip(?:ping)?|exhaust(?:ing)?|deplet(?:e|ing)|drain(?:ing)?|over-?harvest(?:ing)?|use\s+up|using\s+up|clear(?:ing)?\s+out|wip(?:e|ing)\s+out)\b(${OBJECT})`,
+    ),
+    reject: (s, m) => SELF_OBJECT.test(`${m[1] ?? ''} ${words3(after(s, m))}`),
+  },
+  {
+    idea: 'no-depletion',
+    pattern: re(
+      String.raw`\b(?:never|don['’]t|do\s+not|rather\s+than|instead\s+of|avoid(?:s|ing)?)\s+(?:empty|emptying)\s+(?:the|a|any|shared|common|our|this|that)\b`,
+    ),
+  },
+  // "not the whole patch"
+  {
+    idea: 'no-depletion',
+    pattern: re(String.raw`\bnot\s+the\s+(?:whole|entire)\s+${RESOURCE}\b`),
+  },
+  // "don't take all the berries", "never take the last one"
+  {
+    idea: 'no-depletion',
+    pattern: re(
+      String.raw`\b(?:never|don['’]t|do\s+not|rather\s+than|instead\s+of|avoid(?:s|ing)?)\s+${TAKE}\s+(?:(?:all|every|each)\b|the\s+(?:whole|entire|last)\b|everything\b)`,
+    ),
+  },
+  // "preserve food sources"
+  {
+    idea: 'no-depletion',
+    pattern: re(
+      String.raw`\b(?:preserv(?:e|es|ing)|protect(?:s|ing)?|conserv(?:e|es|ing)|spar(?:e|es|ing))\s+(?:(?:the|shared|common|our|food|local|nearby|these|those)\s+){0,2}(?:sources?|patch(?:es)?|bush(?:es)?|shrubs?|plants?|commons)\b`,
+    ),
+  },
+  // "share berries"; "share known food information" and "share findings about food" share knowledge
+  {
+    idea: 'share-split',
+    pattern: re(
+      String.raw`\b(?:share|shares|sharing)\s+((?:${W}\s+){0,3}?)${RESOURCE_HEAD}`,
+    ),
+    reject: (s, m) =>
+      negated(s, m) ||
+      SHARE_NOUN.test(s.slice(0, m.index)) ||
+      REPORTED.test(m[1] ?? '') ||
+      INFO.test(`${m[1] ?? ''} ${words3(after(s, m))}`),
+  },
+  // "shared the berries"; the adjective in "shared shelter" or "shared sources" is not sharing
+  {
+    idea: 'share-split',
+    pattern: re(
+      String.raw`\bshared\s+(?:my|our|the|some|a|an|his|her|their|its|${COUNT})\s+((?:${W}\s+){0,2}?)${RESOURCE_HEAD}`,
+    ),
+    reject: (s, m) =>
+      negated(s, m) || INFO.test(`${m[1] ?? ''} ${words3(after(s, m))}`),
+  },
+  // "findings and resources can be shared"; "berries are split between two stacks" is physical
+  {
+    idea: 'share-split',
+    pattern: re(
+      String.raw`\b${RESOURCE}\s+((?:${W}\s+){0,3}?)(?:can|could|should|will|would|must|may|might|are|is|to)\s+(?:be\s+)?(?:shared|pooled)\b`,
+    ),
+    reject: (_, m) => INFO.test(m[1] ?? ''),
+  },
+  // "our combined supply"
+  {
+    idea: 'share-split',
+    pattern: re(
+      String.raw`\b(?:our|their|a|the)\s+(?:combined|pooled|joint|common|communal)\s+(?:suppl(?:y|ies)|stocks?|stores?|reserves?|food|harvests?|materials?)\b`,
+    ),
+  },
+  { idea: 'share-split', pattern: /\b(?:take|takes|taking)\s+turns\b/i },
+  // "split the berries between us"; splitting wood or bark alone is physical work
+  {
+    idea: 'share-split',
+    pattern: re(
+      String.raw`\b(?:split|splits|splitting|divide|divides|dividing|pooling)\b[^.;]{0,40}?\b(?:evenly|equally|fairly|(?:between|among)\s+(?:us|you|them|both\s+of\s+us|all\s+of\s+us|everyone|everybody|the\s+group|ourselves)|with\s+${OTHERS})\b`,
+    ),
+    reject: negated,
+  },
+  // "avoid competing with others for already discussed supplies"
+  {
+    idea: 'coordinate-collection',
+    pattern: re(
+      String.raw`\b(?:avoid(?:s|ing)?|not|without|rather\s+than|instead\s+of)\s+compet\w*`,
+    ),
+    reject: (s) => !RESOURCE_WORD.test(s),
+    phrase: clause,
+  },
+  // "coordinate scarce materials rather than duplicate collection"; "let's coordinate materials"
+  // names no finite stock, contrast or doubt and does not match
+  {
+    idea: 'coordinate-collection',
+    pattern: /\bcoordinat\w*/i,
+    reject: (s) => {
+      const dup = NOT_DUPLICATING.exec(s);
+      return !(
+        SCARCE.test(s) ||
+        NOT_COLLECTING.test(s) ||
+        ASSUME_MORE.test(s) ||
+        (dup &&
+          (COORDINATED_STOCK.test(s) ||
+            re(String.raw`\b${COLLECTING}`).test(dup[1] ?? '')))
+      );
+    },
+    phrase: clause,
+  },
+];
+
+/** Sharing ideas in each sentence of a text, at most one match per idea and sentence. */
+export function sharingMatches(
+  value: string,
+): { sentence: string; matches: SharingMatch[] }[] {
+  const out: { sentence: string; matches: SharingMatch[] }[] = [];
+  for (const sentence of sentences(value)) {
+    const matches: SharingMatch[] = [];
+    for (const rule of SHARING_RULES) {
+      if (matches.some((m) => m.idea === rule.idea)) continue;
+      const m = rule.pattern.exec(sentence);
+      if (!m || rule.reject?.(sentence, m)) continue;
+      matches.push({
+        idea: rule.idea,
+        phrase: (rule.phrase?.(sentence, m) ?? m[0]).trim(),
+      });
+    }
+    if (matches.length)
+      out.push({
+        sentence,
+        matches: SHARING_IDEAS.flatMap((idea) =>
+          matches.filter((m) => m.idea === idea),
+        ),
+      });
+  }
+  return out;
+}
+
+/** Crude suffix folding for phrase similarity: leaving, leave and leaves share `leav`. */
+function fold(w: string): string {
+  const base = singular(w);
+  const cut = base.replace(/(?:ing|ed|es|e|s)$/, '');
+  const stem = cut.length >= 3 ? cut : base;
+  return /([b-df-hj-np-tv-z])\1$/.test(stem) ? stem.slice(0, -1) : stem;
+}
+/** Jaccard similarity of folded content words (no stop, number or name words, `others` or `rather`). */
+export function phraseSimilarity(
+  a: string,
+  b: string,
+  names: Set<string> = new Set(),
+): number {
+  const set = (value: string) =>
+    new Set(
+      words(value)
+        .filter(
+          (w) =>
+            !STOP.has(w) &&
+            !NUMBER_WORDS.has(w) &&
+            !names.has(w) &&
+            w !== 'others' &&
+            w !== 'rather',
+        )
+        .map(fold),
+    );
+  const x = set(a);
+  const y = set(b);
+  const union = new Set([...x, ...y]).size;
+  return union ? [...x].filter((w) => y.has(w)).length / union : 0;
+}
+
 /**
  * Chronological statements with their echoes: later utterances of the given kinds by other agents
  * that contain the statement's key (at least two content words, in order). A sentence that echoes
@@ -880,7 +1386,16 @@ interface Context {
   list: Utterance[];
   /** Whether two actors were within vision radius of each other in a round. */
   near: (a: string, b: string, tick: number) => boolean;
+  /** An actor's position in a round, as `positions` carries it forward. */
+  at: (actor: string, tick: number) => V7Point | undefined;
   isSurvival: (id: string) => boolean;
+}
+interface Receipt {
+  actor: string;
+  tick: number;
+  from: string;
+  text: string;
+  via: 'message' | 'speech' | 'council';
 }
 
 /**
@@ -889,8 +1404,8 @@ interface Context {
  */
 function receipts(
   c: Pick<Context, 'input' | 'list' | 'agents' | 'near'>,
-): { actor: string; tick: number; from: string; text: string }[] {
-  const out: { actor: string; tick: number; from: string; text: string }[] = [];
+): Receipt[] {
+  const out: Receipt[] = [];
   for (const u of c.list) {
     if (u.kind === 'message' && u.recipient)
       out.push({
@@ -898,11 +1413,18 @@ function receipts(
         tick: u.tick,
         from: u.actor,
         text: u.text,
+        via: 'message',
       });
     if (u.kind === 'public')
       for (const actor of c.agents)
         if (actor !== u.actor && c.near(u.actor, actor, u.tick))
-          out.push({ actor, tick: u.tick, from: u.actor, text: u.text });
+          out.push({
+            actor,
+            tick: u.tick,
+            from: u.actor,
+            text: u.text,
+            via: 'speech',
+          });
   }
   for (const round of c.input.rounds)
     for (const e of round.events) {
@@ -917,6 +1439,7 @@ function receipts(
             tick: round.tick,
             from: text(report.actor),
             text: text(report.text),
+            via: 'council',
           });
     }
   return out;
@@ -1230,24 +1753,313 @@ function relationshipMetric(c: Context): CultureMetrics['relationships'] {
 }
 
 function survivalMetric(c: Context): CultureMetrics['survival'] {
-  let actorRounds = 0;
-  let survivalRounds = 0;
   const interfaces = new Set<string>();
-  for (const round of c.input.rounds)
-    for (const actor of c.agents) {
+  const perAgent = c.agents.map((actor) => {
+    let actorRounds = 0;
+    let survivalRounds = 0;
+    let restRounds = 0;
+    for (const round of c.input.rounds) {
       const id = round.actions[actor]?.interface;
       if (id === undefined) continue;
       actorRounds++;
+      if (id === 'rest') restRounds++;
       if (c.isSurvival(id)) {
         survivalRounds++;
         interfaces.add(id);
       }
     }
+    return {
+      actor,
+      actorRounds,
+      survivalRounds,
+      restRounds,
+      share: ratio(survivalRounds, actorRounds),
+      shareWithoutRest: ratio(survivalRounds - restRounds, actorRounds),
+    };
+  });
+  const sum = (key: 'actorRounds' | 'survivalRounds' | 'restRounds') =>
+    perAgent.reduce((n, a) => n + a[key], 0);
   return {
-    actorRounds,
-    survivalRounds,
-    share: ratio(survivalRounds, actorRounds),
+    actorRounds: sum('actorRounds'),
+    survivalRounds: sum('survivalRounds'),
+    share: ratio(sum('survivalRounds'), sum('actorRounds')),
     interfaces: [...interfaces].sort(),
+    restRounds: sum('restRounds'),
+    shareWithoutRest: ratio(
+      sum('survivalRounds') - sum('restRounds'),
+      sum('actorRounds'),
+    ),
+    perAgent,
+  };
+}
+
+export const REST_CRITERION = `Idle rest: a submitted rest whose producing plan step has no condition on the person's energy, or whose recorded recovery the energy cap cut (the person began the round within one nominal rest of the cap). Rest acts as a default idle behavior when idle rests are at least ${String(REST_DEFAULT_SHARE * 100)}% of rests.`;
+
+/**
+ * Whether `rest` is chosen without an energy need. A rest is idle when its plan step has no energy
+ * condition, or when the energy cap cut its recorded recovery: recovery below the uncapped amount
+ * (nominal times mental factor) means the person was already within one rest of full energy.
+ */
+function restMetric(c: Context): RestMetrics {
+  const energy = c.input.energy;
+  const exact = !energy?.unrecordedRestFactor;
+  const counts = (actors: string[]): RestCounts => {
+    let rests = 0;
+    let idle = 0;
+    let unconditioned = 0;
+    let highEnergy = 0;
+    let toFull = 0;
+    let withStep = 0;
+    let withRecovery = 0;
+    for (const round of c.input.rounds)
+      for (const actor of actors) {
+        if (round.actions[actor]?.interface !== 'rest') continue;
+        rests++;
+        const step = round.restSteps?.[actor];
+        const free = step !== undefined && !step.conditioned;
+        if (step) withStep++;
+        if (free) unconditioned++;
+        if (
+          step?.target !== null &&
+          step?.target !== undefined &&
+          energy &&
+          step.target >= REST_TO_FULL * energy.cap
+        )
+          toFull++;
+        const rested = round.events.find(
+          (e) => e.actor === actor && e.type === 'rested' && e.success,
+        );
+        const data = object(rested?.data);
+        const nominal =
+          typeof data.nominal === 'number'
+            ? data.nominal
+            : energy?.restRecovery;
+        const factor =
+          typeof data.mentalFactor === 'number' ? data.mentalFactor : 1;
+        let high = false;
+        if (
+          rested &&
+          exact &&
+          typeof data.recovered === 'number' &&
+          nominal !== undefined
+        ) {
+          withRecovery++;
+          high = data.recovered < nominal * factor - 1e-6;
+          if (high) highEnergy++;
+        }
+        if (free || high) idle++;
+      }
+    return {
+      rests,
+      idle,
+      unconditioned,
+      highEnergy: exact ? highEnergy : null,
+      toFull,
+      withStep,
+      withRecovery,
+      idleShare: ratio(idle, rests),
+    };
+  };
+  const all = counts(c.agents);
+  return {
+    criterion: REST_CRITERION,
+    defaultShare: REST_DEFAULT_SHARE,
+    toFullShare: REST_TO_FULL,
+    ...all,
+    default:
+      all.idleShare === null ? null : all.idleShare >= REST_DEFAULT_SHARE,
+    perAgent: c.agents.map((actor) => ({ actor, ...counts([actor]) })),
+  };
+}
+
+export const SHARING_LIMITATIONS = [
+  'Rule-based English patterns: a match is a candidate, not an interpretation. Paraphrases outside the patterns are missed (for example "avoiding the patch with only two remaining" or a bare "let\'s coordinate materials"), and a plain logistics sentence can match.',
+  'Ideas are coarse classes. A later expression of the same idea is not proof of transmission: everyone shares one model and similar situations, so independent wording is expected.',
+  'Exposure covers messages to the person, public speech within the vision radius, council reads and names, marks and invitation signs within the vision radius of where they were made (ignoring sign caps, expiry and obstacles). It does not cover what a person saw others do.',
+  'Spoken text is dated by the first round of the plan that wrote it, so exposure must precede the writing, not the speaking. Plan notes and intentions are visible only to their author; owner-only cares and views are reported only in the private memory section.',
+  'Project texts other than project ids, and planned steps that were never executed, are not read.',
+];
+
+interface SharingItem {
+  e: SharingExpression;
+  m: SharingMatch;
+}
+/** Expressions of each utterance sentence that matches a sharing idea, in chronological order. */
+function sharingExpressions(c: Context): SharingExpression[] {
+  const byTick = new Map(c.input.rounds.map((r) => [r.tick, r]));
+  const spoken: readonly Kind[] = ['message', 'public', 'name'];
+  return c.list
+    .flatMap((u) => {
+      const authored = spoken.includes(u.kind)
+        ? (byTick.get(u.tick)?.authored?.[u.actor] ?? u.tick)
+        : u.tick;
+      return sharingMatches(u.text).map((s) => ({
+        actor: u.actor,
+        round: u.tick,
+        authored: Math.min(authored, u.tick),
+        kind: u.kind,
+        recipient: u.recipient,
+        communicated: spoken.includes(u.kind),
+        text: s.sentence,
+        matches: s.matches,
+      }));
+    })
+    .sort(
+      (a, b) =>
+        a.authored - b.authored ||
+        a.round - b.round ||
+        c.order(a.actor, b.actor),
+    );
+}
+
+/**
+ * Earliest receipt by `actor`, before round `before`, of a communicated expression by another
+ * person whose idea passes `wanted`: a message, speech heard within the radius, a council read,
+ * or a name, mark or invitation sign seen within the vision radius of where it was made.
+ */
+function sharingExposure(
+  c: Context,
+): (
+  actor: string,
+  before: number,
+  wanted: (idea: SharingIdea) => boolean,
+) => SharingExposure | null {
+  const heard = receipts(c);
+  const list = sharingExpressions(c).filter((e) => e.communicated);
+  const byTick = new Map(c.input.rounds.map((r) => [r.tick, r]));
+  const sign = (e: SharingExpression) => {
+    const action = byTick.get(e.round)?.actions[e.actor];
+    return action && ['name', 'mark', 'invite'].includes(action.interface)
+      ? c.at(e.actor, e.round)
+      : undefined;
+  };
+  return (actor, before, wanted) => {
+    let best: SharingExposure | null = null;
+    for (const e of list) {
+      if (e.actor === actor || e.round >= before) continue;
+      const idea = e.matches.find((m) => wanted(m.idea))?.idea;
+      if (!idea) continue;
+      const got = heard.find(
+        (r) =>
+          r.actor === actor &&
+          r.from === e.actor &&
+          r.tick >= e.round &&
+          r.tick < before &&
+          r.text.includes(e.text),
+      );
+      let received: { tick: number; via: SharingExposure['via'] } | null = got
+        ? { tick: got.tick, via: got.via }
+        : null;
+      const place = sign(e);
+      if (place)
+        for (const round of c.input.rounds) {
+          if (round.tick < e.round || round.tick >= before) continue;
+          if (received && round.tick >= received.tick) break;
+          const where = c.at(actor, round.tick);
+          if (where && distance(where, place) <= c.input.vision) {
+            received = { tick: round.tick, via: 'sign' };
+            break;
+          }
+        }
+      if (received && (!best || received.tick < best.received))
+        best = {
+          idea,
+          actor: e.actor,
+          round: e.round,
+          received: received.tick,
+          via: received.via,
+        };
+    }
+    return best;
+  };
+}
+
+function sharingMetric(
+  c: Context,
+  exposure: ReturnType<typeof sharingExposure>,
+): CultureMetrics['sharing'] {
+  const list = sharingExpressions(c);
+  const items: SharingItem[] = list.flatMap((e) =>
+    e.matches.map((m) => ({ e, m })),
+  );
+  const reuseList: SharingReuse[] = items.flatMap(({ e, m }) => {
+    const earlier = items.filter(
+      (x) =>
+        x.m.idea === m.idea &&
+        x.e.actor !== e.actor &&
+        x.e.authored < e.authored,
+    );
+    const best = earlier
+      .map((x) => ({
+        x,
+        similarity: phraseSimilarity(m.phrase, x.m.phrase, c.names),
+      }))
+      .reduce<{ x: SharingItem; similarity: number } | null>(
+        (top, y) => (!top || y.similarity > top.similarity ? y : top),
+        null,
+      );
+    if (!best) return [];
+    return [
+      {
+        idea: m.idea,
+        actor: e.actor,
+        round: e.round,
+        authored: e.authored,
+        kind: e.kind,
+        phrase: m.phrase,
+        closest: {
+          actor: best.x.e.actor,
+          round: best.x.e.round,
+          authored: best.x.e.authored,
+          kind: best.x.e.kind,
+          phrase: best.x.m.phrase,
+          similarity: best.similarity,
+        },
+        similarWording: best.similarity >= SHARING_SIMILARITY,
+        exposure: exposure(e.actor, e.authored, (idea) => idea === m.idea),
+        otherExposure: exposure(e.actor, e.authored, (idea) => idea !== m.idea),
+      },
+    ];
+  });
+  const ideas = SHARING_IDEAS.map((idea): SharingIdeaSummary => {
+    const own = items.filter((x) => x.m.idea === idea);
+    const firstAuthored = own.length
+      ? Math.min(...own.map((x) => x.e.authored))
+      : null;
+    const firstUsers = [
+      ...new Set(
+        own.filter((x) => x.e.authored === firstAuthored).map((x) => x.e.actor),
+      ),
+    ].sort(c.order);
+    const reuses = reuseList.filter(
+      (r) => r.idea === idea && !firstUsers.includes(r.actor),
+    );
+    const laterUsers = [...new Set(reuses.map((r) => r.actor))].sort(c.order);
+    return {
+      idea,
+      description: SHARING_DESCRIPTIONS[idea],
+      expressions: own.length,
+      communicated: own.filter((x) => x.e.communicated).length,
+      people: [...new Set(own.map((x) => x.e.actor))].sort(c.order),
+      firstUsers,
+      firstAuthored,
+      laterUsers,
+      exposedLaterUsers: laterUsers.filter(
+        (actor) => reuses.find((r) => r.actor === actor)?.exposure,
+      ),
+    };
+  });
+  return {
+    expressions: list.length,
+    communicated: list.filter((e) => e.communicated).length,
+    reuses: reuseList.length,
+    similarReuses: reuseList.filter((r) => r.similarWording).length,
+    exposedReuses: reuseList.filter((r) => r.exposure).length,
+    similarityThreshold: SHARING_SIMILARITY,
+    ideas,
+    list,
+    reuseList,
+    limitations: SHARING_LIMITATIONS,
   };
 }
 
@@ -1337,6 +2149,7 @@ function trend<T extends { round: number; similarity: number | null }>(
  */
 export function privateMemoryMetric(
   input: CultureInput,
+  exposure?: ReturnType<typeof sharingExposure>,
 ): PrivateMemoryMetrics | null {
   const agents = input.actors.map((a) => a.id);
   const updated = input.rounds.some((r) =>
@@ -1358,6 +2171,33 @@ export function privateMemoryMetric(
     ]),
   );
   const viewed = new Map<string, Set<string>>();
+  // Sharing ideas in each distinct private text, dated by its first write.
+  const sharing: PrivateSharingExpression[] = [];
+  const written = new Set<string>();
+  const scan = (
+    actor: string,
+    round: number,
+    field: 'cares' | 'view',
+    person: string | null,
+    value: string,
+  ) => {
+    const key = [actor, field, person ?? '', value].join('\u0000');
+    if (!value || written.has(key)) return;
+    written.add(key);
+    for (const s of sharingMatches(value))
+      sharing.push({
+        actor,
+        round,
+        field,
+        person,
+        text: s.sentence,
+        matches: s.matches,
+        exposure:
+          exposure?.(actor, round, (idea) =>
+            s.matches.some((m) => m.idea === idea),
+          ) ?? null,
+      });
+  };
   const viewSamples: ViewConvergenceSample[] = [];
   const caresSamples: CaresSimilaritySample[] = [];
   const sample = (round: number) => {
@@ -1416,6 +2256,7 @@ export function privateMemoryMetric(
         if (before !== null && after === null) own.cares.forgotten++;
         if (after !== null) own.cares.ever = true;
         own.cares.current = after;
+        scan(actor, round.tick, 'cares', null, after ?? '');
       }
       if (!update.views) continue;
       let held = own.views.current;
@@ -1429,6 +2270,7 @@ export function privateMemoryMetric(
           own.views.forgotten++;
         }
         held = held.filter((v) => v.person !== person);
+        scan(actor, round.tick, 'view', person, view);
         if (view !== '') {
           held.push({ person, view, round: round.tick });
           viewed.set(actor, (viewed.get(actor) ?? new Set()).add(person));
@@ -1485,6 +2327,15 @@ export function privateMemoryMetric(
     similarity: 'jaccard-content-words',
     viewConvergence: { samples: viewSamples, trend: trend(viewSamples) },
     caresSimilarity: { samples: caresSamples, trend: trend(caresSamples) },
+    sharing: {
+      expressions: sharing,
+      byIdea: Object.fromEntries(
+        SHARING_IDEAS.map((idea) => [
+          idea,
+          sharing.filter((x) => x.matches.some((m) => m.idea === idea)).length,
+        ]),
+      ) as Record<SharingIdea, number>,
+    },
   };
 }
 
@@ -1507,10 +2358,13 @@ export function cultureMetrics(input: CultureInput): CultureMetrics {
       const q = at.get(tick)?.get(b);
       return !!p && !!q && distance(p, q) <= input.vision;
     },
+    at: (actor, tick) => at.get(tick)?.get(actor),
     isSurvival: (id) =>
       survivalInterface(catalogue.get(id) ?? { id, name: id }, edible),
   };
   const ticks = input.rounds.map((r) => r.tick);
+  // Private memory may read public receipts for its own exposure; nothing flows the other way.
+  const exposure = sharingExposure(c);
   return {
     archive: input.archive,
     rounds: {
@@ -1525,12 +2379,14 @@ export function cultureMetrics(input: CultureInput): CultureMetrics {
     vocabulary: vocabularyMetric(c),
     activities: activityMetric(c, at),
     norms: normMetric(c),
+    sharing: sharingMetric(c, exposure),
     beliefs: beliefMetric(c),
     relationships: relationshipMetric(c),
     survival: survivalMetric(c),
+    rest: restMetric(c),
     nonTransactional: communicationMetric(c),
     symbolic: symbolicMetric(c),
-    privateMemory: privateMemoryMetric(input),
+    privateMemory: privateMemoryMetric(input, exposure),
     modelLabels: null,
   };
 }
@@ -1606,6 +2462,8 @@ export function cultureInput(archive: string, through?: number): CultureInput {
   const harness = new Set<string>();
   const rounds: CultureRound[] = [];
   const worlds: V7World[] = [initial];
+  const own = (actor: string, cursor: V7Cursor) =>
+    decided.get(`${actor}\u0000${String(cursor.startedAt)}`) !== false;
   for (const part of index.segments) {
     const source = readFileSync(join(archive, part.path));
     if (createHash('sha256').update(source).digest('hex') !== part.sha256)
@@ -1621,13 +2479,26 @@ export function cultureInput(archive: string, through?: number): CultureInput {
           memory: r.memory,
           intentions: Object.fromEntries(
             Object.entries(r.tasks).flatMap(([actor, cursor]) => {
-              if (
-                decided.get(`${actor}\u0000${String(cursor.startedAt)}`) !==
-                false
-              )
-                return [[actor, cursor.plan.intention]];
+              if (own(actor, cursor)) return [[actor, cursor.plan.intention]];
               harness.add(cursor.plan.intention);
               return [];
+            }),
+          ),
+          // A round's retained cursor is the one that produced its action (state after the round).
+          authored: Object.fromEntries(
+            Object.entries(r.tasks).map(([actor, cursor]) => [
+              actor,
+              cursor.startedAt + 1,
+            ]),
+          ),
+          restSteps: Object.fromEntries(
+            Object.entries(r.tasks).flatMap(([actor, cursor]) => {
+              const action = r.actions[actor];
+              const step =
+                action?.interface === 'rest' && own(actor, cursor)
+                  ? restStep(cursor, action)
+                  : null;
+              return step ? [[actor, step]] : [];
             }),
           ),
         });
@@ -1707,6 +2578,55 @@ export function cultureInput(archive: string, through?: number): CultureInput {
     ],
     rounds,
     voice: world.config.longDevelopment?.culture?.voice ?? false,
+    energy: {
+      cap: initial.config.energyCap,
+      restRecovery: initial.config.restRecovery,
+      unrecordedRestFactor: [...worlds, world].some((w) =>
+        w.revisions.includes('weather-lean-to@1'),
+      ),
+    },
+  };
+}
+
+/**
+ * The energy condition of the plan step that produced a `rest`. The retained cursor is the state
+ * after the round: it stays on the producing step when the round ended the plan (a `reason`) or
+ * the step is still repeating, and otherwise has advanced one step, wrapping to the first. If that
+ * step is not the action, the matching step at the cursor, else the last one before it, is taken.
+ */
+export function restStep(cursor: V7Cursor, action: V7Action): RestStep | null {
+  const steps = cursor.plan.steps;
+  const args = JSON.stringify(action.args);
+  const same = (i: number) => {
+    const step = steps[i];
+    return (
+      step !== undefined &&
+      step.action.interface === action.interface &&
+      JSON.stringify(step.action.args) === args
+    );
+  };
+  const stayed = cursor.reason !== null || cursor.repetition > 0;
+  const expected = stayed ? cursor.step : (cursor.step || steps.length) - 1;
+  const matching = steps.flatMap((_, i) => (same(i) ? [i] : []));
+  const index = same(expected)
+    ? expected
+    : matching.includes(cursor.step)
+      ? cursor.step
+      : (matching.filter((i) => i < cursor.step).at(-1) ?? matching.at(-1));
+  const step = index === undefined ? undefined : steps[index];
+  if (!step) return null;
+  const energy = (c: V7Condition | null): c is V7Condition =>
+    !!c && /(?:^|\.)energy$/.test(c.path);
+  const target = [step.until, cursor.plan.until].find(
+    (c): c is V7Condition =>
+      energy(c) &&
+      (c.comparison === 'gte' || c.comparison === 'gt') &&
+      typeof c.value === 'number',
+  );
+  return {
+    conditioned:
+      energy(step.until) || energy(step.guard) || energy(cursor.plan.until),
+    target: typeof target?.value === 'number' ? target.value : null,
   };
 }
 
@@ -1735,12 +2655,14 @@ export function cultureRow(m: CultureMetrics): string[] {
     String(m.vocabulary.transmittedTerms),
     `${String(m.activities.repeated)} (${String(m.activities.repeatedNonSurvival)})`,
     `${String(m.norms.statements)} / ${String(m.norms.echoed)}`,
+    `${String(m.sharing.expressions)} / ${String(m.sharing.reuses)} (${String(m.sharing.exposedReuses)})`,
     `${String(m.beliefs.causal)} + ${String(m.beliefs.supernatural)} / ${String(m.beliefs.cited)}`,
     String(m.relationships.messages.edges.reduce((n, e) => n + e.weight, 0)),
     percent(m.relationships.messages.reciprocity),
     String(m.relationships.responses.edges.reduce((n, e) => n + e.weight, 0)),
     String(m.relationships.transfers.edges.reduce((n, e) => n + e.weight, 0)),
     percent(m.survival.share),
+    percent(m.survival.shareWithoutRest),
     percent(m.nonTransactional.share),
     String(m.symbolic.perAgent.reduce((n, a) => n + a.succeeded, 0)),
   ];
@@ -1754,12 +2676,14 @@ export const CULTURE_COLUMNS = [
   'Transmitted terms',
   'Repeated activities (non-survival)',
   'Norms / echoed',
+  'Sharing expressions / reuses (exposed)',
   'Beliefs causal + supernatural / cited',
   'Messages',
   'Message reciprocity',
   'Responses',
   'Gives/exchanges',
   'Survival share',
+  'Survival share without rest',
   'Non-transactional share',
   'Symbolic actions',
 ];
@@ -1851,6 +2775,7 @@ export function cultureMarkdown(m: CultureMetrics): string {
     '',
     `Private normative notes (never communicated, context only): ${String(m.norms.privateStatements)}.`,
     '',
+    ...sharingMarkdown(m),
     '### Beliefs',
     '',
     m.beliefs.list.length
@@ -1885,13 +2810,119 @@ export function cultureMarkdown(m: CultureMetrics): string {
       : []),
     '### Auxiliary',
     '',
-    `- Survival share: ${String(m.survival.survivalRounds)} of ${String(m.survival.actorRounds)} actor-rounds (${percent(m.survival.share)}); survival interfaces used: ${m.survival.interfaces.map(id).join(', ') || '–'}.`,
+    `- Survival share: ${String(m.survival.survivalRounds)} of ${String(m.survival.actorRounds)} actor-rounds (${percent(m.survival.share)}); survival interfaces used: ${m.survival.interfaces.map(id).join(', ') || '–'}. Without \`rest\` (a second value; the gate uses the share above): ${String(m.survival.survivalRounds - m.survival.restRounds)} of ${String(m.survival.actorRounds)} (${percent(m.survival.shareWithoutRest)}).`,
+    restLine(m.rest),
     `- Non-transactional communication: ${String(m.nonTransactional.nonTransactional)} of ${String(m.nonTransactional.messages)} (${percent(m.nonTransactional.share)}).`,
     `- Symbolic actions (${m.symbolic.interfaces.map(id).join(', ')}): ${m.symbolic.perAgent.map((a) => `${a.actor} ${String(a.succeeded)}`).join(', ')}; every agent at least one: ${m.symbolic.everyAgentAtLeastOne ? 'yes' : 'no'}.`,
     '',
+    ...restMarkdown(m),
     ...(m.privateMemory ? privateMarkdown(m.privateMemory) : []),
   ];
   return lines.join('\n');
+}
+
+const cell = (value: string, n = 90) => clip(value, n).replace(/\|/g, '/');
+/** Author and round of a received expression, its idea when asked, and the channel and round of receipt. */
+const exposed = (x: SharingExposure | null, idea = false) =>
+  x
+    ? `${x.actor} r${String(x.round)}${idea ? ` ${id(x.idea)}` : ''} via ${x.via} (r${String(x.received)})`
+    : '–';
+
+/** The public sharing section: ideas, reuses with their closest wording and exposure, limitations. */
+function sharingMarkdown(m: CultureMetrics): string[] {
+  const s = m.sharing;
+  return [
+    '### Sharing expressions',
+    '',
+    `Sentences of public and plan text that express restraint in, or sharing of, common resources (patterns in \`SHARING_RULES\`): ${String(s.expressions)}, ${String(s.communicated)} of them spoken, sent or posted. ${String(s.reuses)} later expressions repeat an idea another person had expressed earlier; ${String(s.similarReuses)} with similar wording (folded content-word Jaccard at least ${String(s.similarityThreshold)}), ${String(s.exposedReuses)} after receiving that idea from someone else. Rounds are authored rounds (the first round of the plan that wrote the text).`,
+    '',
+    table(
+      [
+        'Idea',
+        'Expressions (spoken)',
+        'People',
+        'First users (round)',
+        'Later users',
+        'Exposed later users',
+      ],
+      s.ideas.map((i) => [
+        `${id(i.idea)}: ${i.description}`,
+        `${String(i.expressions)} (${String(i.communicated)})`,
+        i.people.join(', ') || '–',
+        i.firstUsers.length
+          ? `${i.firstUsers.join(', ')} (${String(i.firstAuthored)})`
+          : '–',
+        i.laterUsers.join(', ') || '–',
+        i.exposedLaterUsers.join(', ') || '–',
+      ]),
+    ),
+    '',
+    s.reuseList.length
+      ? table(
+          [
+            'Authored / spoken',
+            'Person',
+            'Kind',
+            'Idea',
+            'Phrase',
+            'Closest earlier (similarity)',
+            'Same idea received',
+            'Other idea received',
+          ],
+          s.reuseList.map((r) => [
+            `${String(r.authored)} / ${String(r.round)}`,
+            r.actor,
+            r.kind,
+            id(r.idea),
+            cell(r.phrase, 70),
+            `${r.closest.actor} r${String(r.closest.authored)} ${r.closest.kind} "${cell(r.closest.phrase, 50)}" (${r.closest.similarity.toFixed(2)})`,
+            exposed(r.exposure),
+            exposed(r.otherExposure, true),
+          ]),
+        )
+      : 'No person expressed an idea that another person had expressed earlier.',
+    '',
+    ...s.limitations.map((l) => `- ${l}`),
+    '',
+  ];
+}
+
+const restLine = (r: RestMetrics) =>
+  `- Rest as a default idle behavior: ${String(r.idle)} of ${String(r.rests)} rests idle (${percent(r.idleShare)}: ${String(r.unconditioned)} from steps without an energy condition, ${r.highEnergy === null ? 'high-energy test unavailable' : `${String(r.highEnergy)} begun within one rest of the energy cap`}); ${String(r.toFull)} came from steps that rest until at least ${String(r.toFullShare * 100)}% of the cap. Default: ${r.default === null ? '–' : r.default ? 'yes' : 'no'} (threshold ${String(r.defaultShare * 100)}%).`;
+
+/** Per-person rest and survival table. */
+function restMarkdown(m: CultureMetrics): string[] {
+  if (!m.rest.rests) return [];
+  return [
+    `Rest criterion: ${m.rest.criterion}`,
+    '',
+    table(
+      [
+        'Person',
+        'Actor-rounds',
+        'Rests',
+        'Idle rests (no energy condition / high energy)',
+        `Rests to at least ${String(m.rest.toFullShare * 100)}% of cap`,
+        'Survival share',
+        'Without rest',
+      ],
+      m.survival.perAgent.map((a) => {
+        const r = m.rest.perAgent.find((x) => x.actor === a.actor);
+        return [
+          a.actor,
+          String(a.actorRounds),
+          String(a.restRounds),
+          r
+            ? `${String(r.idle)} (${String(r.unconditioned)} / ${r.highEnergy === null ? '–' : String(r.highEnergy)}) ${percent(r.idleShare)}`
+            : '–',
+          r ? String(r.toFull) : '–',
+          percent(a.share),
+          percent(a.shareWithoutRest),
+        ];
+      }),
+    ),
+    '',
+  ];
 }
 
 const score = (value: number | null) =>
@@ -1923,6 +2954,16 @@ function privateMarkdown(p: PrivateMemoryMetrics): string[] {
     `- Views: ${String(p.views.observers)} people held views of ${String(p.views.targets)} people; ${String(p.views.entries)} views held by ${String(p.views.holding)} people at the last round; ${historyText(p.views)}.`,
     `- Private view convergence (Jaccard similarity of content-word sets between different observers' current views of the same person, mean over pairs then over targets, every ${String(p.sampleInterval)} rounds): ${trendLine(p.viewConvergence.trend, (s) => `${count(s.targets, 'target')}, ${count(s.pairs, 'pair')}`)}`,
     `- Cares similarity across people (same similarity, mean over pairs of people holding cares): ${trendLine(p.caresSimilarity.trend, (s) => `${count(s.people, 'person', 'people')}, ${count(s.pairs, 'pair')}`)}`,
+    `- Private sharing expressions (the public sharing patterns applied to cares and views): ${
+      p.sharing.expressions.length
+        ? p.sharing.expressions
+            .map(
+              (x) =>
+                `${x.actor} round ${String(x.round)} ${x.field === 'view' ? `view of ${x.person ?? ''}` : 'cares'} (${x.matches.map((mm) => mm.idea).join(', ')}; "${clip(x.matches[0]?.phrase ?? '', 60)}"; ${x.exposure ? `heard ${x.exposure.idea} from ${x.exposure.actor} at round ${String(x.exposure.received)}` : 'no earlier public expression received'})`,
+            )
+            .join('; ')
+        : 'none'
+    }.`,
     '',
     table(
       [
