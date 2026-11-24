@@ -65,8 +65,9 @@ pause is caused by an ordinary call that ended without any response but with rec
 transport evidence (for example `server_is_overloaded`), or by a proved abandoned
 invocation, `repair exN` retains the pause under `technical-pauses/` and resumes the run
 without a development handoff. The failed call is never resent and keeps its charge in
-the ledger. Rejected model output, context and computation pauses still need a counted
-handoff, and a second failure in the same round still pauses the run.
+the ledger. In `long-culture`, rejected model output, context and computation pauses still
+need a counted handoff, and a second failure in the same round still pauses the run. Culture
+v2 also resumes rejection pauses without a handoff (see [Culture v2](#culture-v2)).
 
 These numbers were checked against the measured E1 (ex14) rates; the derivation is in
 [PR #29](https://github.com/YuxiangLiu-lyx/self_evolving_world/pull/29).
@@ -110,7 +111,50 @@ guidance about `name`, `mark`, `tell` or `invite` and contains no excluded word.
 
 ### Context compaction
 
-COMPACTION_DETAILS
+`longDevelopment.compaction` changes only ordinary inputs, and nothing is hidden: everything
+moved out of the packet is either still in the same input or one exact query away, with
+the same permissions. Each compaction that applies adds one sentence to `packet.access`
+saying what it did (`apps/simulator/src/long-compaction.ts`).
+
+1. **Paging notes once.** Paged records no longer repeat their page note, and reprojected
+   retrieval results no longer repeat their projection note; `packet.access` states both.
+2. **Already in retrieval.** A packet record, ability candidate or detail whose content is
+   verified to equal, or to be an exact part of, a record already in the same input's
+   retrieval becomes `{id, inRetrieval: true}`. A personal `mastered` flag is kept.
+3. **Joined fragments.** Consecutive fragments of one exact record in retrieval are joined
+   in order into one fragment listing `joinedParts`.
+4. **Settled work.** In `execution.activeState`, completed, stopped or cancelled `:work:`
+   records keep their identity, ability, mode, status, target, products and last payment,
+   marked `settled: true`. An exact `state` query returns the full record. Active and
+   paused work, bindings, reserved items and pointers stay complete.
+5. **Terrain rows.** Visible terrain is a list of `"y:x:cells"` strings, one character per
+   cell for each run of consecutive visible cells in a row, instead of `[x, y, kind]` tuples.
+6. **Recent-use window.** An authored interface keeps its full contract only if it is
+   needed now or was used recently. Every other interface becomes a summary
+   `{id, function, args}` whose `args` names the arguments in order, with types, bounds
+   and choices. Long string limits and references stay in the exact record, which an
+   abilities query by id returns. Developed interfaces get full details under the same
+   rule; otherwise they appear only as compact candidates.
+   - "Needed now" means the bound operation, any step of the current plan, the current
+     learning or operation, or an interface the person mastered this round.
+   - "Used recently" means it appears as an action in the person's `experience.recent`
+     history within the last 25 rounds.
+
+   The ex15 heuristic that always detailed the most recently mastered developed interface
+   is dropped.
+
+**Why 25 rounds.** In ex15, 65 accepted plans had 301 steps. 208 of those steps used an
+interface the person had used in an earlier round. The last use was within 20 rounds for
+88.0% of them, within 25 rounds for 93.8% and within 40 rounds for 98.6%. The history
+keeps 40 rounds; 25 covers almost all reuse while summarizing what has gone unused for a
+long time. Summaries name their arguments because 63 of the 277 authored-interface steps
+would have used a summarized interface. Without names, each of those would need a read or
+risk a rejected output, and rejected outputs count toward the stop rule.
+
+**Offline projection.** `npx tsx scripts/long-context-projection.ts` rebuilds every retained
+ex15 ordinary input with the current builder; the archive configuration reproduces all 147
+recorded estimates. It then rebuilds the same inputs with the v2 settings and fits the
+growth of rounds 0–70. PROJECTION_RESULT
 
 The byte guard rejects an input whose code-unit length times two exceeds
 `computation.inputBytes`. In ex15, inputs held between 2.55 and 3.31 code units per estimated

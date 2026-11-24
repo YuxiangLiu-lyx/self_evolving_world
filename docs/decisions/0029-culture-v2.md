@@ -28,7 +28,7 @@ builder output and protocol:
 
 - `longDevelopment.compaction`: lossless ordinary-input compaction. Full contracts are given
   only for interfaces needed now or used within the last 25 rounds; the rest get summaries
-  that can be read in full by exact id.
+  that name their arguments and can be read in full by exact id.
 - `inputEstimateLimit` 24,000 and `exactRecordWidth` 6,000. `computation.inputBytes` rises to
   200,000 so the byte guard does not bind before the token guard.
 - `culture.goal: 'open'`: health and safety are the only required goal, everything else is
