@@ -80,6 +80,38 @@ E1 runs `pnpm experiment:continuous -- new long-fixes` (ex13 rules and seed, all
 
 E1's gate is at most 4,500 tokens per agent per round; if rounds 0–39 are not below ex13's same window, the run stops for investigation.
 
+## 5. E1 (ex14): fixes 2–4 verified in one run
+
+- **Problem**: fixes 2–4 were offline estimates and prompt guidance; only a run could show their effect.
+- **Run**: `new long-fixes` on the ex13 rules, seed and world, 3 agents, 8 development handoffs and a 1,600,000-token ceiling. The window passed the round-40 gate and was extended toward 80, but it stopped at round 64 when the eighth handoff was spent and a ninth develop review arrived (the same recorded reason as ex13). All three were alive at health 100. One handoff was a recovery from a server overload at round 0.
+- **Metrics**: ex14 rounds 0–63 against ex13 rounds 0–63 and the planned ex13 baseline, rounds 0–79 (`pnpm metrics:long`):
+
+| Metric                                                                     | ex14, rounds 0–63 | ex13, rounds 0–63 | ex13, rounds 0–79 |
+| -------------------------------------------------------------------------- | ----------------- | ----------------- | ----------------- |
+| Tokens per agent per round                                                 | 3,641             | 6,320             | 6,632             |
+| Follow-up share of ordinary calls                                          | 55.7% (39/70)     | 52.5% (74/141)    | 51.7% (92/178)    |
+| Continuation-part queries                                                  | 0                 | 55                | 79                |
+| Plans decided with a partly read record, of plans with no query batch left | 0/14              | 22/29             | 26/35             |
+| Accepted plans                                                             | 31                | 65                | 84                |
+| Median decision gap                                                        | 5 rounds          | 2 rounds          | 2 rounds          |
+| Share of plans where every step runs once                                  | 29.0%             | 69.2%             | 65.5%             |
+| World Agent reuse                                                          | 3/11              | 0/8               | 0/11              |
+| Interfaces bound to one agent or item                                      | 0/6               | 2/9               | 5/12              |
+| Calls with unknown usage                                                   | 1                 | 3                 | 3                 |
+
+- **Gates**: G1 (at most 4,500 tokens per agent per round) passed at 3,641. The round-40 gate passed at 3,337 against ex13's 5,962.
+- **What did not improve**: the follow-up share stayed above 50%, and no plan used interrupt events. Develop was still chosen in 8 of 11 reviews, so the handoff budget again ended the run.
+- **Handoffs**: three handoffs installed working general operations: a cultivation trial, a paired food exposure trial and resting-material arrangement. Three installed first releases that only report physics the world does not represent: branch geometry and wind direction for a wind screen, stone support geometry for air-drying, and strand and tension behavior for cordage. One handoff reassigned the existing cultivation operation because no propagation biology exists, and one recovered the overloaded call. Every handoff is recorded as `current-claude-conversation`.
+- **Next step**: separately decide the missing material and environment representations, and consider letting the World Agent reject unsupported requests without spending a handoff.
+
+Three log-backed events:
+
+1. **Contracts steered requests.** At round 10, Sol chose to investigate preservation before spending time or food on a planting trial that cannot replenish the supply (`ordinary-18`). At round 32, Moss asked for functional preservation because the existing ground-exposure trial explicitly cannot preserve food (`ordinary-51`).
+2. **Reuse instead of new assessment variants.** The World Agent answered three food-assessment requests by reusing `probe` through its arguments: Moss at round 29 (`world-42`), Sol at round 31 (`world-48`) and Lin at round 59 (`world-83`). In ex13, 22 of 28 developed interfaces were assessment, trial or diagnostic variants.
+3. **One person used another's capability.** Lin learned Sol's food trial to establish an observed decay baseline (`ordinary-59`, round 34). Lin retried the site after its own body blocked it (`ordinary-66`, round 40), exposed a matched berry pair from round 42, and inspected and retrieved both samples at rounds 52–54 (`ordinary-76`). Both samples showed decay 34.09 after 10 rounds, identical as the contract states.
+
+This is one seed with three people, so the comparison is a case comparison, not a statistical result. The behavioral analysis is in [experiment/analyses/ex14](../../experiment/analyses/ex14/pr-34-e1-fix-verification.md).
+
 ## Limitations
 
 - Fixes 2–4 are turned on together in E1, so one run cannot separate their effects. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.
