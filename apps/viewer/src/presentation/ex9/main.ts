@@ -25,7 +25,7 @@ const story = await presentationStory(experiment);
 const BOOKMARKS = story.bookmarks;
 document.title = `${experiment.toUpperCase()} · Ashen replay preview`;
 root.innerHTML = `<main class="game" aria-label="${experiment.toUpperCase()} enhanced replay"><canvas id="forest" aria-label="Enhanced recorded forest" tabindex="0"></canvas>
-<header class="masthead glass"><a class="wordmark" href="./">SELF / EVOLVING WORLD</a><span class="preview-label" lang="zh">Ashen 风格回放（预览）</span><span class="provenance" lang="zh">${experiment === 'ex9' ? 'EX9 · 真实实验回放 · 视觉增强' : escape(story.title)}</span><a id="original" href="./?experiment=${experiment}">Original replay ↗</a><a href="./ashen.html?experiment=${experiment === 'ex9' ? 'ex13' : 'ex9'}">${experiment === 'ex9' ? 'EX13' : 'EX9'}</a><button id="fullscreen">Fullscreen</button></header>
+<header class="masthead glass"><a class="wordmark" href="./">SELF / EVOLVING WORLD</a><span class="preview-label">Ashen-style replay (preview)</span><span class="provenance">${experiment === 'ex9' ? 'EX9 · Recorded experiment replay · visual enhancement' : escape(story.title)}</span><a id="original" href="./?experiment=${experiment}">Original replay ↗</a><a href="./ashen.html?experiment=${experiment === 'ex9' ? 'ex13' : 'ex9'}">${experiment === 'ex9' ? 'EX13' : 'EX9'}</a><button id="fullscreen">Fullscreen</button></header>
 <section class="character-hud glass" aria-label="Character HUD"><div class="people" role="group" aria-label="Follow a character">${Object.entries(
   PEOPLE,
 )

@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { EXPRESSION_MEMORY } from '@self-evolving-world/world-core';
 import type {
   V7Action,
   V7Event,
@@ -18,7 +19,8 @@ import type { V7ReplayIndex, V7ReplaySegment } from './continuous-store.js';
  * computed from retained files only: replay segments for actions, events, memory and plans,
  * execution.json for the final catalogue, initial.json and the first retained ordinary call
  * of each actor for the authored prompt. No model is called and nothing is written to the archive.
- * Every rule is documented in docs/presentation/culture-baseline.md.
+ * Owner-only private memory (`cares`, `views`) is reported in its own section and is never read
+ * by a public metric. Every rule is documented in docs/presentation/culture-baseline.md.
  */
 
 /** Interfaces that will carry symbolic culture once they exist; none exists in ex7–ex13. */
@@ -31,6 +33,8 @@ export const ACTIVITY_WINDOW = 1;
 export const RESPONSE_WINDOW = 10;
 /** A prescribed action counts as an echo when performed within this many rounds. */
 export const ACTION_ECHO_WINDOW = 10;
+/** Private memory is measured at the end of every window of this many rounds and at the last round. */
+export const PRIVATE_SAMPLE_INTERVAL = 10;
 /** Base interfaces that always count as survival behavior. */
 export const SURVIVAL_INTERFACES = ['gather', 'eat', 'rest'];
 /** Interface id or name words that concern food, water, warmth or shelter (prefix match). */
@@ -116,6 +120,13 @@ interface CultureMemory {
   intention?: string;
   projects?: { id: string }[];
   collectiveIntent?: { goal?: string; reason?: string };
+  /**
+   * Owner-only private memory update (culture voice), recorded in the round its plan starts.
+   * Read only by `privateMemoryMetric`; never an utterance and never part of a public metric.
+   */
+  cares?: string;
+  /** Owner-only private update: person id to view; an empty view forgets that person. */
+  views?: Record<string, string>;
 }
 /** One retained round: the submitted actions, the settled events and the actor-authored records. */
 export interface CultureRound {
@@ -139,6 +150,8 @@ export interface CultureInput {
   /** Plan intentions the controller wrote itself after a failed decision; never actor-authored. */
   harness: string[];
   rounds: CultureRound[];
+  /** Whether the archive's scope offers private memory (culture `voice`); detected from the archive. */
+  voice?: boolean;
 }
 /** Actor-authored text: messages and public reports, plan intentions, notes, project ids and given names. */
 export interface Utterance {
@@ -186,6 +199,79 @@ export interface NormStatement extends Statement {
 export interface BeliefStatement extends Statement {
   type: 'causal' | 'supernatural';
   citations: { actor: string; round: number }[];
+}
+/** Convergence of different observers' current views of the same person at the end of one window. */
+export interface ViewConvergenceSample {
+  round: number;
+  /** Mean over targets of the mean pairwise similarity; null without two observers of one target. */
+  similarity: number | null;
+  /** Targets with at least one scored observer pair. */
+  targets: number;
+  /** Scored observer pairs behind the value. */
+  pairs: number;
+}
+/** Similarity of different people's current cares at the end of one window. */
+export interface CaresSimilaritySample {
+  round: number;
+  /** Mean pairwise similarity; null without two people holding cares. */
+  similarity: number | null;
+  /** People holding cares. */
+  people: number;
+  /** Scored pairs of people behind the value. */
+  pairs: number;
+}
+/** First and last scored sample, their difference and the least-squares slope over scored samples. */
+export interface PrivateTrend<T> {
+  first: T | null;
+  last: T | null;
+  /** Last minus first similarity; null with fewer than two scored samples. */
+  change: number | null;
+  slopePer100Rounds: number | null;
+}
+/** One person's private memory history: writes recorded in plans, actual changes and forgets. */
+export interface PrivateHistory {
+  writes: number;
+  changes: number;
+  forgotten: number;
+}
+export interface PrivateMemoryMetrics {
+  /** Owner-only: shown only in the owner's own packet; no other person can see it. */
+  visibility: 'owner-only';
+  note: string;
+  cares: PrivateHistory & {
+    /** People who ever held non-empty cares. */
+    people: number;
+    /** People holding cares at the last round. */
+    holding: number;
+  };
+  views: PrivateHistory & {
+    /** People who ever held a view of someone. */
+    observers: number;
+    /** People someone ever held a view of. */
+    targets: number;
+    /** People holding at least one view at the last round. */
+    holding: number;
+    /** Views held at the last round. */
+    entries: number;
+  };
+  perAgent: {
+    actor: string;
+    cares: PrivateHistory & { current: string | null };
+    views: PrivateHistory & {
+      /** Held views, most recently updated last, with the round of their last update. */
+      current: { person: string; view: string; round: number }[];
+    };
+  }[];
+  sampleInterval: number;
+  similarity: 'jaccard-content-words';
+  viewConvergence: {
+    samples: ViewConvergenceSample[];
+    trend: PrivateTrend<ViewConvergenceSample>;
+  };
+  caresSimilarity: {
+    samples: CaresSimilaritySample[];
+    trend: PrivateTrend<CaresSimilaritySample>;
+  };
 }
 export interface CultureMetrics {
   archive: string;
@@ -259,6 +345,11 @@ export interface CultureMetrics {
     everyAgentAtLeastOne: boolean;
   };
   /**
+   * Owner-only private memory (`cares`, `views`) of a scope with a culture voice, reported apart
+   * from every public metric above, which never reads it; null when the archive has none.
+   */
+  privateMemory: PrivateMemoryMetrics | null;
+  /**
    * Extension point for an optional, separately requested model labeling pass over the listed
    * statements. It is never implemented or called here; the field stays null.
    */
@@ -307,6 +398,7 @@ function succeeded(round: CultureRound, actor: string): boolean {
   return !round.events.some((e) => e.actor === actor && e.type === 'failed');
 }
 
+/** Actor-authored text of the metrics below; private `cares` and `views` are never read here. */
 export function utterances(input: CultureInput): Utterance[] {
   const ids = new Set(input.actors.map((a) => a.id));
   const harness = new Set(input.harness);
@@ -1202,6 +1294,200 @@ function symbolicMetric(c: Context): CultureMetrics['symbolic'] {
   };
 }
 
+/** Jaccard similarity of two content-word sets; null when both are empty. */
+export function contentSimilarity(
+  a: string,
+  b: string,
+  names: Set<string>,
+): number | null {
+  const x = new Set(content(a, names));
+  const y = new Set(content(b, names));
+  const union = new Set([...x, ...y]).size;
+  return union ? [...x].filter((w) => y.has(w)).length / union : null;
+}
+
+const mean = (values: number[]) =>
+  values.reduce((n, v) => n + v, 0) / values.length;
+
+function trend<T extends { round: number; similarity: number | null }>(
+  samples: T[],
+): PrivateTrend<T> {
+  const scored = samples.filter((s) => s.similarity !== null);
+  const points = scored.map((s) => ({ x: s.round, y: s.similarity ?? 0 }));
+  const first = scored[0] ?? null;
+  const last = scored.at(-1) ?? null;
+  if (points.length < 2 || !first || !last)
+    return { first, last, change: null, slopePer100Rounds: null };
+  const mx = mean(points.map((p) => p.x));
+  const my = mean(points.map((p) => p.y));
+  const sxx = points.reduce((n, p) => n + (p.x - mx) ** 2, 0);
+  const sxy = points.reduce((n, p) => n + (p.x - mx) * (p.y - my), 0);
+  return {
+    first,
+    last,
+    change: (last.similarity ?? 0) - (first.similarity ?? 0),
+    slopePer100Rounds: (sxy / sxx) * 100,
+  };
+}
+
+/**
+ * Owner-only private memory, rebuilt from the round memory updates exactly as replay applies
+ * them: omitted fields persist, an empty text forgets, views apply in person-id order and only
+ * the most recently updated people are kept. Reported apart from every public metric.
+ */
+export function privateMemoryMetric(
+  input: CultureInput,
+): PrivateMemoryMetrics | null {
+  const agents = input.actors.map((a) => a.id);
+  const updated = input.rounds.some((r) =>
+    agents.some((a) => r.memory[a]?.cares !== undefined || r.memory[a]?.views),
+  );
+  if (!input.voice && !updated) return null;
+  const names = actorWords(input);
+  const history = () => ({ writes: 0, changes: 0, forgotten: 0 });
+  const state = new Map(
+    agents.map((actor) => [
+      actor,
+      {
+        cares: { ...history(), current: null as string | null, ever: false },
+        views: {
+          ...history(),
+          current: [] as { person: string; view: string; round: number }[],
+        },
+      },
+    ]),
+  );
+  const viewed = new Map<string, Set<string>>();
+  const viewSamples: ViewConvergenceSample[] = [];
+  const caresSamples: CaresSimilaritySample[] = [];
+  const sample = (round: number) => {
+    // Observers' current views of each target, in actor order.
+    const byTarget = new Map<string, string[]>();
+    for (const observer of agents)
+      for (const v of state.get(observer)?.views.current ?? [])
+        if (v.person !== observer)
+          byTarget.set(v.person, [...(byTarget.get(v.person) ?? []), v.view]);
+    const perTarget: number[] = [];
+    let viewPairs = 0;
+    for (const views of byTarget.values()) {
+      const scores = views.flatMap((a, i) =>
+        views.slice(i + 1).flatMap((b) => {
+          const s = contentSimilarity(a, b, names);
+          return s === null ? [] : [s];
+        }),
+      );
+      if (!scores.length) continue;
+      perTarget.push(mean(scores));
+      viewPairs += scores.length;
+    }
+    viewSamples.push({
+      round,
+      similarity: perTarget.length ? mean(perTarget) : null,
+      targets: perTarget.length,
+      pairs: viewPairs,
+    });
+    const cares = agents.flatMap((a) => {
+      const c = state.get(a)?.cares.current;
+      return c ? [c] : [];
+    });
+    const scores = cares.flatMap((a, i) =>
+      cares.slice(i + 1).flatMap((b) => {
+        const s = contentSimilarity(a, b, names);
+        return s === null ? [] : [s];
+      }),
+    );
+    caresSamples.push({
+      round,
+      similarity: scores.length ? mean(scores) : null,
+      people: cares.length,
+      pairs: scores.length,
+    });
+  };
+  input.rounds.forEach((round, index) => {
+    for (const actor of agents) {
+      const update = round.memory[actor];
+      const own = state.get(actor);
+      if (!update || !own) continue;
+      if (update.cares !== undefined) {
+        const before = own.cares.current;
+        const after = update.cares === '' ? null : update.cares;
+        own.cares.writes++;
+        if (after !== before) own.cares.changes++;
+        if (before !== null && after === null) own.cares.forgotten++;
+        if (after !== null) own.cares.ever = true;
+        own.cares.current = after;
+      }
+      if (!update.views) continue;
+      let held = own.views.current;
+      for (const person of Object.keys(update.views).sort()) {
+        const view = update.views[person] ?? '';
+        const before = held.find((v) => v.person === person);
+        own.views.writes++;
+        if (view !== '' && before?.view !== view) own.views.changes++;
+        if (view === '' && before) {
+          own.views.changes++;
+          own.views.forgotten++;
+        }
+        held = held.filter((v) => v.person !== person);
+        if (view !== '') {
+          held.push({ person, view, round: round.tick });
+          viewed.set(actor, (viewed.get(actor) ?? new Set()).add(person));
+        }
+      }
+      own.views.current = held.slice(-EXPRESSION_MEMORY.people);
+    }
+    if (
+      round.tick % PRIVATE_SAMPLE_INTERVAL === 0 ||
+      index === input.rounds.length - 1
+    )
+      sample(round.tick);
+  });
+  const perAgent = agents.map((actor) => {
+    const own = state.get(actor);
+    return {
+      actor,
+      cares: {
+        writes: own?.cares.writes ?? 0,
+        changes: own?.cares.changes ?? 0,
+        forgotten: own?.cares.forgotten ?? 0,
+        current: own?.cares.current ?? null,
+      },
+      views: {
+        writes: own?.views.writes ?? 0,
+        changes: own?.views.changes ?? 0,
+        forgotten: own?.views.forgotten ?? 0,
+        current: own?.views.current ?? [],
+      },
+    };
+  });
+  const total = (key: 'cares' | 'views') => ({
+    writes: perAgent.reduce((n, a) => n + a[key].writes, 0),
+    changes: perAgent.reduce((n, a) => n + a[key].changes, 0),
+    forgotten: perAgent.reduce((n, a) => n + a[key].forgotten, 0),
+  });
+  return {
+    visibility: 'owner-only',
+    note: 'Each person sees only their own cares and views; no other person can see them. No public metric reads them.',
+    cares: {
+      ...total('cares'),
+      people: agents.filter((a) => state.get(a)?.cares.ever).length,
+      holding: perAgent.filter((a) => a.cares.current !== null).length,
+    },
+    views: {
+      ...total('views'),
+      observers: viewed.size,
+      targets: new Set([...viewed.values()].flatMap((s) => [...s])).size,
+      holding: perAgent.filter((a) => a.views.current.length).length,
+      entries: perAgent.reduce((n, a) => n + a.views.current.length, 0),
+    },
+    perAgent,
+    sampleInterval: PRIVATE_SAMPLE_INTERVAL,
+    similarity: 'jaccard-content-words',
+    viewConvergence: { samples: viewSamples, trend: trend(viewSamples) },
+    caresSimilarity: { samples: caresSamples, trend: trend(caresSamples) },
+  };
+}
+
 export function cultureMetrics(input: CultureInput): CultureMetrics {
   const agents = input.actors.map((a) => a.id);
   const at = positions(input);
@@ -1244,6 +1530,7 @@ export function cultureMetrics(input: CultureInput): CultureMetrics {
     survival: survivalMetric(c),
     nonTransactional: communicationMetric(c),
     symbolic: symbolicMetric(c),
+    privateMemory: privateMemoryMetric(input),
     modelLabels: null,
   };
 }
@@ -1278,6 +1565,23 @@ const ACTOR_TEXT_EVENTS = [
 interface RetainedCall {
   attempt: { id: string; role: 'ordinary' | 'world'; actor: string };
   input: ContinuousModelInput;
+}
+
+/**
+ * A retained model input with the owner's private `memory.cares` and `memory.views` emptied, so
+ * actor-authored private text never enters the authored-prompt environment. Inputs without
+ * these packet fields (every archive before the culture voice) are returned unchanged.
+ */
+export function withoutPrivateMemory(
+  input: ContinuousModelInput,
+): ContinuousModelInput {
+  if (!('longContext' in input)) return input;
+  const memory = object(input.packet.memory);
+  if (!('cares' in memory) && !('views' in memory)) return input;
+  return {
+    ...input,
+    packet: { ...input.packet, memory: { ...memory, cares: null, views: [] } },
+  };
 }
 
 /** Read a continuous-family archive's retained files into the metrics input, up to and including round `through`. */
@@ -1342,7 +1646,11 @@ export function cultureInput(archive: string, through?: number): CultureInput {
     const call = continuousRead<RetainedCall>(join(archive, 'calls', file));
     if (!pending.has(call.attempt.actor)) continue;
     pending.delete(call.attempt.actor);
-    const request = continuousRequest(execution.model, 'ordinary', call.input);
+    const request = continuousRequest(
+      execution.model,
+      'ordinary',
+      withoutPrivateMemory(call.input),
+    );
     prompts.push(...strings(request));
   }
   // Catalogue and world vocabulary; actor records, events and shared state carry agent text and are skipped.
@@ -1398,6 +1706,7 @@ export function cultureInput(archive: string, through?: number): CultureInput {
       ...worldEvents,
     ],
     rounds,
+    voice: world.config.longDevelopment?.culture?.voice ?? false,
   };
 }
 
@@ -1580,8 +1889,85 @@ export function cultureMarkdown(m: CultureMetrics): string {
     `- Non-transactional communication: ${String(m.nonTransactional.nonTransactional)} of ${String(m.nonTransactional.messages)} (${percent(m.nonTransactional.share)}).`,
     `- Symbolic actions (${m.symbolic.interfaces.map(id).join(', ')}): ${m.symbolic.perAgent.map((a) => `${a.actor} ${String(a.succeeded)}`).join(', ')}; every agent at least one: ${m.symbolic.everyAgentAtLeastOne ? 'yes' : 'no'}.`,
     '',
+    ...(m.privateMemory ? privateMarkdown(m.privateMemory) : []),
   ];
   return lines.join('\n');
+}
+
+const score = (value: number | null) =>
+  value === null ? '–' : value.toFixed(3);
+const historyText = (h: PrivateHistory) =>
+  `${String(h.writes)} / ${String(h.changes)} / ${String(h.forgotten)}`;
+function trendLine<T extends { round: number; similarity: number | null }>(
+  t: PrivateTrend<T>,
+  count: (s: T) => string,
+): string {
+  if (!t.first || !t.last) return 'never defined.';
+  const at = (s: T) =>
+    `round ${String(s.round)} ${score(s.similarity)} (${count(s)})`;
+  const signed = (v: number | null) =>
+    v === null ? '–' : `${v >= 0 ? '+' : ''}${v.toFixed(3)}`;
+  return `first ${at(t.first)}, last ${at(t.last)}; change ${signed(t.change)}, slope ${signed(t.slopePer100Rounds)} per 100 rounds.`;
+}
+
+/** The owner-only private memory section, kept apart from the public sections. */
+function privateMarkdown(p: PrivateMemoryMetrics): string[] {
+  const count = (n: number, one: string, many = `${one}s`) =>
+    `${String(n)} ${n === 1 ? one : many}`;
+  return [
+    '### Private memory (owner-only)',
+    '',
+    `Each person's \`cares\` and \`views\` appear only in that person's own packet; no other person can see them. They are reported only in this section and never enter the public metrics above. Writes / changes / forgotten count recorded plan updates, updates that changed the held text, and empty texts that removed a held one.`,
+    '',
+    `- Cares: ${String(p.cares.people)} people held cares, ${String(p.cares.holding)} at the last round; ${historyText(p.cares)}.`,
+    `- Views: ${String(p.views.observers)} people held views of ${String(p.views.targets)} people; ${String(p.views.entries)} views held by ${String(p.views.holding)} people at the last round; ${historyText(p.views)}.`,
+    `- Private view convergence (Jaccard similarity of content-word sets between different observers' current views of the same person, mean over pairs then over targets, every ${String(p.sampleInterval)} rounds): ${trendLine(p.viewConvergence.trend, (s) => `${count(s.targets, 'target')}, ${count(s.pairs, 'pair')}`)}`,
+    `- Cares similarity across people (same similarity, mean over pairs of people holding cares): ${trendLine(p.caresSimilarity.trend, (s) => `${count(s.people, 'person', 'people')}, ${count(s.pairs, 'pair')}`)}`,
+    '',
+    table(
+      [
+        'Person',
+        'Cares writes / changes / forgotten',
+        'View writes / changes / forgotten',
+        'Currently viewed',
+        'Current cares',
+      ],
+      p.perAgent.map((a) => [
+        a.actor,
+        historyText(a.cares),
+        historyText(a.views),
+        a.views.current.map((v) => v.person).join(', ') || '–',
+        a.cares.current ? clip(a.cares.current, 80).replace(/\|/g, '/') : '–',
+      ]),
+    ),
+    '',
+    p.viewConvergence.samples.length
+      ? table(
+          [
+            'Round',
+            'View convergence',
+            'Targets',
+            'View pairs',
+            'Cares similarity',
+            'People',
+            'Cares pairs',
+          ],
+          p.viewConvergence.samples.map((v, i) => {
+            const c = p.caresSimilarity.samples[i];
+            return [
+              String(v.round),
+              score(v.similarity),
+              String(v.targets),
+              String(v.pairs),
+              score(c?.similarity ?? null),
+              String(c?.people ?? 0),
+              String(c?.pairs ?? 0),
+            ];
+          }),
+        )
+      : 'No round was retained.',
+    '',
+  ];
 }
 
 /** CLI: `pnpm metrics:culture -- experiment/exN [more archives] [rounds] [--markdown file] [--json file]`. */

@@ -190,6 +190,8 @@ describe('dependency-scoped acceptance plans', () => {
       'packages/world-core/src/long-planting.ts',
       'apps/simulator/src/collective-controller.ts',
       'packages/world-core/src/material-lots.ts',
+      'packages/world-core/src/expression.ts',
+      'packages/world-core/src/expression-incentives.ts',
     ])
       expect(plan([path]).experiments).toEqual(['ex7']);
   });

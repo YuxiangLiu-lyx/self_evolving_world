@@ -328,3 +328,14 @@ presentation selects an archive through `presentation/session.ts`, while event
 bookmarks are separate presentation metadata copied by the existing asset adapter.
 See [ADR 0026](docs/decisions/0026-bounded-long-development.md) and the
 [protocol](docs/LONG_DEVELOPMENT.md) for boundaries and limitations.
+
+The opt-in culture scenarios add world-core `expression*.ts`: an authored, scope-bound
+`foundation-expression@1` package whose `name`, `mark`, `tell` and `invite` handlers create
+non-solid sign objects and spoken-word events, an environment hook that delivers heard
+words, records attendance and expiry and, when enabled, derives interface-free evidence for
+`derived` satisfaction rules, and the bounded private-memory parser. `continuousRegistry`
+includes the package only when `longDevelopment.culture` enables it. The simulator's
+`long-culture.ts` builds the six-person genesis; `long-context.ts` and `long-request.ts`
+add the culture packet sections and prompt variant only in that scope, and `long-tokens.ts`
+reports the frozen early token ceiling enforced by the runner. See
+[ADR-0028](docs/decisions/0028-culture-scenario.md) and the [design](docs/CULTURE_SCENARIO.md).

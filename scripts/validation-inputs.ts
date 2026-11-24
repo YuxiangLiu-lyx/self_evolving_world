@@ -61,7 +61,7 @@ export function protocolVersions(path: string): readonly number[] {
   const name = path.split('/').at(-1) ?? '';
   // The continuous family never imports the grid-family modules below.
   if (
-    /^(continuous|forest|open|collective|long|material)-|^continuous\.ts$/.test(
+    /^(continuous|forest|open|collective|long|material|expression)-|^continuous\.ts$|^expression\.ts$/.test(
       name,
     )
   )

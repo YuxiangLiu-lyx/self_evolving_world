@@ -72,3 +72,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-34](completed/pr-34-e1-fix-verification.md): E1 (ex14) fix-verification run: 64 rounds, 3,641 tokens per agent per round against ex13's 6,320, eight recorded handoffs.
 
 - [PR-35](completed/pr-35-culture-metrics.md): read-only rule-based culture metrics analyzer and the ex7–ex13 culture baseline.
+
+- [PR-36](completed/pr-36-culture-scenario.md): opt-in culture scenarios (`long-culture`, `long-culture-incentives`) with voice, differentiation, symbolic interfaces, slack, six people, optional incentives and a round-80 token ceiling.

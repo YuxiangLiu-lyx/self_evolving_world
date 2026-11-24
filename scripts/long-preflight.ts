@@ -7,7 +7,10 @@ import {
 } from '@self-evolving-world/world-core';
 import type { V7World, V7Action } from '@self-evolving-world/world-core';
 /** Deliberately constrained no-model counterexample, never an ordinary decision hint. */
-export function longPreflight(genesis: V7World) {
+export function longPreflight(
+  genesis: V7World,
+  { requireHardship = true }: { requireHardship?: boolean } = {},
+) {
   let world = v7Clone(genesis);
   const registry = continuousRegistry(world),
     selected: Record<string, string> = {},
@@ -65,9 +68,11 @@ export function longPreflight(genesis: V7World) {
     for (const a of world.actors)
       if ((a.life?.deaths ?? 0) > 0) firstDeath[a.id] ??= world.tick;
   }
+  // Slack scenarios deliberately ease subsistence; their counterexample is reported, not required.
   if (
-    Object.keys(firstDepletion).length !== genesis.actors.length ||
-    Object.keys(firstDeath).length === 0
+    requireHardship &&
+    (Object.keys(firstDepletion).length !== genesis.actors.length ||
+      Object.keys(firstDeath).length === 0)
   )
     throw new Error(
       'Single-source subsistence is too easy across the frozen difficult period.',

@@ -308,3 +308,59 @@ it('binds the long-fixes checkpoint to its own frozen fixes and limits', async (
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+it('binds both culture checkpoints to their frozen switches and budget mechanics', async () => {
+  const { initialLongWorld } =
+    await import('../apps/simulator/src/long-scenario.js');
+  const root = mkdtempSync(resolve(tmpdir(), 'long-culture-checkpoint-'));
+  try {
+    for (const scenario of [
+      'long-culture',
+      'long-culture-incentives',
+    ] as const) {
+      const state = newContinuousExecution(
+        'fixture',
+        'isolated-fixture',
+        initialLongWorld('long-ex1', scenario),
+      );
+      expect(state.windowTarget).toBe(
+        scenario === 'long-culture-incentives' ? 120 : 80,
+      );
+      const path = resolve(root, 'experiment/ex1/execution.json');
+      continuousAtomic(path, state);
+      expect(readContinuousExecution(root, 'ex1')).toEqual(state);
+      // An extension changes only the window, never the frozen configuration.
+      const extended = v7Clone(state);
+      extended.windowTarget = 250;
+      continuousAtomic(path, extended);
+      expect(readContinuousExecution(root, 'ex1').windowTarget).toBe(250);
+      for (const alter of [
+        (s: typeof state) => {
+          s.world.config.budgets.development += 1;
+        },
+        (s: typeof state) => {
+          s.world.config.budgets.world += 1;
+        },
+        (s: typeof state) => {
+          s.world.config.longDevelopment?.tokenCeilings?.splice(0, 1);
+        },
+        (s: typeof state) => {
+          const culture = s.world.config.longDevelopment?.culture;
+          if (culture) culture.incentives = !culture.incentives;
+        },
+        (s: typeof state) => {
+          delete s.world.config.longDevelopment?.scenario;
+        },
+      ]) {
+        const altered = v7Clone(state);
+        alter(altered);
+        continuousAtomic(path, altered);
+        expect(() => readContinuousExecution(root, 'ex1')).toThrow(
+          'protected run configuration',
+        );
+      }
+    }
+  } finally {
+    rmSync(root, { recursive: true, force: true });
+  }
+});

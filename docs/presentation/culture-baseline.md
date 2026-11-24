@@ -14,9 +14,9 @@ pnpm metrics:culture -- experiment/ex7 experiment/ex8 experiment/ex9 experiment/
 
 The analyzer reads only:
 
-- the replay segments listed in `replay.json`, each checked against its SHA-256: submitted actions, settled events, per-round memory (notes, preferences, intentions, projects, collective intents) and task-cursor intentions;
-- `initial.json` and `execution.json` for actors, vision radius, resources and the interface catalogue;
-- the first retained ordinary call of each actor, rebuilt into its full request (instructions and packet) with the current request builder, as the authored prompt.
+- the replay segments listed in `replay.json`, each checked against its SHA-256: submitted actions, settled events, per-round memory (notes, preferences, intentions, projects, collective intents, and the private `cares` and `views` updates read only by the [private memory](#private-memory-owner-only-culture-voice-only) section) and task-cursor intentions;
+- `initial.json` and `execution.json` for actors, vision radius, resources, the interface catalogue and whether the scope has a culture voice;
+- the first retained ordinary call of each actor, rebuilt into its full request (instructions and packet) with the current request builder, as the authored prompt; the owner's private `memory.cares` and `memory.views` are emptied first.
 
 Actor-authored text is split into **utterances**: messages (with their subject) and public council reports or responses, which are communication; and plan intentions, notes, preferences, project ids and names given through naming actions. A note, preference, intention or project id counts once per actor, in the first round it appears, however long it persists in memory. The fallback intention the controller writes after a decision without an accepted call ("One failed-decision interval; …", found in ex7–ex10 from `execution.json` attempts and cursor start rounds) is not actor-authored and is skipped. A round's action succeeded unless that actor has a `failed` event in the round.
 
@@ -60,6 +60,16 @@ Actor-authored text is split into **utterances**: messages (with their subject) 
 - **Non-transactional share**: the share of communications that mention no coordinate, no resource id or name (except one that is also an actor name) and no word starting with food, stock, supply, reserve, inventory, material, item, resource, nutrition, toxic, edible, harvest, gather, eat, meal, water, location, position, site, route, coordinate, a compass direction, distance, give, gave, trade, exchange, swap, offer, share, lend, loan, borrow, transfer, handover, accept, please, need, help, request, ask, meet, join, together, build, carry, collect, fetch, bring or cooperat. A whole message counts as transactional if any of these appears.
 - **Symbolic actions**: per agent, attempted and successful uses of interfaces named `name`, `mark`, `tell` and `invite`, and whether every agent has at least one successful use. These interfaces do not exist in ex7–ex13, so every value is zero.
 - **Model labeling** is not implemented. The output keeps `modelLabels: null` and the module exports a `CultureLabeler` contract as the only extension point; a labeling pass would need a separate request.
+
+### Private memory (owner-only, culture voice only)
+
+In a scope with the culture voice, a plan may update what the person `cares` about and their `views` of other people ([culture scenario](../CULTURE_SCENARIO.md#a-voice-and-private-memory)). Only the owner's own packet shows them; no other person can see them. The analyzer therefore reports them only in a separate `privateMemory` section of the JSON and a "Private memory (owner-only)" Markdown section. The section is present when `execution.json` enables `longDevelopment.culture.voice` or any round records an update, and `privateMemory` is `null` otherwise, as in ex7–ex14.
+
+- **State** is rebuilt from the round-memory updates exactly as replay applies them: omitted fields persist, an empty text forgets, views apply in person-id order and only the eight most recently updated people are kept.
+- **Counts**, per person and in total: **writes** (updates recorded with a plan, including unchanged repeats), **changes** (writes that changed the held text, including forgetting) and **forgotten** (empty texts that removed a held one); the people who ever held cares or views and the people viewed; and what is held at the last round, with its text.
+- **Private view convergence**: at the end of every 10-round window and at the last round, for each person currently viewed by at least two other people, the Jaccard similarity of the content-word sets (lowercase singular words without stop words or actor names, as for norm keys) of every pair of observers' views, averaged over the pairs and then over those people. Each sample reports the number of targets and pairs behind it and is null when nobody has two observers; a pair whose views both lack content words is skipped. The trend gives the first and last scored samples, their difference and the least-squares slope over all scored samples per 100 rounds.
+- **Cares similarity** applies the same similarity to every pair of people currently holding cares; it is null with fewer than two.
+- **Separation**: no metric outside this section reads `cares` or `views`. They are not utterances, so they cannot coin, share, transmit or echo a term, norm or belief, and exposure and transmission are measured from public communication only (messages, public text within the vision radius and council reads). A test shows that private views and cares repeating a shared term, a norm and a belief leave every public metric unchanged.
 
 ## Baseline
 

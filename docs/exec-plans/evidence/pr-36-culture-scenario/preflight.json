@@ -1,0 +1,136 @@
+{
+  "description": "Offline, model-free feasibility checks of the long-culture genesis (identical physical world in long-culture-incentives), compared with the retained ex13 preflight. Produced with openPreflight(1600, genesis) and longPreflight(genesis, { requireHardship: false }) from this branch.",
+  "culture": {
+    "actors": 6,
+    "rounds": 1600,
+    "optionalShare": 0.7606,
+    "survivalActionShare": 0.239375,
+    "actions": {
+      "wait": 7302,
+      "gather": 776,
+      "navigate": 86,
+      "eat": 776,
+      "rest": 660
+    },
+    "failures": {},
+    "initialSafeNutrition": 9654,
+    "firstFoodRound": {
+      "lin": 4,
+      "moss": 4,
+      "sol": 5,
+      "kai": 5,
+      "wren": 5,
+      "ivo": 5
+    },
+    "nearestFoodDistance": {
+      "lin": 0.94,
+      "moss": 1.09,
+      "sol": 1.44,
+      "kai": 1.82,
+      "wren": 1.82,
+      "ivo": 1.44
+    },
+    "minima": {
+      "lin": {
+        "health": 86.9,
+        "satiety": 73.9
+      },
+      "moss": {
+        "health": 86.9,
+        "satiety": 70
+      },
+      "sol": {
+        "health": 64.4,
+        "satiety": 71.1
+      },
+      "kai": {
+        "health": 64.4,
+        "satiety": 74.6
+      },
+      "wren": {
+        "health": 64.4,
+        "satiety": 72.6
+      },
+      "ivo": {
+        "health": 86.9,
+        "satiety": 56
+      }
+    },
+    "livesLost": 0,
+    "stationaryCounterexample": {
+      "selected": {
+        "lin": "start-1-nuts",
+        "moss": "forest-berry-1",
+        "sol": "forest-berry-1",
+        "kai": "commons-root-3-0",
+        "wren": "commons-berry-4-0",
+        "ivo": "start-1-nuts"
+      },
+      "firstDepletion": {
+        "wren": 226,
+        "kai": 393
+      },
+      "firstDeath": {
+        "lin": 102,
+        "moss": 102,
+        "sol": 102,
+        "ivo": 102,
+        "wren": 351,
+        "kai": 523
+      },
+      "note": "The deaths at round 102 are two pairs (lin and ivo, moss and sol) whose deliberately naive controller picked the same nearest source; their simultaneous gathers conflict and are both rejected every round, so they never eat. This is a property of that controller in dense starts, not a food shortage; the scenario therefore reports this counterexample without requiring it to fail."
+    }
+  },
+  "ex13": {
+    "actors": 3,
+    "rounds": 1600,
+    "optionalShare": 0.7492,
+    "survivalActionShare": 0.2508,
+    "actions": {
+      "wait": 3596,
+      "navigate": 194,
+      "gather": 331,
+      "eat": 330,
+      "rest": 349
+    },
+    "initialSafeNutrition": 4374,
+    "firstFoodRound": {
+      "sol": 5,
+      "lin": 6,
+      "moss": 6
+    },
+    "nearestFoodDistance": {
+      "lin": 2.19,
+      "moss": 2.19,
+      "sol": 1.53
+    },
+    "minima": {
+      "lin": {
+        "health": 64.3,
+        "satiety": 60.1
+      },
+      "moss": {
+        "health": 86.9,
+        "satiety": 71.1
+      },
+      "sol": {
+        "health": 25.8,
+        "satiety": 68.8
+      }
+    },
+    "livesLost": 0,
+    "stationaryCounterexample": {
+      "firstDepletion": {
+        "lin": 82,
+        "moss": 82,
+        "sol": 174
+      },
+      "firstDeath": {
+        "lin": 227,
+        "moss": 227,
+        "sol": 292
+      }
+    }
+  },
+  "limitation": "The oracle uses privileged safe-food definitions and waits whenever satiety is at least 78, so its optional share is a feasibility bound, not a forecast of model agents. No model was called."
+}

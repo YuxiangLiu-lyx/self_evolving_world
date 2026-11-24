@@ -39,6 +39,14 @@ import type { SceneFrame } from './continuous-scene.js';
 import { CONTINUOUS_VISUALS } from './continuous-visuals.js';
 import { COLLECTIVE_COLORS } from './collective-view.js';
 
+/** Body colors of the long-run people; the culture scenario's three newcomers get their own. */
+const PERSON_COLORS: Record<string, string> = {
+  lin: '#c5aa73',
+  moss: '#83a99e',
+  kai: '#9fa3c9',
+  wren: '#c99a6b',
+  ivo: '#8fb98a',
+};
 const visualCache = new Map<string, HTMLImageElement>();
 function packageVisual(c: CanvasRenderingContext2D, o: V7Object): boolean {
   const render = CONTINUOUS_VISUALS[o.visual.component];
@@ -295,6 +303,8 @@ function object(
     return;
   }
   if (o.kind === 'canopy-post') ellipse(c, 0.03, 0.03, 0.12, 0.06, '#1b302b40');
+  else if (o.visual.component === 'sign')
+    ellipse(c, 0.02, 0.16, 0.12, 0.05, '#1b302b40');
   else if (!['rain-canopy', 'rain-canopy-work'].includes(o.kind))
     ellipse(c, 0.13, 0.12, 0.58, 0.22, '#1b302b40');
   if (packageVisual(c, o)) {
@@ -437,7 +447,8 @@ function actor(
   const dead = a.vitals.health <= 0,
     color =
       (a.collective ? COLLECTIVE_COLORS[a.collective.group] : undefined) ??
-      (a.id === 'lin' ? '#c5aa73' : a.id === 'moss' ? '#83a99e' : '#b89087');
+      PERSON_COLORS[a.id] ??
+      '#b89087';
   ellipse(c, 0.02, 0.15, 0.28, 0.12, '#142b294d');
   if (a.id === selected) {
     c.strokeStyle = '#f5dba1';

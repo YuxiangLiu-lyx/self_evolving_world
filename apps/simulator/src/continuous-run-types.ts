@@ -115,6 +115,9 @@ export interface V7RoundRecord {
       intention?: string;
       collectiveIntent?: CollectiveIntent;
       projects?: V7Project[];
+      /** Opt-in private memory update of the culture scope. */
+      cares?: string;
+      views?: Record<string, string>;
     }
   >;
   events: V7World['events'];

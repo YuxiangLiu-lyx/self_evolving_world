@@ -54,7 +54,7 @@ import {
 } from './continuous-analysis.js';
 
 const USAGE = `Usage:
-  pnpm experiment:continuous -- new open|long|long-fixes|collective-a
+  pnpm experiment:continuous -- new open|long|long-fixes|long-culture|long-culture-incentives|collective-a
   pnpm experiment:continuous -- new collective-b exA
   pnpm experiment:continuous -- continue exN
   pnpm experiment:continuous -- develop exN validation-results/development.json
@@ -119,7 +119,14 @@ try {
     } else
       preflight = {
         baseline: openPreflight(1600, genesis),
-        ...(long ? { stationary: longPreflight(genesis) } : {}),
+        ...(long
+          ? {
+              stationary: longPreflight(genesis, {
+                requireHardship:
+                  !genesis.config.longDevelopment?.culture?.slack,
+              }),
+            }
+          : {}),
         ...(physicalHash ? { physicalHash } : {}),
       };
     token = await renewableAccessToken();
@@ -196,13 +203,15 @@ try {
       (extra === undefined ||
         (extra === '--abandoned-pid' && rest.length === 1))
     ) {
-      await repairContinuousRun(
+      const repaired = await repairContinuousRun(
         root,
         id,
         rest[0] === undefined ? undefined : Number(rest[0]),
       );
       console.log(
-        `${id}: technical pause retained; submit the counted development handoff with develop.`,
+        repaired === 'transport'
+          ? `${id}: transport failure retained; resuming without a development handoff.`
+          : `${id}: technical pause retained; submit the counted development handoff with develop.`,
       );
     } else throw new Error(USAGE);
     state = continuousCheckpoint(root, id);

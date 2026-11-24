@@ -49,6 +49,7 @@ import { COLLECTIVE_FOOD } from './collective-food.js';
 import { COLLECTIVE_SHELTER } from './collective-shelter.js';
 import { OPEN_EXTRACTION } from './open-extraction.js';
 import { collectiveFoundation } from './collective-social.js';
+import { expressionFoundation } from './expression.js';
 import { OPEN_WATER } from './open-water.js';
 import { OPEN_SHORT_DIAGNOSTICS } from './open-short-diagnostics.js';
 import { OPEN_SHORT_REFUGE } from './open-short.js';
@@ -182,6 +183,17 @@ export const continuousRegistry = (world?: V7World) =>
           ),
           ...(world.config.collective
             ? [collectiveFoundation(world.config.development.scope)]
+            : []),
+          ...(world.config.longDevelopment?.culture &&
+          (world.config.longDevelopment.culture.symbols ||
+            world.config.longDevelopment.culture.incentives)
+            ? [
+                expressionFoundation(
+                  world.config.development.scope,
+                  world.config.longDevelopment.culture,
+                  world.config.vision,
+                ),
+              ]
             : []),
           ...V7_PACKAGES.filter(
             (p) => p.scope === world.config.development?.scope,

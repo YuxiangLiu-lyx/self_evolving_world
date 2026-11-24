@@ -33,7 +33,18 @@ const rootSurface: ContinuousVisual = (o) => {
     food && Number(food.waterFraction) <= 0.1200001 ? '#b79b61' : '#d0b77d';
   return `<ellipse rx=".38" ry=".28" fill="#b99e73" stroke="#ddd0aa" stroke-width=".025" ${o.visual.state === 'ready' ? '' : 'stroke-dasharray=".05 .04"'}/><ellipse cx="-.28" rx=".09" ry=".12" fill="#8c9790"/>${o.kind === 'root-drying-tray' ? '<ellipse cx=".28" rx=".09" ry=".12" fill="#8c9790"/>' : ''}${present ? `<path transform="scale(${String(scale)})" d="M-.16-.08L.14-.1L.18.09L-.12.12Z" fill="${fill}"/>` : ''}`;
 };
+/** A small post with a kind-colored glyph and its short text; signs have no physical body. */
+const sign: ContinuousVisual = (o) => {
+  const glyph =
+    o.kind === 'name'
+      ? '<path d="M-.09-.34H.09M0-.34V-.2" stroke="#2f3b35" stroke-width=".03"/>'
+      : o.kind === 'mark'
+        ? '<path d="M-.07-.34L.07-.2M.07-.34L-.07-.2" stroke="#2f3b35" stroke-width=".03"/>'
+        : '<circle cy="-.27" r=".06" fill="none" stroke="#2f3b35" stroke-width=".03"/>';
+  return `<path d="M0 .16V-.12" stroke="#7a6449" stroke-width=".04"/><rect x="-.14" y="-.41" width=".28" height=".28" rx=".04" fill="${color(o.visual.color)}" stroke="${color(o.visual.accent)}" stroke-width=".04"/>${glyph}<text y="-.5" text-anchor="middle" fill="#fff0cf" stroke="#253c34" stroke-width=".02" paint-order="stroke" font-size=".16">${svgText(o.visual.label.slice(0, 24))}</text>`;
+};
 export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
+  sign,
   'surface-residue': (o) =>
     `<circle r=".1" fill="none" stroke="#b8a17b" stroke-width=".01"/>${Number(o.data.mass ?? 0) > 0 ? '<circle r=".03" fill="#574f39"/>' : ''}`,
   'loose-material': (o) =>

@@ -84,7 +84,8 @@ E1's gate is at most 4,500 tokens per agent per round; if rounds 0–39 are not 
 
 - **Problem**: fixes 2–4 were offline estimates and prompt guidance; only a run could show their effect.
 - **Run**: `new long-fixes` on the ex13 rules, seed and world, 3 agents, 8 development handoffs and a 1,600,000-token ceiling. The window passed the round-40 gate and was extended toward 80, but it stopped at round 64 when the eighth handoff was spent and a ninth develop review arrived (the same recorded reason as ex13). All three were alive at health 100. One handoff was a recovery from a server overload at round 0.
-- **Metrics**: ex14 rounds 0–63 against ex13 rounds 0–63 and the planned ex13 baseline, rounds 0–79 (`pnpm metrics:long`):
+- **Comparison window**: 64 rounds. ex14 observed rounds 0–63 before it stopped at round 64, so rounds 64–79 of the planned 80-round window were never observed. Every comparison below is against ex13 rounds 0–63; the ex13 rounds 0–79 column is the planned baseline, shown for reference only.
+- **Metrics** (`pnpm metrics:long`):
 
 | Metric                                                                     | ex14, rounds 0–63 | ex13, rounds 0–63 | ex13, rounds 0–79 |
 | -------------------------------------------------------------------------- | ----------------- | ----------------- | ----------------- |
@@ -98,6 +99,14 @@ E1's gate is at most 4,500 tokens per agent per round; if rounds 0–39 are not 
 | World Agent reuse                                                          | 3/11              | 0/8               | 0/11              |
 | Interfaces bound to one agent or item                                      | 0/6               | 2/9               | 5/12              |
 | Calls with unknown usage                                                   | 1                 | 3                 | 3                 |
+
+- **Token count**: the ex14 value of 3,641 counts all 103 calls, including the three World Agent calls at the round-64 boundary that ended the run; without them it is 3,553.
+
+**Effects of fix 2 and fix 3, separated by mechanism.** All fixes were on together, so this is an attribution within one run, not a causal separation.
+
+- **Fix 2 (whole exact reads)** removed what it targeted: continuation-part queries fell from 55 to 0, and plans decided with a partly read record fell from 22/29 to 0/14. It did not lower the follow-up share (55.7% against 52.5%): agents still spent follow-up calls on queries for other records. Whole records also made no call cheaper: an ordinary call used 7,744 tokens against ex13's 7,597 (+2%).
+- **Fix 3 (plan-horizon guidance)** changed how often agents decide: the median decision gap rose from 2 to 5 rounds, accepted plans fell from 65 to 31, and the share of plans whose every step runs once fell from 69% to 29%. Ordinary calls halved (141 to 70).
+- **Cost**: tokens per agent per round fell 42% (6,320 to 3,641). Ordinary-call tokens per agent per round fell from 5,461 to 2,783 because there were half as many ordinary calls at the same cost per call; World Agent tokens per agent per round stayed about the same (859 against 858). The reduction therefore comes mainly from fix 3's fewer decisions, not from fix 2.
 
 - **Culture metrics** (`pnpm metrics:culture -- experiment/ex14`): survival behavior took 55.2% of actor-rounds (ex13: 41.5% over 280 rounds); there were no messages and no symbolic actions; 2 terms were later used by another agent, neither through communication.
 - **Gates**: G1 (at most 4,500 tokens per agent per round) passed at 3,641. The round-40 gate passed at 3,337 against ex13's 5,962.
@@ -115,7 +124,7 @@ This is one seed with three people, so the comparison is a case comparison, not 
 
 ## Limitations
 
-- Fixes 2–4 are turned on together in E1, so one run cannot separate their effects. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.
+- Fixes 2–4 are turned on together in E1, so one run cannot separate their effects causally; section 5 attributes them by mechanism only. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.
 - The effect of fix 2 is an offline estimate. Fixes 3 and 4 are prompt guidance; only a new run shows whether agents follow it.
 - The bound-interface rule is lexical. It counts an interface named after a person but generic in function as general, and may miss bindings expressed only in code.
 - These fixes lower cost and raise capability reuse. They do not guarantee more interesting behavior; that depends on the next steps, the changes to the environment and incentives.

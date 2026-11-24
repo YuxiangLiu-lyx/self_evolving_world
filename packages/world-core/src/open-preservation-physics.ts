@@ -2,7 +2,18 @@ import type { V7Data, V7Object, V7Stack, V7World } from './continuous-types.js';
 import { v7RoundNumber } from './continuous-data.js';
 import { forestClimate, forestEvent } from './forest-climate.js';
 import { refugeRay } from './open-shelter-geometry.js';
-import { v7ShapeDistance, v7ShapesOverlap } from './continuous-geometry.js';
+import {
+  v7Distance,
+  v7ShapeDistance,
+  v7ShapesOverlap,
+} from './continuous-geometry.js';
+import {
+  foodGroundArea,
+  foodGroundRadius,
+  foodGroundSpatial,
+  foodObjectArea,
+} from './food-water-surface.js';
+import type { FoodWaterSurface } from './food-water-surface.js';
 export interface PreservationPhysics extends V7Data {
   version: number;
   initialWaterFraction: number;
@@ -20,6 +31,9 @@ export interface PreservationPhysics extends V7Data {
   history: V7Data[];
   contamination: string;
   initialization: string;
+  /** Opt-in general surface of the food water representation (`foodWater` worlds only).
+   * Absent in every ex10 record; an object surface also keeps its id in `tray`. */
+  surface?: FoodWaterSurface;
 }
 export function preservationPhysics(s: V7Stack): PreservationPhysics | null {
   const d = s.processing?.preservationPhysics;
@@ -121,15 +135,21 @@ export function preservationExchange(w: V7World, s: V7Stack): void {
     p = s.physical;
   if (!d || !p || d.lastTick === w.tick || s.quantity <= 0) return;
   d.lastTick = w.tick;
+  // Opt-in food water representation; every ex10 world takes the original path.
+  const general = w.state.foodWater === 1;
+  if (general) foodSurfaceRetain(w, s);
   const tray = w.objects.find((o) => o.id === d.tray),
     owner = w.actors.find((a) => a.id === s.owner);
   const point = tray?.spatial ?? owner?.position ?? s.position;
-  const climate = forestClimate(w, point),
+  const climate = forestClimate(w, point, general),
     rh = climate.airHumidity ?? 0.65;
   let area = 0;
   if (tray) {
     try {
-      area = preservationTrayArea(w, tray);
+      area =
+        general && tray.data.foodSurface === true
+          ? foodObjectArea(w, tray)
+          : preservationTrayArea(w, tray);
     } catch {
       area = 0;
     }
@@ -158,6 +178,13 @@ export function preservationExchange(w: V7World, s: V7Stack): void {
       )
     )
       area = 0;
+  } else if (general && d.surface?.kind === 'ground') {
+    try {
+      area = foodGroundArea(w, d.surface);
+    } catch {
+      area = 0;
+    }
+    if (foodSurfaceOccupied(w, s.id, d.surface)) area = 0;
   }
   d.area = area;
   const roof = Math.max(
@@ -216,7 +243,8 @@ export function preservationExchange(w: V7World, s: V7Stack): void {
       massRatio: p.unitMass / d.initialUnitMass,
       prepared: d.prepared,
     };
-    if (spread)
+    // A general food surface wears only when it carries a service account.
+    if (spread && (!general || 'service' in tray.data))
       tray.data.service = Math.max(0, Number(tray.data.service) - 0.01);
   }
   if (area > 0)
@@ -262,4 +290,66 @@ export function preservationAge(s: V7Stack, ambient: number): number {
     d.actualDeterioration += ambient * rate;
   }
   return ambient * rate;
+}
+
+// Opt-in general surfaces of the food water representation (`foodWater` worlds only).
+// Ex10 trays keep their own rules above; these rules apply only to records with `surface`.
+
+/** One sample per surface: another sample bound to it, or other loose material lying on it. */
+export function foodSurfaceOccupied(
+  w: V7World,
+  sample: string,
+  surface: FoodWaterSurface,
+): boolean {
+  if (surface.kind === 'object') {
+    const o = w.objects.find((o) => o.id === surface.id);
+    return (
+      !!o &&
+      w.stacks.some(
+        (x) =>
+          x.id !== sample &&
+          (preservationPhysics(x)?.tray === o.id ||
+            (x.owner === null &&
+              v7ShapeDistance(x.position, o.spatial) <= 0.01)),
+      )
+    );
+  }
+  const spatial = foodGroundSpatial(surface),
+    radius = foodGroundRadius(surface);
+  return w.stacks.some((x) => {
+    if (x.id === sample) return false;
+    const other = preservationPhysics(x)?.surface;
+    if (other?.kind === 'ground')
+      return (
+        v7Distance(other, surface) < foodGroundRadius(other) + radius - 1e-8
+      );
+    return x.owner === null && v7ShapeDistance(x.position, spatial) <= 0.01;
+  });
+}
+/** Exposed food lies on its surface only while some remains, it is not carried and it has
+ * not moved off the surface. */
+export function foodSurfaceLying(
+  w: V7World,
+  s: V7Stack,
+  surface: FoodWaterSurface,
+): boolean {
+  if (s.owner !== null || s.quantity <= 0) return false;
+  if (surface.kind === 'ground')
+    return v7Distance(s.position, surface) <= foodGroundRadius(surface);
+  const o = w.objects.find((o) => o.id === surface.id);
+  return !!o && v7ShapeDistance(s.position, o.spatial) <= 0.01;
+}
+/** Ends a general surface exposure. Composition, preparation, age and history persist. */
+export function foodSurfaceRelease(w: V7World, s: V7Stack): void {
+  const d = preservationPhysics(s);
+  if (!d) return;
+  preservationReleaseSurface(w, s);
+  delete d.surface;
+}
+/** Food that was picked up, given or removed from its surface stops exchanging there. */
+function foodSurfaceRetain(w: V7World, s: V7Stack): void {
+  for (const x of [s, ...w.stacks]) {
+    const surface = preservationPhysics(x)?.surface;
+    if (surface && !foodSurfaceLying(w, x, surface)) foodSurfaceRelease(w, x);
+  }
 }

@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import type { V7Event } from '@self-evolving-world/world-core';
+import type { ContinuousModelInput } from '../apps/simulator/src/continuous-provider.js';
 import {
   activityEpisodes,
   archiveCultureMetrics,
+  contentSimilarity,
   cultureMarkdown,
   cultureMetrics,
   environmentIndex,
@@ -11,6 +13,7 @@ import {
   termCandidates,
   transactional,
   utterances,
+  withoutPrivateMemory,
 } from './culture-metrics.js';
 import type { CultureInput, CultureRound } from './culture-metrics.js';
 
@@ -555,6 +558,267 @@ describe('auxiliary metrics', () => {
   });
 });
 
+describe('owner-only private memory', () => {
+  it('rebuilds cares and views with persistence, forgetting and the person cap', () => {
+    const metrics = cultureMetrics(
+      world([
+        round(1, idle, {
+          memory: {
+            lin: {
+              cares: 'Quiet mornings by the stream',
+              views: { sol: 'Loud', moss: 'Patient and kind' },
+            },
+          },
+        }),
+        // Omitted fields persist.
+        round(2, idle, { memory: { lin: { notes: [] } } }),
+        // An unchanged text is a write, not a change; an empty view forgets.
+        round(3, idle, {
+          memory: {
+            lin: { cares: 'Quiet mornings by the stream', views: { sol: '' } },
+          },
+        }),
+        round(4, idle, {
+          memory: { lin: { cares: '' }, moss: { cares: 'Shared meals' } },
+        }),
+      ]),
+    );
+    const p = metrics.privateMemory;
+    expect(p).toMatchObject({
+      visibility: 'owner-only',
+      cares: { people: 2, holding: 1, writes: 4, changes: 3, forgotten: 1 },
+      views: {
+        observers: 1,
+        targets: 2,
+        holding: 1,
+        entries: 1,
+        writes: 3,
+        changes: 3,
+        forgotten: 1,
+      },
+    });
+    expect(p?.perAgent[0]).toEqual({
+      actor: 'lin',
+      cares: { writes: 3, changes: 2, forgotten: 1, current: null },
+      views: {
+        writes: 3,
+        changes: 3,
+        forgotten: 1,
+        current: [{ person: 'moss', view: 'Patient and kind', round: 1 }],
+      },
+    });
+    expect(p?.perAgent[1]?.cares.current).toBe('Shared meals');
+    // Only round 4, the last retained round, is sampled.
+    expect(p?.viewConvergence.samples.map((s) => s.round)).toEqual([4]);
+
+    const people = Array.from({ length: 10 }, (_, i) => ({
+      id: `p${String(i)}`,
+      name: `P${String(i)}`,
+    }));
+    const crowded = cultureMetrics({
+      ...world([
+        round(
+          1,
+          {},
+          {
+            memory: {
+              p0: {
+                views: Object.fromEntries(
+                  people.slice(1).map((x) => [x.id, `Neighbour ${x.name}`]),
+                ),
+              },
+            },
+          },
+        ),
+      ]),
+      actors: people,
+    });
+    // Views apply in person-id order and only the eight most recent people are kept.
+    expect(
+      crowded.privateMemory?.perAgent[0]?.views.current.map((v) => v.person),
+    ).toEqual(['p2', 'p3', 'p4', 'p5', 'p6', 'p7', 'p8', 'p9']);
+  });
+
+  it('is null without private memory and empty in a voice scope without updates', () => {
+    expect(cultureMetrics(world([round(1, idle)])).privateMemory).toBeNull();
+    const empty = cultureMetrics({ ...world([round(1, idle)]), voice: true });
+    expect(empty.privateMemory).toMatchObject({
+      cares: { people: 0, writes: 0 },
+      views: { observers: 0, writes: 0 },
+      viewConvergence: {
+        samples: [{ round: 1, similarity: null, targets: 0, pairs: 0 }],
+        trend: { first: null, last: null, change: null },
+      },
+    });
+  });
+
+  it('measures private view convergence rising as two observers see a third alike', () => {
+    expect(
+      contentSimilarity(
+        'Moss is a gentle forager.',
+        'Gentle forager, Lin.',
+        NAMES,
+      ),
+    ).toBe(1);
+    expect(contentSimilarity('Moss', 'the', NAMES)).toBeNull();
+    const views = (
+      tick: number,
+      memory: CultureRound['memory'],
+    ): CultureRound => round(tick, idle, { memory });
+    const metrics = cultureMetrics(
+      world([
+        views(1, {
+          lin: {
+            cares: 'The stream and quiet mornings',
+            views: { moss: 'Gentle forager who hums near the stream' },
+          },
+          moss: { views: { lin: 'Quiet' } },
+        }),
+        round(10, idle),
+        views(12, {
+          sol: {
+            cares: 'Quiet mornings and warm fires',
+            views: { moss: 'Stubborn climber hoarding roots' },
+          },
+        }),
+        round(20, idle),
+        views(25, {
+          sol: { views: { moss: 'Gentle climber who hums at dusk' } },
+        }),
+        round(30, idle),
+        views(35, {
+          sol: { views: { moss: 'Gentle forager who hums by the stream' } },
+        }),
+        round(40, idle),
+      ]),
+    );
+    const p = metrics.privateMemory;
+    // Each target has a single observer at round 10, so convergence is undefined there.
+    expect(
+      p?.viewConvergence.samples.map((s) => [
+        s.round,
+        s.similarity,
+        s.targets,
+        s.pairs,
+      ]),
+    ).toEqual([
+      [10, null, 0, 0],
+      [20, 0, 1, 1],
+      [30, 1 / 3, 1, 1],
+      [40, 1, 1, 1],
+    ]);
+    expect(p?.viewConvergence.trend).toMatchObject({
+      first: { round: 20, similarity: 0 },
+      last: { round: 40, similarity: 1 },
+      change: 1,
+    });
+    expect(p?.viewConvergence.trend.slopePer100Rounds).toBeCloseTo(5);
+    expect(
+      p?.caresSimilarity.samples.map((s) => [s.round, s.similarity, s.people]),
+    ).toEqual([
+      [10, null, 1],
+      [20, 0.4, 2],
+      [30, 0.4, 2],
+      [40, 0.4, 2],
+    ]);
+    expect(p?.caresSimilarity.trend.slopePer100Rounds).toBeCloseTo(0);
+    const markdown = cultureMarkdown(metrics);
+    expect(markdown).toContain('### Private memory (owner-only)');
+    expect(markdown).toContain('no other person can see them');
+    expect(markdown).toContain(
+      'first round 20 0.000 (1 target, 1 pair), last round 40 1.000 (1 target, 1 pair)',
+    );
+  });
+
+  it('never feeds private cares and views into public or transmission metrics', () => {
+    const rounds = () => [
+      round(1, idle, {
+        events: [
+          message(1, 'lin', 'moss', 'Meet me at the Stone Circle.'),
+          message(1, 'lin', 'sol', 'We should always share berries.'),
+        ],
+      }),
+      round(2, idle, {
+        memory: { moss: { notes: ['The Stone Circle is quiet.'] } },
+      }),
+      round(3, idle, {
+        events: [message(3, 'moss', 'sol', 'I rested at the Hearth Keeper.')],
+      }),
+    ];
+    const base = world(rounds());
+    const secret = world(rounds());
+    // Private text repeats a shared term, coins a term used publicly later, states a
+    // norm and a belief, and echoes the public norm; none of it may count publicly.
+    const first = secret.rounds[0];
+    if (first)
+      first.memory = {
+        sol: {
+          cares: 'The Hearth Keeper and the Stone Circle.',
+          views: {
+            moss: 'Moss should always share berries because the spirit is angry.',
+          },
+        },
+        lin: { views: { sol: 'Sol must rest by the Stone Circle.' } },
+      };
+    const second = secret.rounds[1];
+    if (second)
+      second.memory = {
+        ...second.memory,
+        sol: {
+          views: {
+            lin: 'We should always share berries at the Hearth Keeper.',
+          },
+        },
+      };
+    expect(utterances(secret)).toEqual(utterances(base));
+    const open = cultureMetrics(base);
+    const hidden = cultureMetrics(secret);
+    expect(open.privateMemory).toBeNull();
+    expect(hidden.privateMemory?.views.entries).toBe(3);
+    expect({ ...hidden, privateMemory: null }).toEqual(open);
+    expect(hidden.vocabulary.top.map((t) => t.term)).toEqual(['Stone Circle']);
+    expect(hidden.norms.phraseEchoes).toBe(0);
+    expect(hidden.beliefs.statements).toBe(0);
+  });
+
+  it('empties private memory in a retained request before it becomes environment', () => {
+    const input: ContinuousModelInput = {
+      longContext: {
+        version: 1,
+        scope: 'culture',
+        role: 'ordinary',
+        actor: 'lin',
+        remainingQueryBatches: 2,
+        outputTokens: 100,
+        voice: true,
+      },
+      protocol: 'continuous-v1',
+      tick: 3,
+      catalogue: { interfaces: [], events: [] },
+      packet: {
+        memory: {
+          tendencies: null,
+          cares: 'The Hearth Keeper',
+          views: [{ person: 'moss', view: 'Ember Warden', updatedAt: 2 }],
+        },
+      },
+      retrieval: [],
+    };
+    const cleaned = withoutPrivateMemory(input);
+    expect(JSON.stringify(cleaned)).not.toMatch(/Hearth Keeper|Ember Warden/);
+    expect(cleaned).toEqual({
+      ...input,
+      packet: { memory: { tendencies: null, cares: null, views: [] } },
+    });
+    expect(JSON.stringify(input)).toContain('Hearth Keeper');
+    const earlier: ContinuousModelInput = {
+      ...input,
+      packet: { memory: { tendencies: null } },
+    };
+    expect(withoutPrivateMemory(earlier)).toBe(earlier);
+  });
+});
+
 describe('retained ex13 baseline', () => {
   it('pins headline culture metrics from retained files', () => {
     const metrics = archiveCultureMetrics('experiment/ex13');
@@ -571,6 +835,7 @@ describe('retained ex13 baseline', () => {
       'survival',
       'nonTransactional',
       'symbolic',
+      'privateMemory',
       'modelLabels',
     ]);
     expect(metrics).toMatchObject({
@@ -594,6 +859,7 @@ describe('retained ex13 baseline', () => {
       survival: { actorRounds: 840, survivalRounds: 349 },
       nonTransactional: { messages: 17, nonTransactional: 0 },
       symbolic: { everyAgentAtLeastOne: false },
+      privateMemory: null,
       modelLabels: null,
     });
     expect(metrics.vocabulary.top[0]).toMatchObject({
@@ -610,5 +876,6 @@ describe('retained ex13 baseline', () => {
     );
     expect(archiveCultureMetrics('experiment/ex13', 80).rounds.count).toBe(80);
     expect(cultureMarkdown(metrics)).toContain('## Culture metrics: ex13');
+    expect(cultureMarkdown(metrics)).not.toContain('Private memory');
   });
 });

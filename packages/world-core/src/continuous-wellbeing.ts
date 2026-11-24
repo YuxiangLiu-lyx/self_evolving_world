@@ -96,7 +96,9 @@ export function v7Wellbeing(world: V7World): void {
           ].some(
             (trigger) =>
               event.type === trigger.event &&
-              event.interface === trigger.interface,
+              (rule.derived
+                ? event.interface === null
+                : event.interface === trigger.interface),
           ) ||
           ['requested', 'learning', 'mastered', 'registered'].includes(
             event.type,
@@ -206,7 +208,10 @@ export function v7Wellbeing(world: V7World): void {
               ...(m.alternativeTriggers ?? []),
             ].some(
               (trigger) =>
-                e.type === trigger.event && e.interface === trigger.interface,
+                e.type === trigger.event &&
+                (rule.derived
+                  ? e.interface === null
+                  : e.interface === trigger.interface),
             ),
         );
         if (evidence && actor.vitals.health > 0 && !source) {

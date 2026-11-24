@@ -6,15 +6,32 @@ import {
 } from '@self-evolving-world/world-core';
 import type { V7World } from '@self-evolving-world/world-core';
 import { initialOpenWorld } from './open-scenario.js';
+import {
+  applyCulture,
+  CULTURE_OPTIONS,
+  LONG_CULTURE,
+  LONG_CULTURE_INCENTIVES,
+} from './long-culture.js';
 
 export const LONG_OBJECTIVE =
   'Observe evidence-based open development, persistent projects, capability dependencies and actual benefits under frozen recurring pressures; no particular invention or activity is required.';
 export const LONG_FIXES_OBJECTIVE =
   'Under the ex13 rules and seed, check whether whole exact reads, plan-horizon guidance and general-capability guidance lower per-agent token use and broaden developed capabilities; no particular invention or activity is required.';
 
+export const LONG_CULTURE_OBJECTIVE =
+  'Under the ex13 rules and seed with six people, reduced survival pressure, names, marks, spoken words, meeting invitations and private views, observe what people make and keep; no particular outcome, activity or invention is required.';
+export const LONG_CULTURE_INCENTIVES_OBJECTIVE =
+  'As the culture run, with bounded, decaying satisfaction from being answered or remembered, two-way contact and noticed own work; no particular outcome, activity or invention is required.';
+
 /** Named long scenarios. `long` is the frozen ex13 baseline. */
-export type LongScenario = 'long' | 'long-fixes';
-export const LONG_SCENARIOS: readonly LongScenario[] = ['long', 'long-fixes'];
+export type LongScenario =
+  'long' | 'long-fixes' | 'long-culture' | 'long-culture-incentives';
+export const LONG_SCENARIOS: readonly LongScenario[] = [
+  'long',
+  'long-fixes',
+  'long-culture',
+  'long-culture-incentives',
+];
 
 /** The fix-verification run: ex13 rules and seed with the three opt-in fixes and smaller limits.
  * The first window stops at round 40 for the comparison gate; it is then extended to `rounds`. */
@@ -30,15 +47,26 @@ export const LONG_FIXES = {
 export function longScenario(
   policy: NonNullable<V7World['config']['longDevelopment']>,
 ): LongScenario {
-  return policy.scenario === 'fixes' ? 'long-fixes' : 'long';
+  return policy.scenario === 'fixes'
+    ? 'long-fixes'
+    : policy.scenario === 'culture'
+      ? 'long-culture'
+      : policy.scenario === 'culture-incentives'
+        ? 'long-culture-incentives'
+        : 'long';
 }
 
 export function longObjective(
   policy: NonNullable<V7World['config']['longDevelopment']>,
 ): string {
-  return longScenario(policy) === 'long-fixes'
+  const scenario = longScenario(policy);
+  return scenario === 'long-fixes'
     ? LONG_FIXES_OBJECTIVE
-    : LONG_OBJECTIVE;
+    : scenario === 'long-culture'
+      ? LONG_CULTURE_OBJECTIVE
+      : scenario === 'long-culture-incentives'
+        ? LONG_CULTURE_INCENTIVES_OBJECTIVE
+        : LONG_OBJECTIVE;
 }
 
 /** Opt-in policy; historical genesis and generated registries remain unchanged. */
@@ -88,6 +116,32 @@ export function initialLongWorld(
     policy.checkpoints = [LONG_FIXES.gate, LONG_FIXES.rounds];
     world.config.budgets.development = LONG_FIXES.developments;
     world.config.experience.targetRounds = LONG_FIXES.gate;
+  }
+  if (scenario === 'long-culture' || scenario === 'long-culture-incentives') {
+    const policy = world.config.longDevelopment;
+    policy.scenario =
+      scenario === 'long-culture' ? 'culture' : 'culture-incentives';
+    policy.exactRecordWidth = LONG_CULTURE.exactRecordWidth;
+    policy.guidance = [...LONG_CULTURE.guidance];
+    policy.tokens = LONG_CULTURE.tokens;
+    policy.tokenCeilings = LONG_CULTURE.tokenCeilings.map((c) => ({ ...c }));
+    policy.checkpoints = [...LONG_CULTURE.checkpoints];
+    policy.transportRecovery = 'uncounted';
+    world.config.budgets.development = LONG_CULTURE.developments;
+    world.config.budgets.world = LONG_CULTURE.worldCalls;
+    world.config.experience.targetRounds = LONG_CULTURE.gate;
+    if (scenario === 'long-culture-incentives') {
+      policy.tokens = LONG_CULTURE_INCENTIVES.tokens;
+      policy.checkpoints = [...LONG_CULTURE_INCENTIVES.checkpoints];
+      world.config.budgets.development = LONG_CULTURE_INCENTIVES.developments;
+      world.config.experience.targetRounds = LONG_CULTURE_INCENTIVES.rounds;
+    }
+    const cultured = applyCulture(world, {
+      ...CULTURE_OPTIONS,
+      incentives: scenario === 'long-culture-incentives',
+    });
+    v7AssertWorld(cultured, continuousRegistry(cultured));
+    return v7Freeze(cultured);
   }
   v7AssertWorld(world, continuousRegistry(world));
   return v7Freeze(world);

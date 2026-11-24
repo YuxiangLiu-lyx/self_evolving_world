@@ -195,6 +195,9 @@ export { FOREST_ROUTE_INSPECTION } from './forest-route-inspection.js';
 export * from './forest-references.js';
 
 export * from './forest-experience.js';
+export * from './expression.js';
+export * from './expression-memory.js';
+export * from './expression-incentives.js';
 export { FOREST_INSULATION } from './forest-insulation.js';
 
 export { FOREST_FIRE, hearthSpatial } from './forest-fire.js';
@@ -211,6 +214,7 @@ export {
 
 export * from './open-foundation.js';
 export * from './open-physical.js';
+export * from './food-water.js';
 export * from './open-processes.js';
 export * from './open-projects.js';
 export { openPlants, openAnimals } from './open-ecology.js';

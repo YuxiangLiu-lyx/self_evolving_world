@@ -9,6 +9,36 @@ const world = `Review the entire batch using only this experiment registry and a
 Specify material/energy/time costs, prerequisites, dependencies, input/output conservation, exact references, work progress, interruption/resume/cancel/death/refund rules, ongoing processes, maintenance and real products/effects. No free stock, hidden-resource disclosure, consent or mastery. Actual participants must communicate and act independently. Code reuse must be recorded, not claimed as reinvention. Effects need observable events and reusable visual metadata; failed/incomplete actions cannot display success.
 Evaluate functional effects, experience and visuals separately. Short pleasure and slowly maintained satisfaction require real events, personal applicability, bounded amount/cap, decay/cooldown and functional deduplication. Verified information gain (including informative failure) may qualify; queries, requests, naming, registration and mastery never do. Familiar legitimate practice and social participation may sustain modest benefit; novelty is not compulsory. Physical comfort is capped at 10, basic nutrition is not reduced by mood. Never alter protected reward accounts, budget, goals or permissions. Established rules execute in code, not repeated model review. Development/review waiting does not advance the world.
 Return queries and result_json null, or queries=[] and result_json containing {reviews:[{actor,decision,ability,reason,specification,learning,experienceReview,visualReview}]}, exactly one per requester. decision reuse/develop/reject; ability existing ID for reuse otherwise null. learning existing duration for reuse, positive integer for develop, zero for reject. learning must be a JSON number, never a quoted string. actor, decision, reason, specification, experienceReview and visualReview are strings; ability is a string or null. Review all reasonable missing functions for development. No narrative outside the JSON.`;
+/** Culture-scope ordinary prompt variant. Physical facts still need evidence, while names,
+ * stories, views, values, explanations and impressions of others are the actor's own; the
+ * label suppressor is removed and the private memory fields are described. Every other
+ * sentence is the legacy prompt, which stays byte-identical for ex13 and long-fixes. */
+export const VOICE_REPLACEMENTS: readonly (readonly [string, string])[] = [
+  [
+    'Never invent resources, completed progress or benefits.',
+    'Names, stories, views, values, explanations and impressions of other people are your own: form, share, revise or drop them freely; they need no evidence. Physical facts need evidence: never invent resources, completed progress or physical effects.',
+  ],
+  [
+    'No query, request, registration, label or mastery earns happiness.',
+    'No query, request, registration or mastery earns happiness.',
+  ],
+  [
+    'projects:project[]. At most six steps',
+    'projects:project[], cares:string|null, views:object. At most six steps',
+  ],
+  [
+    'Omitted projects persist.',
+    'Omitted projects persist. cares is what you care about, at most 300 characters. views maps another person id to how you see that person, at most 8 people of 200 characters each; an empty string forgets one. cares and views are private, shown only to you, and persist when omitted or null.',
+  ],
+];
+export const VOICE_ORDINARY = VOICE_REPLACEMENTS.reduce(
+  (prompt, [from, to]) => {
+    if (!prompt.includes(from))
+      throw new Error(`Missing legacy prompt phrase: ${from}`);
+    return prompt.replace(from, to);
+  },
+  ordinary,
+);
 /** Opt-in addendum. Over all of ex13 an actor's next plan came after a median of 3 rounds (2 in rounds 0-79),
  * and 54% of plans ran every step once (`pnpm metrics:long`). */
 export const PLAN_HORIZON_GUIDANCE =
@@ -34,7 +64,11 @@ export function longRequest(model: string, input: LongInput) {
     stream: true,
     max_output_tokens: input.longContext.outputTokens,
     instructions:
-      (input.longContext.role === 'ordinary' ? ordinary : world) +
+      (input.longContext.role === 'ordinary'
+        ? input.longContext.voice
+          ? VOICE_ORDINARY
+          : ordinary
+        : world) +
       '\nBatch up to four control queries. Each has section, search, ids:string[], offset>=0 and part>=0. Sections abilities/inventory/knowledge/projects/memory/state/observed; world may query only abilities. Exact IDs or text search; use empty search and ids for pagination. No implicit access outside this scope. Remaining query batches are explicit; when zero return a decision. Every model response, including retrieval and failure, consumes the shared budget.' +
       guidance(input),
     input: [{ role: 'user', content: JSON.stringify(input) }],

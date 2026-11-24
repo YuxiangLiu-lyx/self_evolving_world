@@ -122,7 +122,7 @@ test('ex9 presentation binds milestones, clothing, work and interiors to the rea
     });
     await expect(page.locator('#actor')).toHaveValue(actor);
     await expect(
-      page.getByRole('link', { name: 'Ashen 风格回放（预览） ↗' }),
+      page.getByRole('link', { name: 'Ashen-style replay (preview) ↗' }),
     ).toBeVisible();
     await page.locator('#follow').click();
     await capture(page, info, `original-${name}`);
