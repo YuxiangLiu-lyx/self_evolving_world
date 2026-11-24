@@ -358,6 +358,53 @@ describe('culture v2 compaction on the ex15 round-70 state', () => {
     });
   });
 
+  it('counts an interface this person mastered in the current round as needed now', () => {
+    const w = v7Clone(world),
+      template = w.events[0];
+    if (!template) throw new Error('Missing round event');
+    const mastered = (actor: string, ability: string) => ({
+      ...template,
+      id: `event-70-${actor}-${ability}`,
+      actor,
+      type: 'mastered',
+      interface: 'wait',
+      data: { ability },
+    });
+    const details = (world: V7World) =>
+      (
+        longOrdinaryInput(world, 'ivo', s.cursors.ivo).packet.abilities as {
+          details: Row[];
+        }
+      ).details.map((d) => d.id);
+    // food-preparation was last used near round 12 and is not in ivo's plan.
+    expect(details(w)).not.toContain('food-preparation');
+    w.events.push(
+      mastered('kai', 'food-preparation'),
+      mastered('ivo', 'cultivation-trial'),
+    );
+    // Another person's mastery does not count; this person's does.
+    expect(details(w)).not.toContain('food-preparation');
+    expect(details(w)).toContain('cultivation-trial');
+    w.events.push(mastered('ivo', 'food-preparation'));
+    expect(details(w)).toContain('food-preparation');
+    // The ex15 configuration keeps its last-mastered rule and ignores the event.
+    const old = v7Clone(s.world);
+    old.events.push(mastered('ivo', 'food-preparation'));
+    expect(
+      (
+        longOrdinaryInput(old, 'ivo', s.cursors.ivo).packet.abilities as {
+          details: Row[];
+        }
+      ).details.map((d) => d.id),
+    ).toEqual(
+      (
+        longOrdinaryInput(s.world, 'ivo', s.cursors.ivo).packet.abilities as {
+          details: Row[];
+        }
+      ).details.map((d) => d.id),
+    );
+  });
+
   it('derives argument signatures deterministically from the schema', () => {
     const schema: V7Schema = {
       type: 'object',

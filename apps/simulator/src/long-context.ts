@@ -22,6 +22,7 @@ import { forestExperienceSummary } from './forest-experience-context.js';
 import {
   compactLongInput,
   longArgumentSignature,
+  longJustMastered,
   longRecentInterfaces,
   PAGE_ACCESS,
   PROJECTION_NOTE,
@@ -437,7 +438,8 @@ export function longOrdinaryInput(
   const bound = v7Record(a.extensionState['execution:operation'] ?? {});
   const boundAction = v7Record(v7Record(bound.operation ?? {}).action ?? {});
   // Culture v2 (compaction) only: every plan step replaces the current step, the
-  // last-mastered heuristic is dropped, and interfaces used in the recent window are added.
+  // last-mastered heuristic is dropped, and interfaces used in the recent window or
+  // mastered this round (about to be used) are added.
   const compaction = world.config.longDevelopment?.compaction;
   const needed = new Set([
     ...(typeof boundAction.interface === 'string'
@@ -456,7 +458,14 @@ export function longOrdinaryInput(
     ...(a.learning ? [a.learning.ability] : []),
     ...(cursor?.operation ? [cursor.operation.action.interface] : []),
     ...(compaction
-      ? longRecentInterfaces(a, world.tick, compaction.recentAbilityRounds)
+      ? [
+          ...longRecentInterfaces(
+            a,
+            world.tick,
+            compaction.recentAbilityRounds,
+          ),
+          ...longJustMastered(world, id),
+        ]
       : []),
   ]);
   const personalAbilities = longVisibleAbilities(world, id);

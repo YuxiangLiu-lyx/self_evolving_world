@@ -1,4 +1,8 @@
-import type { V7Actor, V7Schema } from '@self-evolving-world/world-core';
+import type {
+  V7Actor,
+  V7Schema,
+  V7World,
+} from '@self-evolving-world/world-core';
 import { CATALOGUE_ACCESS } from './long-catalogue.js';
 
 /** Culture v2 (opt-in `longDevelopment.compaction`) lossless ordinary-input compaction.
@@ -101,6 +105,15 @@ export function longRecentInterfaces(
       .filter((r) => r.tick >= tick - rounds)
       .map((r) => r.action),
   );
+}
+
+/** Interfaces this actor mastered in the current round (its `mastered` events): learning
+ * that just completed is about to be used, so it counts as needed now. */
+export function longJustMastered(world: V7World, actor: string): string[] {
+  return world.events
+    .filter((e) => e.actor === actor && e.type === 'mastered')
+    .map((e) => e.data.ability)
+    .filter((ability): ability is string => typeof ability === 'string');
 }
 
 /** Visible terrain as "y:x:cells" runs of consecutive cells in one row, or null when a
