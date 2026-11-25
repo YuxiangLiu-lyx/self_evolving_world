@@ -2,7 +2,13 @@ import {
   LONG_CALL_PAUSE,
   longWorldInput,
 } from '../apps/simulator/src/long-context.js';
-import { copyFileSync, existsSync, mkdirSync, readFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+} from 'node:fs';
 import { countedDevelopments } from '../apps/simulator/src/collective-controller.js';
 import { resolve } from 'node:path';
 import { execFileSync } from 'node:child_process';
@@ -235,11 +241,139 @@ export function technicalPausePrefix(
   );
 }
 
+/** Seconds added to the server's retry-after before a transport recovery resumes (the user's rule). */
+export const TRANSPORT_RETRY_MARGIN_SECONDS = 60;
+/** At most this many transport recoveries of one experiment within any 60 minutes. */
+export const TRANSPORT_RECOVERY_LIMIT = { recoveries: 6, windowMs: 3_600_000 };
+
+/** The last retry-after in retained failure evidence, in milliseconds (`retry-after-ms` first), or null. */
+export function transportRetryAfterMs(
+  evidence: string | null | undefined,
+): number | null {
+  if (!evidence) return null;
+  const last = (pattern: RegExp) => [...evidence.matchAll(pattern)].at(-1)?.[1];
+  const ms = last(/"retry-after-ms"\s*:\s*"?(\d+(?:\.\d+)?)"?/gi);
+  if (ms !== undefined) return Math.ceil(Number(ms));
+  const seconds = last(/"retry-after"\s*:\s*"?(\d+(?:\.\d+)?)"?/gi);
+  return seconds === undefined ? null : Math.ceil(Number(seconds) * 1000);
+}
+
+/** The last error code in retained failure evidence, or null. */
+export function transportErrorCode(
+  evidence: string | null | undefined,
+): string | null {
+  if (!evidence) return null;
+  return [...evidence.matchAll(/"code"\s*:\s*"([^"]+)"/g)].at(-1)?.[1] ?? null;
+}
+
+export interface TransportWait {
+  failedAt: string;
+  errorCode: string | null;
+  retryAfterSeconds: number | null;
+  marginSeconds: number;
+  /** The earliest resume time: failure + retry-after + margin; the failure time without a retry-after. */
+  resumeAfter: string;
+}
+
+/** When a transport recovery may resume; the failure time is the attempt start plus its elapsed time. */
+export function transportWait(
+  attempt: { startedAt: string; elapsedMs: number | null },
+  evidence: string | null | undefined,
+): TransportWait {
+  const failed = Math.ceil(
+    Date.parse(attempt.startedAt) + (attempt.elapsedMs ?? 0),
+  );
+  if (!Number.isFinite(failed))
+    throw new Error('The failed attempt has no valid start time.');
+  const retry = transportRetryAfterMs(evidence);
+  const resume =
+    retry === null
+      ? failed
+      : failed + retry + TRANSPORT_RETRY_MARGIN_SECONDS * 1000;
+  return {
+    failedAt: new Date(failed).toISOString(),
+    errorCode: transportErrorCode(evidence),
+    retryAfterSeconds: retry === null ? null : retry / 1000,
+    marginSeconds: retry === null ? 0 : TRANSPORT_RETRY_MARGIN_SECONDS,
+    resumeAfter: new Date(resume).toISOString(),
+  };
+}
+
+/** Recovery times of the retained transport recoveries that record one (records before 7d do not). */
+export function transportRecoveryTimes(directory: string): number[] {
+  const pauses = resolve(directory, 'technical-pauses');
+  if (!existsSync(pauses)) return [];
+  return readdirSync(pauses)
+    .map((name) => resolve(pauses, name, 'recovery.json'))
+    .filter((path) => existsSync(path))
+    .map((path) =>
+      continuousRead<{ transportRecovery?: unknown; recoveredAt?: unknown }>(
+        path,
+      ),
+    )
+    .filter((r) => r.transportRecovery === true)
+    .map((r) =>
+      typeof r.recoveredAt === 'string' ? Date.parse(r.recoveredAt) : NaN,
+    )
+    .filter((t) => Number.isFinite(t));
+}
+
+/** Refuse a transport recovery beyond the limit within the trailing window ending at `at`. */
+export function assertTransportRecoveryLimit(
+  times: number[],
+  at: number,
+): void {
+  const recent = times.filter(
+    (t) => t > at - TRANSPORT_RECOVERY_LIMIT.windowMs && t <= at,
+  ).length;
+  if (recent >= TRANSPORT_RECOVERY_LIMIT.recoveries)
+    throw new Error(
+      `${String(recent)} transport recoveries in the last 60 minutes reach the limit of ${String(TRANSPORT_RECOVERY_LIMIT.recoveries)}; stop and wait for the user before resuming.`,
+    );
+}
+
+export interface RepairClock {
+  now: () => number;
+  sleep: (ms: number) => Promise<void>;
+  log: (message: string) => void;
+}
+const SYSTEM_CLOCK: RepairClock = {
+  now: () => Date.now(),
+  sleep: (ms) => new Promise((done) => setTimeout(done, ms)),
+  log: (message) => {
+    console.log(message);
+  },
+};
+
+/** Wait until a transport recovery may resume, refusing one beyond the rate limit before and after. */
+export async function waitForTransportResume(
+  directory: string,
+  id: string,
+  attempt: { startedAt: string; elapsedMs: number | null },
+  evidence: string | null | undefined,
+  clock: RepairClock,
+): Promise<TransportWait & { waitedMs: number }> {
+  const times = transportRecoveryTimes(directory);
+  assertTransportRecoveryLimit(times, clock.now());
+  const wait = transportWait(attempt, evidence);
+  const start = clock.now();
+  const remaining = Date.parse(wait.resumeAfter) - start;
+  if (remaining > 0) {
+    clock.log(
+      `${id}: waiting ${String(Math.ceil(remaining / 1000))} s for the retry-after (${String(wait.retryAfterSeconds)} s after the ${String(wait.errorCode)} failure at ${wait.failedAt}, plus ${String(wait.marginSeconds)} s) before resuming.`,
+    );
+    await clock.sleep(remaining);
+  }
+  assertTransportRecoveryLimit(times, clock.now());
+  return { ...wait, waitedMs: Math.max(0, clock.now() - start) };
+}
+
 /** A computation pause is unfinished work, never a new experiment or an actor-authored request. */
 export async function repairContinuousRun(
   root: string,
   id: string,
   abandonedPid?: number,
+  clock: RepairClock = SYSTEM_CLOCK,
 ): Promise<'transport' | 'rejection' | 'development'> {
   const original = continuousCheckpoint(root, id);
   let abandoned: ReturnType<typeof abandonedLongTransport> | null = null;
@@ -278,18 +412,27 @@ export async function repairContinuousRun(
   const failed = state.attempts
     .filter((a) => a.tick === state.world.tick && a.role === 'ordinary')
     .at(-1);
-  const kind = technicalRepairKind(
-    state,
-    abandoned
-      ? abandoned.record
-      : failed
-        ? await continuousSink(root, id).findCall(failed.id)
-        : null,
-  );
+  const failedRecord = abandoned
+    ? abandoned.record
+    : failed
+      ? await continuousSink(root, id).findCall(failed.id)
+      : null;
+  const kind = technicalRepairKind(state, failedRecord);
   const uncounted = kind !== 'development';
+  const directory = resolve(root, 'experiment', id);
+  // A transport recovery waits for the server's retry-after plus a margin, within a rate limit.
+  const waited =
+    kind === 'transport' && failed
+      ? await waitForTransportResume(
+          directory,
+          id,
+          failed,
+          failedRecord?.failureEvidence,
+          clock,
+        )
+      : null;
   const reason = state.reason;
   // A failed browser capture must not prevent repairing its durable paused world.
-  const directory = resolve(root, 'experiment', id);
   const record = abandoned
     ? {
         manifest: continuousRead<Record<string, unknown>>(
@@ -358,7 +501,16 @@ export async function repairContinuousRun(
     actorRequest: false,
     modelCalls: 0,
     ...(kind === 'transport'
-      ? { transportRecovery: true, developmentHandoff: false }
+      ? {
+          transportRecovery: true,
+          developmentHandoff: false,
+          ...(waited
+            ? {
+                recoveredAt: new Date(clock.now()).toISOString(),
+                transportWait: waited,
+              }
+            : {}),
+        }
       : kind === 'rejection'
         ? {
             rejectionRecovery: true,
