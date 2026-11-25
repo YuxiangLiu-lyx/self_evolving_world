@@ -1432,6 +1432,13 @@ describe('retained ex13 baseline', () => {
       'rest',
       'nonTransactional',
       'symbolic',
+      'idle',
+      'phrases',
+      'invitations',
+      'works',
+      'appearance',
+      'gate',
+      'timeline',
       'privateMemory',
       'modelLabels',
     ]);
@@ -1547,13 +1554,19 @@ describe('retained ex15 culture pilot', () => {
     ]);
 
     const s = metrics.sharing;
+    // An idea's earliest authors restating it are no reuse (fix-log 7h): 23 reuses before, 17 after.
     expect(s).toMatchObject({
       expressions: 31,
       communicated: 9,
-      reuses: 23,
-      similarReuses: 10,
-      exposedReuses: 9,
+      reuses: 17,
+      similarReuses: 8,
+      exposedReuses: 7,
     });
+    expect(
+      s.reuseList.some((r) =>
+        s.ideas.find((i) => i.idea === r.idea)?.firstUsers.includes(r.actor),
+      ),
+    ).toBe(false);
     const at = (actor: string, round: number) =>
       s.list
         .filter((e) => e.actor === actor && e.round === round)
@@ -1595,13 +1608,19 @@ describe('retained ex15 culture pilot', () => {
       similarWording: true,
       exposure: { actor: 'lin', round: 40, via: 'message' },
     });
-    // Kai's round-22 preference follows Wren's round-9 tell, which Kai heard.
+    // Kai's round-22 preference followed Wren's round-9 tell, which Kai heard, but Kai was
+    // itself a first author of the idea (round 1), so it is a restatement, not a reuse (7h).
     expect(
       s.reuseList.find((r) => r.actor === 'kai' && r.authored === 22),
-    ).toMatchObject({
-      idea: 'leave-for-others',
-      exposure: { actor: 'wren', round: 9, via: 'speech' },
-    });
+    ).toBeUndefined();
+    expect(
+      s.list.some(
+        (e) =>
+          e.actor === 'kai' &&
+          e.authored === 22 &&
+          e.matches.some((m) => m.idea === 'leave-for-others'),
+      ),
+    ).toBe(true);
     // Owner-only cares and views carry three sharing ideas, none after a public one was heard.
     expect(
       metrics.privateMemory?.sharing.expressions.map((x) => [

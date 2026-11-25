@@ -67,7 +67,9 @@ pause is caused by an ordinary call that ended without any response but with rec
 transport evidence (for example `server_is_overloaded`), or by a proved abandoned
 invocation, `repair exN` retains the pause under `technical-pauses/` and resumes the run
 without a development handoff. The failed call is never resent and keeps its charge in
-the ledger. In `long-culture`, rejected model output, context and computation pauses still
+the ledger. Since PR-41 (fix-log 7d), a transport recovery first waits for the retry-after in
+the retained failure evidence plus 60 seconds, records the wait in its `recovery.json`, and
+refuses a seventh dated transport recovery of the same experiment within 60 minutes. In `long-culture`, rejected model output, context and computation pauses still
 need a counted handoff, and a second failure in the same round still pauses the run. Culture
 v2 also resumes rejection pauses without a handoff (see [Culture v2](#culture-v2)).
 
@@ -408,8 +410,22 @@ gains no `airHumidity`. Ex10's food tenths and reference prefixes are not instal
 
 `pnpm metrics:culture` measures culture archives with deterministic rules; the full
 definitions are in the [metric definitions](presentation/culture-baseline.md#metric-definitions).
-Besides the measures above and gate G2 (survival share below 50% and a symbolic action by
-every person, unchanged), it reports:
+Besides the measures above and gate G2, it reports the items below.
+
+**Gate G2, revised after the fact (2026-11-25).** After reviewing ex16 and ex17, which both
+failed the original gate, the user revised G2 to a group measure. The original gate (survival
+share below 50% with `rest` counted as survival, and a symbolic action by every person) failed
+a whole run on one solitary or silent person and counted idle rest as survival. The revised
+gate passes when:
+
+1. survival actor-rounds other than `rest` are below 50% of actor-rounds, with `rest` and
+   `wait` reported apart as idle time;
+2. at least half of the people make a successful symbolic action;
+3. at least one name, saying or rule is adopted by another person who had received it.
+
+The analyzer reports the original gate next to the revision. The
+[metric definitions](presentation/culture-baseline.md#gate-g2-revised-after-the-fact) give
+the adoption rules. The other measures are:
 
 - **Sharing expressions:** sentences of spoken, sent or posted text and of plan notes and
   intentions that match keyword rules for five ideas about common resources: leave some for
@@ -425,7 +441,21 @@ every person, unchanged), it reports:
   energy condition or the energy cap cut the recorded recovery (within one rest of full
   energy); (2) the rest began, by exact replay, at or above 75% of the energy cap.
 - **Survival share without rest:** survival actor-rounds other than `rest` over all
-  actor-rounds, per person and in total, next to the survival share.
+  actor-rounds, per person and in total, next to the survival share; **idle time** counts
+  `rest` and `wait`.
+- **Phrase propagation:** clauses another person had communicated that a later clause follows
+  closely (at least four shared words in order, half of the shorter clause, two content
+  words), written after receipt; propagations into spoken text are adopted sayings.
+- **Invitations and attendance:** each invitation with the world's attendance record, the
+  guests who arrived during the grace period and what was said there.
+- **Works valued for their appearance despite a functional failure,** with acknowledgements
+  by people who had received the statement.
+- **Timeline:** names, rules, adoptions, invitations, attendance and works, each with its round
+  and the call that produced the person's plan.
+
+Term transmission counts sign texts seen within the vision radius (fix-log 7g). A sharing reuse
+excludes the idea's first users (7h), and `heard` events and signs are not environment
+vocabulary (8e).
 
 ## Excluded vocabulary
 

@@ -278,9 +278,76 @@ ex16 (`long-culture-v2`) ran 80 rounds and failed gate G2. Following the pre-aut
   - Require a mention of other people or of leaving something for others before a quantity statement counts as restraint.
 - **Metrics**: precision on a fresh fixed-seed sample (6/8 for expressions and 2/5 for reuses before the change).
 
+## 8. Revised G2 and analyzer fixes before the extension
+
+The user reviewed ex16 and ex17 and concluded that G2 failed because of the gate's design, not because the runs failed. Both runs showed negotiated camp terms, a shared mat, an attended invitation and a screen valued for its pattern; ex17 also showed a coined name another person used and a repeated saying. The user then decided to revise the gate, fix 7d, 7g and 7h, add three detections and a timeline, and extend both archives to round 250 ([PR-41](../exec-plans/completed/pr-41-culture-g2-revision.md)). 7c and 7f stay unchanged (see the limitations below). None of this changed a world rule, a prompt, a budget or an archive; the ex7–ex17 compatibility digests are identical.
+
+### 8a. G2 is revised to a group measure, after the fact
+
+- **Problem**: see 7a and 7b. The original survival condition counted idle rest as survival, and the per-person symbolic condition failed a run on one silent person. Neither half measures shared culture by itself.
+- **Evidence**: under the original gate, ex16 failed both conditions (50.6%; Wren silent) and ex17 failed the symbolic condition (Lin and Wren silent). Yet both runs contain adopted content, listed in 8f.
+- **Fix (applied in `metrics:culture`; a post-hoc revision by the user on 2026-11-25, after both runs had failed the original gate)**: G2 passes when all three conditions hold:
+  1. survival actor-rounds other than `rest` are below 50%, with `rest` and `wait` reported as idle time;
+  2. at least half of the people make a successful symbolic action;
+  3. at least one name, saying or rule is adopted by another person who had received it.
+
+  The analyzer prints the original gate next to the revision.
+
+- **Metrics (rounds 1–80 as the analyzer prints them; ex15 rounds 1–70)**:
+
+  | Archive | Survival without rest | Idle (rest + wait) | People with a symbolic action | Adopted names / sayings / rules | Revised G2 | Original G2 |
+  | ------- | --------------------: | -----------------: | ----------------------------- | ------------------------------- | ---------- | ----------- |
+  | ex15    |                 12.1% |  142 / 420 (33.8%) | 6 of 6                        | 0 / 3 / 3                       | pass       | pass        |
+  | ex16    |                 11.9% |  243 / 480 (50.6%) | 5 of 6 (not Wren)             | 0 / 4 / 3                       | pass       | fail        |
+  | ex17    |                  9.6% |  244 / 480 (50.8%) | 4 of 6 (not Lin, Wren)        | 1 / 3 / 1                       | pass       | fail        |
+
+  Idle time is about half of all actor-rounds in both v2 runs. The revised gate passes them on adoption and group participation; it does not show that idle time fell.
+
+### 8b. `repair` waits for the retry-after (7d)
+
+- **Problem**: see 7d.
+- **Fix (applied)**: for a transport pause, `repair` reads `retry-after-ms` or `retry-after` from the retained failure evidence. It waits until the failure time (attempt start plus elapsed time) plus the retry-after plus 60 seconds, then resumes.
+  - Without a retry-after it resumes at once, as before.
+  - It refuses a seventh dated transport recovery of the same experiment within 60 minutes, before and after waiting, and asks for the user.
+  - Each new recovery record adds `recoveredAt` and `transportWait`: the failure time, error code, retry-after, margin, earliest resume time and the time waited. Earlier records are unchanged and are not counted, because they carry no recovery time.
+- **Metrics**: the retained ex16 overload (`ordinary-19`, retry-after 327 s) gives a resume time 387 s after the failure. A repair started 33 s after the failure now waits 354 s (`scripts/transport-wait.test.ts`).
+
+### 8c. Sign texts count as received for term transmission (7g)
+
+- **Fix (applied)**: names, marks and invitation notes count as received by each other person at the first round they come within the vision radius of where the sign was made. Sign caps, expiry and obstacles are ignored, as in the sharing exposure.
+- **Metrics**: ex17 transmitted terms 0 → 2. `Earth's Quiet Gold` went from Sol (round 14, sign) to Moss (round 18, `ordinary-48`). The second, `Quiet Gold`, is part of Sol's own name and is not counted as an adopted name in G2. ex15 (no signs) and ex16 (its only sign, the invitation, carries no term) are unchanged.
+
+### 8d. A sharing reuse excludes the idea's first authors (7h)
+
+- **Fix (applied)**: an expression by any of an idea's first users is no reuse. The second proposal of 7h (requiring a mention of other people before a quantity counts as restraint) was not requested and is not applied.
+- **Metrics**: reuses ex15 23 → 17, ex16 9 → 6, ex17 6 → 6. The 3 ex16 restatements of the review sample (Kai twice, Sol once) are gone.
+
+### 8e. Listeners' `heard` events and signs leaked actor text into the environment vocabulary
+
+- **Problem**: found while adding phrase propagation. The environment, which excludes words that were not coined, included the description and data of every world event and every world object. In the culture voice scopes (ex15 onward), each listener's `heard` event copies spoken text, and name, mark and invitation signs are world objects. So every spoken coinage counted as authored environment and was never a candidate term or phrase.
+- **Evidence**: in ex17, the `heard` event of Sol at tick 52 holds Moss's whole round-52 speech, which made the saying of 8f match the environment.
+- **Fix (applied)**: `heard` events are actor-text events, and sign objects are not environment.
+- **Metrics**: candidate terms ex15 14 → 16 (shared 0 → 1), ex17 6 → 8. ex16 is unchanged at 5. ex7–ex14 have no `heard` events or signs.
+
+### 8f. New detections: phrases, invitations, appearance and a timeline
+
+- **Problem**: the user's review found sayings, an attended invitation and an object valued for its look that the analyzer did not detect.
+- **Fix (applied)**: see the [metric definitions](culture-baseline.md#phrases-invitations-works-and-the-timeline-added-later).
+  - **Phrase propagation**: at least 4 shared words in order covering half of the shorter clause, including 2 content words, written after receipt.
+  - **Invitation attendance**: from the world's `attendance` event, plus guests who arrived during the grace period and what was said there.
+  - **Appearance despite failure**: a work named by its head word, a functional failure and appreciation of its look in one utterance, plus acknowledgements by people who had received it.
+  - **Timeline**: dated items per run, each with the call that produced the person's plan.
+- **Evidence and metrics (the user's test cases, all detected; settle ticks as the analyzer prints them)**:
+  - ex17 tick 52 → 65: Moss (`ordinary-89`): "we needn't make every moment into work"; Sol (`ordinary-97`, heard at tick 52): "we needn't turn every lovely thing into work". Kai's tick-71 note continues it ("without turning every encounter into work"). The pleasantry "I'm glad you're here" is not a saying.
+  - ex16 tick 51 invitation by Moss (`ordinary-119`, `sign-51-moss-600`) for tick 60. Attendance at tick 60: Ivo, Moss and Sol present, Ivo came after hearing it away. Ivo spoke there at tick 60 and Sol at tick 61.
+  - ex16 tick 70: Sol (`ordinary-134`) said that the wind was too strong for the screen's shelter effect and that Sol liked the woven pattern anyway (`screen-50-sol-571`); Moss acknowledged it at tick 71 (`ordinary-138`).
+  - Counts at round 80: phrase propagations ex16 9 (4 into spoken text), ex17 7 (3). The 5 private-note propagations include 2 status reports ("the berry bush is empty", "no visible sprout"), so precision on notes is low and notes do not count for G2.
+
 ## Limitations
 
 - Fixes 2–4 are turned on together in E1, so one run cannot separate their effects causally; section 5 attributes them by mechanism only. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.
 - The effect of fix 2 is an offline estimate. Fixes 3 and 4 are prompt guidance; only a new run shows whether agents follow it.
 - The bound-interface rule is lexical. It counts an interface named after a person but generic in function as general, and may miss bindings expressed only in code.
+- **7c and 7f are left for later scenarios** (user decision before the extension). The cultivation site rule still keeps cultivators away from the commons clearing, and the `tell`, `name`, `mark` and `invite` schemas still allow longer text than their handlers accept. Both remain part of the extended ex16 and ex17 runs, whose genesis cannot change.
+- The revised G2 (8a) was set after both runs had been seen. It is a judgment about what the gate should measure, not a pre-registered test, and the runs pass it on items that the review had already found.
 - These fixes lower cost and raise capability reuse. They do not guarantee more interesting behavior; that depends on the next steps, the changes to the environment and incentives.

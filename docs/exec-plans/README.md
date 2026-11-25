@@ -82,3 +82,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-40](completed/pr-40-culture-v3.md): culture v3 tags with the single G2-failure adjustment of the open-goal wording after ex16.
 
 - [PR-39](completed/pr-39-culture-v2-runs.md): culture v2 runs ex16 and ex17; G2 failed twice, so E3 was not extended and E4 was not run.
+
+- [PR-41](completed/pr-41-culture-g2-revision.md): G2 revised after the fact to a group measure, retry-after waits in repair, sign transmission, first-author reuse, phrase, invitation and appearance detections and a per-run timeline.

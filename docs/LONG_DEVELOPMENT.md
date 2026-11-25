@@ -179,6 +179,8 @@ original failed streams and known/unknown charges. Only the opt-in long-run read
 selects one completed final-answer message; ambiguous or unsupported responses
 still fail. Interrupted transport is reconciled only after the experiment process and
 worker are proved absent (`repair exN --abandoned-pid PID`); an unknown original invocation is never resent.
+A transport repair waits for the server's retry-after plus 60 seconds before resuming and
+refuses a seventh transport recovery of one experiment within 60 minutes (fix-log 7d).
 Development validation records all failed submissions as well as accepted source
 boundaries. No repair silently resumes an exhausted token or call budget.
 
