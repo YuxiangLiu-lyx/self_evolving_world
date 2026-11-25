@@ -70,7 +70,7 @@ The work stopped at R3: gate G2 failed twice, which R6 lists as a stop. E3 was n
 
 - **R3:** ex16 failed G2. The diagnosis and the single adjustment (part A wording, PR #33) are in [CULTURE_SCENARIO](../../CULTURE_SCENARIO.md#culture-v3). ex17 failed G2 again, so the work stopped. The soft rule did not trigger: 3 and 1 counted handoffs before round 80.
 - **R4:** the runs did not reach this step.
-- **R5:** not run, because E3 never reached round 150. Cumulative tokens over ex15–ex17 are 3,274,413 of the 16,000,000 limit.
+- **R5:** not run, because E3 never reached round 150. After PR #33, E4 would have used `long-culture-v3-incentives`, so that it carries the same prompt as the rerun; the requirement summary, written before PR #33, names the v2 tag. Cumulative tokens over ex15–ex17 are 3,274,413 of the 16,000,000 limit.
 - **R6:**
   - the transport errors were single temporary overloads, handled under the user's recovery rule;
   - compatibility digests stayed identical (ex7–ex16);

@@ -204,14 +204,15 @@ ex16 (`long-culture-v2`) ran 80 rounds and failed gate G2. Following the pre-aut
 
   Idle time moved from rest to `wait`, which the gate does not count. The share fell without people doing more of anything else, so this is a measurement fix, not a behavioral one.
 
-### 7b. The per-person symbolic condition fails on people who work alone
+### 7b. The per-person symbolic condition fails on any single silent person
 
-- **Problem**: G2 requires at least one symbolic action from every person. A person who works away from the others, or who chooses to remain silent, fails it for the whole run.
+- **Problem**: G2 requires at least one symbolic action from every person. A single person who works far away, or who stays silent among others, fails it for the whole run.
 - **Evidence**:
-  - In ex16, Wren made 0 symbolic actions (others 3–10). She worked about 12 units from the others' clearing and heard 6 utterances.
-  - In ex17, Lin and Wren made 0 (others 4–7). Both spent their time on cultivation: `plant-cultivation` 8 and 6 rounds. They ended at (22.0, 14.0) and (19.4, 8.5), while Moss, Sol and Kai ended near (18, 19).
-  - In ex15, which passed G2, every person used `tell` at least once, but nobody used `name`, `mark` or `invite`.
-  - Across the three runs, the only symbolic actions besides `tell` were one `invite` (Moss, ex16) and one `name` (Sol, ex17).
+  - In ex16, Wren made 0 symbolic actions (others 3–10). Wren worked about 12 units from the others' clearing, heard 6 utterances (none addressed to Wren) and never read the `tell` contract.
+  - In ex17, Lin and Wren made 0 (others 4–7), for different reasons.
+    - Wren again went far: Wren was within hearing distance (5 units) of someone in only 25 of 80 rounds and did not answer "Hello, Wren".
+    - Lin was within 5 units of another person in all 80 rounds and was greeted by name twice. Lin queried the `tell` contract 4 times, 3 of them after a greeting, and never spoke. Lin's silence was a choice, not distance.
+  - In ex15, which passed G2, every person used `tell` at least once. Across ex15–ex17, the only symbolic actions besides `tell` were one `invite` (Moss, ex16) and one `name` (Sol, ex17).
 - **Fix (proposed, not applied; a user decision)**: decide whether the per-person condition measures what G2 is meant to measure. Options:
   - keep it unchanged and accept that solitary people fail the gate;
   - judge it on the group, for example a share of people or of actor-rounds;
@@ -228,14 +229,17 @@ ex16 (`long-culture-v2`) ran 80 rounds and failed gate G2. Following the pre-aut
   - The planting check in `cultivate-plants@1` and `plant-cultivation@1` comes from the existing `long-planting-site` and propagation rules. It requires ordinary soil, a clear 0.6 m radius and fewer than 3 same-species plants within 5 m.
   - The clearing between the starts holds the renewable commons food, so it fails the density rule.
   - Wren's plans in ex16 say "explore northeast for an uncrowded meadow planting site" and "move beyond the crowded root patches".
-  - In ex17, the handoff test showed that Wren's own position was forest ground, where planting is refused.
+  - In ex16, 4 planting attempts near the camp were refused (2 for density, 2 for occupancy or obstacles). Lin, Kai and Ivo then stopped trying.
+  - An offline check of `initial.json` found no eligible cell for berries or roots within 5 units of the starts' centroid (14, 15). The nearest eligible cells lie about 7.4–7.5 units away.
+  - In ex17, Moss's and Kai's attempts near the camp were refused for density, and four people later planted 8–9 units from the starts.
+  - Wren's own position at the ex17 barrier was forest ground, where planting is refused.
 - **Fix (proposed, not applied)**: none is required by the rules. If 7b is addressed through the scenario, measure how far cultivators are from the others before changing the site rule.
 - **Metrics**: distance of cultivators from the group centroid, and refused versus accepted planting attempts by location.
 
 ### 7d. `repair` resumes a transport pause before the server's retry-after
 
 - **Problem**: `repair` resumes the run immediately, so the next call can hit the same overload.
-- **Evidence**: at ex16 round 2, `ordinary-19` failed with `server_is_overloaded` and retry-after 327 s. The repair resumed about 30 s later. One call succeeded, and `ordinary-21` failed again 40 s after the first failure, with retry-after 348 s. Under the user's rule, the second recovery waited 1,336 s and the run then continued without further transport errors. The [run report](run-report-culture-v2.md) has the full log.
+- **Evidence**: at ex16 round 2, `ordinary-19` failed with `server_is_overloaded` and retry-after 327 s. The repair resumed 33 s later. The next call (`ordinary-20`) succeeded, and its follow-up `ordinary-21` failed again 41 s after the first failure, with retry-after 348 s. Under the user's rule, the second recovery waited 1,336 s and the run then continued without further transport errors. The [run report](run-report-culture-v2.md) has the full log.
 - **Fix (proposed, not applied; a protocol change for a later run version)**: read `retry-after` from the retained failure evidence and refuse to resume before it has elapsed, plus a margin. Each recovery would record its wait.
 - **Metrics**: transport failures within one retry-after window of a previous recovery (1 in ex16), and recoveries per 60 minutes.
 
@@ -244,6 +248,35 @@ ex16 (`long-culture-v2`) ran 80 rounds and failed gate G2. Following the pre-aut
 - **Problem**: the browser test that records ex13 playback has a 120 s limit and passes in about 1.7 minutes on CI. It failed on the first attempt of both PR #32 and PR #33, stopping at exactly 120 s, and both reruns passed. This follows the user's rule for this timeout, given before PR #29: rerun first, then compare durations, then raise it to 180 s.
 - **Fix (applied in this PR)**: `test.setTimeout(180_000)` for that test only, with its assertions unchanged.
 - **Metrics**: first-attempt failures of this test on later PRs (2 of 2 before), and its CI duration.
+
+### 7f. The `tell` schema allows longer text than the interface accepts
+
+- **Problem**: the `tell` description says 240 characters, but the argument schema's `maxLength` is 1000, the default of `text()` in `packages/world-core/src/expression.ts`. A model that trusts the schema writes text the handler then rejects.
+- **Evidence**:
+  - In ex16, all three of Kai's rejected outputs held a 241-character `tell`, and two of them caused the round-24 rejection pause.
+  - In ex15, `ordinary-52` was rejected for the same reason.
+  - `name` (60), `mark` and `invite` notes (120) have the same mismatch.
+- **Fix (proposed, not applied; a change for a later run version, because the interface text is part of the run's genesis)**: set each argument's `maxLength` to the limit the handler enforces.
+- **Metrics**: rejected outputs caused by over-long symbolic text (ex15: 1; ex16: 3).
+
+### 7g. The vocabulary analyzer misses a name transmitted through a sign
+
+- **Problem**: `metrics:culture` reports 0 transmitted terms in ex17, although one coined name spread from one person to another.
+- **Evidence**: Sol named a root patch "Earth's Quiet Gold" (`sign-14-sol-158`), the only `name` in ex15–ex17. Moss saw the sign in its observation and then used the name.
+- **Fix (proposed, not applied)**: count sign texts, including names and marks, as public sources for term transmission, using the same visibility rule the sharing measure already uses for signs.
+- **Metrics**: transmitted terms in ex17 (0 reported, at least 1 observed).
+
+### 7h. The sharing-reuse rule counts an author restating their own idea
+
+- **Problem**: in the sharing measure, a reuse is supposed to mean someone else adopting an idea. The rule also counts a later restatement by one of the idea's first authors.
+- **Evidence**:
+  - In the review sample of the [run report](run-report-culture-v2.md), drawn with seed 20261125 over ex16 and ex17, 6 of 8 detected sharing expressions were real sharing or restraint statements. The two misses were plain "only N" quantities.
+  - Only 2 of 5 detected reuses were plausible uptake by another person.
+  - Of all 15 listed reuses, 3 (Kai twice and Sol once, all in ex16) were first users repeating their own idea.
+- **Fix (proposed, not applied)**:
+  - Exclude anyone who expressed the idea before the first reuse.
+  - Require a mention of other people or of leaving something for others before a quantity statement counts as restraint.
+- **Metrics**: precision on a fresh fixed-seed sample (6/8 for expressions and 2/5 for reuses before the change).
 
 ## Limitations
 
