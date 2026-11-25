@@ -76,3 +76,5 @@ The work stopped at R3: gate G2 failed twice, which R6 lists as a stop. E3 was n
   - compatibility digests stayed identical (ex7–ex16);
   - no archive was changed and no history was rewritten.
 - **R7:** the archives, companion analyses, run report and fix-log entries are in this PR. Backups of the round-80 checkpoints were pushed to `experiment/culture-v2-runs` before merging.
+
+**Validation:** `pnpm validate` passed: 168 unit test files with 992 tests, reconstruction of ex1–ex17, both companion analyses, documentation checks and 89 browser tests.
