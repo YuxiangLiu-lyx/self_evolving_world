@@ -42,4 +42,4 @@ Out of scope:
   - the request contains no excluded word.
 - **R4.** `compat:long` is identical for ex7–ex15 (110, 406, 411, 224, 17, 436, 524, 103 and 159 requests; 27, 3 and 18 paused inputs) and for ex16 (149 requests, 18 paused inputs), whose archive is on the unmerged run branch.
 
-**Validation:** VALIDATE_SUMMARY
+**Validation:** `pnpm validate` (macOS, Node 24.22.2) passed: archive preservation, typecheck, lint, format, architecture, 164 unit test files with 948 tests, reconstruction of ex7–ex15, analysis, build, documentation checks and 62 browser tests of the continuous group. The viewer is unchanged.
