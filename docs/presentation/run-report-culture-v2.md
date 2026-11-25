@@ -1,6 +1,8 @@
 # Run report: culture v2 runs (E3 and E4)
 
-This report covers the culture v2 runs of [PR-39](../exec-plans/completed/pr-39-culture-v2-runs.md): E3, the main `long-culture-v2` run, gated at round 80 and planned to continue to rounds 150 and 250; and E4, the incentive control. Two archives exist. ex16 is E3's first attempt. ex17 is the G2-failure rerun under `long-culture-v3` ([PR-40](../exec-plans/completed/pr-40-culture-v3.md)). Gate G2 failed in both, so E3 was not extended and E4 was not run. Every number comes from retained files under `experiment/`. No model was called to write this report, and no archive changed.
+This report covers the culture v2 runs of [PR-39](../exec-plans/completed/pr-39-culture-v2-runs.md): E3, the main `long-culture-v2` run, gated at round 80 and planned to continue to rounds 150 and 250; and E4, the incentive control. Two archives exist. ex16 is E3's first attempt. ex17 is the G2-failure rerun under `long-culture-v3` ([PR-40](../exec-plans/completed/pr-40-culture-v3.md)). Gate G2 failed in both, so E3 was not extended and E4 was not run. Every number comes from retained files under `experiment/`.
+
+**Update (PR-41, 2026-11-25).** After reviewing this report, the user revised G2 to a group measure, after the fact, and re-evaluated both runs: both pass the revision (see [Revised G2](#revised-g2-after-the-fact)). The user then decided to extend both archives to round 250 and to run E4; those runs are reported separately. The sections below keep the original evaluation. No model was called to write this report, and no archive changed.
 
 Related documents:
 
@@ -130,6 +132,45 @@ The adjustment, under the user's pre-authorized rule (at most one, to part A's w
   - the developed packages differ, because the World Agent wrote a different specification for the same request (ex17's has unit and site inspection and 1-energy planting rounds), and the runs' cultivation outcomes follow partly from that;
   - model sampling diverges from the first call. Every first plan differs in wording, and two differ in action: in ex17 Moss opened with a message to Sol instead of a public greeting, and Ivo spoke at round 0 (in ex16 Ivo's first tell came at round 20).
 - **One seed gives case comparisons only.** Each comparison here is between two single trajectories, not a statistical estimate.
+
+### Revised G2 (after the fact)
+
+The user revised G2 on 2026-11-25, after seeing that both runs had failed the original gate. This is a post-hoc revision, not a pre-registered test. The reasons:
+
+- the original symbolic condition failed a whole run on one silent person (Wren in ex16; Lin and Wren in ex17);
+- the original survival condition counted idle rest as survival (7a);
+- both runs nevertheless contained content that other people took up.
+
+The revised gate passes when survival actor-rounds other than `rest` are below 50% (`rest` and `wait` are reported as idle), at least half of the people make a successful symbolic action, and at least one name, saying or rule is adopted by another person who had received it. The [metric definitions](culture-baseline.md#gate-g2-revised-after-the-fact) give the adoption rules. The values below come from `pnpm metrics:culture -- experiment/exN 80`, with ticks as the analyzer prints them.
+
+| Condition                                       | ex16                   | ex17                          |
+| ----------------------------------------------- | ---------------------- | ----------------------------- |
+| Survival without rest (below 50%)               | 11.9% (57 / 480): pass | 9.6% (46 / 480): pass         |
+| Idle, reported apart (`rest` + `wait`)          | 243 / 480 (186 + 57)   | 244 / 480 (85 + 159)          |
+| People with a symbolic action (at least 3 of 6) | 5: all but Wren: pass  | 4: all but Lin and Wren: pass |
+| Adopted names / sayings / rules (at least 1)    | 0 / 4 / 3: pass        | 1 / 3 / 1: pass               |
+| **Revised G2**                                  | **pass**               | **pass**                      |
+| Original G2                                     | fail                   | fail                          |
+
+The adopted items, each with the adopter's call and the way it was received:
+
+- **ex16**
+  - Sayings:
+    - Kai (tick 5) → Lin (tick 11, `ordinary-33`): "I'd enjoy company while resting and comparing ideas for a fair camp".
+    - Lin (tick 19) → Moss (tick 22, `ordinary-59`): "a welcoming camp would leave room for quiet and freedom to come and go".
+    - Moss (tick 22) → Kai (tick 25, `ordinary-72`): "room to come and go" and "Your windbreak idea sounds lovely".
+  - Rules (sharing reuses with similar wording after exposure):
+    - Sol (tick 1) → Moss (tick 3, `ordinary-23`): "leave some for others".
+    - Kai (tick 1) → Moss (ticks 3 and 11, `ordinary-23`, `ordinary-36`): "leaving food for others".
+- **ex17**
+  - Name: Sol's sign `Earth's Quiet Gold` (tick 14) → Moss (tick 18, `ordinary-48`, by the sign).
+  - Sayings:
+    - Moss (tick 52) → Sol (tick 65, `ordinary-97`): "we needn't make every moment into work", answered with "we needn't turn every lovely thing into work".
+    - Moss (tick 18) → Sol (tick 65): "Earth's Quiet Gold is a lovely name".
+    - Moss (tick 52) → Kai (tick 75, `ordinary-109`): "I'd enjoy some quiet company".
+  - Rule: Kai (tick 1) → Sol (tick 11, `ordinary-35`): "collect a modest share".
+
+What the revision does not change: idle time is still about half of all actor-rounds in both runs, and the same two people (mastery and freedom leanings) stay silent. The revised gate passes these runs on group participation and adoption. It does not show that idle time fell.
 
 ## E0 culture metrics
 
@@ -583,8 +624,8 @@ People also used other people's leaning words as values: 0 times in ex15, 9 in e
   - No cultivation plot established in either run.
   - The screen never shielded anyone, and the mat had no comfort effect by construction. The developed capabilities could not show an effect on wellbeing.
 - **Analyzer limits.**
-  - Term exposure ignores signs, so `Earth's Quiet Gold` counts as not transmitted.
-  - The sharing rules over-count "only N" quantities, and the reuse rule counts first users' restatements (review item A).
+  - Term exposure ignored signs, so `Earth's Quiet Gold` counted as not transmitted (fixed in PR-41, fix-log 7g and 8c).
+  - The sharing rules over-count "only N" quantities, and the reuse rule counted first users' restatements (review item A; the latter fixed in PR-41, fix-log 8d).
   - Paraphrases are missed, and tells are public and undirected.
   - All text measures are English keyword rules (see the [baseline](culture-baseline.md#limitations-of-rule-based-detection)).
 - **This report's own classifications.**

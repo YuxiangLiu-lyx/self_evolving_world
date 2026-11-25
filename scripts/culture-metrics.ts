@@ -1,7 +1,11 @@
 import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { EXPRESSION_MEMORY } from '@self-evolving-world/world-core';
+import {
+  EXPRESSION_LIMITS,
+  EXPRESSION_MEMORY,
+  EXPRESSION_SIGN_KINDS,
+} from '@self-evolving-world/world-core';
 import type {
   V7Action,
   V7Condition,
@@ -163,6 +167,8 @@ export interface CultureRound {
   restSteps?: Record<string, RestStep>;
   /** Each actor's energy at the start of the round, from exact replay; absent in synthetic rounds. */
   energy?: Record<string, number>;
+  /** The accepted ordinary call that produced each actor's plan for this round; absent in synthetic rounds. */
+  calls?: Record<string, string>;
 }
 /** How a plan step that rests depends on the actor's own energy. */
 export interface RestStep {
@@ -191,6 +197,10 @@ export interface CultureInput {
    * installed weather lean-to can lower rest recovery by a factor no event records.
    */
   energy?: { cap: number; restRecovery: number; unrecordedRestFactor: boolean };
+  /** Person-made world objects other than signs and assembly parts; absent in synthetic inputs. */
+  works?: CultureWork[];
+  /** Kinds and names of the world's objects other than signs; absent in synthetic inputs. */
+  objects?: string[];
 }
 /** Actor-authored text: messages and public reports, plan intentions, notes, project ids and given names. */
 export interface Utterance {
@@ -514,6 +524,56 @@ export interface CultureMetrics {
     }[];
     everyAgentAtLeastOne: boolean;
   };
+  /** `rest` and `wait` actor-rounds, reported as idle apart from survival (revised G2). */
+  idle: {
+    interfaces: string[];
+    actorRounds: number;
+    rest: number;
+    wait: number;
+    rounds: number;
+    share: number | null;
+    perAgent: {
+      actor: string;
+      actorRounds: number;
+      rest: number;
+      wait: number;
+      share: number | null;
+    }[];
+  };
+  /** Clauses adopted by another person after receiving them; see `PHRASE_CRITERION`. */
+  phrases: {
+    criterion: string;
+    propagations: number;
+    /** Distinct (source person, source clause, adopter) triples. */
+    adoptions: number;
+    /** Propagations into spoken, sent or posted text. */
+    communicated: number;
+    list: PhrasePropagation[];
+  };
+  invitations: { criterion: string; list: InvitationRecord[] };
+  /** Person-made world objects other than signs, with the call that started each. */
+  works: WorkRecord[];
+  appearance: { criterion: string; list: AppearanceValue[] };
+  /** Gate G2 as revised after the fact on 2026-11-25, with the original gate for reference. */
+  gate: Omit<typeof G2_REVISION, 'criteria'> & {
+    criteria: readonly string[];
+    survival: { share: number | null; threshold: number; passed: boolean };
+    symbolic: { people: string[]; required: number; passed: boolean };
+    adoption: {
+      names: AdoptedItem[];
+      sayings: AdoptedItem[];
+      rules: AdoptedItem[];
+      passed: boolean;
+    };
+    passed: boolean;
+    original: {
+      survivalShare: number | null;
+      everyAgentAtLeastOne: boolean;
+      passed: boolean;
+    };
+  };
+  /** Dated names, rules, invitations, attendance, works and adoptions, each with its call. */
+  timeline: TimelineItem[];
   /**
    * Owner-only private memory (`cares`, `views`) of a scope with a culture voice, reported apart
    * from every public metric above, which never reads it; null when the archive has none.
@@ -1410,13 +1470,15 @@ interface Context {
   /** An actor's position in a round, as `positions` carries it forward. */
   at: (actor: string, tick: number) => V7Point | undefined;
   isSurvival: (id: string) => boolean;
+  /** The accepted call that produced an actor's plan for a round, or null. */
+  call: (actor: string, tick: number) => string | null;
 }
 interface Receipt {
   actor: string;
   tick: number;
   from: string;
   text: string;
-  via: 'message' | 'speech' | 'council';
+  via: 'message' | 'speech' | 'council' | 'sign';
 }
 
 /**
@@ -1507,7 +1569,8 @@ function vocabularyMetric(c: Context): CultureMetrics['vocabulary'] {
       all.push({ surface, actor: u.actor, tick: u.tick });
       uses.set(key, all);
     }
-  const heard = receipts(c).map((r) => ({
+  // Sign texts count as received where they could be seen (fix-log 7g).
+  const heard = [...receipts(c), ...signReceipts(c)].map((r) => ({
     ...r,
     keys: new Set(textCandidates(r.text).map((x) => x.key)),
   }));
@@ -2020,7 +2083,18 @@ function sharingMetric(
   const items: SharingItem[] = list.flatMap((e) =>
     e.matches.map((m) => ({ e, m })),
   );
+  // An idea's earliest authors restating it are not reuses (fix-log 7h).
+  const earliest = new Map<SharingIdea, Set<string>>();
+  for (const idea of SHARING_IDEAS) {
+    const own = items.filter((x) => x.m.idea === idea);
+    const first = Math.min(...own.map((x) => x.e.authored));
+    earliest.set(
+      idea,
+      new Set(own.filter((x) => x.e.authored === first).map((x) => x.e.actor)),
+    );
+  }
   const reuseList: SharingReuse[] = items.flatMap(({ e, m }) => {
+    if (earliest.get(m.idea)?.has(e.actor)) return [];
     const earlier = items.filter(
       (x) =>
         x.m.idea === m.idea &&
@@ -2377,6 +2451,825 @@ export function privateMemoryMetric(
   };
 }
 
+/** Interfaces reported as idle apart from survival under the revised G2. */
+export const IDLE_INTERFACES = ['rest', 'wait'];
+
+function idleMetric(c: Context): CultureMetrics['idle'] {
+  const perAgent = c.agents.map((actor) => {
+    let actorRounds = 0;
+    let rest = 0;
+    let wait = 0;
+    for (const round of c.input.rounds) {
+      const id = round.actions[actor]?.interface;
+      if (id === undefined) continue;
+      actorRounds++;
+      if (id === 'rest') rest++;
+      if (id === 'wait') wait++;
+    }
+    return {
+      actor,
+      actorRounds,
+      rest,
+      wait,
+      share: ratio(rest + wait, actorRounds),
+    };
+  });
+  const sum = (key: 'actorRounds' | 'rest' | 'wait') =>
+    perAgent.reduce((n, a) => n + a[key], 0);
+  return {
+    interfaces: [...IDLE_INTERFACES],
+    actorRounds: sum('actorRounds'),
+    rest: sum('rest'),
+    wait: sum('wait'),
+    rounds: sum('rest') + sum('wait'),
+    share: ratio(sum('rest') + sum('wait'), sum('actorRounds')),
+    perAgent,
+  };
+}
+
+/**
+ * Sign texts: the given name of a `name`, the text of a `mark` and the note of an `invite`,
+ * placed where their author stood. Each is received by every other person at the first round
+ * they come within the vision radius of that place, ignoring sign caps, expiry and obstacles,
+ * as the sharing exposure does (fix-log 7g).
+ */
+function signReceipts(c: Pick<Context, 'input' | 'agents' | 'at'>): Receipt[] {
+  const out: Receipt[] = [];
+  for (const round of c.input.rounds)
+    for (const actor of c.agents) {
+      const action = round.actions[actor];
+      if (
+        !action ||
+        !['name', 'mark', 'invite'].includes(action.interface) ||
+        !succeeded(round, actor)
+      )
+        continue;
+      const args = object(action.args);
+      const keys =
+        action.interface === 'invite'
+          ? ['text', 'message', 'content', 'invitation']
+          : ['name', 'label', 'title', 'text', 'mark', 'symbol'];
+      const said = keys.map((k) => text(args[k])).filter(Boolean);
+      const place = c.at(actor, round.tick);
+      if (!said.length || !place) continue;
+      for (const other of c.agents) {
+        if (other === actor) continue;
+        const seen = c.input.rounds.find((r) => {
+          if (r.tick < round.tick) return false;
+          const where = c.at(other, r.tick);
+          return !!where && distance(where, place) <= c.input.vision;
+        });
+        if (seen)
+          for (const value of said)
+            out.push({
+              actor: other,
+              tick: seen.tick,
+              from: actor,
+              text: value,
+              via: 'sign',
+            });
+      }
+    }
+  return out;
+}
+
+/** Thresholds of phrase propagation; see `phraseMatch`. */
+export const PHRASE_RULE = {
+  /** Shared words, in order (the longest common subsequence), single letters excluded. */
+  minShared: 4,
+  /** Shared words over the words of the shorter clause. */
+  coverage: 0.5,
+  /** Shared content words: not function, number, name, survival, resource or interface words. */
+  content: 2,
+} as const;
+export const PHRASE_CRITERION = `Phrase propagation: a clause (text between sentence punctuation, semicolons, colons, dashes or commas) by one person that shares at least ${String(PHRASE_RULE.minShared)} words in order with a clause another person had communicated earlier (at least ${String(PHRASE_RULE.coverage * 100)}% of the shorter clause, including at least ${String(PHRASE_RULE.content)} content words), written after the person received that text and not before its first author wrote it. Content words exclude function words and contraction fragments, numbers, names, common light verbs, directions, trade and task words, survival words, and the words of resources, world objects and interfaces. Clauses that also match authored prompt, catalogue or world text are excluded. Only propagations into spoken, sent or posted text count as adopted sayings for G2; plan notes and intentions are listed apart.`;
+/** Folded words that never count as content in a phrase. */
+const PHRASE_FUNCTION = new Set(
+  [
+    ...STOP,
+    ...NUMBER_WORDS,
+    ...TRANSACTIONAL_WORDS,
+    ...`t s d ll ve re m don didn doesn isn wasn aren weren won can couldn wouldn shouldn haven hasn hadn
+take make get keep put set check try use see look find start finish continue stay inspect study learn plan
+north south east west northern southern eastern western northeast northwest southeast southwest`.split(
+      /\s+/,
+    ),
+  ]
+    .filter(Boolean)
+    .map(fold),
+);
+
+/** Clauses of a text: split at sentence punctuation, semicolons, colons, dashes and commas. */
+export function phraseClauses(value: string): string[] {
+  return value
+    .split(/[.!?;:\n]+|,|\s[–—-]\s|[–—]/)
+    .map((s) => s.trim())
+    .filter((s) => phraseTokens(s).length >= PHRASE_RULE.minShared);
+}
+/** Folded words of a clause, single letters removed. */
+export function phraseTokens(value: string): string[] {
+  return words(value)
+    .filter((w) => w.length > 1)
+    .map(fold);
+}
+function lcs(a: string[], b: string[]): string[] {
+  const n = a.length;
+  const m = b.length;
+  const table: number[][] = Array.from({ length: n + 1 }, () =>
+    new Array<number>(m + 1).fill(0),
+  );
+  for (let i = n - 1; i >= 0; i--)
+    for (let j = m - 1; j >= 0; j--) {
+      const row = table[i] ?? [];
+      row[j] =
+        a[i] === b[j]
+          ? (table[i + 1]?.[j + 1] ?? 0) + 1
+          : Math.max(table[i + 1]?.[j] ?? 0, row[j + 1] ?? 0);
+    }
+  const out: string[] = [];
+  let i = 0;
+  let j = 0;
+  while (i < n && j < m) {
+    const x = a[i] ?? '';
+    if (x === b[j]) {
+      out.push(x);
+      i++;
+      j++;
+    } else if ((table[i + 1]?.[j] ?? 0) >= (table[i]?.[j + 1] ?? 0)) i++;
+    else j++;
+  }
+  return out;
+}
+/**
+ * Whether two clauses' folded words share a phrase under `PHRASE_RULE`, with the shared words
+ * and their coverage of the shorter clause; null otherwise.
+ */
+export function phraseMatch(
+  a: string[],
+  b: string[],
+  content: (w: string) => boolean,
+): { shared: string[]; coverage: number } | null {
+  const shorter = Math.min(a.length, b.length);
+  if (shorter < PHRASE_RULE.minShared) return null;
+  const shared = lcs(a, b);
+  const coverage = shared.length / shorter;
+  return shared.length >= PHRASE_RULE.minShared &&
+    coverage >= PHRASE_RULE.coverage &&
+    new Set(shared.filter(content)).size >= PHRASE_RULE.content
+    ? { shared, coverage }
+    : null;
+}
+
+export interface PhrasePropagation {
+  actor: string;
+  round: number;
+  authored: number;
+  kind: Kind;
+  call: string | null;
+  text: string;
+  source: {
+    actor: string;
+    round: number;
+    authored: number;
+    kind: Kind;
+    call: string | null;
+    text: string;
+  };
+  shared: string[];
+  coverage: number;
+  received: { tick: number; via: Receipt['via'] };
+}
+interface Clause {
+  actor: string;
+  round: number;
+  authored: number;
+  kind: Kind;
+  communicated: boolean;
+  text: string;
+  tokens: string[];
+}
+
+function phraseMetric(c: Context, heard: Receipt[]): CultureMetrics['phrases'] {
+  const byTick = new Map(c.input.rounds.map((r) => [r.tick, r]));
+  const spoken: readonly Kind[] = ['message', 'public', 'name'];
+  const excluded = new Set(
+    [
+      ...c.input.resources.flatMap((r) => [r.id, r.name]),
+      ...c.input.abilities.flatMap((a) => [a.id, a.name]),
+      ...(c.input.objects ?? []),
+    ].flatMap((value) => words(value).map(fold)),
+  );
+  const names = new Set([...c.names].map(fold));
+  const content = (w: string) =>
+    !PHRASE_FUNCTION.has(w) &&
+    !names.has(w) &&
+    !excluded.has(w) &&
+    !SURVIVAL_WORDS.some((s) => w.startsWith(s));
+  const clauses: Clause[] = c.list
+    .filter((u) => u.kind !== 'project')
+    .flatMap((u) => {
+      const authored = spoken.includes(u.kind)
+        ? Math.min(byTick.get(u.tick)?.authored?.[u.actor] ?? u.tick, u.tick)
+        : u.tick;
+      return phraseClauses(u.text).map((t) => ({
+        actor: u.actor,
+        round: u.tick,
+        authored,
+        kind: u.kind,
+        communicated: spoken.includes(u.kind),
+        text: t,
+        tokens: phraseTokens(t),
+      }));
+    });
+  const environment = c.input.environment
+    .flatMap(phraseClauses)
+    .map(phraseTokens);
+  const authored = (x: string[]) =>
+    environment.some((e) => phraseMatch(e, x, content));
+  const sources = clauses.filter((x) => x.communicated);
+  const list: PhrasePropagation[] = [];
+  for (const t of clauses) {
+    const candidates = sources
+      .filter((s) => s.actor !== t.actor && s.authored < t.authored)
+      .map((s) => ({ s, m: phraseMatch(s.tokens, t.tokens, content) }))
+      .filter(
+        (x): x is { s: Clause; m: { shared: string[]; coverage: number } } =>
+          x.m !== null,
+      )
+      .sort((a, b) => a.s.authored - b.s.authored || a.s.round - b.s.round);
+    for (const { s, m } of candidates) {
+      // The person had written this phrase no later than its source: not an adoption.
+      if (
+        clauses.some(
+          (x) =>
+            x.actor === t.actor &&
+            x.authored <= s.authored &&
+            phraseMatch(x.tokens, s.tokens, content),
+        )
+      )
+        continue;
+      const got = heard.find(
+        (r) =>
+          r.actor === t.actor &&
+          r.from === s.actor &&
+          r.tick >= s.round &&
+          r.tick < t.authored &&
+          r.text.includes(s.text),
+      );
+      if (!got || authored(m.shared)) continue;
+      list.push({
+        actor: t.actor,
+        round: t.round,
+        authored: t.authored,
+        kind: t.kind,
+        call: c.call(t.actor, t.round),
+        text: t.text,
+        source: {
+          actor: s.actor,
+          round: s.round,
+          authored: s.authored,
+          kind: s.kind,
+          call: c.call(s.actor, s.round),
+          text: s.text,
+        },
+        shared: m.shared,
+        coverage: m.coverage,
+        received: { tick: got.tick, via: got.via },
+      });
+      break;
+    }
+  }
+  const adoptions = new Set(
+    list.map((p) => `${p.source.actor}\u0000${p.source.text}\u0000${p.actor}`),
+  );
+  return {
+    criterion: PHRASE_CRITERION,
+    propagations: list.length,
+    adoptions: adoptions.size,
+    communicated: list.filter((p) => COMMUNICATION.includes(p.kind)).length,
+    list,
+  };
+}
+
+export interface InvitationRecord {
+  host: string;
+  round: number;
+  call: string | null;
+  sign: string;
+  place: V7Point;
+  meetingRound: number;
+  text: string;
+  /** People who received the invitation (speech within the radius or the sign) by the meeting round. */
+  heard: string[];
+  /** The world's attendance record at the meeting round; null if none was retained. */
+  attendance: {
+    event: string | null;
+    present: string[];
+    came: string[];
+  } | null;
+  /** Guests within the meeting radius at any round of the meeting and its grace period, first round each. */
+  arrivals: { actor: string; round: number; call: string | null }[];
+  /** Speech by the host and the arrived guests at the place during the meeting and its grace period. */
+  speech: {
+    actor: string;
+    round: number;
+    call: string | null;
+    text: string;
+  }[];
+}
+export const INVITATION_CRITERION = `Invitation attendance: for each invitation, the world's own attendance record at the invited round (present: within ${String(EXPRESSION_LIMITS.meetingRadius)} units of the place; came: present people who had heard it away from the place), plus every guest within that radius at any round from the invited round through the ${String(EXPRESSION_LIMITS.invitationGrace)}-round grace period, and what the host and those guests said there.`;
+
+function invitationMetric(c: Context, heard: Receipt[]): InvitationRecord[] {
+  const out: InvitationRecord[] = [];
+  for (const round of c.input.rounds)
+    for (const e of round.events) {
+      if (e.type !== 'invited' || !e.success || !e.actor) continue;
+      const data = object(e.data);
+      const meeting = object(data.meeting);
+      const sign = text(data.sign) || (e.target ?? '');
+      const place = { x: Number(meeting.x), y: Number(meeting.y) };
+      const meetingRound = Number(meeting.round);
+      if (!Number.isFinite(place.x) || !Number.isSafeInteger(meetingRound))
+        continue;
+      const host = e.actor;
+      const said = text(data.text);
+      const last = meetingRound + EXPRESSION_LIMITS.invitationGrace;
+      const attended = c.input.rounds
+        .flatMap((r) => r.events)
+        .find((x) => x.type === 'attendance' && x.target === sign);
+      const at = object(attended?.data);
+      const list = (value: unknown) =>
+        Array.isArray(value) ? value.map(text).filter(Boolean) : [];
+      const arrivals = c.agents.flatMap((actor) => {
+        if (actor === host) return [];
+        const first = c.input.rounds.find((r) => {
+          if (r.tick < meetingRound || r.tick > last) return false;
+          const where = c.at(actor, r.tick);
+          return (
+            !!where && distance(where, place) <= EXPRESSION_LIMITS.meetingRadius
+          );
+        });
+        return first
+          ? [{ actor, round: first.tick, call: c.call(actor, first.tick) }]
+          : [];
+      });
+      const people = new Set([host, ...arrivals.map((a) => a.actor)]);
+      out.push({
+        host,
+        round: round.tick,
+        call: c.call(host, round.tick),
+        sign,
+        place,
+        meetingRound,
+        text: said,
+        heard: c.agents.filter((actor) =>
+          heard.some(
+            (r) =>
+              r.actor === actor &&
+              r.from === host &&
+              r.tick >= round.tick &&
+              r.tick <= meetingRound &&
+              !!said &&
+              r.text.includes(said),
+          ),
+        ),
+        attendance: attended
+          ? {
+              event: attended.id,
+              present: list(at.present),
+              came: list(at.came),
+            }
+          : null,
+        arrivals,
+        speech: c.list
+          .filter((u) => {
+            if (!COMMUNICATION.includes(u.kind) || !people.has(u.actor))
+              return false;
+            if (u.tick < meetingRound || u.tick > last) return false;
+            const where = c.at(u.actor, u.tick);
+            return (
+              !!where &&
+              distance(where, place) <= EXPRESSION_LIMITS.meetingRadius
+            );
+          })
+          .map((u) => ({
+            actor: u.actor,
+            round: u.tick,
+            call: c.call(u.actor, u.tick),
+            text: u.text,
+          })),
+      });
+    }
+  return out;
+}
+
+/** A person-made world object (not a sign), as the archive's worlds retain it. */
+export interface CultureWork {
+  id: string;
+  kind: string;
+  name: string;
+  maker: string;
+  created: number;
+  /** First round an event reported the object complete, else null. */
+  completed: number | null;
+  /** Status at the last retained sighting, if the object records one. */
+  status: string | null;
+}
+export interface WorkRecord extends CultureWork {
+  call: string | null;
+}
+
+const APPEARANCE =
+  /\b(?:patterns?|looks?|shapes?|colou?rs?|textures?|grain|weave|woven|appearance|design|form|beauty|beautiful|pretty|handsome|elegant)\b/i;
+const APPRECIATE =
+  /\b(?:like[sd]?|lov(?:e|es|ed)|enjoy(?:s|ed)?|admir(?:e|es|ed)|appreciat(?:e|es|ed)|valu(?:e|es|ed)|treasur(?:e|es|ed)|glad|pleased|delight(?:ed)?|beautiful|pretty|handsome|elegant)\b/i;
+const FUNCTION_FAILED =
+  /\btoo\s+(?:strong|weak|wet|small|cold|loose)\b|\b(?:no|without)\s+(?:\w+\s+)?(?:shelter|effect|protection|benefit|warmth|shielding|comfort)\b|\b(?:gave|gives|give|had|has|have)\s+no\b|\b(?:did|does|do|would|will|could)(?:n['’]t|\s+not)\s+(?:work|help|block|shelter|shield|protect|hold|keep)\b|\bwon['’]t\s+(?:work|help|block|shelter|shield|protect|hold)\b|\bfail(?:ed|s|ure)?\b|\buseless\b|\bunsuitable\b|\bnot\s+(?:effective|useful|working)\b/i;
+export const APPEARANCE_CRITERION = `Valued for appearance despite a functional failure: an utterance (spoken, sent or posted text, a plan note or intention) that names a person-made object's kind by its head word, reports that the object failed at its function (for example "too strong for its shelter effect", "gave no", "didn't work", "failed") and, in one sentence, values its appearance (an appreciation word with a pattern, look, shape, colour, texture, grain or weave, or "beautiful"). Acknowledgements are later texts within ${String(RESPONSE_WINDOW)} rounds by people who had received the statement and repeat its appearance word with an appreciation word.`;
+
+export interface AppearanceValue {
+  actor: string;
+  round: number;
+  kind: Kind;
+  call: string | null;
+  text: string;
+  work: string;
+  failure: string;
+  appearance: string;
+  acknowledgements: {
+    actor: string;
+    round: number;
+    call: string | null;
+    text: string;
+  }[];
+}
+
+function appearanceMetric(
+  c: Context,
+  works: CultureWork[],
+  heard: Receipt[],
+): AppearanceValue[] {
+  const head = (w: CultureWork) => w.kind.split(/[^a-z]+/i).at(-1) ?? w.kind;
+  const valued = (sentence: string) =>
+    APPRECIATE.test(sentence)
+      ? [...sentence.matchAll(new RegExp(APPEARANCE.source, 'gi'))]
+          .map((x) => x[0].toLowerCase())
+          .join(', ') || undefined
+      : undefined;
+  const out: AppearanceValue[] = [];
+  for (const u of c.list) {
+    if (u.kind === 'project' || u.kind === 'name') continue;
+    const failure = FUNCTION_FAILED.exec(u.text)?.[0];
+    if (!failure) continue;
+    const appearance = sentences(u.text).map(valued).find(Boolean);
+    if (!appearance) continue;
+    const mentioned = works.filter(
+      (w) =>
+        w.created <= u.tick &&
+        new RegExp(`\\b${head(w)}s?\\b`, 'i').test(u.text),
+    );
+    const work =
+      mentioned.filter((w) => w.maker === u.actor).at(-1) ?? mentioned.at(-1);
+    if (!work) continue;
+    const appearanceWords = appearance.split(', ');
+    out.push({
+      actor: u.actor,
+      round: u.tick,
+      kind: u.kind,
+      call: c.call(u.actor, u.tick),
+      text: u.text,
+      work: work.id,
+      failure,
+      appearance,
+      acknowledgements: c.list
+        .filter(
+          (x) =>
+            x.actor !== u.actor &&
+            x.tick > u.tick &&
+            x.tick <= u.tick + RESPONSE_WINDOW &&
+            x.kind !== 'project' &&
+            sentences(x.text).some(
+              (s) =>
+                APPRECIATE.test(s) &&
+                appearanceWords.some((w) =>
+                  new RegExp(`\\b${w}\\b`, 'i').test(s),
+                ),
+            ) &&
+            heard.some(
+              (r) =>
+                r.actor === x.actor &&
+                r.from === u.actor &&
+                r.tick >= u.tick &&
+                r.tick <= x.tick &&
+                r.text.includes(u.text.slice(0, 80)),
+            ),
+        )
+        .map((x) => ({
+          actor: x.actor,
+          round: x.tick,
+          call: c.call(x.actor, x.tick),
+          text: x.text,
+        })),
+    });
+  }
+  return out;
+}
+
+/** One dated item of a run's timeline of names, rules, invitations, attendance and works. */
+export interface TimelineItem {
+  round: number;
+  type:
+    | 'name'
+    | 'name-adopted'
+    | 'rule'
+    | 'rule-adopted'
+    | 'saying-adopted'
+    | 'invitation'
+    | 'attendance'
+    | 'work-started'
+    | 'work-completed'
+    | 'valued-appearance';
+  actor: string | null;
+  /** The model call that produced the actor's plan for that round; null for world records. */
+  call: string | null;
+  /** Other people involved, each with the call that produced their plan, if any. */
+  people: { actor: string; call: string | null }[];
+  text: string;
+  ref: string | null;
+}
+export interface AdoptedItem {
+  type: 'name' | 'saying' | 'rule';
+  text: string;
+  origin: string;
+  round: number;
+  adopter: string;
+  adoptedRound: number;
+  via: Receipt['via'] | 'action';
+  call: string | null;
+}
+
+export const G2_REVISION = {
+  id: 'G2-group',
+  date: '2026-11-25',
+  postHoc: true,
+  reason:
+    'Revised by the user after reviewing ex16 and ex17, after both had failed the original gate. The original per-person symbolic condition fails a whole run on one solitary or silent person, and the original survival share counts idle rest as survival; neither half measures shared culture by itself. The revision judges the group and requires that some content (a name, saying or rule) be adopted by another person.',
+  criteria: [
+    'Survival actor-rounds other than idle rest and wait below 50% of actor-rounds (wait is never survival; rest and wait are reported as idle).',
+    'At least half of the people make at least one successful symbolic action (name, mark, tell or invite).',
+    'At least one name, saying or rule adopted by another person who had received it: a transmitted term, a phrase propagation, a norm echoed after receipt, or a sharing reuse with similar wording after receipt.',
+  ],
+} as const;
+
+function gateMetric(
+  m: Pick<
+    CultureMetrics,
+    'agents' | 'survival' | 'symbolic' | 'vocabulary' | 'norms' | 'sharing'
+  >,
+  phrases: CultureMetrics['phrases'],
+  heard: Receipt[],
+  call: Context['call'],
+  firstUse: (term: string, actor: string, after: number) => number | null,
+): CultureMetrics['gate'] {
+  const survivalShare = m.survival.shareWithoutRest;
+  const people = m.symbolic.perAgent
+    .filter((a) => a.succeeded >= 1)
+    .map((a) => a.actor);
+  const required = Math.ceil(m.agents.length / 2);
+  const names: AdoptedItem[] = m.vocabulary.top.flatMap((t) =>
+    t.exposedLaterUsers.flatMap((adopter) => {
+      const round = firstUse(t.term, adopter, t.firstRound);
+      return round === null
+        ? []
+        : [
+            {
+              type: 'name' as const,
+              text: t.term,
+              origin: t.firstUsers.join(', '),
+              round: t.firstRound,
+              adopter,
+              adoptedRound: round,
+              via:
+                heard.find(
+                  (r) =>
+                    r.actor === adopter &&
+                    r.tick < round &&
+                    termKey(r.text).includes(termKey(t.term)),
+                )?.via ?? 'speech',
+              call: call(adopter, round),
+            },
+          ];
+    }),
+  );
+  const sayings: AdoptedItem[] = phrases.list
+    .filter((p) => COMMUNICATION.includes(p.kind))
+    .map((p) => ({
+      type: 'saying',
+      text: p.source.text,
+      origin: p.source.actor,
+      round: p.source.round,
+      adopter: p.actor,
+      adoptedRound: p.round,
+      via: p.received.via,
+      call: p.call,
+    }));
+  const rules: AdoptedItem[] = [
+    ...m.norms.list.flatMap((n) => [
+      ...n.phraseEchoes
+        .filter((e) =>
+          heard.some(
+            (r) =>
+              r.actor === e.actor &&
+              r.from === n.actor &&
+              r.tick >= n.round &&
+              r.tick < e.round &&
+              r.text.includes(n.text),
+          ),
+        )
+        .map((e) => ({
+          type: 'rule' as const,
+          text: n.text,
+          origin: n.actor,
+          round: n.round,
+          adopter: e.actor,
+          adoptedRound: e.round,
+          via: 'speech' as const,
+          call: call(e.actor, e.round),
+        })),
+      ...n.actionEchoes.map((e) => ({
+        type: 'rule' as const,
+        text: n.text,
+        origin: n.actor,
+        round: n.round,
+        adopter: e.actor,
+        adoptedRound: e.round,
+        via: 'action' as const,
+        call: call(e.actor, e.round),
+      })),
+    ]),
+    ...m.sharing.reuseList
+      .filter((r) => r.exposure && r.similarWording)
+      .map((r) => ({
+        type: 'rule' as const,
+        text: r.closest.phrase,
+        origin: r.closest.actor,
+        round: r.closest.round,
+        adopter: r.actor,
+        adoptedRound: r.round,
+        via: r.exposure?.via ?? ('speech' as const),
+        call: call(r.actor, r.round),
+      })),
+  ];
+  const survival = survivalShare !== null && survivalShare < 0.5;
+  const symbolic = people.length >= required;
+  const adopted = names.length + sayings.length + rules.length > 0;
+  const originalSurvival = m.survival.share !== null && m.survival.share < 0.5;
+  return {
+    ...G2_REVISION,
+    survival: { share: survivalShare, threshold: 0.5, passed: survival },
+    symbolic: { people, required, passed: symbolic },
+    adoption: { names, sayings, rules, passed: adopted },
+    passed: survival && symbolic && adopted,
+    original: {
+      survivalShare: m.survival.share,
+      everyAgentAtLeastOne: m.symbolic.everyAgentAtLeastOne,
+      passed: originalSurvival && m.symbolic.everyAgentAtLeastOne,
+    },
+  };
+}
+
+function timelineMetric(
+  c: Context,
+  m: Pick<CultureMetrics, 'norms' | 'sharing' | 'gate'>,
+  invitations: InvitationRecord[],
+  works: WorkRecord[],
+  appearance: AppearanceValue[],
+): TimelineItem[] {
+  const items: TimelineItem[] = [];
+  for (const round of c.input.rounds)
+    for (const actor of c.agents) {
+      const action = round.actions[actor];
+      if (
+        !action ||
+        !['name', 'mark'].includes(action.interface) ||
+        !succeeded(round, actor)
+      )
+        continue;
+      const args = object(action.args);
+      const value = ['name', 'label', 'title', 'text', 'mark', 'symbol']
+        .map((k) => text(args[k]))
+        .find(Boolean);
+      if (value)
+        items.push({
+          round: round.tick,
+          type: 'name',
+          actor,
+          call: c.call(actor, round.tick),
+          people: [],
+          text: `${action.interface}: ${value}`,
+          ref:
+            round.events.find(
+              (e) => e.actor === actor && ['named', 'marked'].includes(e.type),
+            )?.target ?? null,
+        });
+    }
+  for (const n of m.norms.list)
+    if (COMMUNICATION.includes(n.kind))
+      items.push({
+        round: n.round,
+        type: 'rule',
+        actor: n.actor,
+        call: c.call(n.actor, n.round),
+        people: [],
+        text: n.text,
+        ref: null,
+      });
+  for (const e of m.sharing.list)
+    if (e.communicated)
+      items.push({
+        round: e.round,
+        type: 'rule',
+        actor: e.actor,
+        call: c.call(e.actor, e.round),
+        people: [],
+        text: `${e.text} [${e.matches.map((x) => x.idea).join(', ')}]`,
+        ref: null,
+      });
+  const adopted: [AdoptedItem[], TimelineItem['type']][] = [
+    [m.gate.adoption.names, 'name-adopted'],
+    [m.gate.adoption.rules, 'rule-adopted'],
+    [m.gate.adoption.sayings, 'saying-adopted'],
+  ];
+  for (const [list, type] of adopted)
+    for (const a of list)
+      items.push({
+        round: a.adoptedRound,
+        type,
+        actor: a.adopter,
+        call: a.call,
+        people: [{ actor: a.origin, call: c.call(a.origin, a.round) }],
+        text: `${a.text} (from ${a.origin}, round ${String(a.round)}, via ${a.via})`,
+        ref: null,
+      });
+  for (const i of invitations) {
+    items.push({
+      round: i.round,
+      type: 'invitation',
+      actor: i.host,
+      call: i.call,
+      people: i.heard.map((actor) => ({ actor, call: null })),
+      text: `meet at (${String(i.place.x)}, ${String(i.place.y)}) at round ${String(i.meetingRound)}: ${i.text}`,
+      ref: i.sign,
+    });
+    items.push({
+      round: i.meetingRound,
+      type: 'attendance',
+      actor: null,
+      call: null,
+      people: i.arrivals.map((a) => ({ actor: a.actor, call: a.call })),
+      text: `present ${i.attendance?.present.join(', ') || 'none'}; came after hearing ${i.attendance?.came.join(', ') || 'none'}; guests within the grace period ${i.arrivals.map((a) => `${a.actor} (round ${String(a.round)})`).join(', ') || 'none'}`,
+      ref: i.attendance?.event ?? i.sign,
+    });
+  }
+  for (const w of works) {
+    items.push({
+      round: w.created,
+      type: 'work-started',
+      actor: w.maker,
+      call: w.call,
+      people: [],
+      text: `${w.name} (${w.kind})`,
+      ref: w.id,
+    });
+    if (w.completed !== null)
+      items.push({
+        round: w.completed,
+        type: 'work-completed',
+        actor: w.maker,
+        call: c.call(w.maker, w.completed),
+        people: [],
+        text: `${w.name} (${w.kind})`,
+        ref: w.id,
+      });
+  }
+  for (const a of appearance)
+    items.push({
+      round: a.round,
+      type: 'valued-appearance',
+      actor: a.actor,
+      call: a.call,
+      people: a.acknowledgements.map((x) => ({ actor: x.actor, call: x.call })),
+      text: a.text,
+      ref: a.work,
+    });
+  return items.sort(
+    (a, b) =>
+      a.round - b.round ||
+      a.type.localeCompare(b.type) ||
+      (a.actor ?? '').localeCompare(b.actor ?? ''),
+  );
+}
+
 export function cultureMetrics(input: CultureInput): CultureMetrics {
   const agents = input.actors.map((a) => a.id);
   const at = positions(input);
@@ -2385,6 +3278,7 @@ export function cultureMetrics(input: CultureInput): CultureMetrics {
     input.resources.filter((r) => r.nutrition > 0).map((r) => termKey(r.id)),
   );
   const list = utterances(input);
+  const byTick = new Map(input.rounds.map((r) => [r.tick, r]));
   const c: Context = {
     input,
     agents,
@@ -2399,31 +3293,76 @@ export function cultureMetrics(input: CultureInput): CultureMetrics {
     at: (actor, tick) => at.get(tick)?.get(actor),
     isSurvival: (id) =>
       survivalInterface(catalogue.get(id) ?? { id, name: id }, edible),
+    call: (actor, tick) => byTick.get(tick)?.calls?.[actor] ?? null,
   };
   const ticks = input.rounds.map((r) => r.tick);
   // Private memory may read public receipts for its own exposure; nothing flows the other way.
   const exposure = sharingExposure(c);
+  const heard = [...receipts(c), ...signReceipts(c)];
+  const last = ticks.length ? Math.max(...ticks) : 0;
+  const base = {
+    agents,
+    vocabulary: vocabularyMetric(c),
+    norms: normMetric(c),
+    sharing: sharingMetric(c, exposure),
+    survival: survivalMetric(c),
+    symbolic: symbolicMetric(c),
+  };
+  const phrases = phraseMetric(c, heard);
+  // A person's first use of a term after its first round; null if they had used it (or a
+  // longer term containing it, such as a name they gave) by then.
+  const firstUse = (term: string, actor: string, after: number) => {
+    const uses = list.filter(
+      (u) => u.actor === actor && termKey(u.text).includes(termKey(term)),
+    );
+    if (uses.some((u) => u.tick <= after)) return null;
+    return uses.find((u) => u.tick > after)?.tick ?? null;
+  };
+  const gate = gateMetric(base, phrases, heard, c.call, firstUse);
+  const invitations = invitationMetric(c, heard);
+  const works: WorkRecord[] = (input.works ?? [])
+    .filter((w) => w.created <= last)
+    .map((w) => ({
+      ...w,
+      completed:
+        w.completed !== null && w.completed <= last ? w.completed : null,
+      call: c.call(w.maker, w.created),
+    }));
+  const appearance = appearanceMetric(c, works, heard);
   return {
     archive: input.archive,
     rounds: {
       first: ticks.length ? Math.min(...ticks) : 0,
-      last: ticks.length ? Math.max(...ticks) : 0,
+      last,
       count: ticks.length,
     },
     agents,
     utterances: Object.fromEntries(
       KINDS.map((k) => [k, list.filter((u) => u.kind === k).length]),
     ) as Record<Kind, number>,
-    vocabulary: vocabularyMetric(c),
+    vocabulary: base.vocabulary,
     activities: activityMetric(c, at),
-    norms: normMetric(c),
-    sharing: sharingMetric(c, exposure),
+    norms: base.norms,
+    sharing: base.sharing,
     beliefs: beliefMetric(c),
     relationships: relationshipMetric(c),
-    survival: survivalMetric(c),
+    survival: base.survival,
     rest: restMetric(c),
     nonTransactional: communicationMetric(c),
-    symbolic: symbolicMetric(c),
+    symbolic: base.symbolic,
+    idle: idleMetric(c),
+    phrases,
+    invitations: { criterion: INVITATION_CRITERION, list: invitations },
+    works,
+    appearance: { criterion: APPEARANCE_CRITERION, list: appearance },
+    gate,
+    timeline: timelineMetric(
+      c,
+      { norms: base.norms, sharing: base.sharing, gate },
+      invitations,
+      works,
+      appearance,
+    ),
     privateMemory: privateMemoryMetric(input, exposure),
     modelLabels: null,
   };
@@ -2445,6 +3384,8 @@ function strings(
 
 /** Event types whose description or data repeat actor-authored text. */
 const ACTOR_TEXT_EVENTS = [
+  // A listener's copy of spoken text (culture voice scopes); it is actor text, not world text.
+  'heard',
   'message',
   'requested',
   'collective-report',
@@ -2502,6 +3443,35 @@ export function cultureInput(archive: string, through?: number): CultureInput {
   const worlds: V7World[] = [initial];
   const own = (actor: string, cursor: V7Cursor) =>
     decided.get(`${actor}\u0000${String(cursor.startedAt)}`) !== false;
+  // The accepted ordinary call of each decision; a query batch precedes its plan, so the last wins.
+  const accepted = new Map<string, string>();
+  for (const a of execution.attempts)
+    if (a.role === 'ordinary' && a.status === 'accepted')
+      accepted.set(`${a.actor}\u0000${String(a.tick)}`, a.id);
+  const actorIds = new Set(initial.actors.map((a) => a.id));
+  const made = new Map<string, CultureWork>();
+  const sight = (w: V7World) => {
+    for (const o of w.objects) {
+      if (
+        !o.createdBy ||
+        !actorIds.has(o.createdBy) ||
+        o.assemblyParent ||
+        EXPRESSION_SIGN_KINDS.includes(o.kind) ||
+        (through !== undefined && o.createdAt > through)
+      )
+        continue;
+      const status = typeof o.data.status === 'string' ? o.data.status : null;
+      made.set(o.id, {
+        id: o.id,
+        kind: o.kind,
+        name: o.name,
+        maker: o.createdBy,
+        created: o.createdAt,
+        completed: null,
+        status: status ?? made.get(o.id)?.status ?? null,
+      });
+    }
+  };
   for (const part of index.segments) {
     const source = readFileSync(join(archive, part.path));
     if (createHash('sha256').update(source).digest('hex') !== part.sha256)
@@ -2516,6 +3486,7 @@ export function cultureInput(archive: string, through?: number): CultureInput {
     const frames = kept.length
       ? reconstructContinuousSegment({ ...segment, rounds: kept })
       : [];
+    frames.forEach(sight);
     kept.forEach((r, i) =>
       rounds.push({
         tick: r.tick,
@@ -2530,6 +3501,14 @@ export function cultureInput(archive: string, through?: number): CultureInput {
             if (own(actor, cursor)) return [[actor, cursor.plan.intention]];
             harness.add(cursor.plan.intention);
             return [];
+          }),
+        ),
+        calls: Object.fromEntries(
+          Object.entries(r.tasks).flatMap(([actor, cursor]) => {
+            const id = own(actor, cursor)
+              ? accepted.get(`${actor}\u0000${String(cursor.startedAt)}`)
+              : undefined;
+            return id ? [[actor, id]] : [];
           }),
         ),
         // A round's retained cursor is the one that produced its action (state after the round).
@@ -2553,6 +3532,18 @@ export function cultureInput(archive: string, through?: number): CultureInput {
     );
   }
   const world = execution.world;
+  sight(world);
+  for (const work of made.values())
+    work.completed =
+      rounds.find((r) =>
+        r.events.some(
+          (e) =>
+            e.target === work.id &&
+            e.success &&
+            (e.type.endsWith('-completed') ||
+              object(e.data).status === 'complete'),
+        ),
+      )?.tick ?? null;
   // Authored prompt: the instructions and packet of each actor's first retained ordinary request.
   const prompts: string[] = [];
   const pending = new Set(world.actors.map((a) => a.id));
@@ -2574,11 +3565,14 @@ export function cultureInput(archive: string, through?: number): CultureInput {
     prompts.push(...strings(request));
   }
   // Catalogue and world vocabulary; actor records, events and shared state carry agent text and are skipped.
+  // Names, marks and invitation signs hold actor text and are not world vocabulary.
+  const notSign = (o: V7World['objects'][number]) =>
+    !EXPRESSION_SIGN_KINDS.includes(o.kind);
   const vocabulary = worlds.flatMap((w) =>
     strings(
       {
         abilities: w.abilities,
-        objects: w.objects,
+        objects: w.objects.filter(notSign),
         resources: w.resources,
         satisfaction: w.satisfaction,
         eventTypes: w.eventTypes ?? [],
@@ -2588,7 +3582,7 @@ export function cultureInput(archive: string, through?: number): CultureInput {
   );
   const finals = strings({
     abilities: world.abilities,
-    objects: world.objects.map((o) => ({
+    objects: world.objects.filter(notSign).map((o) => ({
       id: o.id,
       kind: o.kind,
       name: o.name,
@@ -2626,6 +3620,16 @@ export function cultureInput(archive: string, through?: number): CultureInput {
       ...worldEvents,
     ],
     rounds,
+    objects: [
+      ...new Set(
+        [initial, ...worlds, world].flatMap((w) =>
+          w.objects.filter(notSign).flatMap((o) => [o.kind, o.name]),
+        ),
+      ),
+    ].sort(),
+    works: [...made.values()].sort(
+      (a, b) => a.created - b.created || a.id.localeCompare(b.id),
+    ),
     voice: world.config.longDevelopment?.culture?.voice ?? false,
     energy: {
       cap: initial.config.energyCap,
@@ -2865,6 +3869,8 @@ export function cultureMarkdown(m: CultureMetrics): string {
     `- Symbolic actions (${m.symbolic.interfaces.map(id).join(', ')}): ${m.symbolic.perAgent.map((a) => `${a.actor} ${String(a.succeeded)}`).join(', ')}; every agent at least one: ${m.symbolic.everyAgentAtLeastOne ? 'yes' : 'no'}.`,
     '',
     ...restMarkdown(m),
+    ...gateMarkdown(m),
+    ...eventsMarkdown(m),
     ...(m.privateMemory ? privateMarkdown(m.privateMemory) : []),
   ];
   return lines.join('\n');
@@ -2939,6 +3945,146 @@ function sharingMarkdown(m: CultureMetrics): string[] {
 const yesNo = (v: boolean | null) => (v === null ? '–' : v ? 'yes' : 'no');
 const restLine = (r: RestMetrics) =>
   `- Rest as a default idle behavior, criterion 1 (no energy condition or cap-cut recovery): ${String(r.idle)} of ${String(r.rests)} rests idle (${percent(r.idleShare)}: ${String(r.unconditioned)} from steps without an energy condition, ${r.highEnergy === null ? 'high-energy test unavailable' : `${String(r.highEnergy)} begun within one rest of the energy cap`}); default: ${yesNo(r.default)}. Criterion 2 (start energy at or above ${String(r.startShare * 100)}% of the cap): ${r.highStart === null ? 'start energy unavailable' : `${String(r.highStart)} of ${String(r.withStart)} rests (${percent(r.highStartShare)})`}; default: ${yesNo(r.startDefault)}. Threshold ${String(r.defaultShare * 100)}% for both. ${String(r.toFull)} rests came from steps that rest until at least ${String(r.toFullShare * 100)}% of the cap.`;
+
+const pass = (v: boolean) => (v ? 'pass' : 'fail');
+const via = (a: AdoptedItem) =>
+  `${a.adopter} r${String(a.adoptedRound)} (${a.call ?? 'no call'}) from ${a.origin} r${String(a.round)} via ${a.via}: "${cell(a.text, 70)}"`;
+
+/** Gate G2 as revised after the fact, with idle time and the original gate. */
+function gateMarkdown(m: CultureMetrics): string[] {
+  const g = m.gate;
+  const adopted = [
+    ...g.adoption.names,
+    ...g.adoption.sayings,
+    ...g.adoption.rules,
+  ];
+  return [
+    '### Gate G2 (revised after the fact)',
+    '',
+    `Revision \`${g.id}\` of ${g.date}, made after the fact: ${g.reason}`,
+    '',
+    ...g.criteria.map((x, i) => `${String(i + 1)}. ${x}`),
+    '',
+    table(
+      ['Condition', 'Value', 'Result'],
+      [
+        [
+          'Survival share without idle rest and wait',
+          percent(g.survival.share),
+          pass(g.survival.passed),
+        ],
+        [
+          'People with a symbolic action',
+          `${String(g.symbolic.people.length)} of ${String(m.agents.length)} (${g.symbolic.people.join(', ') || 'none'}); at least ${String(g.symbolic.required)} required`,
+          pass(g.symbolic.passed),
+        ],
+        [
+          'Adopted names, sayings and rules',
+          `${String(g.adoption.names.length)} names, ${String(g.adoption.sayings.length)} sayings, ${String(g.adoption.rules.length)} rules`,
+          pass(g.adoption.passed),
+        ],
+        ['Revised G2', '', pass(g.passed)],
+        [
+          'Original G2 (survival share with rest; every person symbolic)',
+          `${percent(g.original.survivalShare)}; every person: ${yesNo(g.original.everyAgentAtLeastOne)}`,
+          pass(g.original.passed),
+        ],
+      ],
+    ),
+    '',
+    `Idle (\`rest\` and \`wait\`, not survival): ${String(m.idle.rounds)} of ${String(m.idle.actorRounds)} actor-rounds (${percent(m.idle.share)}; rest ${String(m.idle.rest)}, wait ${String(m.idle.wait)}). Per person: ${m.idle.perAgent.map((a) => `${a.actor} ${percent(a.share)}`).join(', ')}.`,
+    '',
+    ...(adopted.length
+      ? adopted.map((a) => `- ${a.type}: ${via(a)}`)
+      : ['No name, saying or rule was adopted by another person.']),
+    '',
+  ];
+}
+
+/** Phrase propagation, invitations, works valued for appearance and the timeline. */
+function eventsMarkdown(m: CultureMetrics): string[] {
+  const p = m.phrases;
+  return [
+    '### Phrase propagation',
+    '',
+    `${p.criterion} ${String(p.propagations)} propagations (${String(p.adoptions)} distinct adoptions, ${String(p.communicated)} into spoken, sent or posted text).`,
+    '',
+    p.list.length
+      ? table(
+          ['Round', 'Person (call)', 'Kind', 'Clause', 'Source', 'Received'],
+          p.list.map((x) => [
+            String(x.round),
+            `${x.actor} (${x.call ?? '–'})`,
+            x.kind,
+            cell(x.text, 70),
+            `${x.source.actor} r${String(x.source.round)} (${x.source.call ?? '–'}): "${cell(x.source.text, 60)}"`,
+            `r${String(x.received.tick)} ${x.received.via}`,
+          ]),
+        )
+      : 'No phrase propagated.',
+    '',
+    '### Invitations and attendance',
+    '',
+    m.invitations.criterion,
+    '',
+    ...(m.invitations.list.length
+      ? m.invitations.list.flatMap((i) => [
+          `- ${i.host} r${String(i.round)} (${i.call ?? '–'}), ${id(i.sign)}: meet at (${String(i.place.x)}, ${String(i.place.y)}) at round ${String(i.meetingRound)}: "${cell(i.text, 100)}". Heard by ${i.heard.join(', ') || 'nobody'}. Attendance: ${i.attendance ? `present ${i.attendance.present.join(', ') || 'none'}, came after hearing ${i.attendance.came.join(', ') || 'none'} (${id(i.attendance.event ?? '–')})` : 'not recorded'}. Guests within the grace period: ${i.arrivals.map((a) => `${a.actor} r${String(a.round)} (${a.call ?? '–'})`).join(', ') || 'none'}.`,
+          ...i.speech.map(
+            (s) =>
+              `  - ${s.actor} r${String(s.round)} (${s.call ?? '–'}): "${cell(s.text, 120)}"`,
+          ),
+        ])
+      : ['No invitation.']),
+    '',
+    '### Works and appearance',
+    '',
+    m.works.length
+      ? table(
+          ['Work', 'Kind', 'Maker (call)', 'Started', 'Completed', 'Status'],
+          m.works.map((w) => [
+            id(w.id),
+            w.kind,
+            `${w.maker} (${w.call ?? '–'})`,
+            String(w.created),
+            w.completed === null ? '–' : String(w.completed),
+            w.status ?? '–',
+          ]),
+        )
+      : 'No person-made object.',
+    '',
+    m.appearance.criterion,
+    '',
+    ...(m.appearance.list.length
+      ? m.appearance.list.flatMap((a) => [
+          `- ${a.actor} r${String(a.round)} (${a.call ?? '–'}), ${id(a.work)}: failure "${a.failure}", appearance "${a.appearance}": "${cell(a.text, 160)}"`,
+          ...a.acknowledgements.map(
+            (x) =>
+              `  - acknowledged by ${x.actor} r${String(x.round)} (${x.call ?? '–'}): "${cell(x.text, 120)}"`,
+          ),
+        ])
+      : ['No object was valued for its appearance despite a failure.']),
+    '',
+    '### Timeline',
+    '',
+    m.timeline.length
+      ? table(
+          ['Round', 'Type', 'Person (call)', 'Others (call)', 'Text', 'Record'],
+          m.timeline.map((t) => [
+            String(t.round),
+            t.type,
+            t.actor ? `${t.actor} (${t.call ?? '–'})` : 'world',
+            t.people
+              .map((x) => (x.call ? `${x.actor} (${x.call})` : x.actor))
+              .join(', ') || '–',
+            cell(t.text, 100),
+            t.ref ? id(t.ref) : '–',
+          ]),
+        )
+      : 'No dated item.',
+    '',
+  ];
+}
 
 /** Per-person rest and survival table. */
 function restMarkdown(m: CultureMetrics): string[] {

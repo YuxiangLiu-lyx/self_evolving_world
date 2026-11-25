@@ -68,4 +68,12 @@ rule, the single adjustment is to part A's wording: `long-culture-v3` adds "with
 open goal and a fact about rest. Every other v2 decision stands. See
 [Culture v3](../CULTURE_SCENARIO.md#culture-v3).
 
+**Addendum (revised G2, PR-41).** ex17 failed G2 again, which stopped the procedure. After
+reviewing both runs, the user revised the gate after the fact. The per-person symbolic
+condition became "at least half of the people", the survival condition stopped counting
+`rest` (with `rest` and `wait` reported as idle), and a third condition requires at least one
+name, saying or rule adopted by another person. Both runs pass the revision, and both
+archives are to be extended to round 250. The revision is recorded as post hoc wherever the
+gate is reported. See [Culture metrics](../CULTURE_SCENARIO.md#culture-metrics).
+
 See the [design](../CULTURE_SCENARIO.md#culture-v2) and the [plan](../exec-plans/completed/pr-38-culture-v2.md).
