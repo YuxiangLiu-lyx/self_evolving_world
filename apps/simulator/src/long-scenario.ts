@@ -10,6 +10,7 @@ import {
   applyCulture,
   CULTURE_OPTIONS,
   CULTURE_V2_OPTIONS,
+  CULTURE_V3_OPTIONS,
   LONG_CULTURE,
   LONG_CULTURE_INCENTIVES,
   LONG_CULTURE_V2,
@@ -26,6 +27,10 @@ export const LONG_CULTURE_INCENTIVES_OBJECTIVE =
   'As the culture run, with bounded, decaying satisfaction from being answered or remembered, two-way contact and noticed own work; no particular outcome, activity or invention is required.';
 export const LONG_CULTURE_V2_OBJECTIVE =
   'As the culture run, with an open goal beyond health and safety, a stated value leaning, lossless context compaction and uncounted recovery handoffs; no particular outcome, activity or invention is required.';
+export const LONG_CULTURE_V3_OBJECTIVE =
+  'As the culture v2 run, with the open goal also leaving open with whom to live and a stated fact that rest restores only missing energy; no particular outcome, activity or invention is required.';
+export const LONG_CULTURE_V3_INCENTIVES_OBJECTIVE =
+  'As the culture v3 run, with bounded, decaying satisfaction from being answered or remembered, two-way contact and noticed own work; no particular outcome, activity or invention is required.';
 export const LONG_CULTURE_V2_INCENTIVES_OBJECTIVE =
   'As the culture v2 run, with bounded, decaying satisfaction from being answered or remembered, two-way contact and noticed own work; no particular outcome, activity or invention is required.';
 
@@ -36,7 +41,9 @@ export type LongScenario =
   | 'long-culture'
   | 'long-culture-incentives'
   | 'long-culture-v2'
-  | 'long-culture-v2-incentives';
+  | 'long-culture-v2-incentives'
+  | 'long-culture-v3'
+  | 'long-culture-v3-incentives';
 export const LONG_SCENARIOS: readonly LongScenario[] = [
   'long',
   'long-fixes',
@@ -44,12 +51,16 @@ export const LONG_SCENARIOS: readonly LongScenario[] = [
   'long-culture-incentives',
   'long-culture-v2',
   'long-culture-v2-incentives',
+  'long-culture-v3',
+  'long-culture-v3-incentives',
 ];
 const CULTURE_SCENARIOS = {
   'long-culture': 'culture',
   'long-culture-incentives': 'culture-incentives',
   'long-culture-v2': 'culture-v2',
   'long-culture-v2-incentives': 'culture-v2-incentives',
+  'long-culture-v3': 'culture-v3',
+  'long-culture-v3-incentives': 'culture-v3-incentives',
 } as const;
 
 /** The fix-verification run: ex13 rules and seed with the three opt-in fixes and smaller limits.
@@ -87,7 +98,11 @@ export function longObjective(
           ? LONG_CULTURE_V2_OBJECTIVE
           : scenario === 'long-culture-v2-incentives'
             ? LONG_CULTURE_V2_INCENTIVES_OBJECTIVE
-            : LONG_OBJECTIVE;
+            : scenario === 'long-culture-v3'
+              ? LONG_CULTURE_V3_OBJECTIVE
+              : scenario === 'long-culture-v3-incentives'
+                ? LONG_CULTURE_V3_INCENTIVES_OBJECTIVE
+                : LONG_OBJECTIVE;
 }
 
 /** Opt-in policy; historical genesis and generated registries remain unchanged. */
@@ -142,7 +157,9 @@ export function initialLongWorld(
     const policy = world.config.longDevelopment;
     const name = CULTURE_SCENARIOS[scenario as keyof typeof CULTURE_SCENARIOS];
     const incentives = name.endsWith('incentives'),
-      v2 = name.startsWith('culture-v2');
+      v3 = name.startsWith('culture-v3'),
+      // Culture v3 keeps every culture v2 field; only the prompt wording differs.
+      v2 = v3 || name.startsWith('culture-v2');
     policy.scenario = name;
     policy.exactRecordWidth = LONG_CULTURE.exactRecordWidth;
     policy.guidance = [...LONG_CULTURE.guidance];
@@ -175,7 +192,7 @@ export function initialLongWorld(
       world.config.experience.targetRounds = LONG_CULTURE_INCENTIVES.rounds;
     }
     const cultured = applyCulture(world, {
-      ...(v2 ? CULTURE_V2_OPTIONS : CULTURE_OPTIONS),
+      ...(v3 ? CULTURE_V3_OPTIONS : v2 ? CULTURE_V2_OPTIONS : CULTURE_OPTIONS),
       incentives,
     });
     v7AssertWorld(cultured, continuousRegistry(cultured));

@@ -78,3 +78,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-37](completed/pr-37-culture-runs.md): E2 culture pilot (ex15): six people, stopped at round 70 by the context guard, gate G2 met, 8 handoffs; E3 and E4 not run.
 
 - [PR-38](completed/pr-38-culture-v2.md): culture v2 run version with lossless context compaction, an open-goal prompt, uncounted recovery handoffs and new culture measures.
+
+- [PR-40](completed/pr-40-culture-v3.md): culture v3 tags with the single G2-failure adjustment of the open-goal wording after ex16.
