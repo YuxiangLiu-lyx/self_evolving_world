@@ -4,18 +4,18 @@
 
 As the culture run, with an open goal beyond health and safety, a stated value leaning, lossless context compaction and uncounted recovery handoffs; no particular outcome, activity or invention is required. Frozen ordinary/world/development attempt ceilings: 1800/300/40. Shared ordinary/world token ceiling: 10000000.
 
-Observed 80 of 80 target rounds. State: window-complete. Observation window reached 80; the world is resumable, not terminal. This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.
+Observed 150 of 150 target rounds. State: window-complete. Observation window reached 150; the world is resumable, not terminal. This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.
 
 ## Measured outcome
 
 | Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | Learned-interface successful rounds |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| lin | true | 100 | 90 | 9.61 | 9.78 | 1 | 0 |
-| moss | true | 100 | 64 | 9.45 | 9.10 | 2 | 10 |
-| sol | true | 100 | 88 | 9.35 | 9.70 | 1 | 12 |
-| kai | true | 100 | 72 | 9.34 | 9.30 | 2 | 0 |
-| wren | true | 100 | 64 | 9.18 | 8.97 | 2 | 6 |
-| ivo | true | 100 | 64 | 9.49 | 9.10 | 1 | 0 |
+| lin | true | 100 | 87 | 9.49 | 9.34 | 2 | 1 |
+| moss | true | 100 | 61 | 9.29 | 8.63 | 2 | 10 |
+| sol | true | 100 | 59 | 9.19 | 8.59 | 1 | 13 |
+| kai | true | 100 | 91 | 9.18 | 8.71 | 3 | 1 |
+| wren | true | 100 | 85 | 9.05 | 8.89 | 3 | 16 |
+| ivo | true | 100 | 75 | 9.29 | 9.54 | 2 | 0 |
 
 Requests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits. This fresh policy inherits no generated interfaces. The explicit authored allowlist, current-run package provenance, personal projects, verified knowledge, trials and persistent processes are retained separately in results.openDevelopment. Actor-written progress is a claim, not a physical outcome. Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.
 
@@ -23,27 +23,27 @@ Requests, reviews, implementation, individual study, successful execution and la
 
 | Interface | Attempted | Successful rounds | Failed rounds |
 | --- | --- | --- | --- |
-| navigate | 107 | 101 | 6 |
-| tell | 28 | 28 | 0 |
-| gather | 28 | 28 | 0 |
-| eat | 29 | 28 | 1 |
-| rest | 186 | 186 | 0 |
+| navigate | 212 | 205 | 7 |
+| tell | 36 | 36 | 0 |
+| gather | 44 | 44 | 0 |
+| eat | 54 | 53 | 1 |
+| rest | 378 | 378 | 0 |
 | request | 3 | 3 | 0 |
-| probe | 2 | 2 | 0 |
-| wait | 57 | 57 | 0 |
-| learn | 6 | 6 | 0 |
-| cultivate-plants | 7 | 3 | 4 |
-| hand-weave-fiber-mat | 13 | 13 | 0 |
-| branch-screen | 13 | 12 | 1 |
+| probe | 3 | 3 | 0 |
+| wait | 112 | 112 | 0 |
+| learn | 10 | 10 | 0 |
+| cultivate-plants | 9 | 5 | 4 |
+| hand-weave-fiber-mat | 22 | 21 | 1 |
+| branch-screen | 16 | 15 | 1 |
 | invite | 1 | 1 | 0 |
 
 ## Cost and limitations
 
-ordinary: 140 attempted calls, 6 failed/rejected; 992977 recorded input tokens and 61516 recorded output tokens; 2 attempts with unknown token usage; 1716.4 elapsed seconds.
+ordinary: 224 attempted calls, 7 failed/rejected; 1686169 recorded input tokens and 93153 recorded output tokens; 3 attempts with unknown token usage; 2618.8 elapsed seconds.
 
 world: 9 attempted calls, 0 failed/rejected; 36310 recorded input tokens and 6712 recorded output tokens; 0 attempts with unknown token usage; 221.8 elapsed seconds.
 
-3 pre-counted conversation development handoffs, 0 failed validation attempts. 3 of them use the development budget; accepted handoffs that installed no package and changed no runtime source do not. Current-conversation development handoffs are counted before work. Internal coding/reasoning calls, tokens and preparation/review costs are not directly metered; these unknown costs are not zero.
+4 pre-counted conversation development handoffs, 0 failed validation attempts. 3 of them use the development budget; accepted handoffs that installed no package and changed no runtime source do not. Current-conversation development handoffs are counted before work. Internal coding/reasoning calls, tokens and preparation/review costs are not directly metered; these unknown costs are not zero.
 
 ## Evidence and reproduction
 
