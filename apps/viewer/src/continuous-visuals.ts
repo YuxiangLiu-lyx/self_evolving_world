@@ -85,6 +85,68 @@ export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
         .join('');
     return `<rect x="${String(-w / 2)}" y="${String(-h / 2)}" width="${String(w)}" height="${String(h)}" fill="#c5ad7a" fill-opacity="${String(0.1 + 0.4 * coverage)}" stroke="#8d704e" stroke-width=".035" ${done ? '' : 'stroke-dasharray=".08 .06"'}/><path d="M${String(-w / 2)} ${String(-h / 2 + 0.05)}H${String(w / 2)}" stroke="#6e5639" stroke-width=".07"/>${courses}<text y="${String(-h / 2 - 0.2)}" text-anchor="middle" fill="#fff0cf" font-size=".2">${done ? 'Lean-to' : `Lean-to ${String(stages)} / 12`}</text>`;
   },
+  // ex16 branch-screen@1: a dashed plan line; uprights and woven rods appear only as installed
+  // pieces (grey when loose), the line is solid only when complete, and no shielding is drawn.
+  'branch-screen': (o) => {
+    const v = o.data.view,
+      view = v && typeof v === 'object' && !Array.isArray(v) ? v : {},
+      parts = (Array.isArray(view.pieces) ? view.pieces : []).flatMap((p) =>
+        p && typeof p === 'object' && !Array.isArray(p) ? [p] : [],
+      ),
+      status = typeof view.status === 'string' ? view.status : o.visual.state,
+      tint = (p: (typeof parts)[number]) =>
+        Number(p.condition ?? 0) >= 0.5
+          ? color(typeof p.color === 'string' ? p.color : '')
+          : '#8b8273';
+    const rods = parts
+      .filter((p) => p.role === 'rod')
+      .map((p, i) => {
+        const a = String(i % 2 ? 0.025 : -0.025),
+          b = String(i % 2 ? -0.025 : 0.025);
+        return `<path d="M${a} -.55L${a} -.45L${b} 0L${a} .45L${a} .55" fill="none" stroke="${tint(p)}" stroke-width=".014"/>`;
+      })
+      .join('');
+    const uprights = parts
+      .filter((p) => p.role === 'upright')
+      .map(
+        (p) =>
+          `<circle cy="${String(Number(p.y ?? 0))}" r=".045" fill="${tint(p)}" stroke="#4f3d2a" stroke-width=".012"/>`,
+      )
+      .join('');
+    return `<path d="M0 -.45V.45" stroke="#c9b48a" stroke-width=".02" ${status === 'complete' ? '' : 'stroke-dasharray=".06 .05"'}/>${rods}${uprights}<text y="-.65" text-anchor="middle" fill="#fff0cf" font-size=".16">${status === 'complete' ? 'Screen' : `Screen ${svgText(status)} ${String(parts.length)} / 11`}</text>`;
+  },
+  // ex16 hand-weave-fiber-mat@1: a dashed 0.45 m square; strips and crossings appear only as paid
+  // rounds lay them, unfinished, failed or worn work is grey with broken ends, a carried mat is a roll.
+  'fiber-mat': (o) => {
+    const v = o.data.view,
+      view = v && typeof v === 'object' && !Array.isArray(v) ? v : {},
+      status = typeof view.status === 'string' ? view.status : o.visual.state,
+      steps = Number(view.steps ?? 0),
+      done = ['complete', 'needs-repair', 'failed', 'repairing'].includes(
+        status,
+      ),
+      tint =
+        status === 'complete' || (!done && status !== 'loose')
+          ? color(typeof view.color === 'string' ? view.color : '')
+          : '#8b8273';
+    if (view.carried === true)
+      return `<rect x="-.12" y="-.05" width=".24" height=".1" rx=".05" fill="${tint}" stroke="#6e5639" stroke-width=".012"/>`;
+    const rows = done || steps >= 3 ? 5 : steps === 2 ? 3 : 0,
+      cross = done ? 5 : Math.max(0, Math.min(5, (steps - 3) * 2)),
+      strip = (i: number, across: boolean) => {
+        const t = (-0.18 + i * 0.09).toFixed(2);
+        return across
+          ? `<path d="M-.2 ${t}H.2" stroke="${tint}" stroke-width=".06"/>`
+          : `<path d="M${t} -.2V.2" stroke="${tint}" stroke-width=".06" stroke-opacity=".8"/>`;
+      },
+      loose =
+        rows === 0
+          ? `<path d="M-.15 -.1L.12 .02M-.1 .12L.16 -.04M-.16 .05L.08 .15" stroke="${tint}" stroke-width=".02" stroke-dasharray=".05 .02"/>`
+          : status === 'complete'
+            ? ''
+            : '<path d="M-.14 .1l.05 .05M.09 -.12l.05 .05M.12 .1l-.04 .05" stroke="#5b5348" stroke-width=".015"/>';
+    return `<rect x="-.225" y="-.225" width=".45" height=".45" fill="${tint}" fill-opacity="${done ? '.35' : '.08'}" stroke="#6e5639" stroke-width=".012" ${status === 'complete' ? '' : 'stroke-dasharray=".04 .03"'}/>${Array.from({ length: rows }, (_, i) => strip(i, true)).join('')}${Array.from({ length: cross }, (_, i) => strip(i, false)).join('')}${loose}<text y="-.3" text-anchor="middle" fill="#fff0cf" font-size=".12">${status === 'complete' ? 'Mat' : `Mat ${svgText(status)} ${String(steps)} / 7`}</text>`;
+  },
   'lean-to-post': () =>
     '<circle r=".1" fill="#8d704e" stroke="#d6bd88" stroke-width=".02"/>',
   'stone-hearth': fireVisual,

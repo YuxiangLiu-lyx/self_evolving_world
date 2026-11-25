@@ -93,6 +93,9 @@ import { LONG_SIMPLE_SHELTER } from './long-simple-shelter.js';
 import { LONG_SHARED_SHELTER } from './long-shared-shelter.js';
 import { LONG_CULTIVATION_TRIAL } from './long-cultivation-trial.js';
 import { LONG_BARK_SEPARATION } from './long-bark-separation.js';
+import { LONG_PLANT_CULTIVATION } from './long-plant-cultivation.js';
+import { LONG_BRANCH_SCREEN } from './long-branch-screen.js';
+import { LONG_FIBER_MAT } from './long-fiber-mat.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -183,6 +186,9 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_SHARED_SHELTER,
   LONG_CULTIVATION_TRIAL,
   LONG_BARK_SEPARATION,
+  LONG_PLANT_CULTIVATION,
+  LONG_BRANCH_SCREEN,
+  LONG_FIBER_MAT,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(
