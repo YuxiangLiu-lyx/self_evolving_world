@@ -10,6 +10,13 @@ After reviewing ex16 and ex17, the user revised gate G2 after the fact (PR-41). 
 ## Requirements
 
 - R1: Extend ex16 with `pnpm experiment:continuous -- extend ex16 150`, then to 250. Extend ex17 the same way after ex16. Allocate E4 with `pnpm experiment:continuous -- new long-culture-v2-incentives` from a clean worktree after ex16 reaches round 150, and run it to round 120. Do not change a budget or a genesis.
+- R1a: Source lineages. `continue` and `extend` refuse a run whose runtime sources differ from its last recorded source revision. After ex16's round-80 window, main gained the culture v3 code and ex17's package, so ex16 no longer matches main. Each continued archive therefore runs in its own branch, whose runtime equals its own last revision; nothing in the protocol is relaxed.
+  - ex16 runs on `experiment/ex16-extension`, branched from `2409b37`, its round-80 checkpoint, which is an ancestor of main with an identical ex16 archive. The branch adds only `scripts/continuous-repair.ts` from PR #35, which is outside the runtime identity.
+  - ex17 runs on this branch, whose runtime equals ex17's last revision.
+  - E4 runs on its own branch from main.
+
+  The branches are merged at the end. Their archives and packages are separate files, and only the package registration lists overlap.
+
 - R2: Handoffs follow the ex15 rule. When the World Agent's specification is self-consistent, implement a simplified but real mechanism with real costs, effects and observable events, and record the modeling assumptions. Deliver an honest first release only for a contradictory or unimplementable specification. Rejected outputs and empty handoffs are uncounted; three consecutive rejections stop the run.
 - R3: Transport recovery follows the user's rule. `repair` waits for the retry-after plus 60 s (PR-41), at most 6 automatic recoveries per experiment within any 60 minutes. Each recovery is logged with its time, error type, retry-after and wait, and none takes a handoff.
 - R4: Monitoring. Stop a run at its next checkpoint when either occurs:
