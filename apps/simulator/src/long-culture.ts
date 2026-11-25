@@ -38,6 +38,12 @@ export const CULTURE_V2_OPTIONS: V7CultureOptions = {
   ...CULTURE_OPTIONS,
   goal: 'open',
 };
+/** Culture v3 switches: culture v2 with the one G2-failure adjustment of part A's wording
+ * (see docs/CULTURE_SCENARIO.md, Culture v3). */
+export const CULTURE_V3_OPTIONS: V7CultureOptions = {
+  ...CULTURE_V2_OPTIONS,
+  goal: 'open-2',
+};
 /** Frozen context and handoff mechanics of the culture v2 run, which otherwise keeps the
  * culture budgets, checkpoints and ceilings. `inputBytes` is raised with the estimate limit
  * because ex15 inputs held up to 3.31 code units per estimated token, so the historical

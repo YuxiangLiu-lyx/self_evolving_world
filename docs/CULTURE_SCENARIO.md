@@ -14,6 +14,8 @@ condition, not a causal comparison. See [ADR-0028](decisions/0028-culture-scenar
 | `pnpm experiment:continuous -- new long-culture-incentives`    | `culture-incentives`    | on         |
 | `pnpm experiment:continuous -- new long-culture-v2`            | `culture-v2`            | off        |
 | `pnpm experiment:continuous -- new long-culture-v2-incentives` | `culture-v2-incentives` | on         |
+| `pnpm experiment:continuous -- new long-culture-v3`            | `culture-v3`            | off        |
+| `pnpm experiment:continuous -- new long-culture-v3-incentives` | `culture-v3-incentives` | on         |
 
 Both variants have the same physical genesis; they differ only in the incentive switch,
 its three satisfaction rules and their event names. Checkpoints are verified against the
@@ -188,6 +190,42 @@ A handoff remains the unit of reviewed code change, and in v2 only such changes 
 See [LONG_DEVELOPMENT](LONG_DEVELOPMENT.md) for the exact rules. The development validator
 rejects any developed interface that serializes to more than 3,500 code units, so a
 6,000-code-unit exact read always returns it whole.
+
+## Culture v3
+
+`long-culture-v3` and `long-culture-v3-incentives` are the G2-failure rerun of culture v2. Each
+is the matching culture v2 genesis, with the same world, seed, fields, budgets and limits;
+only `culture.goal` is `'open-2'` instead of `'open'`. This is the single permitted
+adjustment, to the wording of part A's prompt.
+
+**Diagnosis (ex16, `long-culture-v2`, rounds 0–79).** G2 failed on both conditions:
+
+- **Survival share 50.6%.** Survival took 243 of 480 actor-rounds. 186 of those 243 rounds
+  were `rest`; without `rest` the share is 11.9%. Rest was a default idle behavior by both
+  analyzer criteria:
+  - 115 of 186 rests (62%) were idle: 96 came from plan steps with no energy condition, and
+    the cap cut the recovery of the others.
+  - 145 of 186 rests (78%) began at 75% or more of the energy cap.
+  - Lin, Moss and Kai rested in 45–55% of their rounds, mostly idle. Ivo waited instead
+    (40 rounds), and waiting is not survival behavior.
+  - With nothing required beyond health and safety, idle time was filled with rest, which
+    the gate counts as survival.
+- **Wren made no symbolic action.** Wren travelled about 12 units from the others' clearing,
+  to "an uncrowded meadow planting site", and spent the window on cultivation and weaving
+  alone. She heard 6 utterances and never spoke. The other five each used `tell`.
+
+**Adjustment.** Part A's open goal now also leaves open with whom to live. After the leaning
+comes one fact about the existing rest rule, which restores only missing energy:
+
+> Keep yourself healthy and safe; that is required. Beyond that, how you live, what you do,
+> with whom, and what you care about is up to you. You tend to value _leaning_. Rest restores
+> missing energy up to the cap; at full energy it restores nothing.
+
+The packet `goal` carries the first two sentences. Nothing else changes: the prompt gives no
+guidance about `name`, `mark`, `tell` or `invite`, prescribes no activity and contains no
+excluded word. Slack (part D) was not changed, because survival without `rest` was already
+11.9%: the share came from idle rest, not from survival need. One seed gives a case
+comparison: the adjustment may lower idle rest without changing what people do.
 
 ## A. Voice and private memory
 

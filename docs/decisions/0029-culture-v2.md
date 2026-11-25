@@ -62,4 +62,10 @@ rule. Handoff counts in v2 measure installed code changes only, so they are not 
 comparable with ex15's eight. All new behavior is inert without the v2 fields, as the
 compatibility digests confirm.
 
+**Addendum (culture v3).** ex16, the first culture v2 run, failed gate G2 at round 80. Survival
+was 50.6%, inflated by idle rest, and one person made no symbolic action. Under the G2-failure
+rule, the single adjustment is to part A's wording: `long-culture-v3` adds "with whom" to the
+open goal and a fact about rest. Every other v2 decision stands. See
+[Culture v3](../CULTURE_SCENARIO.md#culture-v3).
+
 See the [design](../CULTURE_SCENARIO.md#culture-v2) and the [plan](../exec-plans/completed/pr-38-culture-v2.md).

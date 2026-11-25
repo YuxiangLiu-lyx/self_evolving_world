@@ -407,8 +407,9 @@ export interface V7CultureOptions {
   foodWater: boolean;
   /** Culture v2 ordinary prompt: health and safety are the only required goal, everything
    * else is open, and the value leaning is stated to the person in the second person.
-   * Absent in ex15 and earlier, whose prompt stays unchanged. */
-  goal?: 'open';
+   * Absent in ex15 and earlier, whose prompt stays unchanged. `open-2` (culture v3) adds
+   * "with whom" to the open goal and states that rest restores only missing energy. */
+  goal?: 'open' | 'open-2';
 }
 export interface V7Configuration {
   longDevelopment?: {
@@ -430,7 +431,9 @@ export interface V7Configuration {
       | 'culture'
       | 'culture-incentives'
       | 'culture-v2'
-      | 'culture-v2-incentives';
+      | 'culture-v2-incentives'
+      | 'culture-v3'
+      | 'culture-v3-incentives';
     /** Opt-in culture scenario switches. Absent in ex13, long-fixes and earlier archives. */
     culture?: V7CultureOptions;
     /** Opt-in additional hard ceilings on the shared token ledger. Each applies to every

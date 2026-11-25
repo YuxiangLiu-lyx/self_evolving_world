@@ -32,6 +32,9 @@ import { OPEN_GOAL } from './open-context.js';
 /** Culture v2 packet goal: health and safety are required, everything else is open. */
 export const OPEN_LIFE_GOAL =
   'Keep yourself healthy and safe; that is required. Beyond that, how you live, what you do and what you care about is up to you.';
+/** Culture v3 packet goal (`goal: 'open-2'`): the open goal also leaves open with whom. */
+export const OPEN_GOAL_2 =
+  'Keep yourself healthy and safe; that is required. Beyond that, how you live, what you do, with whom, and what you care about is up to you.';
 
 export const LONG_CALL_PAUSE =
   'A long-development decision failed; its complete request, response or uncertainty and token charge are retained for current-conversation review.';
@@ -55,7 +58,7 @@ export interface LongInput {
     /** Present only in the culture scope's ordinary prompt variant. */
     voice?: true;
     /** Culture v2 ordinary prompt only: the open goal and the person's value leaning. */
-    goal?: 'open';
+    goal?: 'open' | 'open-2';
     leaning?: string;
     /** Culture v2 only: the ordinary input carries summarized interfaces (compaction). */
     compaction?: true;
@@ -352,8 +355,8 @@ function base(
       ...(role === 'ordinary' && policy.culture?.voice
         ? { voice: true as const }
         : {}),
-      ...(role === 'ordinary' && policy.culture?.goal === 'open'
-        ? { goal: 'open' as const, ...leaning(world, actor) }
+      ...(role === 'ordinary' && policy.culture?.goal
+        ? { goal: policy.culture.goal, ...leaning(world, actor) }
         : {}),
       ...(role === 'ordinary' && policy.compaction
         ? { compaction: true as const }
@@ -475,7 +478,12 @@ export function longOrdinaryInput(
   ).slice(0, 4);
   // Schemas occur only here, not again in the output schema. Baseline verbs use compact argument contracts.
   input.packet = {
-    goal: culture?.goal === 'open' ? OPEN_LIFE_GOAL : OPEN_GOAL,
+    goal:
+      culture?.goal === 'open-2'
+        ? OPEN_GOAL_2
+        : culture?.goal === 'open'
+          ? OPEN_LIFE_GOAL
+          : OPEN_GOAL,
     identity: { id, name: a.name },
     time: world.time,
     state: {
