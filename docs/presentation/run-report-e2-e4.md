@@ -1,5 +1,7 @@
 # Run report: culture runs E2–E4
 
+E3 and E4 were later planned again as culture v2 runs; their results are in the [culture v2 run report](run-report-culture-v2.md).
+
 This report covers the planned culture runs of [PR-37](../exec-plans/completed/pr-37-culture-runs.md): E2, the 80-round culture pilot; E3, its extension of the same archive to round 250; and E4, the incentive control. Only E2 ran. Every number comes from retained files under `experiment/`; no model was called to write this report and no archive changed. The scenario is described in [CULTURE_SCENARIO](../CULTURE_SCENARIO.md), the metric definitions and the ex7–ex13 baseline in the [culture baseline](culture-baseline.md), and the problems the run exposed in [fix log section 6](fix-log.md#6-e2-ex15-newly-exposed-problems). The behavioral analysis is [experiment/analyses/ex15](../../experiment/analyses/ex15/pr-37-culture-pilot.md).
 
 Reproduce the measurements with:

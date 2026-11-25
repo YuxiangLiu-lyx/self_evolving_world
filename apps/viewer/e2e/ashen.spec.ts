@@ -560,7 +560,9 @@ test('ex13 preview follows recorded root, material and residue evidence without 
 test('records actual ex13 playback, work and camera transitions', async ({
   browser,
 }, info) => {
-  test.setTimeout(120_000);
+  // Passing CI runs take about 1.7 minutes (85% of the former 120 s); the first attempts
+  // of PR #32 and PR #33 stopped at exactly 120 s (fix log section 7). Assertions unchanged.
+  test.setTimeout(180_000);
   const context = await browser.newContext({
     viewport: { width: 1440, height: 900 },
     baseURL: 'http://127.0.0.1:4173',

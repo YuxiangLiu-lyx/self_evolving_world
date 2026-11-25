@@ -212,7 +212,7 @@ adjustment, to the wording of part A's prompt.
     the gate counts as survival.
 - **Wren made no symbolic action.** Wren travelled about 12 units from the others' clearing,
   to "an uncrowded meadow planting site", and spent the window on cultivation and weaving
-  alone. She heard 6 utterances and never spoke. The other five each used `tell`.
+  alone. Wren heard 6 utterances and never spoke. The other five each used `tell`.
 
 **Adjustment.** Part A's open goal now also leaves open with whom to live. After the leaning
 comes one fact about the existing rest rule, which restores only missing energy:

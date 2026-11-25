@@ -814,6 +814,19 @@ function lifecycle(w: V7World) {
   }
 }
 
+/** Pure law constants and predicates shared with later cultivation packages (ex16
+ * cultivate-plants@1); exporting them leaves this package's behavior unchanged. */
+export {
+  LAW as CULTIVATION_LAW,
+  TREATED as CULTIVATION_TREATED,
+  lifetime as cultivationLifetime,
+  unspoiled as cultivationUnspoiled,
+  plantOf as cultivationPlantOf,
+  inputs as cultivationInputs,
+  position as cultivationPosition,
+  reach as cultivationReach,
+};
+
 export const LONG_CULTIVATION_TRIAL: V7Package = {
   id: ID,
   version: 1,
