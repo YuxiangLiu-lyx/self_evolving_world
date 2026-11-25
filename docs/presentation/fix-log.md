@@ -165,6 +165,86 @@ E2 ran `new long-culture` as ex15: the ex13 rules, seed and world with six peopl
 
 Together, 6a, 6c and 6d account for four of the eight handoffs: two rejection pauses, one failed submission and one closing recovery, none of which installed a package.
 
+## 7. Culture v2 runs: newly exposed problems
+
+After reviewing ex15, the user chose a new run version ([CULTURE_SCENARIO](../CULTURE_SCENARIO.md#culture-v2)). PR #32 applied the fixes for 6a–6c in `long-culture-v2`:
+
+- lossless compaction with a 24,000-token guard (6a);
+- 6,000-code-unit exact reads with a 3,500-code-unit limit on developed interfaces (6b);
+- uncounted rejection and empty handoffs (6c).
+
+6d was left unchanged.
+
+ex16 (`long-culture-v2`) ran 80 rounds and failed gate G2. Following the pre-authorized procedure, ex17 (`long-culture-v3`, PR #33) reran it with one change to the wording of part A, and it failed G2 again. Two failures stop the work, so E3 was not extended and E4 was not run. The [run report](run-report-culture-v2.md) has the details; the behavioral analyses are [ex16](../../experiment/analyses/ex16/pr-39-culture-v2-run.md) and [ex17](../../experiment/analyses/ex17/pr-39-culture-v3-rerun.md).
+
+**Verification of 6a–6c in ex16 and ex17:**
+
+- **6a:** no context pause. The largest input estimate was 10,983 in ex16 and 9,964 in ex17; ex15 reached 14,396 by round 70.
+- **6b:** 0 continuation-part queries in both runs (ex15: 13). Every developed interface was 3,025–3,473 code units.
+- **6c:** one rejection pause (ex16 round 24) resumed without a handoff, and no run reached three consecutive rejections. Every counted handoff installed a package: 3 in ex16 and 1 in ex17.
+
+### 7a. Idle rest inflates the G2 survival share
+
+- **Problem**: the G2 gate counts every `rest` as survival behavior, even when there was little energy to restore. In ex16 the gate failed on the survival condition at 50.6%, although survival actions other than rest took only 11.9% of actor-rounds.
+- **Evidence** (`pnpm metrics:culture -- experiment/ex16 80`):
+  - 186 of the 243 survival actor-rounds were rest.
+  - 115 of the 186 rests (62%) were idle by the step-condition criterion. 96 came from plan steps with no energy condition, and for the others the energy cap cut the recovery.
+  - 145 of the 186 rests (78%) began at 75% or more of the cap.
+  - Lin, Moss and Kai rested in 45–55% of their rounds.
+- **Fix (applied in `long-culture-v3`, the single G2-failure adjustment)**: the open goal also leaves open with whom to live, and a fact follows the person's leaning: "Rest restores missing energy up to the cap; at full energy it restores nothing."
+- **Metrics (ex16 → ex17, rounds 0–79)**:
+
+  | Metric                                |  ex16 |  ex17 |
+  | ------------------------------------- | ----: | ----: |
+  | Rests                                 |   186 |    85 |
+  | Idle rests (step-condition criterion) |   62% |   31% |
+  | Survival share                        | 50.6% | 27.3% |
+  | Survival share without rest           | 11.9% |  9.6% |
+  | `wait` rounds                         |    57 |   159 |
+
+  Idle time moved from rest to `wait`, which the gate does not count. The share fell without people doing more of anything else, so this is a measurement fix, not a behavioral one.
+
+### 7b. The per-person symbolic condition fails on people who work alone
+
+- **Problem**: G2 requires at least one symbolic action from every person. A person who works away from the others, or who chooses to remain silent, fails it for the whole run.
+- **Evidence**:
+  - In ex16, Wren made 0 symbolic actions (others 3–10). She worked about 12 units from the others' clearing and heard 6 utterances.
+  - In ex17, Lin and Wren made 0 (others 4–7). Both spent their time on cultivation: `plant-cultivation` 8 and 6 rounds. They ended at (22.0, 14.0) and (19.4, 8.5), while Moss, Sol and Kai ended near (18, 19).
+  - In ex15, which passed G2, every person used `tell` at least once, but nobody used `name`, `mark` or `invite`.
+  - Across the three runs, the only symbolic actions besides `tell` were one `invite` (Moss, ex16) and one `name` (Sol, ex17).
+- **Fix (proposed, not applied; a user decision)**: decide whether the per-person condition measures what G2 is meant to measure. Options:
+  - keep it unchanged and accept that solitary people fail the gate;
+  - judge it on the group, for example a share of people or of actor-rounds;
+  - change the scenario so that people are not pulled apart (see 7c).
+
+  Any change to the gate or the scenario is outside the pre-authorized procedure.
+
+- **Metrics**: per-person symbolic actions, distance of each person from the group centroid over time, and utterances heard per person.
+
+### 7c. The cultivation site rule pulls cultivators away from the shared clearing
+
+- **Problem**: the only interface everyone requested first, cultivation, can be used only away from the commons. That separates the people who plant from the others.
+- **Evidence**:
+  - The planting check in `cultivate-plants@1` and `plant-cultivation@1` comes from the existing `long-planting-site` and propagation rules. It requires ordinary soil, a clear 0.6 m radius and fewer than 3 same-species plants within 5 m.
+  - The clearing between the starts holds the renewable commons food, so it fails the density rule.
+  - Wren's plans in ex16 say "explore northeast for an uncrowded meadow planting site" and "move beyond the crowded root patches".
+  - In ex17, the handoff test showed that Wren's own position was forest ground, where planting is refused.
+- **Fix (proposed, not applied)**: none is required by the rules. If 7b is addressed through the scenario, measure how far cultivators are from the others before changing the site rule.
+- **Metrics**: distance of cultivators from the group centroid, and refused versus accepted planting attempts by location.
+
+### 7d. `repair` resumes a transport pause before the server's retry-after
+
+- **Problem**: `repair` resumes the run immediately, so the next call can hit the same overload.
+- **Evidence**: at ex16 round 2, `ordinary-19` failed with `server_is_overloaded` and retry-after 327 s. The repair resumed about 30 s later. One call succeeded, and `ordinary-21` failed again 40 s after the first failure, with retry-after 348 s. Under the user's rule, the second recovery waited 1,336 s and the run then continued without further transport errors. The [run report](run-report-culture-v2.md) has the full log.
+- **Fix (proposed, not applied; a protocol change for a later run version)**: read `retry-after` from the retained failure evidence and refuse to resume before it has elapsed, plus a margin. Each recovery would record its wait.
+- **Metrics**: transport failures within one retry-after window of a previous recovery (1 in ex16), and recoveries per 60 minutes.
+
+### 7e. The ex13 Ashen recording test runs at 85% of its CI timeout
+
+- **Problem**: the browser test that records ex13 playback has a 120 s limit and passes in about 1.7 minutes on CI. It failed on the first attempt of both PR #32 and PR #33, stopping at exactly 120 s, and both reruns passed. This follows the user's rule for this timeout, given before PR #29: rerun first, then compare durations, then raise it to 180 s.
+- **Fix (applied in this PR)**: `test.setTimeout(180_000)` for that test only, with its assertions unchanged.
+- **Metrics**: first-attempt failures of this test on later PRs (2 of 2 before), and its CI duration.
+
 ## Limitations
 
 - Fixes 2–4 are turned on together in E1, so one run cannot separate their effects causally; section 5 attributes them by mechanism only. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.

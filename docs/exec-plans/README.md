@@ -80,3 +80,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-38](completed/pr-38-culture-v2.md): culture v2 run version with lossless context compaction, an open-goal prompt, uncounted recovery handoffs and new culture measures.
 
 - [PR-40](completed/pr-40-culture-v3.md): culture v3 tags with the single G2-failure adjustment of the open-goal wording after ex16.
+
+- [PR-39](completed/pr-39-culture-v2-runs.md): culture v2 runs ex16 and ex17; G2 failed twice, so E3 was not extended and E4 was not run.

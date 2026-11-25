@@ -18,6 +18,7 @@ After reviewing the ex15 pilot, the user chose a new run version (PR-38). E3 is 
   - cumulative tokens per person per round above 6,000, measured as total ledger tokens / (6 × rounds observed), the measure ex15 reported.
 
   Stop by protocol when handoffs run out.
+
 - R5: E4 runs only if E3 reaches round 150 or later and the cumulative tokens of all experiments (ex15 included) are at most 16,000,000. Its comparison with E3's first 120 rounds must note that the two runs fork from the same genesis and are a case comparison.
 - R6: Stop and wait for the user on any of these:
   - an unrenewable login;
@@ -53,4 +54,25 @@ Out of scope:
 
 ## Results
 
-Pending.
+The work stopped at R3: gate G2 failed twice, which R6 lists as a stop. E3 was not extended to rounds 150 and 250, and E4 was not run. The [run report](../../presentation/run-report-culture-v2.md) has the details; the problems are in [fix log section 7](../../presentation/fix-log.md#7-culture-v2-runs-newly-exposed-problems).
+
+| Archive | Tag                                  | Rounds | Ledger tokens | Calls (ordinary / World Agent) | Counted handoffs | G2                                                             |
+| ------- | ------------------------------------ | -----: | ------------: | ------------------------------ | ---------------: | -------------------------------------------------------------- |
+| ex16    | `long-culture-v2`                    |     80 |     1,161,283 | 140 / 9                        |                3 | failed: survival 50.6%; Wren 0 symbolic actions                |
+| ex17    | `long-culture-v3` (G2-failure rerun) |     80 |       793,053 | 107 / 3                        |                1 | failed: survival 27.3% passes; Lin and Wren 0 symbolic actions |
+
+- **R1:** both archives were allocated from merged `main`: ex16 after PR #32, and ex17 after PR #33 was merged into the run branch. No budget changed after a first call.
+- **R2:** four packages were installed, all simplified but real mechanisms and none a first release:
+  - ex16: `cultivate-plants@1`, `branch-screen@1` and `hand-weave-fiber-mat@1`;
+  - ex17: `plant-cultivation@1`, which reuses the ex16 code through a factory.
+
+  Recoveries cost no handoff: two transport recoveries and one rejection recovery in ex16, logged with time, error, retry-after and wait.
+
+- **R3:** ex16 failed G2. The diagnosis and the single adjustment (part A wording, PR #33) are in [CULTURE_SCENARIO](../../CULTURE_SCENARIO.md#culture-v3). ex17 failed G2 again, so the work stopped. The soft rule did not trigger: 3 and 1 counted handoffs before round 80.
+- **R4:** the runs did not reach this step.
+- **R5:** not run, because E3 never reached round 150. Cumulative tokens over ex15–ex17 are 3,274,413 of the 16,000,000 limit.
+- **R6:**
+  - the transport errors were single temporary overloads, handled under the user's recovery rule;
+  - compatibility digests stayed identical (ex7–ex16);
+  - no archive was changed and no history was rewritten.
+- **R7:** the archives, companion analyses, run report and fix-log entries are in this PR. Backups of the round-80 checkpoints were pushed to `experiment/culture-v2-runs` before merging.
