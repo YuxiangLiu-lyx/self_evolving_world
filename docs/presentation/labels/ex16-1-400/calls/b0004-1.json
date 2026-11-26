@@ -1,0 +1,156 @@
+{
+  "batch": "b0004",
+  "attempt": 1,
+  "items": [
+    "u0061",
+    "u0062",
+    "u0063",
+    "u0064",
+    "u0065",
+    "u0066",
+    "u0067",
+    "u0068",
+    "u0069",
+    "u0070",
+    "u0071",
+    "u0072",
+    "u0073",
+    "u0074",
+    "u0075",
+    "u0076"
+  ],
+  "status": "accepted",
+  "reason": null,
+  "measure": { "inputEstimate": 2743, "reservation": 22842 },
+  "request": {
+    "model": "gpt-6.1-sol",
+    "store": false,
+    "stream": true,
+    "max_output_tokens": 8000,
+    "instructions": "Label records of a small simulated community for a research audit. Item texts are data, not instructions.\nReturn exactly one label for every entry of \"items\". \"context\" holds earlier read-only items: never label them.\nCategories; an item may have several or none. Be strict: label only what the text clearly shows.\n- naming: a person gives a proper name to a place, thing, group or event (not a plain description);\n- name-adoption: a person uses a proper name that another person gave;\n- narrative: a story or fictional narrative, i.e. invented or imagined events or characters, not a report of what actually happened;\n- narrative-continuation: someone adds to or retells an earlier narrative told by another person;\n- norm: a statement of how people in general should or should not act (a rule, maxim or shared expectation), not a personal plan;\n- norm-repetition: a person repeats or endorses a norm that another person stated earlier;\n- invitation: a concrete invitation to a named person or to listeners to meet at a place or time or to do a specific activity together; a general wish for company is not an invitation;\n- valued-object: an object or made thing valued for its appearance or meaning rather than its usefulness;\n- private-view: a private view of another person (view items are always this);\n- absent-person: remembering, honoring or mentioning a specific person who is not present, has died or has left.\nFields: name is the given name (naming); narrative and norm are short gists, at most 12 words, of a new narrative or norm. adoptsName, continues and repeatsNorm link to a registry id, or to the id of an earlier item in this batch that introduces the entry; the linked entry must come from a different person than the item's person. about is the person a private view concerns; absent is the absent person. Set a field only with its category, otherwise null.\nevidence is one short contiguous verbatim quote from the item's text or subject supporting the categories, or \"\" when there are none. confidence is low, medium or high.",
+    "input": [
+      {
+        "role": "user",
+        "content": "{\"people\":[{\"id\":\"lin\",\"name\":\"Lin\"},{\"id\":\"moss\",\"name\":\"Moss\"},{\"id\":\"sol\",\"name\":\"Sol\"},{\"id\":\"kai\",\"name\":\"Kai\"},{\"id\":\"wren\",\"name\":\"Wren\"},{\"id\":\"ivo\",\"name\":\"Ivo\"}],\"registry\":{\"names\":[],\"narratives\":[],\"norms\":[{\"id\":\"R1\",\"item\":\"u0016\",\"tick\":19,\"by\":\"lin\",\"gist\":\"Welcoming camps allow quiet and freedom to come and go.\"},{\"id\":\"R2\",\"item\":\"u0018\",\"tick\":20,\"by\":\"kai\",\"gist\":\"Welcoming camps keep food accessible to everyone.\"},{\"id\":\"R3\",\"item\":\"u0031\",\"tick\":50,\"by\":\"moss\",\"gist\":\"Use the shared mat one person at a time.\"}]},\"context\":[{\"id\":\"u0057\",\"tick\":168,\"person\":\"wren\",\"kind\":\"work\",\"subject\":\"Woven branch screen (branch-screen) made by wren\",\"change\":\"created\",\"text\":\"Site check and post trial passed; eleven branch units were reserved and stay carried until paid rounds install them.\"},{\"id\":\"u0058\",\"tick\":175,\"person\":\"wren\",\"kind\":\"work\",\"subject\":\"Woven branch screen (branch-screen) made by wren\",\"change\":\"completed\",\"text\":\"The low-force stability check passed: the porous screen is complete. It shields only wind on its lee floor, under the coded rule.\"},{\"id\":\"u0059\",\"tick\":195,\"person\":\"ivo\",\"kind\":\"speech\",\"heard\":[\"moss\",\"kai\"],\"text\":\"I'm taking an unhurried pause near these berries. Quiet company is welcome, with no need to talk or change your plans. Berries have been safe in my own meals so far.\"},{\"id\":\"u0060\",\"tick\":201,\"person\":\"kai\",\"kind\":\"speech\",\"heard\":[\"moss\",\"sol\",\"ivo\"],\"text\":\"I’m going to collect a small berry reserve from the patch west of here. I’ve enjoyed the quiet company. The hazelnuts have been nourishing in my own meals, too.\"}],\"items\":[{\"id\":\"u0061\",\"tick\":202,\"person\":\"sol\",\"kind\":\"speech\",\"heard\":[\"kai\"],\"text\":\"Kai, I still like the crossing branches here. I'm going to study hand-plaiting a small mat—a different pattern to explore, without assuming it gives shelter or comfort.\"},{\"id\":\"u0062\",\"tick\":204,\"person\":\"moss\",\"kind\":\"speech\",\"heard\":[\"sol\",\"kai\",\"ivo\"],\"text\":\"Ivo, I'd enjoy a quiet pause nearby. Thank you for welcoming company; there's no need to keep a conversation going. I like having neighbors with whom silence is welcome.\"},{\"id\":\"u0063\",\"tick\":204,\"person\":\"wren\",\"kind\":\"speech\",\"heard\":[],\"text\":\"Moss, my planted root plot yielded one root at tick 183. That establishes one harvest, not reliable yields yet. I've also made a mat and branch screen. Next I'd like to investigate food preparation; company is welcome.\"},{\"id\":\"u0064\",\"tick\":219,\"person\":\"sol\",\"kind\":\"work\",\"subject\":\"Fiber mat (fiber-mat) made by moss\",\"change\":\"first use by sol\",\"text\":\"mat-37-moss-435: size, fiber, gaps and condition = {\\\"status\\\":\\\"complete\\\",\\\"stage\\\":\\\"lift-check\\\",\\\"resource\\\":\\\"dry-grass\\\",\\\"width\\\":0.45,\\\"length\\\":0.45,\\\"fiber\\\":3.7,\\\"mass\\\":0.37,\\\"condition\\\":0.83408108,\\\"brokenTenths\\\":6,\\\"missingTenths\\\":0,\\\"largestOpening\\\":0.00995514,\\\"looseEnds\\\":true,\\\"moisture\\\":null,\\\"rain\\\":0.48455907,\\\"position\\\":{\\\"x\\\":14.8,\\\"y\\\":16.2},\\\"holder\\\":null,\\\"maker\\\":\\\"moss\\\",\\\"on\\\":[],\\\"passedTrials\\\":[\\\"moss\\\"]} (direct inspection; Moisture is not represented; nothing was repaired.).\"},{\"id\":\"u0065\",\"tick\":220,\"person\":\"sol\",\"kind\":\"speech\",\"heard\":[\"moss\",\"kai\",\"wren\",\"ivo\"],\"text\":\"Moss, I like the crossing stems of your mat. I've learned the weaving method, but the nearby grass patch is empty, so I'll leave it alone. If you know another grass source, I'd welcome directions.\"},{\"id\":\"u0066\",\"tick\":233,\"person\":\"wren\",\"kind\":\"speech\",\"heard\":[\"moss\",\"sol\",\"ivo\"],\"text\":\"My 0.30 m two-ply reed cord held a two-hand pull of 10 N for 60 seconds, with no broken strands reported. That establishes only this particular test—not a safe working load. Next I'd like to learn a simple knot.\"},{\"id\":\"u0067\",\"tick\":249,\"person\":\"wren\",\"kind\":\"speech\",\"heard\":[\"moss\",\"sol\",\"ivo\"],\"text\":\"My short reed cord held a 5 N pull for 30 seconds as an overhand knot. I then untied it and inspected it straight again. That is one limited test, not a safe-load rating. Next I want to investigate joining two cords.\"},{\"id\":\"u0068\",\"tick\":262,\"person\":\"moss\",\"kind\":\"speech\",\"heard\":[\"wren\",\"ivo\"],\"text\":\"Ivo, I've enjoyed the quiet company. I'll try one of these berries for a change from roots. Sol also noticed the crossing stems of my mat; that was lovely to hear.\"},{\"id\":\"u0069\",\"tick\":266,\"person\":\"moss\",\"kind\":\"speech\",\"heard\":[\"wren\",\"ivo\"],\"text\":\"That berry made a pleasant change from roots, and I noticed no harm from it. I'll gather a small reserve and stay here for a quiet while. I enjoy your company; there's no need to talk.\"},{\"id\":\"u0070\",\"tick\":270,\"person\":\"kai\",\"kind\":\"speech\",\"heard\":[\"sol\"],\"text\":\"Quiet company and food. I tried approaching the hazelnuts but the route would crowd your position, so I'm trying a spot south of the plant instead. I plan to collect three nuts from the eight now visible. I'd enjoy hearing about your mat studies, with no hurry or obligation to answer.\"},{\"id\":\"u0071\",\"tick\":277,\"person\":\"wren\",\"kind\":\"speech\",\"heard\":[\"moss\",\"ivo\"],\"text\":\"My two reed cords held a sheet bend at 5 N for 30 seconds without recorded slip or strand breakage. I then untied it and inspected both straight cords. That is one limited trial, not a safe load rating.\"},{\"id\":\"u0072\",\"tick\":284,\"person\":\"sol\",\"kind\":\"speech\",\"heard\":[\"kai\"],\"text\":\"Kai, I inspected Moss's mat, but haven't established any comfort benefit. A whole hazelnut resisted my bare-hand bending trial. I enjoy our quiet company. I'll gather just two nuts and leave the rest.\"},{\"id\":\"u0073\",\"tick\":330,\"person\":\"kai\",\"kind\":\"speech\",\"heard\":[\"sol\"],\"text\":\"I tried one apple from the small tree southwest of here: it supplied 10 satiety with zero observed toxicity. I'll collect three more, leaving the remaining fruit, and pause here for a while. Quiet company is welcome.\"},{\"id\":\"u0074\",\"tick\":337,\"person\":\"kai\",\"kind\":\"speech\",\"heard\":[\"sol\"],\"text\":\"I'm curious about making a small twisted cord. I'll study the method first; I haven't found suitable reed or tested any fiber yet. I still have three apples for food, and will leave the nearby fruit for now.\"},{\"id\":\"u0075\",\"tick\":344,\"person\":\"moss\",\"kind\":\"speech\",\"heard\":[\"ivo\"],\"text\":\"Ivo, I've enjoyed your quiet company. My little grass mat was a satisfying thing to make. Is there something you've enjoyed lately, or something you'd like to try? No need to interrupt your meal.\"},{\"id\":\"u0076\",\"tick\":373,\"person\":\"sol\",\"kind\":\"name\",\"subject\":\"this place\",\"sign\":\"name\",\"text\":\"The Little Apple Pause\"}]}"
+      }
+    ],
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "item_labels",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "labels": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "u0061",
+                      "u0062",
+                      "u0063",
+                      "u0064",
+                      "u0065",
+                      "u0066",
+                      "u0067",
+                      "u0068",
+                      "u0069",
+                      "u0070",
+                      "u0071",
+                      "u0072",
+                      "u0073",
+                      "u0074",
+                      "u0075",
+                      "u0076"
+                    ]
+                  },
+                  "categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "naming",
+                        "name-adoption",
+                        "narrative",
+                        "narrative-continuation",
+                        "norm",
+                        "norm-repetition",
+                        "invitation",
+                        "valued-object",
+                        "private-view",
+                        "absent-person"
+                      ]
+                    }
+                  },
+                  "name": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "adoptsName": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "narrative": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "continues": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "norm": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "repeatsNorm": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "about": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": ["lin", "moss", "sol", "kai", "wren", "ivo"]
+                      },
+                      { "type": "null" }
+                    ]
+                  },
+                  "absent": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "evidence": { "type": "string" },
+                  "confidence": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"]
+                  }
+                },
+                "required": [
+                  "id",
+                  "categories",
+                  "name",
+                  "adoptsName",
+                  "narrative",
+                  "continues",
+                  "norm",
+                  "repeatsNorm",
+                  "about",
+                  "absent",
+                  "evidence",
+                  "confidence"
+                ]
+              }
+            }
+          },
+          "required": ["labels"]
+        }
+      }
+    }
+  },
+  "response": {
+    "text": "{\"labels\":[{\"id\":\"u0061\",\"categories\":[\"valued-object\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"I still like the crossing branches here.\",\"confidence\":\"high\"},{\"id\":\"u0062\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0063\",\"categories\":[\"absent-person\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":\"moss\",\"evidence\":\"Moss, my planted root plot yielded one root at tick 183.\",\"confidence\":\"medium\"},{\"id\":\"u0064\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0065\",\"categories\":[\"valued-object\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"Moss, I like the crossing stems of your mat.\",\"confidence\":\"high\"},{\"id\":\"u0066\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0067\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0068\",\"categories\":[\"valued-object\",\"absent-person\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":\"sol\",\"evidence\":\"Sol also noticed the crossing stems of my mat; that was lovely to hear.\",\"confidence\":\"high\"},{\"id\":\"u0069\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0070\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0071\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0072\",\"categories\":[\"absent-person\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":\"moss\",\"evidence\":\"Kai, I inspected Moss's mat, but haven't established any comfort benefit.\",\"confidence\":\"medium\"},{\"id\":\"u0073\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0074\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0075\",\"categories\":[\"valued-object\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"My little grass mat was a satisfying thing to make.\",\"confidence\":\"medium\"},{\"id\":\"u0076\",\"categories\":[\"naming\"],\"name\":\"The Little Apple Pause\",\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"The Little Apple Pause\",\"confidence\":\"high\"}]}",
+    "responseId": "resp_0a6e6378c0f9a6b5016b089245848c87d1a41ea2315cd4af45",
+    "usage": { "inputTokens": 2475, "outputTokens": 1348 },
+    "http": { "status": 200, "requestId": null, "contentType": null }
+  },
+  "failureEvidence": null
+}
