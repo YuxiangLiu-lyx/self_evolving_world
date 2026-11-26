@@ -1,0 +1,19 @@
+{
+  "id": "ex16",
+  "status": "passed",
+  "replayHash": "c97c4f9e37a4d9358d23f416eda110b35887b332ddf43463fec377e0849b8c8f",
+  "frameTicks": [
+    0,
+    150,
+    300
+  ],
+  "assertions": [
+    "segment-integrity-and-deterministic-reconstruction",
+    "initial-midpoint-final-state",
+    "private-observation-and-global-view",
+    "camera-and-playback-do-not-change-state",
+    "continuous-geometry-and-object-inspection",
+    "runtime-and-layout-health"
+  ],
+  "errors": []
+}
