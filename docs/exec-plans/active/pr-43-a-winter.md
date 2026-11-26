@@ -1,10 +1,40 @@
-# PR-43: Model-assisted culture labels
+# PR-43: Experiment A (winter arrives) and model-assisted culture labels
 
 ## Requirement summary
 
-The rule-based culture analyzer is unreliable in long runs. The user requested a labeling pass with the existing GPT channel: every utterance, name, invitation, work and private view of an archive gets fixed categories in a fixed JSON schema. A human then verifies every positive label and a random sample of 20 negatives against the archive text. This PR builds and tests the tool offline with a fake transport. The real labeling runs, which call the model, are run later by the user.
+This PR delivers experiment A of the user's culture program (A–D) and the annotation tool all program experiments use.
+
+**Experiment A.** The culture scenario's survival pressure starts at round 300: `pressureStart` 300 and `difficultyStart` 440 in a cycle of 800, confirmed in the archived configuration. At round 400 the intensity is 0.71: cold +1.07, rain +0.57 and plant growth at 71%. ex16 continues from round 250 to round 400 on its own branch. That branch starts at the round-250 checkpoint commit `4c108a4` (continuation-branch rule), with checkpoint backups at rounds 300 and 350. The hard cap is 3,500,000 tokens spent in A; ex16's ledger was 2,903,618 at round 250. The report compares rounds before and after 300:
+
+- food stocks and hoarding;
+- giving and sharing;
+- whether the norms of moderate taking, leaving some for others and open access are raised or broken;
+- health and survival;
+- mentions or remembrance of anyone who falls;
+- the camp and the works;
+- how often people communicate.
+
+- Experiment reuse: ex16 — the user explicitly asked to extend ex16 from round 250 to 400 (experiment A). `extend` preserves the earlier windows under `windows/`.
+
+**Annotation tool.**
+
+The rule-based culture analyzer is unreliable in long runs. The user requested a labeling pass with the existing GPT channel: every utterance, name, invitation, work and private view of an archive gets fixed categories in a fixed JSON schema. A human then verifies every positive label and a random sample of 20 negatives against the archive text. The tool was built and tested offline with a fake transport. The real labeling runs call the model, as the user requested for the program, and are counted in a separate annotation ledger capped at 1,000,000 tokens.
 
 ## Requirements
+
+- A1: Extend ex16 with `pnpm experiment:continuous -- extend ex16 300`, then `350` and `400`, on branch `experiment/ex16-winter` from `4c108a4`. Commit and push a checkpoint backup at each target. The only change brought onto the branch beyond ex16's runtime is PR #35's repair script, which is already in `4c108a4`'s ancestry. No budget or genesis changes.
+- A2: Follow the standing handoff, recovery and stopping rules. The new extended list of excluded words applies to every newly developed interface. Briefs go in `validation-results/handoffs/`.
+- A3: Measure the before/after comparison listed above per 25-round block from the retained archive.
+- A4: Label ex16 ticks 1–400 with the tool below:
+  - verify every positive against the archive;
+  - re-check 20 seeded negatives;
+  - report the agreement rate;
+  - publish the timeline of events, with each item's tick, call, text and who adopted whom.
+
+  Annotation tokens are counted in their own ledger, separate from the experiment's.
+
+- A5: Before the merge, replay ex7–ex18 and the full ex16 on the merged code with byte-identical requests and paused inputs, and pass `pnpm validate`.
+- A6: Deliver the English report, up to 5 moments in `docs/presentation/highlights.md` and fix-log entries.
 
 - R1: Build blind items (speech, name, invitation, work, view) from an archive with the culture-metrics reader, the retained events and memory. Each item has an opaque id, the tick, the person, the kind, the hearers of speech and the text. The model input contains no scenario tag, scope, experiment number, file path or call id. A separate local mapping gives each item's tick, actor, call and event. `--from` and `--through` select a round range; earlier items are read-only context.
 - R2: Use the categories `naming`, `name-adoption`, `narrative`, `narrative-continuation`, `norm`, `norm-repetition`, `invitation`, `valued-object`, `private-view` and `absent-person`; an item can have several or none.
@@ -21,13 +51,13 @@ The rule-based culture analyzer is unreliable in long runs. The user requested a
 
 In scope: `scripts/culture-labels.ts` and its test, one `package.json` script, the tooling class in `scripts/validation-plan.ts` and `docs/VALIDATION.md`, CULTURE_SCENARIO, DEVELOPMENT and PRODUCT.
 
-Out of scope: any model call or labeling run, the transport and login files, `scripts/culture-metrics.ts`, world rules, archives and the human verification.
+Out of scope: the transport and login files, `scripts/culture-metrics.ts`, world rules, archives and the human verification.
 
 ## Acceptance criteria
 
 - The tests in `scripts/culture-labels.test.ts` pass, and `pnpm typecheck`, ESLint and Prettier pass on the changed files.
 - `pnpm validate` and CI `quality` and `pr-policy` pass.
-- No archive changes and no model is called.
+- No earlier archive changes. ex16 changes only by the authorized extension.
 
 ## Results
 
