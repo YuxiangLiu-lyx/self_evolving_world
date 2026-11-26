@@ -30,6 +30,13 @@ export function openPreflight(
       (r) => r.id === id && r.nutrition > 0 && r.toxicity === 0,
     );
   const blocked = new Map<string, Set<string>>();
+  // Culture v2 villages only: the far middle food area lies in the start sectors of at most
+  // two people of each group, so ownership by the nearest start would starve the third by
+  // construction once the local food runs out. Sources are shared and reserved per round,
+  // as in the collective arms.
+  const shared =
+    !!world.config.collective ||
+    world.config.longDevelopment?.scenario === 'culture-v2-villages';
   let optionalActivityRounds = 0;
   for (let tick = 0; tick < rounds; tick++) {
     // This omniscient feasibility oracle is deliberately separate from private formal observations.
@@ -71,7 +78,7 @@ export function openPreflight(
             Number(x.data.stock) > 0 &&
             !blocked.get(actor.id)?.has(x.id) &&
             !reservedSources.has(x.id) &&
-            (world.config.collective ||
+            (shared ||
               initial.actors
                 .slice()
                 .sort(
@@ -95,7 +102,7 @@ export function openPreflight(
               Number(x.data.stock) > 0 &&
               !blocked.get(actor.id)?.has(x.id) &&
               !reservedSources.has(x.id) &&
-              (world.config.collective ||
+              (shared ||
                 initial.actors
                   .slice()
                   .sort(
@@ -118,7 +125,7 @@ export function openPreflight(
       else if (actor.vitals.energy < 8)
         intents[actor.id] = { interface: 'rest', args: {} };
       else if (actor.vitals.satiety < 78 && visibleSource) {
-        if (world.config.collective) reservedSources.add(visibleSource.id);
+        if (shared) reservedSources.add(visibleSource.id);
         if (v7Reach(actor, visibleSource.spatial))
           intents[actor.id] = {
             interface: 'gather',

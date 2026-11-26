@@ -177,8 +177,17 @@ const FOOD = {
   root: { nutrition: 14, toxicity: 0 },
 };
 
-const round2 = (value: number) => Math.round(value * 100) / 100;
-function clearSpot(
+export const round2 = (value: number) => Math.round(value * 100) / 100;
+/** Where people start and what food grows near them. The default is the single clearing of
+ * every culture genesis; the culture v2 villages genesis supplies its own. */
+export interface CultureLayout {
+  /** Desired start of person `index` of `count`; the nearest collision-free point is used.
+   * People are placed in order, so a start may depend on earlier people. */
+  start(world: V7World, index: number, count: number): V7Point;
+  /** Food planted after the people when slack is on. */
+  food(world: V7World): void;
+}
+export function clearSpot(
   world: V7World,
   desired: V7Point,
   radius: number,
@@ -195,8 +204,16 @@ function clearSpot(
         world.actors.every((a) => v7Distance(a.position, p) > a.radius + gap),
     );
 }
+/** Starts on a ring around the shared clearing (every culture genesis before the villages). */
+function ringStart(_world: V7World, i: number, count: number): V7Point {
+  const angle = (i * 2 * Math.PI) / count;
+  return {
+    x: round2(CULTURE_CENTER.x + Math.cos(angle) * CULTURE_START_RADIUS),
+    y: round2(CULTURE_CENTER.y + Math.sin(angle) * CULTURE_START_RADIUS),
+  };
+}
 /** Six people on collision-free nearby starts; the first three keep their ex13 identities. */
-function populate(world: V7World, count: number): void {
+function populate(world: V7World, count: number, layout: CultureLayout): void {
   const template = world.actors[0];
   if (!template) throw new Error('Missing baseline identity.');
   const people = CULTURE_PEOPLE.slice(0, count).map((person) => {
@@ -213,13 +230,9 @@ function populate(world: V7World, count: number): void {
   });
   world.actors = [];
   people.forEach((actor, i) => {
-    const angle = (i * 2 * Math.PI) / people.length;
     const position = clearSpot(
       world,
-      {
-        x: round2(CULTURE_CENTER.x + Math.cos(angle) * CULTURE_START_RADIUS),
-        y: round2(CULTURE_CENTER.y + Math.sin(angle) * CULTURE_START_RADIUS),
-      },
+      layout.start(world, i, people.length),
       actor.radius,
       actor.radius + 0.2,
     );
@@ -281,10 +294,16 @@ function plantFood(world: V7World): void {
     }
   });
 }
+/** The layout of every culture genesis before the villages: one shared clearing. */
+export const CULTURE_CLEARING: CultureLayout = {
+  start: ringStart,
+  food: plantFood,
+};
 /** Apply the selected culture switches to a long-fixes-shaped genesis (not frozen). */
 export function applyCulture(
   world: V7World,
   options: V7CultureOptions,
+  layout: CultureLayout = CULTURE_CLEARING,
 ): V7World {
   const policy = world.config.longDevelopment,
     development = world.config.development;
@@ -297,8 +316,9 @@ export function applyCulture(
     policy.difficultyStart = CULTURE_SLACK.difficultyStart;
     policy.growthFloor = CULTURE_SLACK.growthFloor;
   }
-  if (options.density !== world.actors.length) populate(world, options.density);
-  if (options.slack) plantFood(world);
+  if (options.density !== world.actors.length)
+    populate(world, options.density, layout);
+  if (options.slack) layout.food(world);
   world.actors.forEach((actor, i) => {
     if (options.differentiation) {
       const t = CULTURE_TENDENCIES[i % CULTURE_TENDENCIES.length];

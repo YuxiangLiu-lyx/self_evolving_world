@@ -347,3 +347,10 @@ recent-use history. `continuous-repair.ts` resumes rejection pauses without a ha
 enforces the consecutive-rejection stop. The development store marks empty handoffs as
 uncounted, and `countedDevelopments` is the only budget count. Each behavior runs only when
 its `longDevelopment` field is present. See [ADR-0029](docs/decisions/0029-culture-v2.md).
+The culture v2 villages tag reuses it too. `long-villages.ts` widens the long-fixes genesis
+into two mirrored ex13 neighborhoods and a meadow, and passes a `CultureLayout` (starts and
+food) to `applyCulture`, whose default stays the single clearing. The open ecology groups
+animals by herd (`data.group`, defaulting to the species). The runner starts the first window
+at `longDevelopment.firstWindow` when it is present, and the observatory frames maps more than
+twice as wide as tall through `observatory-camera.ts`. See the
+[villages design](docs/CULTURE_SCENARIO.md#villages).

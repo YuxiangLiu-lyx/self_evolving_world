@@ -94,7 +94,10 @@ export function newContinuousExecution(
     developments: [],
     phase: 'running',
     reason: null,
-    windowTarget: world.config.experience?.targetRounds ?? V7_WINDOW,
+    windowTarget:
+      world.config.longDevelopment?.firstWindow ??
+      world.config.experience?.targetRounds ??
+      V7_WINDOW,
     barrier: null,
     pendingCall: null,
     registrations: [],

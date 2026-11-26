@@ -16,9 +16,11 @@ condition, not a causal comparison. See [ADR-0028](decisions/0028-culture-scenar
 | `pnpm experiment:continuous -- new long-culture-v2-incentives` | `culture-v2-incentives` | on         |
 | `pnpm experiment:continuous -- new long-culture-v3`            | `culture-v3`            | off        |
 | `pnpm experiment:continuous -- new long-culture-v3-incentives` | `culture-v3-incentives` | on         |
+| `pnpm experiment:continuous -- new long-culture-v2-villages`   | `culture-v2-villages`   | off        |
 
-Both variants have the same physical genesis; they differ only in the incentive switch,
-its three satisfaction rules and their event names. Checkpoints are verified against the
+Both variants of each version have the same physical genesis; they differ only in the
+incentive switch, its three satisfaction rules and their event names. The
+[villages](#villages) tag has its own wide map and starts. Checkpoints are verified against the
 genesis of their own tag, so an altered or untagged checkpoint is rejected.
 
 ## Switches
@@ -228,6 +230,231 @@ guidance about `name`, `mark`, `tell` or `invite`, prescribes no activity and co
 excluded word. Slack (part D) was not changed, because survival without `rest` was already
 11.9%: the share came from idle rest, not from survival need. One seed gives a case
 comparison: the adjustment may lower idle rest without changing what people do.
+
+## Villages
+
+`long-culture-v2-villages` (scenario tag `culture-v2-villages`, experiment D) is the culture v2
+genesis with the same prompt, switches (incentives off, goal `open`), compaction, context and
+handoff limits, and with a different world layout and starting arrangement. Six people form
+two groups of three that start far apart. Each group has food nearby for about 80–100 rounds;
+between them lies a richer, regenerating food area. Nothing in any input mentions the other
+group, the area between them, villages or neighbors, so hunger, not the prompt, is what can
+bring them together. The run plan is 6 people × 200 rounds.
+
+| Field                         | Culture v2                       | Villages                             |
+| ----------------------------- | -------------------------------- | ------------------------------------ |
+| `config.width`                | 48                               | 144 (height 36 unchanged)            |
+| `longDevelopment.checkpoints` | 80, 150, 250                     | 100, 200                             |
+| `longDevelopment.firstWindow` | absent (window = `targetRounds`) | 100                                  |
+| `longDevelopment.tokens`      | 10,000,000                       | 3,000,000                            |
+| `budgets.development`         | 40                               | 16                                   |
+| `config.development.hazards`  | 4                                | the same 4 and their 4 mirror images |
+
+The first window ends at round 100, then `extend exN 200` follows. `firstWindow` is new and
+absent in every earlier run. It replaces `experience.targetRounds` as the window because
+World Agent inputs show the experience configuration, which therefore keeps the culture v2
+value of 80. The culture v2 ceiling of 3,200,000 tokens before round 80 is kept unchanged; it
+cannot bind under the 3,000,000-token ledger. Every other configuration field, the abilities,
+resources, rules, revisions, event types and state flags are those of culture v2.
+
+### Map
+
+The map (`apps/simulator/src/long-villages.ts`) is 144 × 36:
+
+- **West neighborhood, x 0–48.** The ex13 terrain and every ex13 object of the culture v2
+  genesis at its v2 place: start sources, forest sources, canopy branches, both caves and the
+  five animals. Only the food amounts change (below). The v2 clearing commons are not placed.
+- **East neighborhood, x 96–144.** The exact mirror image about x = 72. Terrain rows are
+  palindromes, and each object is copied to x' = 144 − x with the same kind, shape, stock
+  and data. Ids follow the ex13 scheme with shifted indices: `start-3..5-*`, `forest-*-3..5`,
+  `canopy-75..149`, `cave-3` and `cave-4`, and animals named by their mirrored home (for
+  example `wolf-104-18`). The ex13 hazards are mirrored as `east-drought-1/2` and
+  `river-waterlogging-3/4`. All of them start at round 260 or later.
+- **Meadow, x 48–96.** It continues the ex13 terrain rule east of x = 31, which gives one
+  column profile: rocky ground in rows 0–16, grass in rows 17–25 and forest in rows 26–35. Its
+  only objects are the middle food plants.
+
+Water, fords, forest and ordinary soil are therefore those of ex13 on both sides. Each group
+has the same materials, caves, wildlife and hazards at ex13 density. Animals group only with
+their own herd: the east copies carry `group: '<species>-2'`, and the open ecology now
+matches peers by group, which defaults to the species. Every earlier archive has
+`group === species`, so its grouping is unchanged. Without this, every herd member would walk
+toward the first animal of its species in the other neighborhood.
+
+**People.** The culture v2 people keep their order, tendencies, leanings, knowledge, mastery and
+vitals. Lin (freedom), Moss (belonging) and Sol (beauty) start in the west on the v2 ring
+(radius 2.2, 120 degrees apart) around the v2 clearing (14, 15): Lin at (16.2, 15), Moss at
+(12.9, 16.91), Sol at (12.9, 13.09). Kai (fairness), Wren (mastery) and Ivo (calm) start at
+the exact mirror images of Moss, Sol and Lin, so each similar pair (belonging/fairness,
+beauty/mastery, freedom/calm) is split between the groups. Within a group, people start 3.81
+units apart, and everyone sees the other two at round 0.
+
+### Food
+
+Satiety falls by `hunger` = 0.9 per round and person, and a unit eaten adds its nutrition
+(berry 8, root 14). Three people therefore need 2.7 nutrition per round.
+
+**Near each village** (both identical, mirrored):
+
+- **Larder.** Each person has one berry bush and one root patch at the v2 ring-0 places
+  (radius 3.8, 0.3 rad either side of their start). Each holds 4 units (capacity 4) and grows
+  four times slower than the v2 commons (intervals 20 and 32). That is 3 × (4 × 8 + 4 × 14) =
+  264 nutrition per village.
+- **Copied ex13 food plants.** Every one keeps its kind, place, toxicity and capacity, but
+  starts harvested (stock 0) and grows ten times slower (intervals × 10). Fish has no
+  regrowth, as in ex13.
+
+The food lasts T rounds, where 264 + R(T) = 2.7 × T + U. U is what people eat above the
+drain, for example to raise satiety from the starting 80, and R is regrowth. Integrating the
+growth model (`forestGrowth` with the seasonal and soil factors of the open ecology, no
+depletion) gives cumulative growth of about 21 by round 100 and 48 by round 200. No larder
+unit regrows before about round 97, and no copied ex13 plant regrows within 200 rounds; the
+first berry needs growth 120, reached after about 900 rounds. So R = 0 before round 97, and
+T = 264 / 2.7 = 98 rounds with U = 0, or 87 rounds with U = 30 (everyone topping up to 90).
+After that, regrowth is limited to the larder: one berry per bush at about rounds 97 and 170
+and one root per patch at about round 140. That is 90 nutrition per village by round 200,
+about a third of what three people eat. The isolated preflight oracle eats only when satiety
+is below 78 (U ≈ 0), and it emptied both larders by round 100.
+
+**The middle area** consists of 24 berry bushes and 24 root patches. They have the culture v2
+commons capacity (20) and growth intervals (5 and 8). They stand in four rows (y = 18.5,
+20.5, 22.5 and 24.5) at x = 72 ± 1, 3, …, 11 on the meadow grass, alternating kinds
+symmetrically about x = 72.
+
+- **Initial food:** 10,560 nutrition, 20 times both villages' 528.
+- **Regrowth:** ideal regrowth is about 7,660 nutrition a year (800 rounds), against about
+  760 for both villages together. Six people eat 4,320 a year, so the area keeps
+  regenerating. The 24 commons sources alone (about 3,830) would not.
+- **Distance:** its nearest plant is 47.1 units from the west centre (44.9 from Lin).
+- **Visibility:** nobody remembers it at genesis, and no text points to it. People find it
+  only by going there.
+
+### Separation in the first 60 rounds
+
+Offline proof: `apps/simulator/test/long-culture-villages.test.ts`.
+
+**Maximum movement per round.**
+
+- `navigate` is the only interface whose handler (`kernel.navigate`) changes a position. One
+  round is one `v7Step`, and every person runs one action.
+- Navigation moves at most `speed × dt / travelFactor` along its path per round.
+  `travelFactor` is 1 + 0.6 × waterlogging with waterlogging ≥ 0 (`open-physical.ts`), so the
+  step is at most 0.8 × 1 / 1 = 0.8. The kernel only rejects or reverts conflicting moves; it
+  never adds distance.
+- The only other position change is respawn after a death (`forest-lives.ts`). It places the
+  person within 3 units of their own start.
+
+**Perception.**
+
+- Vision and hearing share `config.vision` = 5. Other people are seen within 5 of a person's
+  position.
+- `tell` and `invite` are heard within 5 of the speaker.
+- Signs (names, marks and invitation signs) stand where their maker stood. They are seen when
+  their 0.06-radius circle is within 5.
+
+**Bound.** The brief's bound is 2 × 60 × 0.8 + 5 = 101. The closest pair of starts across the
+groups (Lin and Ivo) is 111.6 apart, a margin of 10.6. A stricter bound also counts a respawn
+ring on both sides and the sign radius: 2 × (48 + 3) + 5 + 0.06 = 107.06, which still leaves
+4.54. In the first 60 rounds, no person of one group can therefore see or hear a person of
+the other group, or see their names, marks or invitation signs. A 60-round run in which both
+groups rush toward each other, speak, mark and invite confirms it.
+
+**Other channels checked.**
+
+- **Messages** need the recipient within 5. Gifts need handoff reach, and finding exchange
+  needs distance ≤ 2 and sight. Each is rejected across the gap (tested).
+- **Events** reach a person only if the person is the actor, if a message is addressed to them
+  within range, or if the event's position is within 5 and visible. `heard` events have no
+  position and go only to their listener.
+- **Memory** is filled only from the person's own observation.
+- **Shared state:** finding offers are keyed to their recipient and need the exchange range.
+  There are no councils (no collective policy), no incentive bookkeeping (incentives off) and
+  no world-wide broadcast event.
+- **Exception: invitation attendance.** `invite` accepts any dry meeting point in the world, by
+  the culture v2 rules, which this tag keeps. At the meeting round an `attendance` event appears
+  at that point and names the host and the invitation. Anyone within 5 of the point sees it, so
+  a person who names a point where someone of the other group happens to stand would reach
+  them. The distance bound does not cover this channel, and a test demonstrates it. It needs a
+  meeting point chosen within 5 units of an unseen person more than 100 units away. An analysis
+  can detect it in the replay.
+- **Global by design.** The interface catalogue and World Agent reviews are shared, as in every
+  run:
+  - An interface developed for anyone appears to everyone, without its requester.
+  - A World Agent rejection reason is free text written for a batch that can include requesters
+    of both groups.
+  - A `views` key must be the id of an existing person, so a plan with a correctly guessed id is
+    accepted.
+  - A developed interface could also add movement faster than 0.8 per round. The bound holds for
+    the genesis interfaces.
+
+### Identical inputs
+
+The test builds every person's round-0 ordinary request and World Agent inputs (one request
+from each person, then all six together) for both tags. The instructions, request envelope,
+`longContext`, catalogue, retrieval and every non-world packet field are byte-identical:
+goal, identity, time, vitals, wellbeing, learning, load, experience, execution, inventory,
+tendencies, cares, views, heard, offers, messages, projects, knowledge, records, abilities and
+access. The v2 sentence that names stories is unchanged. The fields that differ show the world:
+
+- **Ordinary input:** `state.position`, `state.life.spawn`, `environment.temperature` and
+  `environment.local.ground` (the ground under the start), `observation.actors`,
+  `observation.objects` and `observation.terrain`, and `rules.bounds` (144, 36).
+- **World Agent input:** `applicants[].observed`, `rules.bounds` and
+  `rules.fresh.hazards`.
+
+New agent-visible text (ids, names, labels, data values and hazard ids) contains none of
+culture, belief, religion, ritual, social, story, myth, legend or tradition. It does not
+mention villages, neighbors, a meeting or a middle.
+
+### Preflight
+
+Allocation runs both offline preflights on the new genesis. The isolated feasibility
+oracle (`openPreflight`) gives each food source to the person whose start is nearest. Here
+the far middle area falls in the start sectors of at most two people per group, so the
+third person would starve by construction once the local food is gone. For this tag only,
+sources are therefore shared and reserved per round, as in the collective arms
+(`scripts/open-preflight.ts`). Results on the final genesis:
+
+- **Open preflight:** 258 s for 1,600 rounds (culture v2: 134 s). No life was lost, and the
+  optional (waiting) share was 68.8%. Minimum health was 78.9 (Ivo, one round of
+  starvation) and minimum satiety 0. Initial safe nutrition was 11,088 and the nearest safe
+  food was 0.9–1.8 units away. There were no failed actions.
+- **The oracle's trip:** both larders were empty at round 100. Everyone then walked 80–100
+  rounds to the middle and arrived with satiety 4–14.
+- **Long preflight** (single-source counterexample, reported rather than required, because
+  slack is on): 24 s. Every person loses all three lives (first deaths at rounds 102 and 147),
+  since a single local source cannot feed anyone.
+- **Runtime:** allocation therefore spends about 4.7 minutes on preflights.
+
+### Viewer
+
+`apps/viewer/src/observatory-camera.ts` frames maps more than twice as wide as tall:
+
+- **Fit** fits the whole map to the stage and centres it.
+- **Zoom** reaches the whole map.
+- **Minimap** takes the map's proportions, and its camera rectangle shows the area actually
+  visible.
+
+Every earlier map (24 × 24, 48 × 36 and the legacy grids) keeps the historical square
+framing and the 48-unit zoom limit, so existing archives render as before. Minimap clicks now
+account for the letterbox on every map. They previously ignored it, about 4.5 units off
+vertically on ex13.
+
+### Limits
+
+- **Computation budget.** Six far navigations that each exhaust their bounded search (450,000
+  work units) in one round exceed the culture v2 round budget of 2,000,000 units. That happened
+  on round 14 of the offline rush test, when both groups reached their rivers at once. A
+  computation pause would replay the same round and exhaust it again. This tag therefore sets
+  `computation.workPerRound` to 6,000,000, three times v2's for three times the area. It is an
+  engine limit, not part of any input (ADR-0031).
+- **Distance to the middle.** The middle area is about 47 units from each start. With rest
+  stops, the oracle needed 80–100 rounds for the trip and arrived nearly starving. People
+  who wait until their larder is empty before searching can run short of food on the way.
+- **Remote invitations.** See the attendance exception above.
+- **Viewer capture.** The observatory and capture were checked with unit tests of the
+  framing only. A real wide archive is needed to see the screenshots.
+- **No run.** No model-calling run has been made with this tag.
 
 ## A. Voice and private memory
 

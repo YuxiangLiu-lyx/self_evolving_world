@@ -205,6 +205,12 @@ a {
   cursor: crosshair;
   box-shadow: 0 3px 10px #193e344d;
 }
+/* Maps more than twice as wide as tall keep their own proportions; others stay square. */
+.minimap.wide {
+  width: min(320px, 40%);
+  height: auto;
+  aspect-ratio: var(--map-aspect);
+}
 .stage-caption {
   position: absolute;
   bottom: 15px;
@@ -490,6 +496,10 @@ a {
   .minimap {
     width: 105px;
     height: 105px;
+  }
+  .minimap.wide {
+    bottom: 64px;
+    height: auto;
   }
   .camera-tools {
     top: 50px;
