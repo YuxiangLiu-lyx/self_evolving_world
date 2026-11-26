@@ -61,6 +61,16 @@ Out of scope: the transport and login files, `scripts/culture-metrics.ts`, world
 
 ## Results
 
-- R1–R10 are implemented. Output location: `docs/presentation/labels/<archive>-<from>-<through>/`, with the ledger at `docs/presentation/labels/ledger.json`. `experiment/` accepts only numbered archives and paired companion analyses, and presentation files are checked only for format and links. Outputs are written Prettier-formatted, and a generated timeline passes markdownlint.
-- Offline estimate (o200k_base, 20 items per batch, reasoning tokens excluded): about 2,300 input tokens and 900–1,500 output tokens per batch, or about 14,000 input and 5,700–8,900 output tokens per 100 items. The reservation per batch is about 23,000 tokens. The full ex16 (67 items), ex17 (56) and ex18 (48) archives need 4, 3 and 3 batches.
-- Not yet run: `pnpm validate`, CI and any labeling call. No archive is labeled and no label is verified.
+See the [run report](../../presentation/run-report-a-winter.md).
+
+- A1: ex16 ran 250 → 300 → 350 → 400 on `experiment/ex16-winter` from `4c108a4`, with backups pushed at each target. A spent 2,044,361 tokens of its 3,500,000 cap, and all six people survived.
+- A2: 8 handoff attempts: 6 counted packages, all Wren's, and 2 empty handoffs closing evidence-free `fetch failed` pauses. No overload with a retry-after occurred.
+- A3: the before/after comparison per 25-tick block is in the report.
+  - The pressure barely starts within the window: intensity 0.71 at tick 400 and the season still summer until tick 400. Cooling moved bodies into comfort, and nobody was hurt.
+  - People spread out and stopped talking after tick 300. There was no giving, no norm breach and no remembering of absent people.
+- A4: 76 items labeled for 23,408 tokens, plus 7,596 for calibration; the annotation ledger stands at 31,004.
+  - Agent-verified agreement: 85.7% overall, 80.6% on positives and 95.0% on negatives.
+  - The verified timeline is published.
+- A5: ex7–ex15, ex17 and ex18 are byte-identical to their main digests, and the full ex16 (528 requests, 36 paused inputs) to its branch digest. `pnpm validate` results are in the PR.
+- A6: report, highlights and fix-log section 10.
+- Tooling fix: window-bound analyses now include nested windows and the history of their time (fix-log 10a).

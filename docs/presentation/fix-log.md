@@ -435,6 +435,41 @@ After the revision in section 8, ex16 and ex17 were extended to round 250 and E4
   - Require a mention of other people before a quantity counts as `take-moderately` (the second proposal of 7h).
 - **Metrics**: precision on a fresh fixed-seed sample of each list.
 
+## 10. Experiment A: newly exposed problems
+
+Experiment A extended ex16 from round 250 to 400 ([PR-43](../exec-plans/completed/pr-43-a-winter.md), [run report](run-report-a-winter.md)).
+
+### 10a. Window-bound analyses missed nested windows and the history of their time
+
+- **Problem**: the window check of 9c matched an analysis only against the files that one extension preserved. An analysis written after an earlier extension also binds the earlier preserved copies and `window-history.json` as it was then, and the next extension appends to that history.
+- **Evidence**: after ex16 was extended past round 250, `pnpm analysis:check` failed on `pr-42-culture-v2-extension`. Its 1,006 artifacts include `windows/through-80/*`, `windows/through-150/*` and a two-entry `window-history.json`.
+- **Fix (applied)**: `windowMaterial` now adds the earlier windows' preserved copies, which stay at their own paths, and the history file rebuilt from the earlier entries exactly as `continuousAtomic` wrote it (`scripts/analysis-window.test.ts`).
+- **Metrics**: `pnpm analysis:check` passes with ex16's round-80, round-250 and round-400 analyses.
+
+### 10b. The pressure that A was meant to observe barely starts within the window
+
+- **Problem**: the culture scenario's pressure ramps from tick 300 to full at tick 440, and the season label reaches winter only at tick 600. A 400-round window shows the onset, not a hard season.
+- **Evidence**:
+  - At tick 400 the intensity is 0.714: cold +1.07 °C and plant growth 0.714.
+  - Mean body temperature fell from 28.6 to 25.4 °C, out of the too-warm range, and thermal comfort rose from 0.865 to 0.992.
+  - No injury, no death and no mention of cold.
+- **Fix (proposed, not applied)**: to observe scarcity and cold, extend to at least round 600, where pressure is full from 440, or start a run with an earlier `pressureStart`. Either is a user decision.
+- **Metrics**: body temperature, satiety and deaths per 25-tick block.
+
+### 10c. Evidence-free transport failures keep recurring
+
+- **Problem**: see 9a.
+- **Evidence**: two more `fetch failed` pauses in A: rounds 282 and 365, 117–124 ms, no response. Each was closed by an empty handoff.
+- **Fix (proposed, not applied)**: as 9a.
+- **Metrics**: 3 such pauses in ex16 since round 99.
+
+### 10d. The annotation over-labels invitations
+
+- **Problem**: the model labels a general wish for company as an invitation even after the definitions were tightened.
+- **Evidence**: 1 of 6 invitation labels in ex16 was verified (the round-51 meeting). The other five are "I'd enjoy resting together" without a place or time.
+- **Fix (proposed, not applied)**: require a place, time or named activity in the schema (an `invitation` field), or verify invitations against `invited` events only.
+- **Metrics**: invitation precision on the next verified sample.
+
 ## Limitations
 
 - Fixes 2–4 are turned on together in E1, so one run cannot separate their effects causally; section 5 attributes them by mechanism only. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.
