@@ -1195,6 +1195,28 @@ function environment(w: V7World) {
   }
 }
 
+/** The cord-knot@1 bend measurement, knot state and hand constants, exported unchanged for
+ * packages that work on the same cords (ex16 hand-join-fiber-cords@1). */
+export const CORD_KNOT = {
+  KNOT,
+  LAW,
+  OPENING,
+  PINCH,
+  CLEAR,
+  MAX_FORCE,
+  MAX_SECONDS,
+  /** plan()'s cord width, centreline and tightest bend radius without cracking (null: none). */
+  bend(
+    w: V7World,
+    s: V7Stack,
+  ): { width: number; length: number; bend: number | null } | null {
+    const g = plan(w, s);
+    return g ? { width: g.width, length: g.length, bend: g.bend } : null;
+  },
+  /** The cord's knot state: straight, loop, tucked or tied. */
+  state: (s: V7Stack): string => shapeOf(s),
+};
+
 export const LONG_CORD_KNOT: V7Package = {
   id: ID,
   version: 1,
