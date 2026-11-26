@@ -86,3 +86,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-41](completed/pr-41-culture-g2-revision.md): G2 revised after the fact to a group measure, retry-after waits in repair, sign transmission, first-author reuse, phrase, invitation and appearance detections and a per-run timeline.
 
 - [PR-42](completed/pr-42-culture-v2-extension.md): ex16 and ex17 extended to round 250 on continuation branches and E4 run as ex18, with the extension report, analyses and window-bound analysis checks.
+
+- [PR-43](completed/pr-43-a-winter.md): experiment A (ex16 extended to round 400 as the pressure begins) and the blind GPT annotation tool with a separate ledger and verified labels.
