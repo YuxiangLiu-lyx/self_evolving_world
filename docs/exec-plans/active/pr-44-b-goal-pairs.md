@@ -44,6 +44,13 @@ This plan fixes the outcome measures before any B run. They are not changed afte
 
   Only verified items count, and the report gives the agreement rates.
 
+  Counting procedure, fixed before any B annotation (`scripts/culture-metrics-pairs.ts`):
+  - an `agree` verdict confirms every labelled category; a `partial` verdict confirms only the categories the verifier lists in `confirmed`; a `disagree` verdict confirms none;
+  - a linked category (adoption, continuation, repetition) counts only when its link points to an entry by another person;
+  - a confirmed valued object carries the `object` the verifier identified in the archive, and measure 7 counts distinct such objects;
+  - items the verifier finds missing in the negative sample enter the agreement rates, not the measures, because only a sample of negatives is re-checked;
+  - measure 4 reads every cares write of ticks 1–80; measure 6 reads the world's `attendance` events of ticks 1–80.
+
 - R6: Report each pair side by side (old goal against v2 on the same seed) and the totals of each arm. Report the number of pairs in which each arm is higher.
   - No significance test is claimed with three pairs; the report describes, it does not generalize.
   - ex15 (ticks 1–70) and ex16 (ticks 1–80) are shown as references and are not part of any pair.
