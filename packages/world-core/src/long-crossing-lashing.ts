@@ -3013,3 +3013,56 @@ export const LONG_CROSSING_LASHING: V7Package = {
     }
   },
 };
+
+/** cordLoad's result under a type nameable outside this module (its strand law is fiber-cord@1's). */
+type CordLoad = {
+  r: NonNullable<ReturnType<typeof F.material>>;
+  law: NonNullable<(typeof F.STRANDS)[string]>;
+  p: V7Data;
+  d: number;
+  concentration: number;
+  strength: number;
+  stiffness: number;
+} | null;
+const loadOf: (w: V7World, cord: V7Stack, model: Model) => CordLoad = cordLoad;
+const creepOf: (
+  load: NonNullable<CordLoad>,
+  model: Model,
+  added: number[],
+) => number = creepInto;
+/** The multi-turn-contact@1 planner, tension, load, wear and relation helpers of hand-lash-crossing@1,
+ * exported unchanged (appended) for packages that work on its lashings (ex16 hand-frap-crossing@1). */
+export const MULTI_TURN_CONTACT = {
+  ID,
+  REVISION,
+  KEY,
+  LAW,
+  METHOD,
+  PREFIX,
+  RETAINED,
+  stateOf,
+  recOf,
+  trialsOf,
+  measurePiece,
+  plan,
+  describe,
+  modelOf,
+  modelJson,
+  tensions,
+  separated,
+  threshold,
+  cordLoad: loadOf,
+  creepInto: creepOf,
+  slackTurn,
+  writePiece,
+  freeCord,
+  freePiece,
+  ledger,
+  members,
+  view,
+  fragmentCord,
+  pieceIds,
+  ownCord,
+  liveSlip,
+  turnText,
+};

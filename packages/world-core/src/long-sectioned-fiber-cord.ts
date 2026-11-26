@@ -44,6 +44,22 @@ const PREFIX = 'sectioned-cord-';
 const SECTION = M.LENGTH.max;
 /** Requested twisted span: the fiber-cord@1 minimum, up to two sections. */
 const LENGTH = { min: M.LENGTH.min, max: 0.6 };
+/** The identity and requested-length range one sectioned cord operation runs under; every other rule
+ * is shared, so another operation can reuse this code under its own identity. */
+interface Profile {
+  id: string;
+  revision: string;
+  state: string;
+  prefix: string;
+  length: { min: number; max: number };
+}
+const SECTIONED: Profile = {
+  id: ID,
+  revision: REVISION,
+  state: STATE,
+  prefix: PREFIX,
+  length: LENGTH,
+};
 /** Paid rounds of each section in order; one release check follows the last section. */
 const STEPS = ['separate-align', 'twist', 'counter-ply'];
 const CHECK = 'release-check';
@@ -108,12 +124,17 @@ function sectionsOf(p: V7Data): Section[] {
     };
   });
 }
-/** Twisted spans up to 0.60 m whose plies stay hand-twistable and within the strands, given the volume. */
-function feasible(strand: number, volume: number): number[] | null {
+/** Twisted spans within the requested range (0.05-0.60 m here) whose plies stay hand-twistable and
+ * within the strands, given the volume. */
+function feasible(
+  range: Profile['length'],
+  strand: number,
+  volume: number,
+): number[] | null {
   const length = (area: number) => (volume / 2 / area - 2 * F.END) / M.TAKEUP,
-    low = Math.max(LENGTH.min, length((Math.PI * M.PLY.max ** 2) / 4)),
+    low = Math.max(range.min, length((Math.PI * M.PLY.max ** 2) / 4)),
     high = Math.min(
-      LENGTH.max,
+      range.max,
       length((Math.PI * M.PLY.min ** 2) / 4),
       (strand - 2 * F.END) / M.TAKEUP,
     );
@@ -140,9 +161,10 @@ function view(w: V7World, s: V7Stack): V7Data {
   };
 }
 
-const ownJobs = (w: V7World, a: V7Actor) =>
-  collectiveJobs(w, ID).filter((j) => j.owner === a.id);
-const current = (w: V7World, a: V7Actor) => ownJobs(w, a).find(open);
+const ownJobs = (k: Profile, w: V7World, a: V7Actor) =>
+  collectiveJobs(w, k.id).filter((j) => j.owner === a.id);
+const current = (k: Profile, w: V7World, a: V7Actor) =>
+  ownJobs(k, w, a).find(open);
 const workpieceOf = (w: V7World, j: CollectiveWork) =>
   j.target ? w.stacks.find((s) => s.id === j.target) : undefined;
 /** Reserved input fiber of the work not yet handled. */
@@ -182,8 +204,8 @@ function summary(w: V7World, j: CollectiveWork): V7Data {
     visual: piece ? view(w, piece) : null,
   };
 }
-function sync(a: V7Actor, j: CollectiveWork) {
-  a.extensionState[STATE] = v7Json(j);
+function sync(k: Profile, a: V7Actor, j: CollectiveWork) {
+  a.extensionState[k.state] = v7Json(j);
 }
 /** A released workpiece stays as the real unfinished or failed material it is. */
 function settle(piece: V7Stack | undefined, status: string) {
@@ -193,6 +215,7 @@ function settle(piece: V7Stack | undefined, status: string) {
   p.workId = null;
 }
 function pause(
+  k: Profile,
   c: V7ActionContext,
   j: CollectiveWork,
   reason: string,
@@ -200,15 +223,16 @@ function pause(
   j.status = 'paused';
   j.reason = reason;
   c.emit(
-    `${PREFIX}paused`,
+    `${k.prefix}paused`,
     `${reason} Paid rounds, reserved fiber and the workpiece are kept; nothing was spent.`,
     { ...summary(c.world, j), requiredEnergy: M.STEP },
     j.target ?? j.id,
   );
-  sync(c.actor, j);
+  sync(k, c.actor, j);
   return { complete: true, writes: [j.id] };
 }
 function fail(
+  k: Profile,
   c: V7ActionContext,
   j: CollectiveWork,
   reason: string,
@@ -220,18 +244,19 @@ function fail(
   workStop(w, c.actor, j, reason, false);
   settle(piece, 'failed');
   c.emit(
-    `${PREFIX}failed`,
+    `${k.prefix}failed`,
     `${reason} The actual loose, twisted or damaged fiber stays as it is; nothing is refunded.`,
     summary(w, j),
     piece?.id ?? j.id,
   );
-  sync(c.actor, j);
+  sync(k, c.actor, j);
   return { complete: true, writes: [j.id, ...j.escrow] };
 }
 
 /** Round 1: measure all reserved fiber, set broken strands aside, separate two ply bundles and
  * align the first section. */
 function align(
+  k: Profile,
   c: V7ActionContext,
   j: CollectiveWork,
   inputs: V7Stack[],
@@ -259,7 +284,7 @@ function align(
       plyDiameter: F.metres(g.plyDiameter),
       strandLength: law.length,
       waterShare: F.wetness(r),
-      feasibleLength: feasible(law.length, g.volume),
+      feasibleLength: feasible(k.length, law.length, g.volume),
     },
     problem =
       usable < 2
@@ -280,7 +305,7 @@ function align(
       false,
     );
     openRemember(c, {
-      key: `${ID}:make:${resource}:shortfall:${problem.split(' ').slice(0, 3).join('-')}`,
+      key: `${k.id}:make:${resource}:shortfall:${problem.split(' ').slice(0, 3).join('-')}`,
       subject: resource,
       property: 'sectioned hand-twisted two-ply cord feasibility',
       value: v7Json({ outcome: 'shortfall', problem, ...measured }),
@@ -290,12 +315,12 @@ function align(
       verified: true,
     });
     c.emit(
-      `${PREFIX}shortfall`,
+      `${k.prefix}shortfall`,
       `Separating and aligning showed a shortfall: ${problem}. No cord was started; all reserved fiber is returned.`,
       { ...summary(w, j), ...measured, shortfall: problem },
       j.id,
     );
-    sync(c.actor, j);
+    sync(k, c.actor, j);
     return { complete: true, writes: [j.id, ...j.escrow] };
   }
   // Broken strands come out first, from the least intact lots, as owned damaged scrap.
@@ -355,7 +380,7 @@ function align(
           rounds: j.initialWork,
           workId: j.id,
           law: F.LAW,
-          madeWith: REVISION,
+          madeWith: k.revision,
           classes: [...classes].sort(),
           condition: v7RoundNumber(Math.min(1, intact / usable)),
           length,
@@ -384,7 +409,7 @@ function align(
   j.target = piece.id;
   j.scrap = scraps.map((s) => s.id);
   c.emit(
-    `${PREFIX}progress`,
+    `${k.prefix}progress`,
     `Paid round 1 of ${String(j.initialWork)} (separate-align, section 1 of ${String(n)}): ${String(usable / 10)} units in two bundles${broken ? `, ${String(broken / 10)} broken set aside as scrap` : ''}; ${String(first.to)} m aligned. Unfinished work is no cord.`,
     {
       ...summary(w, j),
@@ -394,7 +419,7 @@ function align(
     },
     piece.id,
   );
-  sync(c.actor, j);
+  sync(k, c.actor, j);
   return {
     complete: false,
     remaining: j.remainingWork,
@@ -404,6 +429,7 @@ function align(
 
 /** Release check: two interlocked plies along every section must keep a coherent form. */
 function check(
+  k: Profile,
   c: V7ActionContext,
   j: CollectiveWork,
   piece: V7Stack,
@@ -445,7 +471,7 @@ function check(
     condition: F.conditionOf(piece),
   };
   openRemember(c, {
-    key: `${ID}:make:${piece.resource}:${F.band(F.conditionOf(piece))}:${value.outcome}:${String(sections.length)}-section`,
+    key: `${k.id}:make:${piece.resource}:${F.band(F.conditionOf(piece))}:${value.outcome}:${String(sections.length)}-section`,
     subject: piece.resource,
     property: 'sectioned hand-twisted two-ply cord form after release',
     value,
@@ -454,14 +480,14 @@ function check(
     verified: true,
   });
   c.emit(
-    holds ? `${PREFIX}completed` : `${PREFIX}check-failed`,
+    holds ? `${k.prefix}completed` : `${k.prefix}check-failed`,
     holds
       ? `Released: two interlocked plies kept one continuous ${String(value.length)} m cord made in ${String(value.sectionCount)} section(s), ply ${String(value.plyDiameter)} m thick. It is untested; no strength is known.`
       : 'Released: the plies did not keep their form; it stays a failed workpiece, not a cord.',
     { ...summary(w, j), ...value },
     piece.id,
   );
-  sync(c.actor, j);
+  sync(k, c.actor, j);
   return {
     complete: true,
     remaining: 0,
@@ -470,7 +496,11 @@ function check(
 }
 
 /** One paid round after rechecking hands, room, reservation and energy. */
-function advance(c: V7ActionContext, j: CollectiveWork): V7HandlerResult {
+function advance(
+  k: Profile,
+  c: V7ActionContext,
+  j: CollectiveWork,
+): V7HandlerResult {
   const w = c.world;
   if (!open(j)) throw new Error('This cord work is already settled.');
   const inputs = pending(w, j),
@@ -480,11 +510,11 @@ function advance(c: V7ActionContext, j: CollectiveWork): V7HandlerResult {
       ? inputs.reduce((n, s) => n + tenths(s), 0) !== Number(j.reservedTenths)
       : piece?.reservedFor !== j.id
   )
-    return fail(c, j, 'Reserved fiber or the workpiece is missing.');
+    return fail(k, c, j, 'Reserved fiber or the workpiece is missing.');
   const blocked = F.crowded(w, c.actor, Number(j.workLength));
-  if (blocked) return pause(c, j, `No room to work: ${blocked}.`);
+  if (blocked) return pause(k, c, j, `No room to work: ${blocked}.`);
   if (c.actor.vitals.energy < M.STEP)
-    return pause(c, j, 'Not enough energy for the next paid round.');
+    return pause(k, c, j, 'Not enough energy for the next paid round.');
   const resumed = j.status === 'paused';
   if (!workPay(c, j, M.STEP))
     throw new Error('Energy changed before the paid round.');
@@ -494,16 +524,16 @@ function advance(c: V7ActionContext, j: CollectiveWork): V7HandlerResult {
   j.y = c.actor.position.y;
   if (resumed)
     c.emit(
-      `${PREFIX}resumed`,
+      `${k.prefix}resumed`,
       'Unfinished cord work resumed after rechecking hands, room, reserved fiber and energy.',
       summary(w, j),
       j.target ?? j.id,
     );
   const round = j.completedWork,
     n = Number(j.sections);
-  if (round === 1) return align(c, j, inputs);
+  if (round === 1) return align(k, c, j, inputs);
   if (!piece) throw new Error('Missing workpiece.');
-  if (round >= j.initialWork) return check(c, j, piece);
+  if (round >= j.initialWork) return check(k, c, j, piece);
   const { section, step } = stepOf(round, n),
     p = F.part(piece),
     r = F.material(w, piece.resource);
@@ -514,6 +544,7 @@ function advance(c: V7ActionContext, j: CollectiveWork): V7HandlerResult {
     openMaterial(r).flexibility < F.BEND
   )
     return fail(
+      k,
       c,
       j,
       step === 'separate-align'
@@ -548,12 +579,12 @@ function advance(c: V7ActionContext, j: CollectiveWork): V7HandlerResult {
   p.section = section;
   p.stages = round;
   c.emit(
-    `${PREFIX}progress`,
+    `${k.prefix}progress`,
     `Paid round ${String(round)} of ${String(j.initialWork)} (${step}, section ${String(section)} of ${String(n)}): ${done}. Unfinished work is no cord.`,
     { ...summary(w, j), round, handled: { incorporatedTenths: 0 } },
     piece.id,
   );
-  sync(c.actor, j);
+  sync(k, c.actor, j);
   return {
     complete: false,
     remaining: j.remainingWork,
@@ -561,9 +592,9 @@ function advance(c: V7ActionContext, j: CollectiveWork): V7HandlerResult {
   };
 }
 
-function start(c: V7ActionContext): V7HandlerResult {
+function start(k: Profile, c: V7ActionContext): V7HandlerResult {
   const w = c.world;
-  if (current(w, c.actor))
+  if (current(k, w, c.actor))
     throw new Error(
       'Unfinished sectioned cord work exists; resume it with make and its workId, or cancel it. Nothing was spent.',
     );
@@ -577,8 +608,8 @@ function start(c: V7ActionContext): V7HandlerResult {
       v7Number(
         c.action.args.requestedLength,
         'requestedLength',
-        LENGTH.min,
-        LENGTH.max,
+        k.length.min,
+        k.length.max,
       ),
     ),
     units = list.reduce((t, a) => t + foodTenths(a.quantity), 0);
@@ -640,7 +671,7 @@ function start(c: V7ActionContext): V7HandlerResult {
     );
   const n = sectionCount(length),
     j = workCreate(c, 'make', roundsOf(n));
-  j.revision = REVISION;
+  j.revision = k.revision;
   j.resource = first.resource;
   j.origin = first.origin;
   j.cordLength = length;
@@ -652,15 +683,15 @@ function start(c: V7ActionContext): V7HandlerResult {
   workReserve(c, j, list);
   w.stacks = w.stacks.filter((x) => x.quantity > 0);
   c.emit(
-    `${PREFIX}started`,
+    `${k.prefix}started`,
     `${String(units / 10)} unit(s) of sampled fiber reserved and held for one continuous ${String(length)} m two-ply cord in ${String(n)} section(s) of ${String(j.sectionLength)} m; no tool, anchor, water, splice or extra fiber is used.`,
     summary(w, j),
     j.id,
   );
-  return advance(c, j);
+  return advance(k, c, j);
 }
 
-function inspect(c: V7ActionContext): V7HandlerResult {
+function inspect(k: Profile, c: V7ActionContext): V7HandlerResult {
   const w = c.world,
     a = c.actor,
     { workId, targetId } = c.action.args;
@@ -670,7 +701,7 @@ function inspect(c: V7ActionContext): V7HandlerResult {
     );
   const j =
       typeof workId === 'string'
-        ? ownJobs(w, a).find((x) => x.id === workId)
+        ? ownJobs(k, w, a).find((x) => x.id === workId)
         : undefined,
     s = j
       ? workpieceOf(w, j)
@@ -702,7 +733,7 @@ function inspect(c: V7ActionContext): V7HandlerResult {
     verified: false,
   });
   c.emit(
-    `${PREFIX}inspected`,
+    `${k.prefix}inspected`,
     'Only measurable length, sections, plies, loose ends, fraying, damage, condition and stage are reported; untested strength stays unknown and nothing was repaired.',
     value,
     subject,
@@ -710,10 +741,10 @@ function inspect(c: V7ActionContext): V7HandlerResult {
   return { complete: true, writes: [] };
 }
 
-function cancel(c: V7ActionContext): V7HandlerResult {
+function cancel(k: Profile, c: V7ActionContext): V7HandlerResult {
   const w = c.world,
     workId = c.action.args.workId,
-    j = current(w, c.actor);
+    j = current(k, w, c.actor);
   if (!j || (typeof workId === 'string' && workId !== j.id))
     throw new Error(
       'No unfinished sectioned cord work of yours to cancel; nothing was spent.',
@@ -731,22 +762,22 @@ function cancel(c: V7ActionContext): V7HandlerResult {
   );
   settle(piece, 'unfinished');
   c.emit(
-    `${PREFIX}cancelled`,
+    `${k.prefix}cancelled`,
     'Cord work cancelled: unworked fiber is returned once and any workpiece stays an owned unfinished item with its actual sections.',
     { ...summary(w, j), returned },
     piece?.id ?? j.id,
   );
-  sync(c.actor, j);
+  sync(k, c.actor, j);
   return { complete: true, writes: [j.id, ...j.escrow] };
 }
 
 /** The unchanged fiber-cord@1 sample and trial, announced under this operation's event names. */
-const announced = (c: V7ActionContext): V7ActionContext => ({
+const announced = (k: Profile, c: V7ActionContext): V7ActionContext => ({
   ...c,
   emit: (type, description, data, target) => {
     c.emit(
       type.startsWith('fiber-cord-')
-        ? `${PREFIX}${type.slice('fiber-cord-'.length)}`
+        ? `${k.prefix}${type.slice('fiber-cord-'.length)}`
         : type,
       description,
       data,
@@ -755,31 +786,31 @@ const announced = (c: V7ActionContext): V7ActionContext => ({
   },
 });
 
-function execute(c: V7ActionContext): V7HandlerResult {
+function execute(k: Profile, c: V7ActionContext): V7HandlerResult {
   const mode = v7String(c.action.args.mode, 'mode'),
-    j = current(c.world, c.actor);
+    j = current(k, c.world, c.actor);
   if (!ARGS[mode]) throw new Error('Unknown cord mode.');
   // The bound action continues each round; make naming the work resumes it.
   if (j && mode === 'make' && c.operation?.first === false)
-    return advance(c, j);
+    return advance(k, c, j);
   if (j && mode === 'make' && c.action.args.workId === j.id) {
     M.relevant(c, mode, ['workId']);
-    return advance(c, j);
+    return advance(k, c, j);
   }
   if (c.operation?.first === false && mode === 'make')
     throw new Error('The bound cord work is already settled.');
   M.relevant(c, mode, ARGS[mode]);
-  if (mode === 'sample') return M.sample(announced(c));
-  if (mode === 'make') return start(c);
-  if (mode === 'inspect') return inspect(c);
-  if (mode === 'trial') return M.trial(announced(c));
-  return cancel(c);
+  if (mode === 'sample') return M.sample(announced(k, c));
+  if (mode === 'make') return start(k, c);
+  if (mode === 'inspect') return inspect(k, c);
+  if (mode === 'trial') return M.trial(announced(k, c));
+  return cancel(k, c);
 }
 
 /** Reserved fiber stays in the owner's hands and an unworked round pauses. Worked fiber already
  * wears once per round through hand-twist-fiber-cord@1, which wears every fiber-cord item. */
-function environment(w: V7World) {
-  for (const j of collectiveJobs(w, ID).filter(open)) {
+function environment(k: Profile, w: V7World) {
+  for (const j of collectiveJobs(w, k.id).filter(open)) {
     const a = w.actors.find((a) => a.id === j.owner);
     if (!a) continue;
     j.x = a.position.x;
@@ -792,7 +823,7 @@ function environment(w: V7World) {
         'Not worked this round; paid rounds, reserved fiber and the workpiece are kept.';
       forestEvent(
         w,
-        `${PREFIX}paused`,
+        `${k.prefix}paused`,
         'Cord work paused because it was not worked this round; nothing was spent.',
         a.position,
         a.id,
@@ -800,7 +831,33 @@ function environment(w: V7World) {
         j.target ?? j.id,
       );
     }
-    sync(a, j);
+    sync(k, a, j);
+  }
+}
+/** Death stops open work once: reserved fiber and the workpiece stay where the performer died. */
+function death(k: Profile, w: V7World, a: V7Actor) {
+  for (const j of ownJobs(k, w, a).filter(open)) {
+    const piece = workpieceOf(w, j);
+    j.x = a.position.x;
+    j.y = a.position.y;
+    workStop(
+      w,
+      a,
+      j,
+      'Performer died; reserved fiber and the workpiece were left where they died, once. Nothing is refunded.',
+      true,
+    );
+    settle(piece, 'unfinished');
+    forestEvent(
+      w,
+      `${k.prefix}failed`,
+      'Cord work stopped by death; reserved fiber and the unfinished workpiece lie where the person died.',
+      a.position,
+      a.id,
+      summary(w, j),
+      piece?.id ?? j.id,
+    );
+    sync(k, a, j);
   }
 }
 
@@ -877,7 +934,9 @@ export const LONG_SECTIONED_CORD: V7Package = {
       },
     },
   ],
-  handlers: { 'long.hand-twist-sectioned-cord': execute },
+  handlers: {
+    'long.hand-twist-sectioned-cord': (c) => execute(SECTIONED, c),
+  },
   processes: {},
   visualComponents: [],
   events: [
@@ -897,30 +956,25 @@ export const LONG_SECTIONED_CORD: V7Package = {
   ],
   resources: [],
   satisfaction: [],
-  afterEnvironment: environment,
-  onDeath(w, a) {
-    for (const j of ownJobs(w, a).filter(open)) {
-      const piece = workpieceOf(w, j);
-      j.x = a.position.x;
-      j.y = a.position.y;
-      workStop(
-        w,
-        a,
-        j,
-        'Performer died; reserved fiber and the workpiece were left where they died, once. Nothing is refunded.',
-        true,
-      );
-      settle(piece, 'unfinished');
-      forestEvent(
-        w,
-        `${PREFIX}failed`,
-        'Cord work stopped by death; reserved fiber and the unfinished workpiece lie where the person died.',
-        a.position,
-        a.id,
-        summary(w, j),
-        piece?.id ?? j.id,
-      );
-      sync(a, j);
-    }
+  afterEnvironment: (w) => {
+    environment(SECTIONED, w);
   },
+  onDeath(w, a) {
+    death(SECTIONED, w, a);
+  },
+};
+
+/** An operation identity for SECTIONED_CORD_WORK: ability, revision, state key, event prefix and
+ * requested-length range. */
+export type SectionedCordProfile = Profile;
+/** The sectional making (round-1 measurement, regrip, twist, counter-ply, release check), inspection,
+ * cancel, pause, resume and death rules of hand-twist-sectioned-cord@1, exported unchanged (appended)
+ * so ex16 hand-twist-long-sectioned-cord@1 runs this code under its own identity and length range. */
+export const SECTIONED_CORD_WORK = {
+  SECTION,
+  sectionCount,
+  roundsOf,
+  execute,
+  environment,
+  death,
 };
