@@ -8,14 +8,15 @@ it removes suppressors and provides carriers, and it never tells agents what to 
 say, value or believe in. No particular outcome is required; this is an exploratory
 condition, not a causal comparison. See [ADR-0028](decisions/0028-culture-scenario.md).
 
-| Command                                                        | Scenario tag            | Incentives |
-| -------------------------------------------------------------- | ----------------------- | ---------- |
-| `pnpm experiment:continuous -- new long-culture`               | `culture`               | off        |
-| `pnpm experiment:continuous -- new long-culture-incentives`    | `culture-incentives`    | on         |
-| `pnpm experiment:continuous -- new long-culture-v2`            | `culture-v2`            | off        |
-| `pnpm experiment:continuous -- new long-culture-v2-incentives` | `culture-v2-incentives` | on         |
-| `pnpm experiment:continuous -- new long-culture-v3`            | `culture-v3`            | off        |
-| `pnpm experiment:continuous -- new long-culture-v3-incentives` | `culture-v3-incentives` | on         |
+| Command                                                                           | Scenario tag            | Incentives |
+| --------------------------------------------------------------------------------- | ----------------------- | ---------- |
+| `pnpm experiment:continuous -- new long-culture`                                  | `culture`               | off        |
+| `pnpm experiment:continuous -- new long-culture-incentives`                       | `culture-incentives`    | on         |
+| `pnpm experiment:continuous -- new long-culture-v2`                               | `culture-v2`            | off        |
+| `pnpm experiment:continuous -- new long-culture-v2-incentives`                    | `culture-v2-incentives` | on         |
+| `pnpm experiment:continuous -- new long-culture-v3`                               | `culture-v3`            | off        |
+| `pnpm experiment:continuous -- new long-culture-v3-incentives`                    | `culture-v3-incentives` | on         |
+| `pnpm experiment:continuous -- new long-culture-v2 --import exN --newcomers file` | `culture-v2-import`     | off        |
 
 Both variants have the same physical genesis; they differ only in the incentive switch,
 its three satisfaction rules and their event names. Checkpoints are verified against the
@@ -228,6 +229,131 @@ guidance about `name`, `mark`, `tell` or `invite`, prescribes no activity and co
 excluded word. Slack (part D) was not changed, because survival without `rest` was already
 11.9%: the share came from idle rest, not from survival need. One seed gives a case
 comparison: the adjustment may lower idle rest without changing what people do.
+
+## Import and newcomers
+
+`pnpm experiment:continuous -- new long-culture-v2 --import exN --newcomers file.json`
+starts a new experiment from the retained world of a completed culture window and adds
+newcomers at its genesis. It was added for experiment C: whether newcomers learn the local
+names and sayings of an existing group. Its scenario tag is `culture-v2-import`. The run
+uses the `long-culture-v2` prompt and rules with incentives off, and it has its own frozen
+limits (`LONG_IMPORT` in `long-import.ts`): 100 rounds from the imported round, 12
+development handoffs and a 2,500,000-token ledger. For ex18 the window runs from round 120
+to round 220 with 8 people.
+
+The newcomers file lists one to six people as `{ "newcomers": [{ "id", "name", "leaning" }] }`.
+Each person needs a lowercase id, the same name capitalized and a one-word leaning.
+[`import-newcomers.json`](../apps/simulator/test/fixtures/import-newcomers.json) holds the
+two people of experiment C, Tova (leaning `curiosity`) and Bram (leaning `calm`):
+
+```sh
+pnpm experiment:continuous -- new long-culture-v2 --import ex18 --newcomers apps/simulator/test/fixtures/import-newcomers.json
+```
+
+**Source and proof.** The source must be a completed window with no pending call or
+barrier; for ex18 this is the window that completed at round 120. The import only reads the
+source archive. It reads `execution.json` `world` and computes its `continuousHash`. The
+hash must equal three others:
+
+- the hash of the world rebuilt by exact replay of every segment in `replay.json` (each
+  segment's SHA-256 is checked against the index first);
+- the `after` hash recorded with the last replayed round (`replay.json` records segment
+  file hashes, not a world hash);
+- the world of the scheduled stage checkpoint at that round, if one is kept.
+
+`manifest.json` and `preflight.json` record these values as `importedFrom`, with the source
+id, round and scope, the SHA-256 of `execution.json`, the replay index, the last runtime
+source revision and the source provenance. For ex18 all four hashes are
+`d21459c66264e4645651e4f6f0287070e18c125261eb522dcf77bdada6f42e2d`; the source revision
+is revision 4 (round 73, `efcd206b…`).
+
+**Genesis changes.** `configuration.json` is the world configuration plus `importChanges`,
+a machine-readable list of every change with its old value, new value and reason. Any
+other configuration difference from `long-culture-v2` is refused. Checkpoints of the run are
+verified against the configuration derived in code (`longImportConfig`) from the source
+scope and round recorded in `manifest.json`. Like the other run policy files, `long-import.ts`
+cannot be changed by a development handoff. For ex18 the list is:
+
+| Path                                        | ex18                    | Import              |
+| ------------------------------------------- | ----------------------- | ------------------- |
+| `config.longDevelopment.scenario`           | `culture-v2-incentives` | `culture-v2-import` |
+| `config.longDevelopment.culture.incentives` | `true`                  | `false`             |
+| `config.longDevelopment.checkpoints`        | `[80, 120]`             | `[80, 150, 250]`    |
+| `config.longDevelopment.tokens`             | 4,000,000               | 2,500,000           |
+| `config.budgets.development`                | 16                      | 12                  |
+| `config.experience.targetRounds`            | 120                     | 220 (window target) |
+| `config.development.scope`                  | `long-ex18`             | `long-exN`          |
+| `config.development.inherited`              | absent                  | `['long-ex18']`     |
+| `actors.6`, `actors.7`                      | absent                  | Tova and Bram       |
+
+The checkpoints are the culture v2 values, so the new window has one scheduled stage, at
+round 150. Every other value is byte-identical to the source: tick, time, terrain, plants,
+objects, signs, items, processes, events, world state and the residents' vitals,
+inventories, memories, cares, views and mastered abilities. A test diffs the two worlds and
+compares every other field byte by byte.
+
+**Inherited packages.** `development.inherited` (absent in every world that was not
+imported) lists earlier scopes. `continuousRegistry` then also includes those scopes'
+packages, so ex18's `plant-establishment-trial@1`, `unheated-food-preparation@1` and
+`thermal-food-preparation@1` keep their handlers, processes and state schemas for the
+people who mastered them. `v7Install` is unchanged: new installs still need the current
+scope, and the inherited packages, like every other foreign scope, are rejected. Every
+other world's registry is unchanged.
+
+**Newcomers.** They are made from the culture genesis person, like the new people of the
+culture scenario:
+
+- temperament: the median of the six residents' values for each dimension. For ex18 this
+  is curiosity 0.525, risk tolerance 0.5, closeness 0.475 and comfort preference 0.5;
+- start: health 100, satiety 80, energy 40 and temperature 22, the genesis wellbeing and
+  experience, and an empty inventory, as the residents had at round 0; `bornAt` is the
+  imported round;
+- no memory: no cells, objects, notes, preferences, cares, views, projects or knowledge
+  (also no food knowledge, which the residents received at genesis), no relationships and
+  only the authored baseline of the scope (the 18 baseline interfaces);
+- start position: 6–7 units from `CULTURE_CENTER` (14, 15) on opposite sides, on dry
+  ordinary ground (`.` or `f`, ordinary soil) clear of every body, and at least 0.5 units
+  clear of objects and ground items. Of the 24 directions where both people have such a
+  start, the one farthest from the nearest resident is used.
+
+For ex18 this places Tova at (9.23, 19.77), 6.75 units south-west of the centre, with no
+resident or sign within the vision radius 5. Bram is at (18.6, 10.4), 6.5 units north-east,
+and sees Wren (3.76) and Ivo (4.17). No newcomer sees the sign naming the clearing at
+round 120. No prompt text, packet field or note mentions place names, sayings or the
+residents' history. A newcomer learns only what the world shows: observation, hearing and
+signs in sight. The test checks each newcomer's first ordinary input. It contains no
+excluded word, no "Berry" or "Lantern" and no resident note, care, view, intention,
+project goal or heard text. It names only residents in sight. For an import, the excluded
+words also include _story_, _myth_, _legend_ and _tradition_ (`IMPORT_EXCLUDED_WORDS`). This
+covers newcomer names, leanings and interfaces developed in the new run. The unchanged
+ordinary instructions still contain the culture voice sentence about names and stories,
+the same text every culture v2 person receives.
+
+**Execution.** The new execution has no attempts, plans, retrieval, barrier or pending
+call, so every person decides afresh at the imported round. The residents keep their
+memories in the world. Ex18's incentive state stays inert with incentives off:
+
+- the three derived satisfaction rules remain registered, but nothing can produce their
+  events;
+- the `expression:contacts`, `expression:acknowledged`, `expression:bonds` and
+  `expression:noticed` bookkeeping is never updated again;
+- the only residue is Kai's last `answered` award: 0.5 until round 126, plus a sustained
+  part of 0.017 at round 120 that reaches 0 by round 132.
+
+**Preflight.** The genesis oracle cannot be reused unchanged. It tried to eat Lin's 0.9-unit
+hazelnut, which `eat` refuses because it takes whole units, so Lin starved at round 218. It
+now skips owned items below one unit, which never exist at a genesis. The import's baseline
+oracle covers the imported window: 100 rounds, all 8 people alive. Over 1,600 rounds it
+loses Wren at round 336, after pressure starts at round 300. The cause is the oracle
+assigning each food source to the nearest person at the start, whose positions are no
+longer the genesis ring. The stationary counterexample still runs 1,600 rounds and is
+reported without a hardship requirement, as in every slack scenario.
+
+Replay, analysis and the observatory start at the imported round: segments are named from
+it (`replay/execution-000120-000220.json`), the browser frames are the imported, middle and
+final rounds, and the slider starts at the imported round. Every earlier archive starts at
+round 0 and is unchanged. The viewer gives Tova and Bram their own body colors. No
+imported archive exists yet, so the browser capture of an imported window is untested.
 
 ## A. Voice and private memory
 

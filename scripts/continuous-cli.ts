@@ -5,6 +5,13 @@ import {
 } from '../apps/simulator/src/long-scenario.js';
 import type { LongScenario } from '../apps/simulator/src/long-scenario.js';
 import { longPreflight } from './long-preflight.js';
+import {
+  importLongWorld,
+  LONG_IMPORT,
+  parseLongNewcomers,
+} from '../apps/simulator/src/long-import.js';
+import type { LongImport } from '../apps/simulator/src/long-import.js';
+import { readLongImportSource } from './long-import.js';
 import { OPEN_OBJECTIVE } from './open-analysis.js';
 import {
   initialCollectiveWorld,
@@ -61,6 +68,7 @@ import {
 const USAGE = `Usage:
   pnpm experiment:continuous -- new open|long|long-fixes|long-culture|long-culture-incentives|long-culture-v2|long-culture-v2-incentives|long-culture-v3|long-culture-v3-incentives|collective-a
   pnpm experiment:continuous -- new collective-b exA
+  pnpm experiment:continuous -- new long-culture-v2 --import exN --newcomers file.json
   pnpm experiment:continuous -- continue exN
   pnpm experiment:continuous -- develop exN validation-results/development.json
   pnpm experiment:continuous -- extend exN rounds
@@ -74,27 +82,49 @@ try {
   let id: string, state: V7Execution, token: string | undefined;
   if (command === 'new') {
     const scenario = target;
+    // Opt-in import: a completed culture window as genesis, plus newcomers.
+    const importing = scenario === 'long-culture-v2' && extra === '--import';
     if (
       !['open', ...LONG_SCENARIOS, 'collective-a', 'collective-b'].includes(
         scenario ?? '',
       ) ||
-      (scenario === 'collective-b'
-        ? !/^ex[1-9]\d*$/.test(extra ?? '')
-        : extra) ||
-      rest.length
+      (importing
+        ? rest.length !== 3 ||
+          !/^ex[1-9]\d*$/.test(rest[0] ?? '') ||
+          rest[1] !== '--newcomers'
+        : (scenario === 'collective-b'
+            ? !/^ex[1-9]\d*$/.test(extra ?? '')
+            : extra) || rest.length)
     )
       throw new Error(USAGE);
     checkExperiments(root);
+    const source = importing ? readLongImportSource(root, rest[0] ?? '') : null;
+    const newcomers = source
+      ? parseLongNewcomers(
+          continuousRead<unknown>(resolve(root, rest[2] ?? '')),
+          source.world,
+        )
+      : [];
+    const imported = (scope: string): LongImport | null =>
+      source
+        ? importLongWorld(source.world, {
+            experiment: source.proof.experiment,
+            scope,
+            newcomers,
+          })
+        : null;
     const comparison = scenario?.startsWith('collective-') ?? false;
     const long: LongScenario | undefined = LONG_SCENARIOS.find(
       (s) => s === scenario,
     );
     const arm = scenario === 'collective-a' ? 'A' : 'B';
-    const genesis = comparison
-      ? initialCollectiveWorld('collective-preflight', arm)
-      : long
-        ? initialLongWorld('long-preflight', long)
-        : initialOpenWorld();
+    const genesis =
+      imported('long-preflight')?.world ??
+      (comparison
+        ? initialCollectiveWorld('collective-preflight', arm)
+        : long
+          ? initialLongWorld('long-preflight', long)
+          : initialOpenWorld());
     const physicalHash = comparison
       ? continuousHash(collectivePhysicalGenesis(genesis))
       : null;
@@ -103,6 +133,7 @@ try {
       physicalHash?: string;
       reusedFrom?: string;
       stationary?: ReturnType<typeof longPreflight>;
+      importedFrom?: NonNullable<typeof source>['proof'];
     };
     if (scenario === 'collective-b' && extra) {
       const prior = continuousRead<typeof preflight>(
@@ -121,7 +152,14 @@ try {
           'The second arm must preserve the actually preflighted physical baseline.',
         );
       preflight = { ...prior, reusedFrom: extra };
-    } else
+    } else if (source)
+      // The baseline oracle covers the imported window; see docs/CULTURE_SCENARIO.md.
+      preflight = {
+        baseline: openPreflight(LONG_IMPORT.rounds, genesis),
+        stationary: longPreflight(genesis, { requireHardship: false }),
+        importedFrom: source.proof,
+      };
+    else
       preflight = {
         baseline: openPreflight(1600, genesis),
         ...(long
@@ -140,14 +178,16 @@ try {
     const directory = resolve(root, 'experiment', id),
       git = (...args: string[]) =>
         execFileSync('git', args, { cwd: root, encoding: 'utf8' }).trim();
+    const imports = imported(`long-${id}`);
     state = newContinuousExecution(
       model,
       'chatgpt-plan',
-      comparison
-        ? initialCollectiveWorld(`collective-${id}`, arm)
-        : long
-          ? initialLongWorld(`long-${id}`, long)
-          : initialOpenWorld(`open-${id}`),
+      imports?.world ??
+        (comparison
+          ? initialCollectiveWorld(`collective-${id}`, arm)
+          : long
+            ? initialLongWorld(`long-${id}`, long)
+            : initialOpenWorld(`open-${id}`)),
     );
     if (comparison) state.windowTarget = 200;
     continuousAtomic(resolve(directory, 'manifest.json'), {
@@ -172,11 +212,22 @@ try {
         node: process.version,
         platform: process.platform,
       },
+      ...(source && imports
+        ? {
+            importedFrom: source.proof,
+            newcomers: {
+              temperament: imports.temperament,
+              placements: imports.newcomers,
+            },
+          }
+        : {}),
       files: [],
     });
     continuousAtomic(
       resolve(directory, 'configuration.json'),
-      state.world.config,
+      imports
+        ? { ...state.world.config, importChanges: imports.changes }
+        : state.world.config,
     );
     continuousAtomic(resolve(directory, 'preflight.json'), preflight);
     continuousAtomic(resolve(directory, 'initial.json'), state.world);
@@ -185,9 +236,13 @@ try {
       root,
       id,
       state,
-      'Initial open-development-v1 fresh policy, inheritSkills=false, with only the explicit authored baseline. No historical generated skills, objects, rewards or mastery. Offline policies and composition fixtures are excluded from ordinary inputs.',
+      source
+        ? `Imported ${source.proof.experiment} round-${String(source.proof.round)} world (world hash ${source.proof.worldHash}, equal to its exact replay) with the listed configuration changes and ${String(newcomers.length)} newcomers without memory; packages of ${source.proof.scope} stay available, new handoffs use this scope. Offline policies and composition fixtures are excluded from ordinary inputs.`
+        : 'Initial open-development-v1 fresh policy, inheritSkills=false, with only the explicit authored baseline. No historical generated skills, objects, rewards or mastery. Offline policies and composition fixtures are excluded from ordinary inputs.',
     );
-    console.log(`Allocated ${id} (${scenario ?? ''}).`);
+    console.log(
+      `Allocated ${id} (${scenario ?? ''}${source ? ` imported from ${source.proof.experiment} at round ${String(source.proof.round)}` : ''}).`,
+    );
   } else {
     if (!target || !/^ex[1-9]\d*$/.test(target)) throw new Error(USAGE);
     id = target;

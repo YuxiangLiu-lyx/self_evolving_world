@@ -4,6 +4,8 @@ import { isDevelopmentReviewer } from '../apps/simulator/src/development-identit
 import type { DevelopmentReviewer } from '../apps/simulator/src/development-identity.js';
 import { CONTINUOUS_VISUALS } from '../apps/viewer/src/continuous-visuals.js';
 import { CULTURE_EXCLUDED_WORDS } from '../apps/simulator/src/long-culture.js';
+import { IMPORT_EXCLUDED_WORDS } from '../apps/simulator/src/long-import.js';
+import { LONG_IMPORT_SCENARIO } from '../apps/simulator/src/long-scenario.js';
 import {
   existsSync,
   readFileSync,
@@ -381,7 +383,7 @@ export function validateContinuousDevelopment(
     );
   // These enforce experiment identity, authorization and exactly-once budgets rather than world design.
   const protectedPaths =
-    /(^scripts\/continuous-|continuous-policy\.ts$|(continuous-(run|provider|input)|long-(context|request|tokens|scenario|pressure))\.ts$|packages\/world-core\/src\/world\.ts$|chatgpt-auth\.ts$|responses\.ts$|package\.json$|pnpm-lock\.yaml$)/;
+    /(^scripts\/continuous-|continuous-policy\.ts$|(continuous-(run|provider|input)|long-(context|request|tokens|scenario|pressure|import))\.ts$|packages\/world-core\/src\/world\.ts$|chatgpt-auth\.ts$|responses\.ts$|package\.json$|pnpm-lock\.yaml$)/;
   if (changed.some((p) => !current[p] || protectedPaths.test(p)))
     throw new Error(
       'The run policy, controller, transport, source verifier and historical foundation require a separate run version. Source versions cannot be deleted.',
@@ -430,9 +432,13 @@ export function validateContinuousDevelopment(
     )
       throw new Error('Package visual implementation is absent.');
     // Culture scope: developed interfaces must not hand ordinary agents a goal vocabulary.
+    // An imported world also keeps out words that would frame what newcomers find.
     if (
       state.world.config.longDevelopment?.culture &&
-      CULTURE_EXCLUDED_WORDS.test(
+      (state.world.config.longDevelopment.scenario === LONG_IMPORT_SCENARIO
+        ? IMPORT_EXCLUDED_WORDS
+        : CULTURE_EXCLUDED_WORDS
+      ).test(
         JSON.stringify({
           abilities: pkg.abilities,
           events: pkg.events ?? [],

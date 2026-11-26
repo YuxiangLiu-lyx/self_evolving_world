@@ -231,6 +231,15 @@ export const continuousRegistry = (world?: V7World) =>
                 ),
               ]
             : []),
+          // Imported worlds only: packages of inherited scopes keep their handlers,
+          // processes and state schemas; v7Install still rejects them for new installs.
+          ...(world.config.development.inherited?.length
+            ? V7_PACKAGES.filter(
+                (p) =>
+                  p.scope !== undefined &&
+                  !!world.config.development?.inherited?.includes(p.scope),
+              )
+            : []),
           ...V7_PACKAGES.filter(
             (p) => p.scope === world.config.development?.scope,
           ),

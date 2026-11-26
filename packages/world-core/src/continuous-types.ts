@@ -433,7 +433,8 @@ export interface V7Configuration {
       | 'culture-v2'
       | 'culture-v2-incentives'
       | 'culture-v3'
-      | 'culture-v3-incentives';
+      | 'culture-v3-incentives'
+      | 'culture-v2-import';
     /** Opt-in culture scenario switches. Absent in ex13, long-fixes and earlier archives. */
     culture?: V7CultureOptions;
     /** Opt-in additional hard ceilings on the shared token ledger. Each applies to every
@@ -492,6 +493,10 @@ export interface V7Configuration {
     version: 1;
     inheritSkills: false;
     scope: string;
+    /** Opt-in (imported worlds): earlier scopes whose packages stay in the registry, so
+     * that abilities already installed and mastered in the imported world keep working.
+     * New installs still require `scope`. Absent in every world that was not imported. */
+    inherited?: string[];
     baseline: string[];
     detailLimit: number;
     projectLimit: number;
