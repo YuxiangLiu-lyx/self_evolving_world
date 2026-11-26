@@ -96,9 +96,12 @@ import { LONG_BARK_SEPARATION } from './long-bark-separation.js';
 import {
   LONG_PLANT_CULTIVATION,
   LONG_EX17_PLANT_CULTIVATION,
+  LONG_EX18_PLANT_ESTABLISHMENT,
 } from './long-plant-cultivation.js';
 import { LONG_BRANCH_SCREEN } from './long-branch-screen.js';
 import { LONG_FIBER_MAT } from './long-fiber-mat.js';
+import { LONG_UNHEATED_FOOD_PREPARATION } from './long-unheated-food-preparation.js';
+import { LONG_THERMAL_FOOD_PREPARATION } from './long-thermal-food-preparation.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -193,6 +196,9 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_BRANCH_SCREEN,
   LONG_FIBER_MAT,
   LONG_EX17_PLANT_CULTIVATION,
+  LONG_EX18_PLANT_ESTABLISHMENT,
+  LONG_UNHEATED_FOOD_PREPARATION,
+  LONG_THERMAL_FOOD_PREPARATION,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(
