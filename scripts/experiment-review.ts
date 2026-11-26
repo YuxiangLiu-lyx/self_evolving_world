@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import {
   existsSync,
   mkdirSync,
@@ -103,9 +104,17 @@ export function windowMaterial(
   if (!existsSync(path)) return null;
   const history = readJson(path);
   if (!Array.isArray(history)) throw new Error('Invalid window history.');
-  for (const entry of history) {
+  const prefix = `experiment/${experimentId(id)}/`;
+  // Copies preserved by earlier extensions stay at their own paths and belong to every later window.
+  const earlier: Record<string, string> = {};
+  for (const [index, entry] of history.entries()) {
     const retained = object(object(entry).retained);
-    const window: Record<string, string> = {};
+    const window: Record<string, string> = { ...earlier };
+    if (index > 0)
+      // The history file as it was when this window ended: the earlier entries, written atomically.
+      window[`${prefix}window-history.json`] = createHash('sha256')
+        .update(JSON.stringify(history.slice(0, index)) + '\n')
+        .digest('hex');
     for (const [key, hash] of Object.entries(retained)) {
       const match = /^windows\/through-\d+\/(.+)$/.exec(key);
       const file = resolve(directory, key);
@@ -113,9 +122,11 @@ export function windowMaterial(
         throw new Error(
           `Preserved window artifact ${key} is missing or changed.`,
         );
-      window[`experiment/${experimentId(id)}/${match[1]}`] = hash;
+      window[`${prefix}${match[1]}`] = hash;
     }
     if (isDeepStrictEqual(window, artifacts)) return window;
+    for (const [key, hash] of Object.entries(retained))
+      if (typeof hash === 'string') earlier[`${prefix}${key}`] = hash;
   }
   return null;
 }
