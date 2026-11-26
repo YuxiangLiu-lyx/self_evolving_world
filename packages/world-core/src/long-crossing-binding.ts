@@ -2759,3 +2759,24 @@ export const LONG_CROSSING_BINDING: V7Package = {
     }
   },
 };
+
+/** The crossing-contact@1 piece, cord, section, room and closure rules, exported unchanged for
+ * packages that bind the same crossings (ex16 hand-lash-crossing@1). */
+export const CROSSING_CONTACT = {
+  LAW,
+  REVISION,
+  BIND,
+  RIGID,
+  BARK,
+  HAND_SPAN,
+  GRAVITY,
+  ANGLE,
+  DIRECTIONS,
+  TREATED,
+  measurePiece,
+  bendingStrength,
+  measureCord,
+  section,
+  space,
+  closureSlip,
+};
