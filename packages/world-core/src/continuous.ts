@@ -107,6 +107,11 @@ import { LONG_UNHEATED_FOOD_PREPARATION } from './long-unheated-food-preparation
 import { LONG_THERMAL_FOOD_PREPARATION } from './long-thermal-food-preparation.js';
 import { LONG_HEARTH_FOOD_PREPARATION } from './long-thermal-food.js';
 import { LONG_MECHANICAL_FOOD_HANDLING } from './long-mechanical-food-handling.js';
+import { LONG_EX19_FOOD_AIR_EXPOSURE } from './long-ex19-food-air-exposure.js';
+import { LONG_EX19_THIN_SLICE_FOOD_DRYING } from './long-ex19-thin-slice-food-drying.js';
+import { LONG_EX19_CUTTING_EDGE_ASSESSMENT } from './long-ex19-cutting-edge-assessment.js';
+import { LONG_EX19_SHELL_COMPRESSION_OPENING } from './long-ex19-shell-compression-opening.js';
+import { LONG_EX19_LEVER_MASS_COMPARATOR } from './long-ex19-lever-mass-comparison.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -209,6 +214,11 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_THERMAL_FOOD_PREPARATION,
   LONG_HEARTH_FOOD_PREPARATION,
   LONG_MECHANICAL_FOOD_HANDLING,
+  LONG_EX19_FOOD_AIR_EXPOSURE,
+  LONG_EX19_THIN_SLICE_FOOD_DRYING,
+  LONG_EX19_CUTTING_EDGE_ASSESSMENT,
+  LONG_EX19_SHELL_COMPRESSION_OPENING,
+  LONG_EX19_LEVER_MASS_COMPARATOR,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(
