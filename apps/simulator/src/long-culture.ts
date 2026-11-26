@@ -44,6 +44,12 @@ export const CULTURE_V3_OPTIONS: V7CultureOptions = {
   ...CULTURE_V2_OPTIONS,
   goal: 'open-2',
 };
+/** Culture v2 old-goal switches: culture v2 with the ex15 goal sentence and the leaning
+ * shown only as the `tendencies` field (see docs/CULTURE_SCENARIO.md, Culture v2 old-goal). */
+export const CULTURE_V2_OLDGOAL_OPTIONS: V7CultureOptions = {
+  ...CULTURE_V2_OPTIONS,
+  goal: 'original',
+};
 /** Frozen context and handoff mechanics of the culture v2 run, which otherwise keeps the
  * culture budgets, checkpoints and ceilings. `inputBytes` is raised with the estimate limit
  * because ex15 inputs held up to 3.31 code units per estimated token, so the historical

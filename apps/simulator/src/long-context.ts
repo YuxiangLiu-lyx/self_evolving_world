@@ -35,6 +35,10 @@ export const OPEN_LIFE_GOAL =
 /** Culture v3 packet goal (`goal: 'open-2'`): the open goal also leaves open with whom. */
 export const OPEN_GOAL_2 =
   'Keep yourself healthy and safe; that is required. Beyond that, how you live, what you do, with whom, and what you care about is up to you.';
+/** Culture v2 old-goal packet goal (`goal: 'original'`): the goal sentence that opens the
+ * ex15 ordinary prompt, verbatim, in place of the open goal. */
+export const ORIGINAL_GOAL =
+  'Maintain health and tolerable risk, understand unknowns through evidence, develop reusable abilities and improve personal and shared living. Choose your own questions, projects and activities; none is required.';
 
 export const LONG_CALL_PAUSE =
   'A long-development decision failed; its complete request, response or uncertainty and token charge are retained for current-conversation review.';
@@ -57,7 +61,8 @@ export interface LongInput {
     guidance?: ('plan-horizon' | 'general-capabilities')[];
     /** Present only in the culture scope's ordinary prompt variant. */
     voice?: true;
-    /** Culture v2 ordinary prompt only: the open goal and the person's value leaning. */
+    /** Culture v2 ordinary prompt only: the open goal and the person's value leaning.
+     * Absent for culture v2 old-goal, as in ex15. */
     goal?: 'open' | 'open-2';
     leaning?: string;
     /** Culture v2 only: the ordinary input carries summarized interfaces (compaction). */
@@ -355,7 +360,11 @@ function base(
       ...(role === 'ordinary' && policy.culture?.voice
         ? { voice: true as const }
         : {}),
-      ...(role === 'ordinary' && policy.culture?.goal
+      // Culture v2 old-goal (`original`) carries neither marker, as in ex15: its leaning
+      // stays only in the tendencies field.
+      ...(role === 'ordinary' &&
+      policy.culture?.goal &&
+      policy.culture.goal !== 'original'
         ? { goal: policy.culture.goal, ...leaning(world, actor) }
         : {}),
       ...(role === 'ordinary' && policy.compaction
@@ -479,11 +488,13 @@ export function longOrdinaryInput(
   // Schemas occur only here, not again in the output schema. Baseline verbs use compact argument contracts.
   input.packet = {
     goal:
-      culture?.goal === 'open-2'
-        ? OPEN_GOAL_2
-        : culture?.goal === 'open'
-          ? OPEN_LIFE_GOAL
-          : OPEN_GOAL,
+      culture?.goal === 'original'
+        ? ORIGINAL_GOAL
+        : culture?.goal === 'open-2'
+          ? OPEN_GOAL_2
+          : culture?.goal === 'open'
+            ? OPEN_LIFE_GOAL
+            : OPEN_GOAL,
     identity: { id, name: a.name },
     time: world.time,
     state: {
