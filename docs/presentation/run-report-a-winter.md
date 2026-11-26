@@ -345,7 +345,7 @@ All 18 World Agent calls in A reviewed Wren's six requests (three per request at
 
 ## Timeline of events (verified)
 
-Verified on 2026-11-26: verdicts on the model labels (gpt-6.1-sol) for ex16 rounds 1–400 were set by a Claude agent at the user's request, not by a human annotator, and await a human spot-check. Every entry of [`verification.json`](verification.json) (36 positives and 20 seeded negatives of 40) was checked against the retained archive in `experiment/ex16`: the replay events, `heard` events and positions within the 5-unit hearing range, the memory views and the call responses.
+Verified on 2026-11-26: verdicts on the model labels (gpt-6.1-sol) for ex16 rounds 1–400 were set by a Claude agent at the user's request, not by a human annotator, and await a human spot-check. Every entry of [`verification.json`](labels/ex16-1-400/verification.json) (36 positives and 20 seeded negatives of 40) was checked against the retained archive in `experiment/ex16`: the replay events, `heard` events and positions within the 5-unit hearing range, the memory views and the call responses.
 
 ### Agreement
 
