@@ -86,6 +86,39 @@ export function analysisMaterial(root: string, id: string) {
     ),
   };
 }
+/**
+ * The artifacts of a preserved observation window of an extended archive, keyed as the archive
+ * was before the extension, when they equal `artifacts`; otherwise null. `extend` copies every
+ * artifact of the completed window to `windows/through-N/` and records their hashes in
+ * `window-history.json`; each copy is hashed again here, so an analysis of an earlier window stays
+ * bound to exactly the files it was written from.
+ */
+export function windowMaterial(
+  root: string,
+  id: string,
+  artifacts: unknown,
+): Record<string, string> | null {
+  const directory = resolve(root, 'experiment', experimentId(id));
+  const path = resolve(directory, 'window-history.json');
+  if (!existsSync(path)) return null;
+  const history = readJson(path);
+  if (!Array.isArray(history)) throw new Error('Invalid window history.');
+  for (const entry of history) {
+    const retained = object(object(entry).retained);
+    const window: Record<string, string> = {};
+    for (const [key, hash] of Object.entries(retained)) {
+      const match = /^windows\/through-\d+\/(.+)$/.exec(key);
+      const file = resolve(directory, key);
+      if (!match?.[1] || !existsSync(file) || hashFile(file) !== hash)
+        throw new Error(
+          `Preserved window artifact ${key} is missing or changed.`,
+        );
+      window[`experiment/${experimentId(id)}/${match[1]}`] = hash;
+    }
+    if (isDeepStrictEqual(window, artifacts)) return window;
+  }
+  return null;
+}
 export function parseAnalysis(
   root: string,
   value: unknown,
@@ -96,7 +129,11 @@ export function parseAnalysis(
   const taskId = text(a.taskId, 'analysis task ID');
   if (a.version !== 1 || !/^[a-z0-9][a-z0-9-]{1,79}$/.test(taskId))
     throw new Error('Invalid analysis identity.');
-  if (!isDeepStrictEqual(a.artifacts, material.artifacts))
+  // An analysis binds the current archive or, after an extension, one preserved window of it.
+  const artifacts = isDeepStrictEqual(a.artifacts, material.artifacts)
+    ? material.artifacts
+    : windowMaterial(root, id, a.artifacts);
+  if (!artifacts)
     throw new Error(
       'Analysis artifacts changed; inspect the actual record again.',
     );
@@ -113,11 +150,7 @@ export function parseAnalysis(
     const evidence = actor.evidence.map((v: unknown) =>
       text(v, 'evidence reference'),
     );
-    if (
-      evidence.some(
-        (p) => !Object.hasOwn(material.artifacts, p.split('#')[0] ?? ''),
-      )
-    )
+    if (evidence.some((p) => !Object.hasOwn(artifacts, p.split('#')[0] ?? '')))
       throw new Error(
         'Analysis must cite an actual bound experiment artifact.',
       );
@@ -156,7 +189,7 @@ export function parseAnalysis(
     experiment: id,
     taskId,
     reviewer: text(a.reviewer, 'reviewer'),
-    artifacts: material.artifacts,
+    artifacts,
     summary: substantive(a.summary, 'summary'),
     agents,
     findings,
