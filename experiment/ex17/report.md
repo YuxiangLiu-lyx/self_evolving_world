@@ -4,18 +4,18 @@
 
 As the culture v2 run, with the open goal also leaving open with whom to live and a stated fact that rest restores only missing energy; no particular outcome, activity or invention is required. Frozen ordinary/world/development attempt ceilings: 1800/300/40. Shared ordinary/world token ceiling: 10000000.
 
-Observed 80 of 80 target rounds. State: window-complete. Observation window reached 80; the world is resumable, not terminal. This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.
+Observed 150 of 150 target rounds. State: window-complete. Observation window reached 150; the world is resumable, not terminal. This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.
 
 ## Measured outcome
 
 | Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | Learned-interface successful rounds |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| lin | true | 100 | 72 | 9.27 | 9.53 | 1 | 8 |
-| moss | true | 100 | 64 | 9.19 | 8.58 | 1 | 2 |
-| sol | true | 100 | 72 | 9.61 | 8.71 | 1 | 1 |
-| kai | true | 100 | 48 | 9.04 | 8.70 | 1 | 5 |
-| wren | true | 100 | 64 | 9.33 | 8.71 | 1 | 6 |
-| ivo | true | 100 | 77.2 | 9.55 | 9.43 | 1 | 4 |
+| lin | true | 100 | 73 | 9.22 | 8.91 | 1 | 9 |
+| moss | true | 100 | 71 | 9.12 | 9.28 | 1 | 2 |
+| sol | true | 100 | 79 | 9.52 | 9.24 | 1 | 1 |
+| kai | true | 100 | 65 | 8.87 | 8.75 | 1 | 5 |
+| wren | true | 100 | 57 | 9.10 | 7.53 | 1 | 10 |
+| ivo | true | 100 | 84.2 | 9.48 | 9.43 | 1 | 4 |
 
 Requests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits. This fresh policy inherits no generated interfaces. The explicit authored allowlist, current-run package provenance, personal projects, verified knowledge, trials and persistent processes are retained separately in results.openDevelopment. Actor-written progress is a claim, not a physical outcome. Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.
 
@@ -23,22 +23,22 @@ Requests, reviews, implementation, individual study, successful execution and la
 
 | Interface | Attempted | Successful rounds | Failed rounds |
 | --- | --- | --- | --- |
-| navigate | 127 | 126 | 1 |
+| navigate | 154 | 152 | 2 |
 | message | 2 | 2 | 0 |
-| tell | 22 | 22 | 0 |
-| gather | 19 | 19 | 0 |
-| eat | 27 | 27 | 0 |
-| rest | 85 | 85 | 0 |
+| tell | 30 | 30 | 0 |
+| gather | 33 | 33 | 0 |
+| eat | 52 | 52 | 0 |
+| rest | 121 | 121 | 0 |
 | probe | 5 | 5 | 0 |
 | request | 1 | 1 | 0 |
-| wait | 159 | 159 | 0 |
-| plant-cultivation | 26 | 26 | 0 |
+| wait | 464 | 464 | 0 |
+| plant-cultivation | 31 | 31 | 0 |
 | name | 1 | 1 | 0 |
 | learn | 6 | 6 | 0 |
 
 ## Cost and limitations
 
-ordinary: 107 attempted calls, 0 failed/rejected; 731556 recorded input tokens and 48870 recorded output tokens; 0 attempts with unknown token usage; 1376.8 elapsed seconds.
+ordinary: 145 attempted calls, 0 failed/rejected; 1021999 recorded input tokens and 64362 recorded output tokens; 0 attempts with unknown token usage; 1753.9 elapsed seconds.
 
 world: 3 attempted calls, 0 failed/rejected; 10191 recorded input tokens and 2436 recorded output tokens; 0 attempts with unknown token usage; 87.1 elapsed seconds.
 
