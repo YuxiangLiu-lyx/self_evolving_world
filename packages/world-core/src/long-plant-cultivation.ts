@@ -48,10 +48,20 @@ import {
 /** Object kind of a plot; it is drawn with the ex15 cultivation-trial drawing. */
 const KIND = 'cultivation-plot';
 const VISUAL = 'cultivation-trial';
-/** Prepare and record the site, then transfer the unit (World Agent specification). */
+/** Prepare and record the site, then transfer the unit (World Agent specification). ex18
+ * instead pays three rounds: loosen, place, cover. */
 const STAGES = 2;
 
-type Lifecycle = 'preparing' | 'planted' | 'established' | 'dead' | 'ended';
+/** `placed` and `uncovered` occur only in the three-round ex18 variant: a placed unit lies in
+ * the open plot before covering, and stays uncovered when its work stops there. */
+type Lifecycle =
+  | 'preparing'
+  | 'placed'
+  | 'uncovered'
+  | 'planted'
+  | 'established'
+  | 'dead'
+  | 'ended';
 /** Persistent plot record. Like every plant the plot carries `createdBy: null`, so observers
  * see only public plant fields; growth interval, dispersal schedule and planter stay here. */
 type PlotRecord = {
@@ -73,6 +83,8 @@ type PlotRecord = {
   /** Food condition of the unit when it entered the soil. */
   transferDecay: number | null;
   preparedAt: number;
+  /** ex18 only: the round the unit was placed in the open plot, before covering. */
+  placedAt?: number | null;
   plantedAt: number | null;
   establishedAt: number | null;
   maturedAt: number | null;
@@ -88,18 +100,23 @@ type Trial = {
   /** Observation window after placement and its optional check rounds: a schedule only. */
   window: number;
   checks: number[];
-  /** Energy of one tending round on one plot. */
-  tend: number;
+  /** Energy of one tending round on one plot; null (ex18) when no hand treatment can change a
+   * plot, so the care mode is refused before any cost. */
+  tend: number | null;
 };
 /** One variant of the shared operation; ex16 cultivate-plants@1 keeps its original values. */
 type Variant = {
   id: string;
   scope: string;
   handler: string;
-  /** Energy of each of the two paid planting rounds. */
+  /** Energy of each paid planting round. */
   energy: number;
+  /** ex18: three paid rounds (loosen, place, cover) instead of two (prepare, transfer). */
+  stages?: number;
   /** The mode that stops unfinished planting. */
   stop: string;
+  /** ex18: the name of the care mode (ex16 and ex17: 'tend'). */
+  care?: string;
   trial: Trial | null;
   description: string;
   reuse: NonNullable<V7Package['reuse']>;
@@ -124,6 +141,8 @@ type Ledger = {
 
 const LABELS: Record<Lifecycle, string> = {
   preparing: 'Prepared plot',
+  placed: 'Plot with placed unit, not covered',
+  uncovered: 'Uncovered plot, not planted',
   planted: 'Planted plot, no sprout seen',
   established: 'Sprouted plot',
   dead: 'Failed plot',
@@ -142,12 +161,16 @@ const buried = (w: V7World, o: V7Object) => {
     : undefined;
 };
 
+/** A placed unit that is not yet, or never was, covered (ex18 only). */
+const exposed = (t: PlotRecord) =>
+  t.lifecycle === 'placed' || t.lifecycle === 'uncovered';
+
 /** Public plant fields, drawing metadata and labels; it confers no growth or reward. */
-function refresh(w: V7World, o: V7Object) {
+function refresh(w: V7World, o: V7Object, stages = STAGES) {
   const t = record(o);
   const elapsed = t.plantedAt === null ? 0 : w.tick - t.plantedAt;
   o.data.mode = t.lifecycle;
-  o.data.progress = v7RoundNumber(t.stages / STAGES);
+  o.data.progress = v7RoundNumber(t.stages / stages);
   o.data.elapsed = elapsed;
   o.visual.state = t.lifecycle;
   o.visual.label = LABELS[t.lifecycle];
@@ -160,10 +183,11 @@ function refresh(w: V7World, o: V7Object) {
     site: { x: o.spatial.x, y: o.spatial.y, radius: LAW.radius },
     quantityPlanted: t.lot ? t.quantity : 0,
     stagesCompleted: t.stages,
-    stages: STAGES,
+    stages,
     lifecycle: t.lifecycle,
-    // Carried while the site is prepared and buried once transferred: never drawn.
-    unitVisible: false,
+    // Carried while the site is prepared and buried once covered: drawn only while it lies
+    // uncovered in the plot (ex18).
+    unitVisible: exposed(t),
     unitPresent: !!buried(w, o),
     sprouted: t.lifecycle === 'established',
     harvestableStock:
@@ -201,6 +225,18 @@ function summary(w: V7World, o: V7Object | undefined, j?: CollectiveWork) {
   };
 }
 
+/** The plot's unit is gone before establishing: the plot stops growing and is a failed plot. */
+function kill(w: V7World, o: V7Object, cause: string) {
+  const t = record(o);
+  o.data.interval = 0;
+  o.data.stage = 'dead';
+  o.data.stock = 0;
+  delete o.data.resource;
+  t.lifecycle = 'dead';
+  t.endedAt = w.tick;
+  t.cause = cause;
+}
+
 /** The existing dispersal law turns one stock unit of a living plant into a propagule; a whole,
  * untreated, unspoiled unit of the same food gathered from such a plant is that propagule. */
 function propagule(w: V7World, s: V7Stack): V7Object {
@@ -232,6 +268,11 @@ function cultivation(v: Variant): V7Package {
   const REVISION = `${ID}@1`;
   const STATE = `long:work:${ID}`;
   const STAGE_ENERGY = v.energy;
+  const ROUNDS = v.stages ?? STAGES;
+  const CARE = v.care ?? 'tend';
+  const draw = (w: V7World, o: V7Object) => {
+    refresh(w, o, ROUNDS);
+  };
 
   /** A plot. A plant later dispersed from an established plot clones its kind and revision
    * under the existing law but carries no record: it is an ordinary plant. */
@@ -267,13 +308,20 @@ function cultivation(v: Variant): V7Package {
         v7Distance(o.spatial, spatial) < LAW.crowdingRadius &&
         (plantOf(o, species) ||
           (isPlot(o) &&
-            record(o).lifecycle === 'preparing' &&
+            (record(o).lifecycle === 'preparing' ||
+              record(o).lifecycle === 'placed') &&
             record(o).species === species)),
     ).length;
     if (crowd >= LAW.crowdingLimit)
       return `${String(crowd)} ${species} plants or prepared plots already stand within 5 m; the existing rule starts no new plant there.`;
     return null;
   }
+
+  /** ex18: the open work's unit already lies in its plot (placed, not covered). */
+  const placedPlot = (w: V7World, j: CollectiveWork) => {
+    const o = w.objects.find((x) => x.id === j.target && isPlot(x));
+    return !!o && record(o).lot !== null;
+  };
 
   function pause(
     c: V7ActionContext,
@@ -283,7 +331,7 @@ function cultivation(v: Variant): V7Package {
   ): V7HandlerResult {
     j.status = 'paused';
     j.reason = reason;
-    refresh(c.world, o);
+    draw(c.world, o);
     c.emit(
       'cultivation-work-paused',
       `${reason} The prepared site and the unit are kept; nothing was spent.`,
@@ -294,7 +342,8 @@ function cultivation(v: Variant): V7Package {
     return { complete: true, writes: [j.id, o.id] };
   }
 
-  /** Settle unfinished work once: the reserved unit is released and the empty site cleared. */
+  /** Settle unfinished work once: the reserved unit is released and the empty site cleared.
+   * ex18: once placed, the unit stays uncovered in the plot, which remains. */
   function settle(
     w: V7World,
     a: V7Actor,
@@ -311,11 +360,19 @@ function cultivation(v: Variant): V7Package {
     if (o) {
       const t = record(o);
       t.workId = null;
-      t.lifecycle = 'ended';
-      t.endedAt = w.tick;
-      t.cause = reason;
-      // Hand-loosened soil is not a represented lasting state, so no object remains.
-      w.objects = w.objects.filter((x) => x.id !== o.id);
+      if (t.lot) {
+        if (buried(w, o)) {
+          t.lifecycle = 'uncovered';
+          t.cause = reason;
+        } else if (t.lifecycle !== 'dead') kill(w, o, reason);
+        draw(w, o);
+      } else {
+        t.lifecycle = 'ended';
+        t.endedAt = w.tick;
+        t.cause = reason;
+        // Hand-loosened soil is not a represented lasting state, so no object remains.
+        w.objects = w.objects.filter((x) => x.id !== o.id);
+      }
     }
     sync(a, j);
     return o;
@@ -341,9 +398,12 @@ function cultivation(v: Variant): V7Package {
     const o = c.world.objects.find((x) => x.id === j.target && isPlot(x));
     if (!o) throw new Error('The prepared plot no longer exists.');
     const t = record(o);
-    const unit = c.world.stacks.find(
-      (s) => s.id === j.escrow[0] && s.reservedFor === j.id,
-    );
+    // ex18: after the placing round the unit lies in the plot, reserved for it.
+    const unit = t.lot
+      ? buried(c.world, o)
+      : c.world.stacks.find(
+          (s) => s.id === j.escrow[0] && s.reservedFor === j.id,
+        );
     if (!unit || unit.quantity < t.quantity || !unspoiled(c.world, unit))
       return fail(
         c,
@@ -368,22 +428,38 @@ function cultivation(v: Variant): V7Package {
         summary(c.world, o, j),
         o.id,
       );
+    // Transfer moves the unit, with its origin, mass and age, out of the inventory into the soil.
+    const transfer = () => {
+      unit.owner = null;
+      unit.reservedFor = o.id;
+      unit.position = { x: o.spatial.x, y: o.spatial.y };
+      t.lot = unit.id;
+      t.transferDecay = unit.decay ?? 0;
+    };
     if (t.stages === 1) {
-      refresh(c.world, o);
+      draw(c.world, o);
       c.emit(
         'cultivation-site-prepared',
         'A small plot was loosened by hand and recorded; the unit is still carried and owned.',
         summary(c.world, o, j),
         o.id,
       );
+    } else if (t.stages < ROUNDS) {
+      // ex18 placing round: the unit lies in the open plot; only covering completes planting.
+      transfer();
+      t.placedAt = c.world.tick;
+      t.lifecycle = 'placed';
+      draw(c.world, o);
+      c.emit(
+        'cultivation-unit-placed',
+        'The unit was placed in the loosened plot and left uncovered; it can no longer be eaten or used, and only covering completes planting.',
+        { ...summary(c.world, o, j), unit: v7Json(unit) },
+        o.id,
+      );
     } else {
-      // Transfer moves the unit, with its origin, mass and age, out of the inventory into the
-      // soil, where the plot becomes a propagule exactly like a naturally dispersed one.
-      unit.owner = null;
-      unit.reservedFor = o.id;
-      unit.position = { x: o.spatial.x, y: o.spatial.y };
-      t.lot = unit.id;
-      t.transferDecay = unit.decay ?? 0;
+      // At the last round the plot becomes a propagule exactly like a naturally dispersed one.
+      const placed = !!t.lot;
+      if (!placed) transfer();
       t.plantedAt = c.world.tick;
       t.lifecycle = 'planted';
       t.workId = null;
@@ -411,10 +487,12 @@ function cultivation(v: Variant): V7Package {
       }
       j.status = 'completed';
       j.outputs = [o.id];
-      refresh(c.world, o);
+      draw(c.world, o);
       c.emit(
         'cultivation-propagule-planted',
-        'The unit was transferred into the plot and covered. It establishes only through actual temperature, light, soil moisture and season, and may stall or rot; no food was produced.',
+        placed
+          ? 'The placed unit was covered with soil, completing planting, not establishment. It establishes only through actual temperature, light, soil moisture and season, and may stall or rot; no food was produced.'
+          : 'The unit was transferred into the plot and covered. It establishes only through actual temperature, light, soil moisture and season, and may stall or rot; no food was produced.',
         { ...summary(c.world, o, j), unit: v7Json(unit) },
         o.id,
       );
@@ -451,7 +529,7 @@ function cultivation(v: Variant): V7Package {
       throw new Error(
         `${String(STAGE_ENERGY)} energy is required for the first round. Nothing was spent.`,
       );
-    const j = workCreate(c, 'plant', STAGES);
+    const j = workCreate(c, 'plant', ROUNDS);
     j.x = x;
     j.y = y;
     workReserve(c, j, allocations);
@@ -473,6 +551,7 @@ function cultivation(v: Variant): V7Package {
       unitMass: r?.mass ?? 0,
       transferDecay: null,
       preparedAt: c.world.tick,
+      ...(ROUNDS > STAGES ? { placedAt: null } : {}),
       plantedAt: null,
       establishedAt: null,
       maturedAt: null,
@@ -519,15 +598,21 @@ function cultivation(v: Variant): V7Package {
         ? [{ itemId: s.id, quantity: s.quantity, decay: s.decay ?? 0 }]
         : [];
     });
+    // ex18: after the placing round the unit already lies in the plot and stays there.
+    const placed = placedPlot(c.world, j);
     const o = settle(
       c.world,
       c.actor,
       j,
-      'Ended before transfer; the reserved unit returns once in its current condition. Spent energy and time are not refunded.',
+      placed
+        ? 'Cancelled after placing; the unit stays uncovered in the plot, where it does not establish. Spent energy and time are not refunded.'
+        : 'Ended before transfer; the reserved unit returns once in its current condition. Spent energy and time are not refunded.',
     );
     c.emit(
       'cultivation-trial-ended',
-      'Planting ended before transfer; the unit was returned once in its current condition and the prepared site was cleared.',
+      placed
+        ? 'Planting cancelled after placing; the unit stays uncovered in the plot, keeps ageing and does not establish.'
+        : 'Planting ended before transfer; the unit was returned once in its current condition and the prepared site was cleared.',
       { ...summary(c.world, o, j), returned },
       o?.id ?? j.id,
     );
@@ -610,6 +695,14 @@ function cultivation(v: Variant): V7Package {
       conditions,
       species: t.species,
     };
+    // ex18: an uncovered unit is visible in the plot, so its food condition can be seen.
+    const unit = exposed(t) ? buried(c.world, o) : undefined;
+    if (exposed(t))
+      value.unitCondition = unit
+        ? v7RoundNumber(
+            Math.max(0, 1 - (unit.decay ?? 0) / lifetime(c.world, unit)),
+          )
+        : null;
     if (v.trial) Object.assign(value, compare(c, o, value, v.trial));
     openRemember(c, {
       key: `${o.id}:plot-record`,
@@ -629,7 +722,7 @@ function cultivation(v: Variant): V7Package {
         stock: Number(value.visibleStock),
       },
     ].slice(-12);
-    refresh(c.world, o);
+    draw(c.world, o);
     return value;
   }
 
@@ -770,7 +863,7 @@ function cultivation(v: Variant): V7Package {
   /** ex17: one round of hand care on one placed plot. The existing plant rules keep 0.6 m around
    * every plant clear, so no competing plant can stand there and nothing is removed; tending adds
    * no water, nutrient or growth. */
-  function tend(c: V7ActionContext, trial: Trial): V7HandlerResult {
+  function tend(c: V7ActionContext, energy: number): V7HandlerResult {
     const o = subject(c);
     if (!isPlot(o)) throw new Error('Tend targets a plot. Nothing was spent.');
     const t = record(o);
@@ -778,7 +871,7 @@ function cultivation(v: Variant): V7Package {
       throw new Error(
         'Only a planted or sprouted plot can be tended. Nothing was spent.',
       );
-    v7Spend(c.actor, trial.tend);
+    v7Spend(c.actor, energy);
     const competing = c.world.objects
       .filter(
         (x) =>
@@ -799,7 +892,7 @@ function cultivation(v: Variant): V7Package {
         observation: value,
         competingPlants: competing,
         removed: 0,
-        energy: trial.tend,
+        energy,
       },
       o.id,
     );
@@ -812,12 +905,24 @@ function cultivation(v: Variant): V7Package {
     );
   }
 
+  /** ex18: maintenance is enabled only with a real input and effect; none exists yet. */
+  function unmaintained(): V7HandlerResult {
+    throw new Error(
+      'No maintenance can be performed yet: watering needs a measured reachable water supply and a way to carry it, and this world has neither; no fertilizer or amendment exists; and the plant rules keep 0.6 m around a plot clear, so no obstruction or surface condition can be changed by hand. Use inspect-progress to observe a plot. Nothing was spent.',
+    );
+  }
+
   function execute(c: V7ActionContext): V7HandlerResult {
     const mode = v7String(c.action.args.mode, 'mode');
     if (mode === 'plant') return plant(c);
     if (mode === 'inspect') return inspect(c);
     if (mode === v.stop) return end(c);
-    if (mode === 'tend') return v.trial ? tend(c, v.trial) : untended();
+    if (mode === CARE)
+      return !v.trial
+        ? untended()
+        : v.trial.tend === null
+          ? unmaintained()
+          : tend(c, v.trial.tend);
     if (v.trial && mode === 'inspect-progress') return progress(c);
     throw new Error('Unknown cultivation mode.');
   }
@@ -898,15 +1003,16 @@ function cultivation(v: Variant): V7Package {
           { ...summary(w, o), planter: t.planter },
           o.id,
         );
-      } else if (t.lifecycle === 'planted' && !unit) {
-        // The unit spoiled under the existing ageing law before establishing.
-        o.data.interval = 0;
-        o.data.stage = 'dead';
-        o.data.stock = 0;
-        delete o.data.resource;
-        t.lifecycle = 'dead';
-        t.endedAt = w.tick;
-        t.cause = 'The planted unit decayed before establishing.';
+      } else if ((t.lifecycle === 'planted' || exposed(t)) && !unit) {
+        // The unit spoiled under the existing ageing law before establishing (ex18: or while
+        // it lay uncovered in the plot).
+        kill(
+          w,
+          o,
+          exposed(t)
+            ? 'The placed unit decayed before it was covered.'
+            : 'The planted unit decayed before establishing.',
+        );
         forestEvent(
           w,
           'cultivation-trial-failed',
@@ -933,7 +1039,7 @@ function cultivation(v: Variant): V7Package {
           o.id,
         );
       }
-      refresh(w, o);
+      draw(w, o);
     }
     // A plant dispersed from an established plot is ordinary: it shows its plant name, not a plot label.
     for (const o of w.objects.filter(
@@ -998,17 +1104,23 @@ function cultivation(v: Variant): V7Package {
       for (const j of collectiveJobs(w, ID).filter(
         (j) => j.owner === a.id && open(j),
       )) {
+        // ex18: a unit already placed stays uncovered in its plot.
+        const placed = placedPlot(w, j);
         const o = settle(
           w,
           a,
           j,
-          'Performer died before transfer; the reserved unit was left where they died.',
+          placed
+            ? 'Performer died after placing; the unit stays uncovered in the plot.'
+            : 'Performer died before transfer; the reserved unit was left where they died.',
           true,
         );
         forestEvent(
           w,
           'cultivation-trial-failed',
-          'Planting stopped by death before transfer; the unit lies where the person died.',
+          placed
+            ? 'Planting stopped by death after placing; the unit stays uncovered in the plot and does not establish.'
+            : 'Planting stopped by death before transfer; the unit lies where the person died.',
           a.position,
           a.id,
           summary(w, o, j),
@@ -1095,4 +1207,46 @@ export const LONG_EX17_PLANT_CULTIVATION: V7Package = cultivation({
       'Two paid one-round stages; job, reserved unit and plot persist across interruption; resuming pays only the remaining stage after revalidation; completion, failure, abandoning and death settle once. Growth runs only in ordinary simulation.',
   },
   events: [...EVENTS, 'cultivation-plot-tended'],
+});
+
+/** ex18: the same operation as a three-round establishment trial (loosen, place, cover) with
+ * unit, site and progress inspection, a 120-round observation window and a production ledger.
+ * Maintenance is refused before any cost: no water transfer, amendment or hand-changeable
+ * obstruction exists in this world. */
+export const LONG_EX18_PLANT_ESTABLISHMENT: V7Package = cultivation({
+  id: 'plant-establishment-trial',
+  scope: 'long-ex18',
+  handler: 'long.plant-establishment-trial',
+  energy: 1,
+  stages: 3,
+  stop: 'cancel',
+  care: 'maintain',
+  trial: {
+    window: 120,
+    checks: [10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120],
+    tend: null,
+  },
+  description:
+    'A general plant establishment trial: one owned food unit from a living plant is loosened into, placed in and covered by a hand-dug plot in three paid rounds, where it roots, stalls or rots under the existing plant propagation, growth and ageing rules, with unit, site and progress inspection and a production ledger; maintenance is refused while no real treatment exists.',
+  reuse: {
+    experiment:
+      'ex17 plant-cultivation@1 and ex16 cultivate-plants@1 (the same operation code through the shared factory; their texts, handlers and behavior unchanged); ex15 cultivation-trial@1 (three-round loosen, place, cover design, law constants, propagule and site predicates, observation inputs, footprint, reach and drawing)',
+    source:
+      'open-ecology.ts (existing seedling establishment, growth, dispersal and spacing law, unchanged); forest-environment.ts (existing food ageing); long-planting-site.ts (hand-workable site); collective-work.ts (escrow, paid work, stop); open-foundation.ts (baseline probe and personal records); base gather (harvest)',
+    description:
+      'Implementation reuse only; no earlier ability, plot or mastery is inherited. Planting creates nothing: one real unit becomes a propagule exactly like a naturally dispersed one, and all growth comes from the existing ecology.',
+  },
+  text: {
+    function:
+      'Plant one owned food unit from a living plant in a small hand-dug plot, where it may root as a new plant under the existing plant rules; inspect units, sites, plants and plot progress; cancel unfinished planting.',
+    equivalence: 'cultivation:plant-propagule:loosen-place-cover:1',
+    modes: ['inspect', 'plant', 'inspect-progress', 'maintain', 'cancel'],
+    costs:
+      'Study: 3 rounds. Plant: inputStackId names one whole owned, untreated, unspoiled food unit (quantity 1; one plot per unit) gathered from a living plant; stock still on a plant is not owned. x, y: a 0.25 m plot within reach on ordinary meadow soil (.), waterlogging at most 0.1, soil moisture 0.3-1.2, 0.6 m clear of objects and people, fewer than 3 plants of that food within 5 m. Three paid rounds of 1 energy: loosen, place, cover; plant resumes paused work after rechecking reach, site, unit and energy. Inspect and inspect-progress: one round, 0.2 energy. Inspect: inputStackId checks a unit (with x, y also a site for it), or target a plant source or plot in reach. Inspect-progress: target a plot in reach. Maintain: refused at no cost. Cancel: one round, no energy. Harvest uses gather. No tool, water or seed is given.',
+    effects:
+      'Loosening keeps the unit carried, owned and ageing. Placing moves it, with origin and age, into the open plot, where it cannot be eaten or used. Covering completes planting, not establishment: the plot becomes a propagule exactly like a naturally dispersed one, rooting only through actual temperature, light, soil moisture and season; cold, darkness or drought stall it; if the buried unit spoils first, the plot dies. On rooting, the unit becomes a new plant with no stock (ceiling 4), regrowing under the natural rule, harvested by anyone with gather; a ledger records growth and units produced and removed. Nothing is copied or guaranteed. A unit check reports decay, treatment, origin and whether it can be planted, never viability. Inspect-progress reports visible changes since your last look, else inconclusive; trial window 120 rounds, checks every 10; not a growth date. Maintain: no water transfer, amendment or hand-changeable obstruction exists. Records are unverified. An unworked round pauses; low energy, leaving reach or a changed site pause without charge; a lost or spoiled unit stops the work. Cancel, or death, before placing returns the unit once (where the person died); after placing, the unit stays uncovered, does not root and ages. No reward or refund.',
+    progress:
+      'Three paid one-round stages; job, reserved unit and plot persist across interruption; resuming pays only the remaining stages after revalidation; completion, failure, cancelling and death settle once. Growth runs only in ordinary simulation.',
+  },
+  events: [...EVENTS, 'cultivation-unit-placed'],
 });
