@@ -105,6 +105,8 @@ import { LONG_FIBER_CORD } from './long-fiber-cord.js';
 import { LONG_CORD_KNOT } from './long-cord-knot.js';
 import { LONG_UNHEATED_FOOD_PREPARATION } from './long-unheated-food-preparation.js';
 import { LONG_THERMAL_FOOD_PREPARATION } from './long-thermal-food-preparation.js';
+import { LONG_HEARTH_FOOD_PREPARATION } from './long-thermal-food.js';
+import { LONG_MECHANICAL_FOOD_HANDLING } from './long-mechanical-food-handling.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -205,6 +207,8 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_EX18_PLANT_ESTABLISHMENT,
   LONG_UNHEATED_FOOD_PREPARATION,
   LONG_THERMAL_FOOD_PREPARATION,
+  LONG_HEARTH_FOOD_PREPARATION,
+  LONG_MECHANICAL_FOOD_HANDLING,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(
