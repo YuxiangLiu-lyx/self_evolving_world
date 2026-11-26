@@ -1,6 +1,7 @@
 import { joiningVisual } from './long-joining-visual.js';
 import { canopyVisual, canopyPostVisual } from './forest-canopy-visual.js';
 import { fireVisual } from './forest-fire-visual.js';
+import { hearthVisual } from './long-hearth-visual.js';
 import type { V7Object, V7Event } from '@self-evolving-world/world-core';
 export const svgText = (value: string): string =>
   value
@@ -150,6 +151,7 @@ export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
   'lean-to-post': () =>
     '<circle r=".1" fill="#8d704e" stroke="#d6bd88" stroke-width=".02"/>',
   'stone-hearth': fireVisual,
+  'open-hearth': hearthVisual,
   'rain-canopy': canopyVisual,
   'canopy-post': canopyPostVisual,
   'stone-mosaic': (o) => {

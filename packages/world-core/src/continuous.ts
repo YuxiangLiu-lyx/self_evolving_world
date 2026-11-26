@@ -99,6 +99,8 @@ import {
 } from './long-plant-cultivation.js';
 import { LONG_BRANCH_SCREEN } from './long-branch-screen.js';
 import { LONG_FIBER_MAT } from './long-fiber-mat.js';
+import { LONG_HEARTH_FOOD_PREPARATION } from './long-thermal-food.js';
+import { LONG_MECHANICAL_FOOD_HANDLING } from './long-mechanical-food-handling.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -193,6 +195,8 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_BRANCH_SCREEN,
   LONG_FIBER_MAT,
   LONG_EX17_PLANT_CULTIVATION,
+  LONG_HEARTH_FOOD_PREPARATION,
+  LONG_MECHANICAL_FOOD_HANDLING,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(
