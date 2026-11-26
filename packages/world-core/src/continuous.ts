@@ -99,6 +99,9 @@ import { LONG_FIBER_MAT } from './long-fiber-mat.js';
 import { LONG_HAND_BREAK_FOOD } from './long-hand-break-food.js';
 import { LONG_FIBER_CORD } from './long-fiber-cord.js';
 import { LONG_CORD_KNOT } from './long-cord-knot.js';
+import { LONG_FIBER_CORD_JOIN } from './long-fiber-cord-join.js';
+import { LONG_CROSSING_BINDING } from './long-crossing-binding.js';
+import { LONG_SECTIONED_CORD } from './long-sectioned-fiber-cord.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -195,6 +198,9 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_HAND_BREAK_FOOD,
   LONG_FIBER_CORD,
   LONG_CORD_KNOT,
+  LONG_FIBER_CORD_JOIN,
+  LONG_CROSSING_BINDING,
+  LONG_SECTIONED_CORD,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(
