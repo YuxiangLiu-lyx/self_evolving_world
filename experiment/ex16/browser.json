@@ -1,11 +1,11 @@
 {
   "id": "ex16",
   "status": "passed",
-  "replayHash": "4c88452d8cb61598873497ef1addf7c1762ebc7c7eb7ad7211186366f4ed3453",
+  "replayHash": "c97c4f9e37a4d9358d23f416eda110b35887b332ddf43463fec377e0849b8c8f",
   "frameTicks": [
     0,
-    125,
-    250
+    150,
+    300
   ],
   "assertions": [
     "segment-integrity-and-deterministic-reconstruction",
