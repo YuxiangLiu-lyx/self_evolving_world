@@ -78,4 +78,20 @@ Out of scope:
 
 ## Results
 
-Pending.
+The [run report](../../presentation/run-report-culture-v2-extension.md) has all figures.
+
+- R1: ex16 ran to round 250 (checkpoints 150 and 250). ex18 (E4) was allocated after ex16 reached round 150 and ran to round 120. ex17 ran to round 250 last. No budget or genesis changed.
+  - E4 first ran in parallel with ex16's rounds 150–221. The user's later instruction fixed the order (ex16 to 250, then ex18, then ex17), and the runs were sequential from then on.
+- R1a: each continued archive ran on its branch from its checkpoint commit (table above). The only change brought in was the PR #35 repair script.
+- R1b: on the merged code, ex7–ex15, ex16 (340 requests, 24 paused inputs), ex17 (285, 0) and ex18 (190, 0) replay with byte-identical requests and paused inputs.
+  - The 12 developed packages are scoped to their own experiments.
+  - The 99 packages have unique ids and handlers.
+- R2: 12 handoffs in the three runs, 11 counted, all simplified but real mechanisms.
+  - ex18's thermal package and the maintenance mode of its cultivation package reject what the world cannot represent, before costs.
+  - ex17's round-156 package was renamed before submission to avoid an id clash (fix-log 9d).
+- R3: one recovery, ex16 round 99 (`fetch failed`, no evidence), closed by an uncounted empty handoff after 62 s. In-round rejections: ex16 1 and ex18 4. No three-rejection stop.
+- R4: no monitoring rule triggered. The largest number of counted handoffs in 50 rounds was 3, and the cost was 1,536–2,045 tokens per person per round. Checkpoints were pushed to the continuation branches.
+- R5: no stop condition occurred. Cumulative tokens across ex15–ex18 were 7,999,986.
+- R6–R7: archives, screenshots, analyses (ex16 and ex17 rounds 0–250, ex18), the run report with review items A and B and the per-run timelines, and fix-log section 9 (9a–9i). The analysis check now accepts analyses bound to a preserved window (fix-log 9c).
+
+Limitations: single seeds and case comparisons; the revised G2 is post hoc and its adoption counts are upper bounds (fix-log 9i); the incentives are invisible to the agents (9g).

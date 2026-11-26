@@ -76,4 +76,6 @@ name, saying or rule adopted by another person. Both runs pass the revision, and
 archives are to be extended to round 250. The revision is recorded as post hoc wherever the
 gate is reported. See [Culture metrics](../CULTURE_SCENARIO.md#culture-metrics).
 
+**Addendum (extension, PR-42).** ex16 and ex17 ran to round 250 and E4 ran as ex18 for 120 rounds. Main's runtime had moved on after ex16's first window, so each continued archive ran on its own branch from its checkpoint commit and was replayed in full on main before the merge. The source-identity protection stays as it is. See [Continuing an archive after shared code changed](../LONG_DEVELOPMENT.md#continuing-an-archive-after-shared-code-changed) and the [run report](../presentation/run-report-culture-v2-extension.md).
+
 See the [design](../CULTURE_SCENARIO.md#culture-v2) and the [plan](../exec-plans/completed/pr-38-culture-v2.md).

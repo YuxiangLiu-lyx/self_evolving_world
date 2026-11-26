@@ -257,3 +257,15 @@ unchanged:
 - `longDevelopment.abilityTextLimit: 3500`: development validation rejects a package any
   of whose interfaces serializes to more than 3,500 code units, naming the interface, its
   length and the limit. A rejected submission is a counted failed handoff.
+
+## Continuing an archive after shared code changed
+
+`continue` and `extend` refuse an archive whose runtime sources differ from its last recorded source revision. A handoff in any run changes shared runtime code, so after another run has developed, a paused or completed archive can no longer continue on main. The user approved the following procedure in PR-42 (ex16 and ex17):
+
+1. Branch from the archive's last checkpoint commit, where the archive equals main's copy and `currentContinuousRuntimeMatches` is true.
+2. Bring onto the branch only changes that cannot affect simulation output, such as `scripts/continuous-repair.ts`, which is outside the runtime identity. List each one in the plan.
+3. Run the extension and its handoffs on that branch. Write the archive's compatibility digest there (`scripts/long-compatibility.ts --write`).
+4. Merge into main, and compare the full archive's requests and paused inputs with that digest on the merged code. Any difference stops the merge; main's code is not changed to make it pass.
+5. Check that every package added on the branch installs only in its own scope and that package ids and handlers stay unique.
+
+A companion analysis written for an earlier window stays valid after an extension. `extend` preserves that window under `windows/through-N/`, and the analysis check accepts an analysis bound to a preserved window.

@@ -343,6 +343,98 @@ The user reviewed ex16 and ex17 and concluded that G2 failed because of the gate
   - ex16 tick 70: Sol (`ordinary-134`) said that the wind was too strong for the screen's shelter effect and that Sol liked the woven pattern anyway (`screen-50-sol-571`); Moss acknowledged it at tick 71 (`ordinary-138`).
   - Counts at round 80: phrase propagations ex16 9 (4 into spoken text), ex17 7 (3). The 5 private-note propagations include 2 status reports ("the berry bush is empty", "no visible sprout"), so precision on notes is low and notes do not count for G2.
 
+## 9. Culture v2 extension: newly exposed problems
+
+After the revision in section 8, ex16 and ex17 were extended to round 250 and E4 ran as ex18 for 120 rounds ([PR-42](../exec-plans/completed/pr-42-culture-v2-extension.md), [run report](run-report-culture-v2-extension.md)). The entries below are problems the extension exposed. 9b and 9c were fixed in this PR; the others are proposals.
+
+### 9a. A connection failure without a response leaves no transport evidence
+
+- **Problem**: the opt-in transport recovery requires retained failure evidence. A request that fails before any response is retained with an empty `failureEvidence`, so `repair` cannot recognize it as a transport failure. It issues a technical development handoff instead.
+- **Evidence**: ex16 round 99, `ordinary-168` (Lin) failed with `fetch failed` 163 ms after it started, with no response and empty evidence. `repair` issued development attempt 4; an empty declaration closed it, and it stayed uncounted only because v2 does not count empty handoffs. The [recovery log](run-report-culture-v2-extension.md#recovery-log) has the times.
+- **Fix (proposed, not applied)**: record the client-side error (its name, message and elapsed time) as transport evidence when a call ends without any response, and classify it as a transport failure. Keep the wait rule: no retry-after means the 60 s margin.
+- **Metrics**: technical handoffs caused by evidence-free transport failures (1 in the extension).
+
+### 9b. An archive cannot continue after other runs change shared runtime code
+
+- **Problem**: `continue` and `extend` refuse a run whose runtime sources differ from its last recorded revision. After ex16's first window, main gained the culture v3 code and ex17's package, so ex16 could not be extended on main. Every later handoff in any run invalidates every other paused archive in the same tree.
+- **Evidence**: `extend ex16 150` on main failed with "Continuous run source changed outside a versioned development handoff". Eight runtime files differed from ex16's revision 4; ex17 matched main exactly.
+- **Fix (applied with the user's approval)**: each continued archive ran on its own branch, starting at its last checkpoint commit (ex16 `2409b37`, ex17 `b643e48`). The only change brought onto those branches is the PR #35 repair script, which is outside the runtime identity. Before the merge, every continued archive was replayed in full on the merged code: requests and paused inputs were byte-identical (ex16 340 and 24, ex17 285 and 0, ex18 190 and 0), and so were ex7–ex15.
+- **Metrics**: compatibility digests of each continued archive on main (all identical).
+
+### 9c. Analyses of an extended archive failed the analysis check
+
+- **Problem**: a companion analysis binds the hashes of every archive file. Extending ex16 changed those files, so the round-80 analysis `pr-39-culture-v2-run` failed `pnpm analysis:check`. Published analyses are preserved and cannot be rewritten.
+- **Evidence**: "Analysis artifacts changed; inspect the actual record again." The analysis's 222 artifacts equal, hash for hash, the copies that `extend` preserved under `experiment/ex16/windows/through-80/`.
+- **Fix (applied)**: `parseAnalysis` also accepts an analysis whose artifacts equal one preserved window, after hashing every preserved copy again (`windowMaterial`, `scripts/analysis-window.test.ts`).
+- **Metrics**: `pnpm analysis:check` passes with the round-80 and round-250 analyses of ex16 and ex17 side by side.
+
+### 9d. Package ids can collide across run branches
+
+- **Problem**: handoffs on separate branches cannot see each other's packages, so two of them can pick the same id, handler or export name. Validation on each branch passes, and the clash only appears at the merge.
+- **Evidence**: ex18's round-73 handoff and ex17's round-156 handoff both produced `thermal-food-preparation@1`. The clash was caught before the ex17 submission, and the ex17 package was renamed to `hearth-food-preparation@1` before any call used it. After all merges, the 99 packages have unique ids and handlers.
+- **Fix (proposed, not applied)**: a unit test that asserts unique package revisions, handler ids and exported names in `V7_PACKAGES`. Each handoff brief should also list the ids already taken on other open branches.
+- **Metrics**: duplicate ids at merge time (1 caught by hand).
+
+### 9e. Long plans and hearing that does not trigger a decision leave speech unanswered
+
+- **Problem**: in the long windows, idle time grew and people stopped responding to each other. Hearing someone does not start a new decision, and no plan used interrupts, so a person can reply only when its own plan ends. Plans of 60–70 rounds made that rare.
+- **Evidence**:
+  - Idle share (`rest` plus `wait`) rose from 50.6% (ex16 ticks 1–80) to 59.7% over 250 rounds, and in ex17 from 50.8% to 67.6%.
+  - In ex16, Moss's plan from tick 127 ran 61 rounds and Ivo's from tick 124 ran 70.
+  - Symbolic actions fell from 29 in ex16 ticks 1–80 to 16 in ticks 81–250. Sol's direct question to Moss at tick 220 (`event-220-sol-2460`) was never answered.
+  - Wren's first `tell` (tick 204) reached nobody: Moss had moved 5.16 units away. The [ex16 analysis](../../experiment/analyses/ex16/pr-42-culture-v2-extension.md) has the details.
+- **Fix (proposed, not applied; a scenario change)**: let hearing an utterance addressed to the person by name end the current plan step at the next safe boundary, or cap plan length. Measure it as a new scenario version, not on these archives.
+- **Metrics**: share of addressed utterances answered within 10 rounds, plan length distribution, and idle share.
+
+### 9f. The analyzer misses named places, stories and shared tastes in speech
+
+- **Problem**: the term and phrase rules are lexical. They do not see a place name given in speech, an invented story told over several utterances, or a shared liking expressed in different words.
+- **Evidence**:
+  - In ex18, Sol named its clearing "The Berry Lantern" at tick 10 (`event-10-sol-105`) and Moss praised the name. Kai, Lin and Moss then built a lantern story over five utterances (ticks 79, 80, 103, 109, 117). The metrics count neither.
+  - In ex16, a liking for the woven objects ("woven things give this place a character", Sol, tick 134) spread without a shared phrase.
+- **Fix (proposed, not applied)**: count capitalized names whose words include a resource or object word when they are introduced as a name ("call it", "named"). Report recurring motifs (a content word repeated by several people across utterances) as candidates for review, not as adoptions.
+- **Metrics**: recall on a hand-labelled sample of named places and motifs.
+
+### 9g. The incentive rules are invisible to the people they reward
+
+- **Problem**: E4 adds incentive events, but the people's inputs do not describe them. So the incentive control measures reward events, not a behavioral response to incentives.
+- **Evidence**:
+  - ex18's `ordinary-1` input differs from ex16's only in the scope string.
+  - Ten awards went to three people (Kai 4, Lin 3, Moss 3) for named speech within their trio, and Sol, Wren and Ivo got none.
+  - Award events reached a decision input 6 times, all Moss's, and no output mentions them. The [ex18 analysis](../../experiment/analyses/ex18/pr-42-e4-incentive-control.md) has the details.
+- **Fix (proposed, not applied; a design decision for the user)**: decide whether an incentive control should state its rules, as other world rules are stated, or stay implicit. Report the per-person award count next to any comparison.
+- **Metrics**: awards per person, and outputs that refer to awarded events.
+
+### 9h. The climate leaves little room for a developed capability
+
+- **Problem**: a package can be correct and still unusable in the remaining window.
+- **Evidence**: ex17's `hearth-food-preparation@1` (round 156) allows friction ignition only at rain ≤ 0.15. Under the frozen climate that is from about round 232, so the hearth had about 18 rounds of usable weather before round 250. Nobody cleared a hearth or tried friction fire: Wren mastered the package at tick 159 with rain at 0.85 and had no hardwood drill (`ordinary-167`), and Lin, who mastered it at tick 243, wrote that learning it did not mean it would light a fire.
+- **Fix (proposed, not applied)**: none to the package. The handoff brief could ask the developer to report when, under the frozen climate, a weather-gated mode first becomes usable, so the report can separate "not used" from "not usable".
+- **Metrics**: rounds between installation and the first usable round of each weather-gated mode.
+
+### 9i. The revised G2 adoption counts over-count in long runs
+
+- **Problem**: the adoption lists behind the revised G2 (section 8a) mix in items that are not adoptions.
+  - A rule adoption pairs the closest earlier wording, which can be a private note the adopter never saw, with a receipt of any spoken expression of the same idea.
+  - Phrase propagation accepts status reports and pleasantries that reuse another person's sentence frame.
+- **Evidence** ([review item A](run-report-culture-v2-extension.md#review-item-a-sharing-reuse-and-saying-sample-extended-runs), seed 20261126):
+  - 4 of 8 sampled sharing expressions are real, against 6 of 8 at round 80; the misses are mostly per-meal quantities such as "only three" or "a modest portion" in private notes.
+  - 1 of 5 sampled reuses is real, against 2 of 5.
+  - 0 of 5 sampled adopted sayings is a saying.
+  - Every rule adoption listed after tick 80 (3 in ex16, 5 in ex17) takes its wording from a private note or intention and its receipt from Kai's tick-1 tell.
+- **Impact on G2**: each run still has at least one clear adoption, so no revised G2 pass depends on these errors:
+  - ex16: "room to come and go", Lin to Moss at tick 22;
+  - ex17: the sign name `Earth's Quiet Gold` and the "needn't make every moment into work" saying;
+  - ex18: Moss's take-one-and-leave-the-other reply to Kai at tick 20.
+
+  The counts at round 250 are upper bounds.
+
+- **Fix (proposed, not applied)**:
+  - Require the closest wording of a rule adoption to come from a text the adopter received.
+  - Exclude clauses that report an inspection, trial or eating result from adopted sayings.
+  - Require a mention of other people before a quantity counts as `take-moderately` (the second proposal of 7h).
+- **Metrics**: precision on a fresh fixed-seed sample of each list.
+
 ## Limitations
 
 - Fixes 2–4 are turned on together in E1, so one run cannot separate their effects causally; section 5 attributes them by mechanism only. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.
