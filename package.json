@@ -39,6 +39,7 @@
     "analysis:check": "tsx scripts/experiment-cli.ts analyses",
     "metrics:long": "tsx scripts/long-metrics.ts",
     "metrics:culture": "tsx scripts/culture-metrics.ts",
+    "labels:culture": "tsx scripts/culture-labels.ts",
     "compat:long": "tsx scripts/long-compatibility.ts"
   },
   "devDependencies": {
