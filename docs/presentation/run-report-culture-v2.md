@@ -2,7 +2,7 @@
 
 This report covers the culture v2 runs of [PR-39](../exec-plans/completed/pr-39-culture-v2-runs.md): E3, the main `long-culture-v2` run, gated at round 80 and planned to continue to rounds 150 and 250; and E4, the incentive control. Two archives exist. ex16 is E3's first attempt. ex17 is the G2-failure rerun under `long-culture-v3` ([PR-40](../exec-plans/completed/pr-40-culture-v3.md)). Gate G2 failed in both, so E3 was not extended and E4 was not run. Every number comes from retained files under `experiment/`.
 
-**Update (PR-41, 2026-11-25).** After reviewing this report, the user revised G2 to a group measure, after the fact, and re-evaluated both runs: both pass the revision (see [Revised G2](#revised-g2-after-the-fact)). The user then decided to extend both archives to round 250 and to run E4; those runs are reported separately. The sections below keep the original evaluation. No model was called to write this report, and no archive changed.
+**Update (PR-41, 2026-11-25).** After reviewing this report, the user revised G2 to a group measure, after the fact, and re-evaluated both runs: both pass the revision (see [Revised G2](#revised-g2-after-the-fact)). The user then decided to extend both archives to round 250 and to run E4; those runs are reported in the [extension report](run-report-culture-v2-extension.md). The sections below keep the original evaluation. No model was called to write this report, and no archive changed.
 
 Related documents:
 
