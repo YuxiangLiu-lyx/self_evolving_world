@@ -1,0 +1,558 @@
+$ pnpm typecheck
+
+> self-evolving-world@0.0.0 typecheck /Users/liuyuxiang/developer/sew-a16
+> tsc --noEmit && pnpm --filter @self-evolving-world/world-core typecheck && pnpm --filter @self-evolving-world/viewer exec tsc --noEmit
+
+
+> @self-evolving-world/world-core@0.0.0 typecheck /Users/liuyuxiang/developer/sew-a16/packages/world-core
+> tsc -p tsconfig.json --noEmit
+
+
+$ pnpm architecture:check
+
+> self-evolving-world@0.0.0 architecture:check /Users/liuyuxiang/developer/sew-a16
+> depcruise --config dependency-cruiser.config.cjs apps packages
+
+
+✔ no dependency violations found (583 modules, 2917 dependencies cruised)
+
+
+$ pnpm test
+
+> self-evolving-world@0.0.0 test /Users/liuyuxiang/developer/sew-a16
+> vitest run
+
+
+ RUN  v4.1.12 /Users/liuyuxiang/developer/sew-a16
+
+ ✓ apps/simulator/test/long-ex15-shared-shelter.test.ts (11 tests) 14659ms
+     ✓ is scoped to ex15, builds on simple-shelter@1 and needs four rounds of personal study  462ms
+     ✓ builds two bays in 24 paid rounds and 24 energy, commissioning each separately and conserving the real materials  1990ms
+     ✓ shields one person on each bay floor independently, and nobody on a crowded bay  3143ms
+     ✓ withholds protection in real weather beyond the light-weather limits  1254ms
+     ✓ pauses when not worked, resumes after revalidation and pauses without spending on low energy, out of reach or an occupied bay  568ms
+     ✓ cancels once, returning only uninstalled materials, keeping a commissioned bay and leaving an unfinished one  988ms
+     ✓ rejects wrong recipes, wrong bay counts, unsuitable sites, a blocked approach, foreign materials and low energy without spending anything  1014ms
+     ✓ lets only the builder resume, cancel, repair or dismantle, while anyone who studied may inspect every bay in reach  1837ms
+     ✓ lets wear disable only the affected bay until exact repair and reinspection  1435ms
+     ✓ dismantles one stage of one bay per round and 1 energy, returning every part to the ground  1571ms
+     ✓ stops at death, leaving installed parts and dropping uninstalled materials where the person died  395ms
+ ✓ scripts/culture-metrics.test.ts (31 tests) 16722ms
+     ✓ pins headline culture metrics from retained files  13134ms
+     ✓ pins sharing expressions, rest and the survival share without rest  3557ms
+ ✓ apps/simulator/test/long-ex16-hand-frap-crossing.test.ts (16 tests) 11133ms
+     ✓ is scoped to ex16 after the cord, binding and lashing packages, keeps them byte-identical, needs three study rounds at 0.2 energy and fits the frozen size limit  1452ms
+     ✓ assess: Wren's actual 0.64 m cord, lashed in two turns round her two whole branch units, is measured short for every transverse turn count; attempt is refused before costs  821ms
+     ✓ blocked gap: at a 30 degree crossing the gap between the pieces is narrower than the cord far beyond the bundles; the route goes round that wedge and part of the snugging bears on the bark there instead of on the leg bundles  669ms
+     ✓ attempt: frapCount + 3 paid rounds of 0.5 open the closure, route and snug a transverse turn of the lashing’s own cord and close over it; the drawn-in legs raise every turn’s tension  908ms
+     ✓ trial: the raised turn tensions decide holding; the frapped lashing slides at the bark friction of its higher tensions and repeated identical tests add no information  761ms
+     ✓ zero slack: a cord exactly as long as the longest stage fits with nothing to spare there, and one millimetre less is a paid measured shortfall that leaves the lashing closed  939ms
+     ✓ slack in the base turns is taken up first: a snug lashing gains tension at once, a lashing loosened by creep is drawn in further before its turns carry tension again  405ms
+     ✓ slipping closure: a stiffer cord whose closure cannot keep the raised end tension slips at the release check; every turn falls loose and all three items are conserved  537ms
+     ✓ broken cord: a worn cord parts at the dressing tension into conserved fragments, a frapped cord too weak for its own tension parts in place, and a cord below sound condition is refused before costs  412ms
+     ✓ untie: frapCount + wrapCount + 1 paid rounds of 0.5 withdraw the closure, unwind each transverse and base turn and free the same three items; open turns fall loose when not worked  484ms
+     ✓ pauses a closed lashing uncharged, lets turns open in the hands fall loose when not worked, resumes only by workId and cancel keeps a still-closed lashing  759ms
+     ✓ inspect records visible turns for 0.2 energy and leaves tensions and holding force unknown  317ms
+     ✓ a frapped cord wears 0.0005 per round exactly once and is not carried as a hanging load; the work and frapped lashing stay personal  774ms
+     ✓ refuses impossible, unsupported or unavailable inputs before costs  1438ms
+ ✓ apps/simulator/test/long-ex16-branch-screen.test.ts (11 tests) 10942ms
+     ✓ assesses a site for 0.2 energy and runs a real post trial for 0.5 energy without making a support  332ms
+     ✓ refuses assembly without a passing trial, on a bad site, with the wrong recipe or on low energy, spending nothing  720ms
+     ✓ assembles in eight paid rounds of 1.5 energy, installing and conserving the real branch units  710ms
+     ✓ removes only part of the real wind chill on its lee floor, never rain chill or air temperature  2638ms
+     ✓ pauses when not worked, resumes by target and pauses without charge on low energy, out of reach or with a person on the footprint  543ms
+     ✓ cancels once, returning uninstalled units and leaving an incomplete screen; only the builder may change it  996ms
+     ✓ a loose rod opens a gap, a loose upright ends shielding, and an exact repair with a passing check restores it  2987ms
+     ✓ fails its stability check with a worn piece and passes a rerun only after replacement  675ms
+     ✓ dismantles three pieces per round for 1 energy, leaving every piece on the ground  759ms
+ ✓ apps/simulator/test/long-ex15-simple-shelter.test.ts (11 tests) 9515ms
+     ✓ is scoped to ex15 and needs four rounds of personal study  360ms
+     ✓ builds in twelve paid rounds and 12 energy, installing and conserving the real materials  1001ms
+     ✓ shields one occupant from part of the real rain and wind chill without changing air temperature  2778ms
+     ✓ withholds protection in real weather beyond the light-weather limits  662ms
+     ✓ pauses when not worked, resumes after revalidation and pauses without spending on low energy or out of reach  452ms
+     ✓ cancels once, returning only uninstalled materials and leaving an unfinished frame  421ms
+     ✓ rejects wrong recipes, unsuitable sites, foreign materials and low energy without spending anything  604ms
+     ✓ lets only the builder resume, cancel, repair or dismantle  1147ms
+     ✓ loses protection when wear loosens a part, and regains it only after exact repair and reinspection  806ms
+     ✓ dismantles one stage per round and 1 energy, returning every part to the ground  959ms
+     ✓ stops at death, leaving installed parts and dropping uninstalled materials where the person died  324ms
+ ✓ apps/simulator/test/long-ex16-hand-twist-long-sectioned-cord.test.ts (15 tests) 8920ms
+     ✓ is scoped to ex16 after both cord packages, keeps them and the cord consumers byte-identical, takes one 0.2-energy study round after the sectional method and fits the size limit  334ms
+     ✓ make: refuses uncovered, physically impossible, out-of-range, irrelevant, crowded or underpowered requests before any cost  941ms
+     ✓ make: thirteen paid rounds of 1 energy twist 0.4 reed into one continuous owned 1.0 m two-ply cord in four sections, sized by conserved volume  1162ms
+     ✓ make: up to 0.60 m it gives the same rounds and cord as hand-twist-sectioned-cord, which keeps its own ceiling  762ms
+     ✓ pauses uncharged when not worked, resumes only by workId without re-measuring, and cancel or a repeated cancel releases unworked fiber exactly once  744ms
+     ✓ inspect reports measured sections, held and plied lengths for 0.2 energy and leaves strength unknown  790ms
+     ✓ trial: the unchanged fiber-cord@1 two-hand trial for 0.5 energy, identical to hand-twist-fiber-cord on the same long cord  985ms
+     ✓ its cords are ordinary cords: knot, join, binding, lashing and frapping take a 1.0 m cord as it is and measure their own need  1103ms
+     ✓ keeps the work personal: another person cannot resume, inspect, trial or cancel it  681ms
+     ✓ worked fiber wears 0.0005 condition per round once, through hand-twist-fiber-cord@1  515ms
+ ✓ apps/simulator/test/long-ex16-hand-lash-crossing.test.ts (13 tests) 7611ms
+     ✓ is scoped to ex16 after the cord and binding packages, keeps them byte-identical, needs five study rounds at 0.2 energy and fits the frozen size limit  1470ms
+     ✓ attempt: a cord of Wren's actual 0.54 m size cannot take two turns round two whole branch units; the paid first round measures the shortfall and releases the inputs once  317ms
+     ✓ attempt: impossible, unsupported or unavailable inputs are refused before costs  1538ms
+     ✓ attempt: wrapCount + 3 paid rounds of 0.5 lash two whole branch units with a real 0.64 m cord into a relation of the three conserved items  578ms
+     ✓ trial: actual turn tensions decide holding; separate clamps then stretches the turns, slide slips at the bark friction of the turns on the top piece  796ms
+     ✓ four turns: inner turns carry less of the dressing pull, slack turns contribute nothing and holding grows less than in proportion  379ms
+     ✓ untie: wrapCount + 1 paid rounds of 0.5 free the same three items; open turns fall off when not worked; a damaged closure resists  374ms
+     ✓ pauses uncharged and relaxes hand-held turns, resumes only by workId re-routing them, and cancel keeps a tucked closure as a loose lashing  929ms
+     ✓ a lashed cord wears 0.0005 per round exactly once and is not carried as a hanging load; the work and lashing stay personal  590ms
+     ✓ stops at death, leaving the pieces and cord where the person died once in their actual configuration  301ms
+ ✓ apps/simulator/test/long-culture.test.ts (10 tests) 6981ms
+   ✓ keeps every word ordinary agents can see free of the excluded vocabulary, at round 0 and after symbolic actions  720ms
+   ✓ eases survival: later pressure, a higher growth floor and renewable food near every start  5680ms
+ ✓ apps/simulator/test/long-ex16-hand-twist-fiber-cord.test.ts (15 tests) 6799ms
+     ✓ is scoped to ex16, needs three study rounds at 0.2 energy and fits the frozen size limit  321ms
+     ✓ sample: informative failures keep their real products; food, products and bad selections are refused at no cost  695ms
+     ✓ make: refuses uncovered, out-of-range, irrelevant, crowded or underpowered requests at no cost  866ms
+     ✓ make: four paid rounds of 1 energy twist 0.5 reed into one owned 0.30 m two-ply cord sized by conserved volume  471ms
+     ✓ pauses uncharged when not worked, resumes only by workId, and cancel leaves the real workpiece  642ms
+     ✓ inspect records measurable features for 0.2 energy and leaves strength unknown  401ms
+     ✓ trial: a bounded two-hand pull records requested and achieved force, extension and damage, and can lose grip  756ms
+     ✓ trial: repeated loads never strengthen a cord, and a break leaves two owned fragments of conserved fiber  385ms
+     ✓ trial: a thin cord breaks at its breaking force, and lots too small or short to grip are refused  621ms
+     ✓ worked fiber wears 0.0005 condition per round; raw fiber and tested lots do not  349ms
+     ✓ keeps the work personal: another person cannot resume, inspect, trial or cancel it  478ms
+ ✓ apps/simulator/test/long-ex16-hand-twist-sectioned-cord.test.ts (15 tests) 6532ms
+     ✓ is scoped to ex16 after hand-twist-fiber-cord@1, leaves that package unchanged, needs three study rounds at 0.2 energy and fits the size limit  369ms
+     ✓ make: refuses uncovered, impossible, out-of-range, irrelevant, crowded or underpowered requests before any cost  981ms
+     ✓ make: seven paid rounds of 1 energy twist 0.4 reed into one continuous owned 0.60 m two-ply cord sized by conserved volume  620ms
+     ✓ pauses uncharged when not worked, resumes only by workId, and cancel leaves the real partly plied workpiece  631ms
+     ✓ inspect reports measured sections, held and plied lengths for 0.2 energy and leaves strength unknown  487ms
+     ✓ trial: the unchanged fiber-cord@1 two-hand trial for 0.5 energy, identical to hand-twist-fiber-cord on the same cord  642ms
+     ✓ its cords are ordinary cords: the knot, join and crossing-binding operations take them as they are  889ms
+     ✓ worked fiber wears 0.0005 condition per round once, through hand-twist-fiber-cord@1  328ms
+     ✓ keeps the work personal: another person cannot resume, inspect, trial or cancel it  478ms
+ ✓ apps/simulator/test/long-ex16-hand-weave-fiber-mat.test.ts (13 tests) 6442ms
+     ✓ tests a real 0.1 sample for 0.5 energy, keeping it as tested scrap, and fails informatively on roots  333ms
+     ✓ refuses assembly without a passing test, on a bad square, with the wrong recipe or on low energy, spending nothing  618ms
+     ✓ lays out, weaves and lift-checks a mat in seven paid rounds for 6.5 energy, conserving the real grass  551ms
+     ✓ pauses when not worked, resumes by target and pauses without charge on low energy, out of reach or with a person on the square  471ms
+     ✓ cancels once: before the strip rounds all fiber returns, after them loose work stays and can only be dismantled  487ms
+     ✓ lets anyone who studied inspect and sit-test a complete mat on dry firm ground, with no comfort or other wellbeing effect  780ms
+     ✓ wears 0.0005 per round, 0.002 with a person on it, and needs repair below condition 0.5  457ms
+     ✓ repairs only after inspection, replacing up to one unit of broken stems in three paid rounds, and conserves the fiber  630ms
+     ✓ lifts the same mat as carried load, keeps its fiber out of piecemeal drop, and places it on a clear square  572ms
+     ✓ dismantles into recovered fiber and scraps for 0.5 energy, without refund  430ms
+     ✓ stops at death, dropping reserved fiber where the person died, keeping the work, and lays a carried mat down  582ms
+ ✓ apps/simulator/test/long-ex16-hand-join-fiber-cords.test.ts (11 tests) 6216ms
+     ✓ is scoped to ex16 after both cord packages, needs three study rounds at 0.2 energy and fits the frozen size limit  1294ms
+     ✓ attempt: four paid rounds of 0.5 join both cords by a sheet bend on two conserved centrelines  606ms
+     ✓ attempt: measured limits end the paid stage with the actual cords; impossible geometry is refused before costs  1100ms
+     ✓ trial: a bounded two-hand pull on both standing parts records requested and achieved force and time  885ms
+     ✓ pauses uncharged when not worked, resumes only by workId, and cancel opens unretained crossings but keeps a wrapped bend  629ms
+     ✓ inspect records visible bend geometry for 0.2 energy and leaves holding force unknown  322ms
+     ✓ joined cords wear 0.0005 per round exactly once, and the work and join stay personal  610ms
+ ✓ apps/simulator/test/collective-life.test.ts (14 tests) 6077ms
+     ✓ uses one slot per group, fairly serves all eighteen members and reconstructs preserved intentions  4861ms
+ ✓ apps/simulator/test/long-ex16-hand-bind-crossing.test.ts (11 tests) 5638ms
+     ✓ is scoped to ex16 after the three cord packages, needs four study rounds at 0.2 energy and fits the frozen size limit  1012ms
+     ✓ attempt: impossible, unsupported or unavailable inputs are refused before costs  1071ms
+     ✓ attempt: four paid rounds of 0.5 bind two whole branch units with a long enough cord into a relation of the three conserved items  392ms
+     ✓ trial: a bounded opposed-hand test records requested and achieved force and time; separate holds, slide slips at the friction load  615ms
+     ✓ untie: two paid rounds of 0.5 free the same three items; a damaged closure resists  301ms
+     ✓ pauses uncharged and relaxes a hand-held wrap, resumes only by workId, and cancel keeps a tucked closure as a loose binding  714ms
+     ✓ a bound cord wears 0.0005 per round exactly once, carrying hangs the bottom piece in the wrap, and the work and binding stay personal  858ms
+ ✓ apps/simulator/test/long-ex16-hand-tie-cord-knot.test.ts (10 tests) 5481ms
+     ✓ is scoped to ex16 after the cord package, needs three study rounds at 0.2 energy and fits the frozen size limit  1188ms
+     ✓ attempt: three paid rounds of 0.5 energy tie an overhand in the same cord on a conserved centreline  437ms
+     ✓ attempt: measured limits end the paid stage with the actual cord; impossible geometry is refused before costs  925ms
+     ✓ trial: a bounded two-hand pull through the tied knot records requested and achieved force and time  812ms
+     ✓ untie: two paid rounds of 0.5 reverse the crossings and return the same straight cord; a damaged knot resists  312ms
+     ✓ pauses uncharged when not worked, resumes only by workId, cancel leaves the actual configuration and a loose knot needs only dressing  632ms
+     ✓ inspect records visible knot geometry for 0.2 energy and leaves knotted strength unknown  368ms
+     ✓ a knotted cord wears 0.0005 per round exactly once, and the work stays personal  549ms
+ ✓ apps/simulator/test/long-ex16-cultivate-plants.test.ts (10 tests) 5515ms
+     ✓ establishes only through the existing ecology, absorbs the unit and grows stock for gather  2890ms
+     ✓ fails when the buried unit rots first and stops growing  340ms
+     ✓ rejects unsuitable units, sites and treatments without spending anything  698ms
+     ✓ pauses, resumes and ends without charging unperformed rounds, and only for its own planter  345ms
+ ✓ apps/simulator/test/open-woven.test.ts (8 tests) 4406ms
+   ✓ requires real learned tests and fresh local materials, retains paid dry/wet observations and finite water accounting  354ms
+   ✓ builds and calibrates only through all paid stages, conserved comparison pieces and actual geometry  470ms
+   ✓ releases only surviving allocations once, resumes remaining work and salvages consumed components after destruction  376ms
+   ✓ requires personal assay learning before calibration and uses the shared sample contract without granting others mastery  731ms
+   ✓ retains escaped food units and invalidates estimates when real aperture or tare changes  708ms
+   ✓ keeps calibration and sample use unavailable to unlearned actors, then permits paid learning and real shared use  918ms
+   ✓ does not repeat understanding rewards for known batch tests and preserves conserved material through wet contact  773ms
+ ✓ apps/simulator/test/long-ex15-cultivation-trial.test.ts (8 tests) 5131ms
+     ✓ establishes only through the existing ecology, absorbs the unit and regrows stock for gather  2924ms
+     ✓ dies when the buried unit rots first, and only the planter clears it  397ms
+     ✓ rejects unsuitable units and sites without spending anything  515ms
+     ✓ pauses, resumes and cancels without charging unperformed stages  416ms
+ ✓ apps/simulator/test/long-ex16-hand-break-food.test.ts (12 tests) 3647ms
+     ✓ pauses without charge when not worked or short of energy, keeps ageing, and resumes only by work id  419ms
+     ✓ refuses unsuitable requests at no cost  763ms
+     ✓ resolves other foods physically: a berry deforms and a hazelnut resists, with informative records  316ms
+     ✓ keeps the work personal: another person cannot resume, inspect or cancel it  387ms
+ ✓ apps/simulator/test/long-culture-incentives.test.ts (7 tests) 3434ms
+     ✓ caps, cools down, deduplicates and decays the answered source  2054ms
+     ✓ notices made things once per person, but never signs  707ms
+ ✓ apps/simulator/test/open-extraction.test.ts (9 tests) 3096ms
+   ✓ requires fresh scope, exact personally studied dependencies and four actual learning rounds  319ms
+   ✓ allocates two actual portions and conserves solids/nutrients/toxins through real leakage, separation and cancellation  364ms
+   ✓ rejects wrong ownership, repeated references, alias ambiguity, absent water and actual overcapacity before payment  313ms
+   ✓ keeps installed contact, weather and loss active when an actor leaves, and releases surviving matter once on death  330ms
+   ✓ measures actual residues with uncertainty and refuses a safety certificate or rewards for inconclusive or repeated readings  374ms
+   ✓ balances all physical mass against retained deposits and measured atmospheric exchange, including vessel collapse  611ms
+ ✓ apps/simulator/test/long-culture-symbols.test.ts (8 tests) 2890ms
+     ✓ marks only within reach and keeps each person’s most recent names and marks  760ms
+     ✓ records invitations, actual attendance at the invited round and expiry  486ms
+     ✓ reconstructs every sign, heard list and private memory from the recorded actions  915ms
+ ✓ apps/simulator/test/collective-small-drying.test.ts (8 tests) 2662ms
+     ✓ rejects unknown, fragmented, stale, wrong-owner and oversized inputs without inventing sheet or food  657ms
+     ✓ keeps old tray semantics and fresh scopes; the actual applicant still lacks owned bark and cannot receive a free support  672ms
+ ✓ apps/simulator/test/long-ex15-bark-separation.test.ts (8 tests) 2545ms
+     ✓ reports other materials as unresolved and refuses trial and recovery at no cost  406ms
+     ✓ recovers ordinary bark in paid increments of at most 0.1 m2 and conserves the input  346ms
+     ✓ pauses when not worked or without energy, resumes only the remainder and cancels without refund  338ms
+     ✓ delivers whole bark units the existing shelter accepts, while peeled branches stay treated  651ms
+ ✓ apps/simulator/test/collective-surface-diagnostics.test.ts (6 tests) 2524ms
+     ✓ reports multiple independent failures and unknown dimensions without inventing a connected sheet or hidden evidence  352ms
+     ✓ requires separate learning, exact owned access, paid commitment and preserves isolation of personal reads and public context  683ms
+     ✓ explains the real round-111 request and succeeds at a clear nearby site in an isolated control without editing the archive  888ms
+ ✓ apps/simulator/test/long-nut-opening.test.ts (6 tests) 2510ms
+   ✓ retains two paid real contacts, tool wear, private exposed findings and a single conserved assembly across serialization  449ms
+   ✓ pauses before charging, retains damage on cancellation/death and prevents conflicting consumption and support use  461ms
+   ✓ rejects stale source/quote, wrong ownership, unsuitable material, missing energy and occupied contact before payment  857ms
+   ✓ rejects other real matter at the contact site and distant nominated support before charging  393ms
+ ✓ apps/simulator/test/collective-material-combine.test.ts (7 tests) 2137ms
+     ✓ rejects stale, foreign, locked, duplicate and incompatible actual sources before material or energy changes  833ms
+     ✓ preserves exact checkpoint state, rejects use without study, and keeps another experiment registry fresh  377ms
+ ✓ scripts/open-registration.test.ts (2 tests) 1968ms
+   ✓ binds supplementary browser precision to the actual original migration without changing any original round field  845ms
+   ✓ rejects corrupt precision evidence, raw prefix tampering and precision proofs attached to unrelated rounds  1123ms
+ ✓ apps/simulator/test/long-moss-separation.test.ts (3 tests) 1927ms
+   ✓ measures only real exposed clearance after actual personal study, conserves the assembly and records no executable separation or product  313ms
+   ✓ does not invent contact work, locks, resets, refunds or rewards from repeated control modes and missing rules  477ms
+   ✓ enforces current provenance, ownership, unchanged condition and personal evidence without granting other people findings  1137ms
+ ✓ apps/simulator/test/collective-tool-assessment.test.ts (5 tests) 1922ms
+     ✓ uses actual registry hardness without a scratch claim or reward and changes no material  326ms
+     ✓ retains personal dated reads, live damage and unknown hardness without name inference  307ms
+     ✓ requires personal learning, affordable atomic payment and private record ownership  610ms
+     ✓ checks the real round-132 applicant stone without requiring bark or a recipe experiment  483ms
+ ✓ apps/simulator/test/forest-input-encoding.test.ts (17 tests) 1890ms
+   ✓ restores every retained round-149 field and literal through the key dictionary, without mutating policy or calls  335ms
+ ✓ apps/simulator/test/open-preservation.test.ts (12 tests) 1799ms
+ ✓ apps/simulator/test/coevolution.test.ts (3 tests) 1719ms
+     ✓ audits the archived run and rejects altered checkpoints  1552ms
+ ✓ apps/simulator/test/long-ex15-food-preparation.test.ts (8 tests) 1690ms
+     ✓ rejects unknown, mixed, insufficient-energy and foreign inputs without spending anything  352ms
+ ✓ apps/simulator/test/long-culture-food-water.test.ts (7 tests) 1647ms
+     ✓ dries prepared food on open ground in dry weather and slows its decay against a paired sample  542ms
+ ✓ apps/simulator/test/collective-root-surface.test.ts (5 tests) 1655ms
+     ✓ rejects fines, disconnected or undersized sheets, wrong tools and blocked sites without preparing extra food  705ms
+     ✓ requires separate extension mastery, supports the original interface after study and preserves active legacy operations  340ms
+ ✓ apps/simulator/test/open-water.test.ts (14 tests) 1647ms
+ ✓ apps/simulator/test/evolution-run.test.ts (5 tests) 1644ms
+     ✓ audits every retained private input of the archived run and rejects bypassed reviews or simulated provenance  1596ms
+ ✓ apps/simulator/test/long-nut-access.test.ts (3 tests) 1597ms
+   ✓ invalidates changed quotes, ownership and unavailable receivers before payment, and cancellation/death release once without remote refunds  1121ms
+ ✓ apps/simulator/test/long-moss-apple.test.ts (3 tests) 1584ms
+   ✓ quotes through unchanged private control queries and separately consumes one real tenth with actual immediate physiology  375ms
+   ✓ fails unauthorized, changed, foreign, dead or unaffordable inputs before charging and retains irreversible effects on cancellation  775ms
+   ✓ keeps evidence private, rejects partial references and deduplicates canonical physical findings without historical activation  433ms
+ ✓ apps/simulator/test/collective-observed-failures.test.ts (4 tests) 1524ms
+   ✓ distinguishes the actual ex12 malformed item reference from an alleged owned-inventory lookup defect  708ms
+   ✓ combines the two actual ex12 round-90 bark supplies without retuning the retained world  405ms
+   ✓ assesses the actual fractional bark from the ex12 round-95 request with one mass conversion and no free roots  407ms
+ ✓ scripts/unit-reporter.test.ts (6 tests) 1506ms
+ ✓ apps/simulator/test/collective-tray-clearance.test.ts (5 tests) 1417ms
+     ✓ rejects invalid or unaffordable work before payment, reports independent failures and requires individual learning  484ms
+     ✓ reproduces the real round-127 requester geometry without inventing a historical blocker  495ms
+ ✓ apps/simulator/test/long-branch-assessment.test.ts (3 tests) 1423ms
+   ✓ performs a single paid conserved observation with explicit unavailable facts, no safety claim or reward, and retained dated reassessments  322ms
+   ✓ fails invalid ownership, reservations, partial or changed specimen, insufficient energy and forbidden operations before a paid finding  919ms
+ ✓ apps/simulator/test/open-short-refuge.test.ts (12 tests) 1349ms
+ ✓ apps/simulator/test/forest-fire.test.ts (8 tests) 1275ms
+     ✓ preserves component mass and kit identity; a finite fire warms another actor and consumes fuel without healing  416ms
+ ✓ apps/simulator/test/open-shelter.test.ts (9 tests) 1243ms
+ ✓ apps/simulator/test/long-birch-assessment.test.ts (3 tests) 1149ms
+   ✓ fails invalid ownership, reservations, partial or changed specimen, insufficient energy and forbidden operations before a paid finding  761ms
+ ✓ apps/simulator/test/long-plum-assessment.test.ts (3 tests) 1122ms
+   ✓ requires actual reach, unchanged source identity, personal mastery and sufficient energy before a charge  699ms
+ ✓ apps/simulator/test/collective-roots.test.ts (8 tests) 1092ms
+ ✓ apps/simulator/test/open-food-assay.test.ts (5 tests) 1043ms
+   ✓ preserves actual drying after leaving while stopping unperformed readings and releases a dying performer exactly once  407ms
+ ✓ apps/simulator/test/collective-bark.test.ts (9 tests) 1015ms
+ ✓ apps/simulator/test/long-culture-v2-context.test.ts (13 tests) 1016ms
+     ✓ lowers every estimate below the uncompacted v2 and ex15 inputs  456ms
+ ✓ apps/simulator/test/forest-canopy.test.ts (7 tests) 998ms
+ ✓ apps/simulator/test/long-apple-assessment.test.ts (3 tests) 1018ms
+   ✓ fails invalid ownership, reservations, partial or changed specimen, insufficient energy and forbidden operations before a paid finding  670ms
+ ✓ apps/simulator/test/long-moss-recovery.test.ts (3 tests) 987ms
+   ✓ rejects absent, remote, foreign-locked or wrong-source inputs before charging and does not release another process lock  534ms
+ ✓ apps/simulator/test/long-joining.test.ts (4 tests) 968ms
+   ✓ measures actual versioned geometry then places, wraps and recovers exact whole sources with paid stages and no reward  307ms
+ ✓ scripts/harness.test.ts (4 tests) 955ms
+     ✓ protects every nested archive and rejects additions hidden by gitignore  519ms
+ ✓ apps/simulator/test/collective-work.test.ts (8 tests) 911ms
+ ✓ apps/simulator/test/long-moss-opening.test.ts (3 tests) 910ms
+   ✓ retains actual independent response, grounded tool, source conservation and private inspection through resumed paid contacts  395ms
+   ✓ requires exact quoted inputs and preserves actual damage and ground custody after cancellation  327ms
+ ✓ apps/simulator/test/long-planting.test.ts (3 tests) 883ms
+     ✓ persists a completed actual specimen, allows other observers, ages it without food multiplication and labels the observation limit honestly  537ms
+ ✓ apps/simulator/test/collective-food-inspection.test.ts (6 tests) 873ms
+     ✓ rejects missing or wrong material, insufficient quantity, changed contact and overlapping bodies without fabricating inputs  370ms
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 20/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 40/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 60/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+ ✓ apps/simulator/test/long-forest-nut-examination.test.ts (2 tests) 836ms
+   ✓ deduplicates equivalent personal observations and rejects unsupported source changes, ownership and insufficient effort before payment  605ms
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 80/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+stdout | scripts/forest-experience-replay.test.ts > experience replay retains actual operation inputs > reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events
+ex1: 100/1200 rounds; 0 model attempts; 0 development handoffs; running
+
+ ✓ scripts/forest-experience-replay.test.ts (1 test) 830ms
+     ✓ reconstructs a resource-alias sample across a segment boundary without selecting reserved material or changing any events  829ms
+ ✓ scripts/long-metrics.test.ts (3 tests) 858ms
+   ✓ reproduces the ex13 baselines used by the fix log  452ms
+   ✓ fingerprints every retained ex13 request and paused ordinary input  405ms
+ ✓ apps/simulator/test/long-opened-assessment.test.ts (2 tests) 815ms
+   ✓ checks exact live source, tool and personal evidence access before any payment or report  596ms
+ ✓ apps/simulator/test/long-nut-examination.test.ts (3 tests) 765ms
+ ✓ scripts/continuous-request-audit.test.ts (3 tests) 768ms
+   ✓ reconstructs actual pre/post repair reservations from their source and exact attempt boundary without inference  762ms
+ ✓ apps/simulator/test/open-metrology.test.ts (10 tests) 740ms
+ ✓ apps/simulator/test/forest-willow.test.ts (6 tests) 740ms
+   ✓ qualifies real willow panels and manufactured cord for unchanged mantle and hearth recipe costs  364ms
+ ✓ apps/simulator/test/long-prepared-planting.test.ts (3 tests) 702ms
+ ✓ apps/simulator/test/forest-recuperation.test.ts (7 tests) 679ms
+ ✓ scripts/continuous-store.test.ts (7 tests) 671ms
+ ✓ apps/simulator/test/forest-insulation.test.ts (7 tests) 665ms
+ ✓ apps/simulator/test/long-root-assessment.test.ts (3 tests) 662ms
+   ✓ requires study and creator permission, releases work on cancellation/death, and never automatically reburies or duplicates the root  357ms
+ ✓ apps/simulator/test/open-contact.test.ts (6 tests) 643ms
+ ✓ apps/simulator/test/long-moss-placement.test.ts (3 tests) 635ms
+ ✓ apps/simulator/test/long-moss-food-assessment.test.ts (2 tests) 645ms
+   ✓ keeps original source restrictions and rejects wrong ownership, partial material and conflicts without charge  429ms
+ ✓ apps/simulator/test/collective-inventory.test.ts (5 tests) 609ms
+ ✓ apps/simulator/test/long-food-trial.test.ts (3 tests) 584ms
+ ✓ scripts/rejection-recovery.test.ts (7 tests) 604ms
+ ✓ apps/simulator/test/long-cultivation.test.ts (3 tests) 576ms
+ ✓ apps/simulator/test/long-pagination.test.ts (3 tests) 579ms
+   ✓ retains scope and privacy at large catalogue size and never turns a control query into an observation or world mutation  455ms
+ ✓ apps/simulator/test/open-short-diagnostics.test.ts (7 tests) 546ms
+ ✓ scripts/coevolution-source.test.ts (2 tests) 567ms
+     ✓ binds retained engine bytes, validation logs and the complete executed prefix  565ms
+ ✓ apps/simulator/test/long-sol-residue.test.ts (2 tests) 550ms
+ ✓ apps/simulator/test/long-moss-diagnostic.test.ts (3 tests) 539ms
+ ✓ apps/simulator/test/long-join-reconciliation.test.ts (3 tests) 542ms
+ ✓ packages/world-core/test/forest-shelter.test.ts (7 tests) 538ms
+     ✓ expires after 160 actual exposure rounds while retaining walls; paid maintenance restores only 160  339ms
+ ✓ apps/simulator/test/long-moss.test.ts (3 tests) 516ms
+ ✓ apps/simulator/test/collective-bark-feedback.test.ts (4 tests) 474ms
+ ✓ apps/simulator/test/long-development.test.ts (8 tests) 510ms
+ ✓ apps/simulator/test/open-shelter-diagnostics.test.ts (6 tests) 476ms
+ ✓ apps/simulator/test/long-residue.test.ts (3 tests) 464ms
+ ✓ apps/simulator/test/forest-operation-continuity.test.ts (5 tests) 435ms
+ ✓ apps/simulator/test/forest-experience.test.ts (11 tests) 435ms
+ ✓ apps/simulator/test/open-hardness.test.ts (7 tests) 426ms
+ ✓ apps/simulator/test/long-join-assessment.test.ts (2 tests) 422ms
+ ✓ apps/simulator/test/long-resting-material.test.ts (3 tests) 396ms
+ ✓ apps/simulator/test/open-development.test.ts (9 tests) 291ms
+ ✓ apps/simulator/test/long-surface.test.ts (2 tests) 278ms
+ ✓ apps/simulator/test/open-bark.test.ts (5 tests) 273ms
+ ✓ apps/simulator/test/long-cordage.test.ts (2 tests) 235ms
+ ✓ apps/simulator/test/open-food-examination.test.ts (5 tests) 217ms
+ ✓ scripts/empty-handoff.test.ts (4 tests) 229ms
+ ✓ apps/simulator/test/long-air-drying.test.ts (2 tests) 217ms
+ ✓ apps/simulator/test/long-moss-residue.test.ts (2 tests) 214ms
+ ✓ apps/simulator/test/long-weather-barrier.test.ts (2 tests) 195ms
+ ✓ apps/simulator/test/long-culture-v2.test.ts (2 tests) 189ms
+ ✓ apps/simulator/test/continuous.test.ts (6 tests) 175ms
+ ✓ apps/simulator/test/long-site-assessment.test.ts (2 tests) 160ms
+ ✓ packages/world-core/test/forest-food.test.ts (8 tests) 152ms
+ ✓ packages/world-core/test/forest.test.ts (10 tests) 139ms
+ ✓ scripts/collective-campaign.test.ts (1 test) 143ms
+ ✓ apps/simulator/test/open-ecology.test.ts (5 tests) 127ms
+ ✓ apps/simulator/test/long-catalogue.test.ts (2 tests) 115ms
+ ✓ scripts/experiments.test.ts (20 tests) 106ms
+ ✓ apps/viewer/test/continuous-history.test.ts (7 tests) 100ms
+ ✓ packages/world-core/test/forest-warming.test.ts (5 tests) 101ms
+ ✓ scripts/transport-recovery.test.ts (2 tests) 103ms
+ ✓ apps/viewer/test/replay-service.test.ts (7 tests) 88ms
+ ✓ packages/world-core/test/forest-routing.test.ts (6 tests) 88ms
+ ✓ apps/simulator/test/long-scenario.test.ts (3 tests) 77ms
+ ✓ apps/simulator/test/long-guidance.test.ts (3 tests) 83ms
+ ✓ scripts/documentation.test.ts (15 tests) 74ms
+ ✓ packages/world-core/test/forest-wildlife.test.ts (3 tests) 70ms
+ ✓ scripts/ability-text-limit.test.ts (1 test) 75ms
+ ✓ apps/simulator/test/long-exact-read.test.ts (3 tests) 66ms
+ ✓ apps/simulator/test/random-run.test.ts (12 tests) 69ms
+ ✓ packages/world-core/test/continuous.test.ts (12 tests) 65ms
+ ✓ apps/simulator/test/open-process-physical.test.ts (3 tests) 54ms
+ ✓ apps/simulator/test/long-capability-view.test.ts (1 test) 53ms
+ ✓ scripts/learning-analysis.test.ts (1 test) 48ms
+ ✓ apps/simulator/test/collective-transport.test.ts (3 tests) 46ms
+ ✓ scripts/forest-navigation.test.ts (2 tests) 46ms
+ ✓ apps/simulator/test/synchronous-run.test.ts (4 tests) 39ms
+ ✓ apps/simulator/test/forest-context.test.ts (2 tests) 37ms
+ ✓ apps/simulator/test/forest.test.ts (1 test) 36ms
+ ✓ scripts/long-interruption.test.ts (1 test) 37ms
+ ✓ apps/viewer/test/ashen.test.ts (9 tests) 39ms
+ ✓ packages/world-core/test/continuous-mosaic.test.ts (2 tests) 29ms
+ ✓ scripts/validation.test.ts (1 test) 23ms
+ ✓ scripts/continuous-repair.test.ts (3 tests) 28ms
+ ✓ scripts/survival-analysis.test.ts (2 tests) 22ms
+ ✓ packages/world-core/test/coevolution.test.ts (11 tests) 20ms
+ ✓ scripts/continuous-developer.test.ts (2 tests) 22ms
+ ✓ packages/world-core/test/continuous-nature.test.ts (2 tests) 20ms
+ ✓ apps/simulator/test/long-response-phase.test.ts (5 tests) 17ms
+ ✓ apps/simulator/test/experiment.test.ts (14 tests) 20ms
+ ✓ apps/viewer/test/timeline.test.ts (7 tests) 14ms
+ ✓ apps/simulator/test/learning-run.test.ts (4 tests) 16ms
+ ✓ packages/world-core/test/learning.test.ts (22 tests) 10ms
+ ✓ packages/world-core/test/forest-perception.test.ts (1 test) 11ms
+ ✓ scripts/validation-plan.test.ts (11 tests) 11ms
+ ✓ packages/world-core/test/continuous-equality.test.ts (2 tests) 11ms
+ ✓ packages/world-core/test/evolution.test.ts (10 tests) 9ms
+ ✓ scripts/long-report.test.ts (1 test) 10ms
+ ✓ apps/simulator/test/chatgpt-auth.test.ts (9 tests) 7ms
+ ✓ apps/simulator/test/chatgpt-renewal.test.ts (1 test) 6ms
+ ✓ apps/viewer/test/long-presentation.test.ts (5 tests) 6ms
+ ✓ scripts/transport-wait.test.ts (4 tests) 7ms
+ ✓ scripts/validation-cache.test.ts (3 tests) 5ms
+ ✓ packages/world-core/test/world.test.ts (38 tests) 6ms
+ ✓ packages/world-core/test/program.test.ts (16 tests) 5ms
+ ✓ apps/viewer/test/scene-layers.test.ts (3 tests) 5ms
+ ✓ scripts/pr-policy.test.ts (4 tests) 4ms
+ ✓ apps/viewer/test/long-specimen-visual.test.ts (1 test) 3ms
+ ✓ packages/world-core/test/survival.test.ts (7 tests) 4ms
+ ✓ apps/viewer/test/replay-playback.test.ts (3 tests) 4ms
+ ✓ packages/world-core/test/round.test.ts (5 tests) 3ms
+ ✓ apps/viewer/test/ashen-playback.test.ts (7 tests) 3ms
+ ✓ apps/viewer/test/experiments.test.ts (10 tests) 3ms
+ ✓ apps/simulator/test/survival-run.test.ts (1 test) 2ms
+ ✓ apps/viewer/test/long-labels.test.ts (1 test) 1ms
+ ✓ scripts/validation-reconstruction.test.ts (3 tests) 2ms
+ ✓ scripts/continuous-baseline.test.ts (1 test) 1ms
+
+ Test Files  176 passed (176)
+      Tests  1102 passed (1102)
+   Start at  14:55:49
+   Duration  143.51s (transform 2.27s, setup 0ms, import 31.56s, tests 245.30s, environment 7ms)
+
+
+$ pnpm build
+
+> self-evolving-world@0.0.0 build /Users/liuyuxiang/developer/sew-a16
+> pnpm -r build
+
+Scope: 3 of 4 workspace projects
+packages/world-core build$ tsc -p tsconfig.json
+packages/world-core build: Done
+apps/simulator build$ tsc -p tsconfig.json
+apps/viewer build$ tsc --noEmit && vite build
+apps/simulator build: Done
+apps/viewer build: vite v8.3.6 building client environment for production...
+apps/viewer build: transforming...
+apps/viewer build: ✓ 292 modules transformed.
+apps/viewer build: rendering chunks...
+apps/viewer build: computing gzip size...
+apps/viewer build: dist/experiments/ex11/replay.json                              0.27 kB │ gzip:     0.22 kB
+apps/viewer build: dist/experiments/ex14/replay.json                              0.27 kB │ gzip:     0.22 kB
+apps/viewer build: dist/experiments/ex15/replay.json                              0.27 kB │ gzip:     0.22 kB
+apps/viewer build: dist/experiments/ex12/replay.json                              0.42 kB │ gzip:     0.29 kB
+apps/viewer build: dist/experiments/ex13/replay.json                              0.57 kB │ gzip:     0.34 kB
+apps/viewer build: dist/forest-lab.html                                           0.70 kB │ gzip:     0.35 kB
+apps/viewer build: dist/experiments/ex10/replay.json                              0.71 kB │ gzip:     0.41 kB
+apps/viewer build: dist/ashen.html                                                0.71 kB │ gzip:     0.37 kB
+apps/viewer build: dist/index.html                                                0.95 kB │ gzip:     0.41 kB
+apps/viewer build: dist/observatory.html                                          0.95 kB │ gzip:     0.41 kB
+apps/viewer build: dist/experiments/ex8/replay.json                               1.39 kB │ gzip:     0.63 kB
+apps/viewer build: dist/experiments/ex7/replay.json                               1.54 kB │ gzip:     0.69 kB
+apps/viewer build: dist/experiments/ex4/overview.svg                              1.72 kB │ gzip:     0.65 kB
+apps/viewer build: dist/experiments/ex9/replay.json                               1.89 kB │ gzip:     0.79 kB
+apps/viewer build: dist/experiments/ex3/overview.svg                              4.14 kB │ gzip:     1.48 kB
+apps/viewer build: dist/experiments/ex14/overview.svg                             4.87 kB │ gzip:     1.61 kB
+apps/viewer build: dist/experiments/ex3/replay.json                               4.91 kB │ gzip:     1.09 kB
+apps/viewer build: dist/presentation/ex13/story.json                              5.10 kB │ gzip:     1.80 kB
+apps/viewer build: dist/experiments/index.json                                    5.66 kB │ gzip:     1.88 kB
+apps/viewer build: dist/experiments/ex5/overview.svg                              5.80 kB │ gzip:     1.22 kB
+apps/viewer build: dist/experiments/ex2/overview.svg                              6.87 kB │ gzip:     1.76 kB
+apps/viewer build: dist/experiments/ex11/overview.svg                             7.49 kB │ gzip:     1.06 kB
+apps/viewer build: dist/experiments/ex15/overview.svg                             8.75 kB │ gzip:     2.65 kB
+apps/viewer build: dist/experiments/ex13/overview.svg                            13.96 kB │ gzip:     4.81 kB
+apps/viewer build: dist/classic.html                                             14.12 kB │ gzip:     3.49 kB
+apps/viewer build: dist/experiments/ex1/overview.svg                             14.69 kB │ gzip:     1.89 kB
+apps/viewer build: dist/experiments/ex10/overview.svg                            17.24 kB │ gzip:     6.31 kB
+apps/viewer build: dist/experiments/ex6/overview.svg                             24.14 kB │ gzip:     3.34 kB
+apps/viewer build: dist/experiments/ex4/replay.json                              36.08 kB │ gzip:     4.31 kB
+apps/viewer build: dist/experiments/ex8/overview.svg                             39.91 kB │ gzip:    14.64 kB
+apps/viewer build: dist/experiments/ex12/overview.svg                            39.99 kB │ gzip:    11.13 kB
+apps/viewer build: dist/experiments/ex1/replay.json                              42.25 kB │ gzip:     1.40 kB
+apps/viewer build: dist/experiments/ex7/overview.svg                             44.25 kB │ gzip:    13.94 kB
+apps/viewer build: dist/experiments/ex2/replay.json                              49.36 kB │ gzip:     1.21 kB
+apps/viewer build: dist/experiments/ex9/overview.svg                             52.67 kB │ gzip:    19.66 kB
+apps/viewer build: dist/experiments/ex5/replay.json                             191.65 kB │ gzip:    22.73 kB
+apps/viewer build: dist/experiments/ex6/replay.json                             213.78 kB │ gzip:    24.13 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000900-001000.json          695.34 kB │ gzip:    38.84 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000600-000700.json          730.99 kB │ gzip:    40.93 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000800-000900.json          731.41 kB │ gzip:    42.68 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000100-000200.json          740.54 kB │ gzip:    42.15 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000700-000800.json          748.80 kB │ gzip:    43.46 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000200-000300.json          751.98 kB │ gzip:    43.64 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000500-000600.json          773.42 kB │ gzip:    44.74 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000000-000100.json          773.77 kB │ gzip:    49.94 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000400-000500.json          786.06 kB │ gzip:    46.49 kB
+apps/viewer build: dist/experiments/ex11/replay/execution-000000-000007.json    879.80 kB │ gzip:    65.46 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000000-000100.json     896.12 kB │ gzip:    71.54 kB
+apps/viewer build: dist/experiments/ex7/replay/part-000300-000400.json          898.19 kB │ gzip:    52.83 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000100-000200.json     978.68 kB │ gzip:    88.62 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000200-000300.json   1,026.67 kB │ gzip:    92.53 kB
+apps/viewer build: dist/experiments/ex10/replay/execution-000300-000358.json  1,095.01 kB │ gzip:   135.64 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000300-000400.json   1,095.04 kB │ gzip:    98.68 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000800-000897.json        1,111.90 kB │ gzip:   101.01 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000700-000800.json        1,125.42 kB │ gzip:   102.94 kB
+apps/viewer build: dist/experiments/ex14/replay/execution-000000-000064.json  1,134.91 kB │ gzip:   124.49 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000400-000500.json   1,167.16 kB │ gzip:   122.13 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000600-000700.json        1,176.15 kB │ gzip:   116.03 kB
+apps/viewer build: dist/experiments/ex10/replay/execution-000000-000100.json  1,316.61 kB │ gzip:   132.79 kB
+apps/viewer build: dist/experiments/ex13/replay/execution-000200-000280.json  1,359.74 kB │ gzip:   173.71 kB
+apps/viewer build: dist/assets/replay-worker-pKVZULzr.js                      1,390.89 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000000-000100.json        1,399.16 kB │ gzip:    74.33 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000500-000600.json   1,453.49 kB │ gzip:   148.44 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000900-001000.json   1,516.66 kB │ gzip:   147.73 kB
+apps/viewer build: dist/experiments/ex10/replay/execution-000200-000300.json  1,518.93 kB │ gzip:   170.61 kB
+apps/viewer build: dist/experiments/ex10/replay/precision-000100-000200.json  1,520.78 kB │ gzip:   178.22 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-001000-001100.json   1,527.12 kB │ gzip:   149.35 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000600-000700.json   1,533.62 kB │ gzip:   151.65 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000700-000800.json   1,545.79 kB │ gzip:   148.82 kB
+apps/viewer build: dist/experiments/ex13/replay/execution-000000-000100.json  1,577.19 kB │ gzip:   190.61 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-001100-001200.json   1,593.41 kB │ gzip:   158.81 kB
+apps/viewer build: dist/experiments/ex9/replay/execution-000800-000900.json   1,599.06 kB │ gzip:   148.74 kB
+apps/viewer build: dist/experiments/ex13/replay/execution-000100-000200.json  1,647.16 kB │ gzip:   209.87 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000500-000600.json        1,774.75 kB │ gzip:   146.78 kB
+apps/viewer build: dist/experiments/ex15/replay/execution-000000-000070.json  2,056.45 kB │ gzip:   215.22 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000300-000400.json        2,184.52 kB │ gzip:   122.76 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000200-000300.json        2,232.20 kB │ gzip:   120.30 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000100-000200.json        2,279.24 kB │ gzip:   111.35 kB
+apps/viewer build: dist/experiments/ex8/replay/part-000400-000500.json        2,282.68 kB │ gzip:   143.69 kB
+apps/viewer build: dist/experiments/ex12/replay/execution-000100-000136.json  3,887.95 kB │ gzip:   657.17 kB
+apps/viewer build: dist/experiments/ex12/replay/execution-000000-000100.json  7,216.31 kB │ gzip: 1,167.76 kB
+apps/viewer build: dist/assets/ashen-bi2Sj6hO.css                                 5.70 kB │ gzip:     2.05 kB
+apps/viewer build: dist/assets/open-trial-diagnostic-view-CgiL_Adj.css            7.59 kB │ gzip:     2.51 kB
+apps/viewer build: dist/assets/classic-CkITEJCO.css                              16.01 kB │ gzip:     4.83 kB
+apps/viewer build: dist/assets/replay-client-D7BLL8xG.js                          0.80 kB │ gzip:     0.39 kB
+apps/viewer build: dist/assets/timeline-Cr8yQImd.js                               4.86 kB │ gzip:     1.54 kB
+apps/viewer build: dist/assets/forestLab-Cj_uGrmd.js                              7.67 kB │ gzip:     2.97 kB
+apps/viewer build: dist/assets/continuous-visuals-CfAJQcwA.js                    14.92 kB │ gzip:     4.94 kB
+apps/viewer build: dist/assets/observatory-EpfhGW7g.js                           21.45 kB │ gzip:     7.77 kB
+apps/viewer build: dist/assets/classic-CW6deke5.js                               35.70 kB │ gzip:    11.89 kB
+apps/viewer build: dist/assets/ashen-BWlJpvJW.js                                 42.69 kB │ gzip:    15.84 kB
+apps/viewer build: dist/assets/open-trial-diagnostic-view-D5neNMQX.js            72.90 kB │ gzip:    21.52 kB
+apps/viewer build: dist/assets/dist-CX374-nh.js                                 315.29 kB │ gzip:    93.28 kB
+apps/viewer build: ✓ built in 2.52s
+apps/viewer build: Done
+
+Every saved round reconstructed with identical world and event hashes.
