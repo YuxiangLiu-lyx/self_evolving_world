@@ -122,6 +122,10 @@ import { LONG_EX21_CONSTITUENT_TEST } from './long-ex21-constituent-test.js';
 import { LONG_EX22_SHELLED_FOOD } from './long-ex22-shelled-food.js';
 import { LONG_EX22_OBSERVATIONAL_DRAWING } from './long-ex22-observational-drawing.js';
 import { LONG_EX22_SLEEP } from './long-ex22-sleep.js';
+import { LONG_EX23_PLANT_WATERING } from './long-ex23-plant-watering.js';
+import { LONG_EX23_CASING_CRACKING } from './long-ex23-casing-cracking.js';
+import { LONG_EX23_DIGGING_TOOL } from './long-ex23-digging-tool.js';
+import { LONG_EX23_SEED_PROPAGATION } from './long-ex23-seed-propagation.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -239,6 +243,10 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_EX22_SHELLED_FOOD,
   LONG_EX22_OBSERVATIONAL_DRAWING,
   LONG_EX22_SLEEP,
+  LONG_EX23_PLANT_WATERING,
+  LONG_EX23_CASING_CRACKING,
+  LONG_EX23_DIGGING_TOOL,
+  LONG_EX23_SEED_PROPAGATION,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(
