@@ -248,6 +248,11 @@ export { collectiveFoodProfile } from './collective-food-profile.js';
 export { leanExposure } from './collective-shelter-exposure.js';
 export { simpleShelterExposure } from './long-shelter-exposure.js';
 export { sharedShelterExposure } from './long-shared-shelter-exposure.js';
+export {
+  WEATHER_SHELTER,
+  shelterMeasure,
+  weatherShelterExposure,
+} from './long-ex24-weather-shelter-physics.js';
 export { branchScreenExposure } from './long-branch-screen-exposure.js';
 export { collectiveJobs } from './collective-work.js';
 

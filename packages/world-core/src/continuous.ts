@@ -126,6 +126,12 @@ import { LONG_EX23_PLANT_WATERING } from './long-ex23-plant-watering.js';
 import { LONG_EX23_CASING_CRACKING } from './long-ex23-casing-cracking.js';
 import { LONG_EX23_DIGGING_TOOL } from './long-ex23-digging-tool.js';
 import { LONG_EX23_SEED_PROPAGATION } from './long-ex23-seed-propagation.js';
+import { LONG_EX24_VENTILATED_STORAGE } from './long-ex24-ventilated-storage.js';
+import { LONG_EX24_WEATHER_SHELTER } from './long-ex24-weather-shelter.js';
+import { LONG_EX24_MATERIAL_EXAMINATION } from './long-ex24-material-examination.js';
+import { LONG_EX24_LENGTH_REFERENCE } from './long-ex24-length-reference.js';
+import { LONG_EX24_FOOD_EVIDENCE } from './long-ex24-food-evidence.js';
+import { LONG_EX24_FOOD_STACK_SELECTION } from './long-ex24-food-stack-selection.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -247,6 +253,12 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_EX23_CASING_CRACKING,
   LONG_EX23_DIGGING_TOOL,
   LONG_EX23_SEED_PROPAGATION,
+  LONG_EX24_VENTILATED_STORAGE,
+  LONG_EX24_WEATHER_SHELTER,
+  LONG_EX24_MATERIAL_EXAMINATION,
+  LONG_EX24_LENGTH_REFERENCE,
+  LONG_EX24_FOOD_EVIDENCE,
+  LONG_EX24_FOOD_STACK_SELECTION,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(

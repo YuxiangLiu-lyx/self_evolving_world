@@ -636,3 +636,14 @@ export const LONG_EX21_CONSTITUENT_TEST: V7Package = {
   resources: [],
   satisfaction: [],
 };
+
+/** The unchanged parts that ex24 assess-food-evidence@1 reuses: the exact id-list and bounded
+ * text parsers, the classification of a supplied object, and the requirement-bill rows. */
+export type { Row as ConstituentRow, Status as ConstituentStatus };
+export {
+  ABSOLUTE as CONSTITUENT_ABSOLUTE_BALANCE,
+  SET_BY_METHOD as CONSTITUENT_SET_BY_METHOD,
+  bounded as constituentBounded,
+  classify as constituentClassify,
+  idList as constituentIdList,
+};

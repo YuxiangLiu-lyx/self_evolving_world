@@ -116,6 +116,149 @@ export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
       .join('');
     return `<path d="M0 -.45V.45" stroke="#c9b48a" stroke-width=".02" ${status === 'complete' ? '' : 'stroke-dasharray=".06 .05"'}/>${rods}${uprights}<text y="-.65" text-anchor="middle" fill="#fff0cf" font-size=".16">${status === 'complete' ? 'Screen' : `Screen ${svgText(status)} ${String(parts.length)} / 11`}</text>`;
   },
+  // ex24 prepare-ventilated-food-storage@1: a dashed footprint until the rack is complete; only
+  // laid supports and crosspieces are drawn (grey when loosened), stored food as separated units
+  // (blue-edged while wet), an airflow mark only while the coded storage checks pass, and a
+  // result label only after a comparison supports slower decay.
+  'ventilated-food-rack': (o) => {
+    const v = o.data.view,
+      view = v && typeof v === 'object' && !Array.isArray(v) ? v : {},
+      parts = (Array.isArray(view.pieces) ? view.pieces : []).flatMap((p) =>
+        p && typeof p === 'object' && !Array.isArray(p) ? [p] : [],
+      ),
+      status = typeof view.status === 'string' ? view.status : o.visual.state,
+      done = status === 'complete',
+      side = Number(view.footprint ?? 0) || 1,
+      n = (x: number) => String(Math.round(x * 1000) / 1000),
+      tint = (p: (typeof parts)[number]) =>
+        Number(p.condition ?? 0) >= 0.5
+          ? color(typeof p.color === 'string' ? p.color : '')
+          : '#8b8273',
+      bar = (p: (typeof parts)[number], along: boolean) => {
+        const d = Number(p.diameter ?? 0.04),
+          l = Number(p.length ?? side),
+          c = along ? Number(p.u ?? 0) : Number(p.v ?? 0);
+        return along
+          ? `<rect x="${n(c - d / 2)}" y="${n(-l / 2)}" width="${n(d)}" height="${n(l)}" rx="${n(d / 2)}" fill="${tint(p)}" stroke="#4f3d2a" stroke-width=".006"/>`
+          : `<rect x="${n(-l / 2)}" y="${n(c - d / 2)}" width="${n(l)}" height="${n(d)}" rx="${n(d / 2)}" fill="${tint(p)}" stroke="#4f3d2a" stroke-width=".006"/>`;
+      },
+      f = view.food,
+      food = f && typeof f === 'object' && !Array.isArray(f) ? f : null,
+      count = food ? Math.min(4, Math.ceil(Number(food.quantity ?? 0))) : 0,
+      units = Array.from(
+        { length: count },
+        (_, i) =>
+          `<ellipse cx="${n(-0.3 + i * 0.2)}" rx=".08" ry=".035" fill="${color(typeof food?.color === 'string' ? food.color : '')}"${food?.wet === true ? ' stroke="#7fb2d6" stroke-width=".015"' : ''}/>`,
+      ).join(''),
+      air =
+        view.favourable === true
+          ? '<path d="M-.34 .16Q-.24 .11-.14 .16T.06 .16T.26 .16" fill="none" stroke="#cfe3d6" stroke-width=".012" stroke-opacity=".8"/>'
+          : '',
+      label = done
+        ? view.demonstrated === true
+          ? 'Rack: slower decay shown'
+          : 'Rack'
+        : `Rack ${svgText(status)} ${String(parts.length)} / 5`;
+    return `${done ? '' : `<rect x="${n(-side / 2)}" y="${n(-side / 2)}" width="${n(side)}" height="${n(side)}" fill="none" stroke="#c9b48a" stroke-width=".012" stroke-dasharray=".05 .04"/>`}${parts
+      .filter((p) => p.role === 'support')
+      .map((p) => bar(p, true))
+      .join('')}${parts
+      .filter((p) => p.role === 'crosspiece')
+      .map((p) => bar(p, false))
+      .join(
+        '',
+      )}${units}${air}<text y="${n(-side / 2 - 0.1)}" text-anchor="middle" fill="#fff0cf" font-size=".16">${label}</text>`;
+  },
+  // ex24 construct-weather-shelter@1, in plan: a dashed floor outline until the final
+  // inspection passes; only laid rods (grey when loosened), covering panels by their measured
+  // cover (gaps dashed), bedding (blue-edged when wet), drips while rain reaches the floor, red
+  // marks for broken lashings, and an occupancy mark only while protection is active.
+  'thatched-weather-shelter': (o) => {
+    const v = o.data.view,
+      view = v && typeof v === 'object' && !Array.isArray(v) ? v : {},
+      list = (x: unknown): Record<string, unknown>[] =>
+        (Array.isArray(x) ? (x as unknown[]) : []).flatMap((p) =>
+          p && typeof p === 'object' && !Array.isArray(p)
+            ? [p as Record<string, unknown>]
+            : [],
+        ),
+      record = (x: unknown): Record<string, unknown> =>
+        x && typeof x === 'object' && !Array.isArray(x)
+          ? (x as Record<string, unknown>)
+          : {},
+      rods = list(view.rods),
+      panels = list(view.panels),
+      materials = record(view.materials),
+      bedding = record(view.bedding),
+      joints = record(view.joints),
+      work = record(view.work),
+      status = typeof view.status === 'string' ? view.status : o.visual.state,
+      done = status === 'complete',
+      n = (x: number) => String(Math.round(x * 1000) / 1000),
+      frame = (f: unknown) => -0.8 + 0.8 * Number(f ?? 0),
+      tint = (p: (typeof rods)[number]) =>
+        Number(p.condition ?? 0) >= 0.5 && status !== 'collapsed'
+          ? color(typeof p.color === 'string' ? p.color : '')
+          : '#8b8273',
+      rod = (p: (typeof rods)[number]) => {
+        const side = p.side === 'L' ? -1 : 1,
+          y0 = frame(p.from),
+          y1 = frame(p.to),
+          x =
+            p.role === 'ridge'
+              ? 0
+              : p.role === 'rail'
+                ? side * 0.4
+                : side * 0.4 * (p.row === 'upper' ? 1 / 3 : 2 / 3);
+        return p.role === 'leg'
+          ? `<path d="M${n(side * 0.4)} ${n(y0)}L0 ${n(y0)}" stroke="${tint(p)}" stroke-width=".04" stroke-linecap="round"/>`
+          : `<path d="M${n(x)} ${n(y0)}L${n(x)} ${n(y1)}" stroke="${tint(p)}" stroke-width=".035" stroke-linecap="round"/>`;
+      },
+      cover = color(
+        typeof materials.covering === 'string' ? materials.covering : '',
+      ),
+      panel = (p: (typeof panels)[number]) => {
+        const c = Math.max(0, Math.min(1, Number(p.cover ?? 0))),
+          laid = Number(p.laid ?? 0);
+        if (laid <= 0) return '';
+        const upper = p.course === 'upper',
+          x = p.side === 'L' ? (upper ? -0.2 : -0.4) : upper ? 0 : 0.2,
+          y = p.bay === 1 ? 0 : -0.8,
+          gap =
+            c < 0.999
+              ? ' stroke="#2f2a22" stroke-width=".012" stroke-dasharray=".03 .03"'
+              : '';
+        return p.id === 'rear'
+          ? `<rect x="-0.4" y="0.8" width="0.8" height="0.1" fill="${cover}" fill-opacity="${n(0.25 + 0.6 * c)}"${gap}/>`
+          : `<rect x="${n(x)}" y="${n(y)}" width="0.2" height="0.8" fill="${cover}" fill-opacity="${n(0.25 + 0.6 * c)}"${gap}/>`;
+      },
+      bed =
+        Number(bedding.laid ?? 0) > 0
+          ? `<rect x="-0.3" y="-0.7" width="0.6" height="1.4" rx=".05" fill="${color(typeof materials.bedding === 'string' ? materials.bedding : '')}" fill-opacity=".55"${bedding.dry === false ? ' stroke="#7fb2d6" stroke-width=".02"' : ''}/>`
+          : '',
+      drips =
+        view.dripping === true
+          ? '<circle cx="-.12" cy="-.2" r=".025" fill="#7fb2d6"/><circle cx=".1" cy=".25" r=".025" fill="#7fb2d6"/>'
+          : '',
+      broken = Number(joints.broken ?? 0),
+      breaks =
+        broken > 0
+          ? [0, 1, 2]
+              .map(
+                (f) =>
+                  `<path d="M-.05 ${n(frame(f) - 0.05)}l.1 .1m0 -.1l-.1 .1" stroke="#c0392b" stroke-width=".02"/>`,
+              )
+              .join('')
+          : '',
+      inside =
+        view.protectionActive === true
+          ? '<circle r=".12" fill="none" stroke="#cfe3d6" stroke-width=".02"/>'
+          : '',
+      label = done
+        ? `Shelter${view.protectionActive === true ? ' (sheltering)' : ''}`
+        : `Shelter ${svgText(status)} ${String(Number(work.completed ?? 0))} / ${String(Number(work.required ?? 10))}`;
+    return `<rect x="-0.4" y="-0.8" width="0.8" height="1.6" fill="none" stroke="#c9b48a" stroke-width=".012"${done ? '' : ' stroke-dasharray=".05 .04"'}/>${bed}${panels.map(panel).join('')}${rods.map(rod).join('')}${breaks}${drips}${inside}<text y="-1.02" text-anchor="middle" fill="#fff0cf" font-size=".16">${label}</text>`;
+  },
   // ex16 hand-weave-fiber-mat@1: a dashed 0.45 m square; strips and crossings appear only as paid
   // rounds lay them, unfinished, failed or worn work is grey with broken ends, a carried mat is a roll.
   'fiber-mat': (o) => {

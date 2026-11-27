@@ -345,7 +345,8 @@ describe('propagate a berry plant from seed in ex23', () => {
     const pkg = V7_PACKAGES.find((p) => p.id === id);
     const ability = pkg?.abilities[0];
     if (!pkg || !ability) throw new Error('Missing package.');
-    expect(V7_PACKAGES.at(-1)).toBe(pkg);
+    // The last ex23 package; later experiments' packages follow it.
+    expect(V7_PACKAGES.filter((p) => p.scope === 'long-ex23').at(-1)).toBe(pkg);
     expect(
       continuousRegistry(g)
         .packages.filter((p) => !p.id.startsWith('foundation-'))
