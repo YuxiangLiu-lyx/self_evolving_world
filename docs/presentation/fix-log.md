@@ -470,6 +470,69 @@ Experiment A extended ex16 from round 250 to 400 ([PR-43](../exec-plans/complete
 - **Fix (proposed, not applied)**: require a place, time or named activity in the schema (an `invitation` field), or verify invitations against `invited` events only.
 - **Metrics**: invitation precision on the next verified sample.
 
+## 11. Experiment B: newly exposed problems
+
+Experiment B ran three seed pairs of the old-goal and open-goal arms, ex19–ex24 ([PR-44](../exec-plans/completed/pr-44-b-goal-pairs.md), [run report](run-report-b-goal-pairs.md)). 11d–11g are applied fixes or process rules now in force; 11a–11c and 11h are proposals.
+
+### 11a. A rejection stop ended ex21 at round 44
+
+- **Problem**: the culture v2 recovery stops a run for review after three consecutive rejected outputs (`rejectionRecovery.stopAfter: 3`), and `repair` refuses to resume it by design. A person who keeps omitting one required plan field therefore ends the whole run.
+- **Evidence**:
+  - Moss's `ordinary-137`, `-138` and `-139` at tick 44 of ex21 were rejected with "Expected the registered task plan shape."; each omitted the required `preferences` field. The lead did not bypass the stop, so ex21 covers 44 of 80 rounds.
+  - Two-rejection pauses of the same kind came earlier: ex19 rounds 39 (Lin) and 50 (Kai), ex21 round 20 (Lin).
+  - 29 of B's 32 rejected outputs were this error, and all 29 omitted `preferences`: 23 in the old-goal arm (24 rejected of 445 ordinary calls) and 6 in the open-goal arm (8 of 375). In ticks 1–80, ex15 had 8 rejected of 147, ex16 4 of 140, ex17 0 of 110 and ex18 3 of 151.
+- **Fix (proposed, not applied; a scenario change)**: in a new run version, either accept an omitted `preferences` as an empty list, or return the validation message to the person in the next decision's input. Either change must not apply to B's archives, whose inputs are frozen.
+- **Metrics**: rejected outputs per ordinary call, the share that omit `preferences`, and rejection stops per run.
+
+### 11b. The token budget ended ex19 at round 76
+
+- **Problem**: B fixed the hard token budget at 1,500,000 per run (R2). A run with many calls exhausts it before round 80.
+- **Evidence**: ex19 stopped at round 76 with 1,463,499 tokens on its ledger, because the frozen budget could not reserve the next complete attempt. It made 176 calls (161 ordinary, 15 World Agent). ex23 reached round 80 with 1,410,016 tokens and 179 calls. The open-goal runs used 1,011,619–1,140,358 tokens.
+- **Fix (proposed, not applied; a user decision for the next allocation)**: size the budget from measured usage, for example the largest B ledger at round 80 plus one attempt's reservation, or report a run that stops on its budget separately from runs that complete their window, as this report does.
+- **Metrics**: ledger at the last round, and rounds reached per run.
+
+### 11c. `repair` can start while a pause capture is still running
+
+- **Problem**: after a technical pause, the develop process captures the paused archive's screenshots. If `repair` starts before that capture finishes, the capture fails.
+- **Evidence**: at ex21's round-20 rejection pause, the capture failed with "Invalid or unfinished continuous archive". The retained `technical-pauses/round-20/recovery.json` records `captureStatus: running`. The simulation was preserved, and the final capture of round 44 ran normally.
+- **Fix (proposed, not applied)**: let `repair` refuse, or wait, while the latest pause's capture is still running.
+- **Metrics**: technical pauses whose `captureStatus` is not `completed` (1 in B).
+
+### 11d. Permission denials and the rules that followed
+
+- **Problem**: the permission system refused two writes. One was the implementing agent's new source file for ex23's watering handoff, which paused that handoff. The other was the lead's brief in a newly created worktree, `sew-lab`. The user said neither denial was intended.
+- **Evidence**: the ex23 handoff resumed under a scope the user narrowed (see the [run report](run-report-b-goal-pairs.md#handoffs)). `sew-lab` (branch `tmp/b-labels`) was used only to label ex19–ex22; its results were moved into the B worktree, and it is no longer used.
+- **Fix (applied as process rules by the user)**: no new worktrees; test a target location with a harmless file before writing there; report a denial with its full path and message, without a workaround.
+- **Metrics**: denials per experiment, and workarounds after a denial (none should occur).
+
+### 11e. A zsh loop passed an empty seed
+
+- **Problem**: an earlier labeling loop relied on word splitting of an unquoted variable, which zsh does not do by default. The `--seed` argument was empty.
+- **Evidence**: that run made no model call. The lead re-ran it with explicit seeds, and each label directory's negative sample now records the archive's own seed (20261201–20261203 for B, 20261123 for the references).
+- **Fix (applied)**: one explicit command per label run instead of a word-split loop.
+- **Metrics**: label directories whose `negatives-sample.json` seed differs from the archive seed (0).
+
+### 11f. Handoffs need hooks in shared runtime modules
+
+- **Problem**: some B packages could only work through hooks in shared runtime modules, which every archive replays.
+- **Evidence**: ex21 `small-combustion-source` (`forest-environment`: warmth and burns), ex22 `sleep-in-place` (`open-experience`: the routine list), ex23 `rooted-plant-watering` (`open-physical` `openConditions`: root-zone water), ex24 `prepare-ventilated-food-storage` (`forest-environment`: a decay multiplier of 0.8, the specification's declared coefficient) and ex24 `construct-weather-shelter` (`forest-environment`: exposure). The ex19 lever comparator was refactored into a factory.
+- **Fix (applied)**: each hook is gated on its own package revision, so it changes nothing in a world that has not installed the package. Every archive, ex7–ex24, replays byte-identically on the merged code.
+- **Metrics**: compatibility digests of ex7–ex24 after each merge (all identical).
+
+### 11g. A subagent wrote to `/tmp/null`
+
+- **Problem**: temporary files outside the worktree can collide across agents.
+- **Evidence**: a subagent briefly wrote `/tmp/null` and deleted it. That also removed an older `/tmp/null` left by the D subagent.
+- **Fix (applied as a brief rule)**: temporary files go only in the worktree's git-ignored `validation-results/scratch/`, never in `/tmp`.
+- **Metrics**: files written outside the worktree during an experiment (none should occur).
+
+### 11h. The annotation ledger total was overstated after A
+
+- **Problem**: the experiment A report and the PR-43 results give the annotation ledger after A as 31,004 tokens, which counts the two calibration calls twice. A share computed from that figure understates B's annotation cost.
+- **Evidence**: before B, the six calls in `labels/ledger.json` sum to 23,408 tokens: 7,596 for the two calibration calls and 15,812 for the four ex16-1-400 batches. B's 14 calls sum to 45,466, and the ledger now stands at 68,874.
+- **Fix (proposed, not applied)**: correct the A figure, and take ledger totals from the file with a command rather than by hand.
+- **Metrics**: report figures that differ from the ledger file's sums (0).
+
 ## Limitations
 
 - Fixes 2–4 are turned on together in E1, so one run cannot separate their effects causally; section 5 attributes them by mechanism only. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.

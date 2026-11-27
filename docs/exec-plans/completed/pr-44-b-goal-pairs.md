@@ -4,7 +4,7 @@
 
 Experiment B tests whether the goal sentence changes what people build together. It also tests how robust the result is across seeds. The two arms differ only in two places of the ordinary input:
 
-- `long-culture-v2` uses the open goal and the first-person leaning sentence;
+- `long-culture-v2` uses the open goal and the leaning sentence "You tend to value _leaning_.";
 - `long-culture-v2-oldgoal` uses ex15's original goal sentence, with the leaning only as a data field.
 
 `apps/simulator/test/long-culture-v2-oldgoal.test.ts` proves that the inputs are otherwise byte-identical. Both arms run on the same three new seeds, so each seed forms a pair.
@@ -79,4 +79,21 @@ Out of scope: changes to earlier archives, to the transport or to the v2 prompt 
 
 ## Results
 
-Pending.
+See the [run report](../../presentation/run-report-b-goal-pairs.md).
+
+- R1: seeds 20261201, 20261202 and 20261203, each shared by one old-goal and one open-goal run.
+- R2: six serial runs in the planned order, ex19 (seed 1, old goal) to ex24 (seed 3, open goal), each with a handoff budget of 8 and a token budget of 1,500,000.
+  - ex19 stopped at round 76 on its token budget (1,463,499 of 1,500,000), and ex21 at round 44 on the rejection stop: three consecutive rejected outputs without `preferences` (fix-log 11a, 11b). Both keep their results.
+  - ex20, ex22, ex23 and ex24 completed 80 rounds. All six people survived in every run.
+- R3: 22 counted handoffs (old goal 4, 4, 4; open goal 2, 2, 6), each a simplified but real mechanism.
+  - Rejected outputs: 24 of 445 ordinary calls in the old-goal arm and 8 of 375 in the open-goal arm, all uncounted.
+  - One transport failure (ex20, HTTP 503) was repaired after 60 s. ex23's first handoff ran under the user's narrowed scope after a permission denial.
+- R4: the six run ledgers total 7,064,562 tokens. The 14 annotation calls counted 45,466 tokens, and the annotation ledger stands at 68,874 of 1,000,000.
+- R5 and R6, measured with `scripts/culture-metrics-pairs.ts` from labels verified by Claude agents (not a human):
+  - In 11 of the 24 pair comparisons the open-goal run was higher, in none the old-goal run, and 13 were ties at zero. The old-goal runs had no verified positive label.
+  - Measure 4 is partly mechanical (the open-goal prompt states the leaning), measure 3 rests on 6–24 messages per run, ex21 covers 44 rounds, and three pairs support no significance test or generalization.
+  - ex15 (ticks 1–70) and ex16 (ticks 1–80) are reported separately, from a fresh labeling pass. A supplementary, not pre-registered, ticks 1–44 window for the seed-2 pair gives the same comparison as the full window.
+- R7:
+  - The six archives, the eight label directories with their verified timelines and the measure outputs in `docs/presentation/b-measures/` are delivered.
+  - So are the report, five highlights and fix-log section 11. The companion analyses are `experiment/analyses/ex19` … `ex24/pr-44-b-goal-pairs`.
+  - Every archive, ex7–ex24, replays byte-identically on the merged code. `pnpm validate` and CI `quality` and `pr-policy` had not run when this was written; their results belong to the PR.
