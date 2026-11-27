@@ -1,6 +1,7 @@
 import type { V7Point, V7Resource, V7World } from './continuous-types.js';
 import { v7Distance } from './continuous-geometry.js';
 import { v7RoundNumber } from './continuous-data.js';
+import { rootZoneMoisture } from './long-ex23-root-zone-water.js';
 
 /** Immutable, local forcing. Recovery is gradual; elapsed time never unlocks capabilities. */
 export function openConditions(world: V7World, point: V7Point) {
@@ -29,7 +30,14 @@ export function openConditions(world: V7World, point: V7Point) {
   }
   const base =
     ground === ',' || ground === '=' ? 0.9 : ground === ':' ? 0.25 : 0.65;
-  const moisture = Math.max(0.05, Math.min(1.5, base - drought + waterlogging));
+  const unwatered = Math.max(
+    0.05,
+    Math.min(1.5, base - drought + waterlogging),
+  );
+  // ex23 rooted-plant-watering@1: retained root-zone water of a watered planted cell. It is 0
+  // without an actual delivery and without that installed revision, so other worlds replay.
+  const added = rootZoneMoisture(world, point);
+  const moisture = added > 0 ? Math.min(1.5, unwatered + added) : unwatered;
   return {
     ground,
     moisture: v7RoundNumber(moisture),
@@ -43,6 +51,12 @@ export function openConditions(world: V7World, point: V7Point) {
         : waterlogging > 0.25
           ? 'saturated soil'
           : 'ordinary soil',
+    ...(added > 0
+      ? {
+          rootZoneWater: v7RoundNumber(added),
+          unwatered: v7RoundNumber(unwatered),
+        }
+      : {}),
   };
 }
 

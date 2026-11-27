@@ -1,0 +1,34 @@
+{
+  "run": "ex19-1-80",
+  "overall": {
+    "entries": 12,
+    "verified": 12,
+    "pending": 0,
+    "agree": 12,
+    "partial": 0,
+    "disagree": 0,
+    "agreement": 1,
+    "lenient": 1
+  },
+  "positives": {
+    "entries": 0,
+    "verified": 0,
+    "pending": 0,
+    "agree": 0,
+    "partial": 0,
+    "disagree": 0,
+    "agreement": null,
+    "lenient": null
+  },
+  "negatives": {
+    "entries": 12,
+    "verified": 12,
+    "pending": 0,
+    "agree": 12,
+    "partial": 0,
+    "disagree": 0,
+    "agreement": 1,
+    "lenient": 1
+  },
+  "categories": {}
+}

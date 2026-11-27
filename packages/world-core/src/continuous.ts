@@ -113,6 +113,31 @@ import { LONG_SECTIONED_CORD } from './long-sectioned-fiber-cord.js';
 import { LONG_CROSSING_LASHING } from './long-crossing-lashing.js';
 import { LONG_CROSSING_FRAPPING } from './long-crossing-frapping.js';
 import { LONG_EXTENDED_SECTIONED_CORD } from './long-extended-sectioned-cord.js';
+import { LONG_EX19_FOOD_AIR_EXPOSURE } from './long-ex19-food-air-exposure.js';
+import { LONG_EX19_THIN_SLICE_FOOD_DRYING } from './long-ex19-thin-slice-food-drying.js';
+import { LONG_EX19_CUTTING_EDGE_ASSESSMENT } from './long-ex19-cutting-edge-assessment.js';
+import { LONG_EX19_SHELL_COMPRESSION_OPENING } from './long-ex19-shell-compression-opening.js';
+import { LONG_EX19_LEVER_MASS_COMPARATOR } from './long-ex19-lever-mass-comparison.js';
+import { LONG_EX20_SURFACE_MARKING } from './long-ex20-surface-marking.js';
+import { LONG_EX20_SAMPLE_OPENING } from './long-ex20-sample-opening.js';
+import { LONG_EX21_AIR_DRY_FOOD } from './long-ex21-air-dry-food.js';
+import { LONG_EX21_SMALL_COMBUSTION } from './long-ex21-small-combustion.js';
+import { LONG_EX21_BEAM_MASS_COMPARATOR } from './long-ex21-beam-mass-comparator.js';
+import { LONG_EX21_SAMPLE_DRYING } from './long-ex21-sample-drying.js';
+import { LONG_EX21_CONSTITUENT_TEST } from './long-ex21-constituent-test.js';
+import { LONG_EX22_SHELLED_FOOD } from './long-ex22-shelled-food.js';
+import { LONG_EX22_OBSERVATIONAL_DRAWING } from './long-ex22-observational-drawing.js';
+import { LONG_EX22_SLEEP } from './long-ex22-sleep.js';
+import { LONG_EX23_PLANT_WATERING } from './long-ex23-plant-watering.js';
+import { LONG_EX23_CASING_CRACKING } from './long-ex23-casing-cracking.js';
+import { LONG_EX23_DIGGING_TOOL } from './long-ex23-digging-tool.js';
+import { LONG_EX23_SEED_PROPAGATION } from './long-ex23-seed-propagation.js';
+import { LONG_EX24_VENTILATED_STORAGE } from './long-ex24-ventilated-storage.js';
+import { LONG_EX24_WEATHER_SHELTER } from './long-ex24-weather-shelter.js';
+import { LONG_EX24_MATERIAL_EXAMINATION } from './long-ex24-material-examination.js';
+import { LONG_EX24_LENGTH_REFERENCE } from './long-ex24-length-reference.js';
+import { LONG_EX24_FOOD_EVIDENCE } from './long-ex24-food-evidence.js';
+import { LONG_EX24_FOOD_STACK_SELECTION } from './long-ex24-food-stack-selection.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -221,6 +246,31 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_CROSSING_LASHING,
   LONG_CROSSING_FRAPPING,
   LONG_EXTENDED_SECTIONED_CORD,
+  LONG_EX19_FOOD_AIR_EXPOSURE,
+  LONG_EX19_THIN_SLICE_FOOD_DRYING,
+  LONG_EX19_CUTTING_EDGE_ASSESSMENT,
+  LONG_EX19_SHELL_COMPRESSION_OPENING,
+  LONG_EX19_LEVER_MASS_COMPARATOR,
+  LONG_EX20_SURFACE_MARKING,
+  LONG_EX20_SAMPLE_OPENING,
+  LONG_EX21_AIR_DRY_FOOD,
+  LONG_EX21_SMALL_COMBUSTION,
+  LONG_EX21_BEAM_MASS_COMPARATOR,
+  LONG_EX21_SAMPLE_DRYING,
+  LONG_EX21_CONSTITUENT_TEST,
+  LONG_EX22_SHELLED_FOOD,
+  LONG_EX22_OBSERVATIONAL_DRAWING,
+  LONG_EX22_SLEEP,
+  LONG_EX23_PLANT_WATERING,
+  LONG_EX23_CASING_CRACKING,
+  LONG_EX23_DIGGING_TOOL,
+  LONG_EX23_SEED_PROPAGATION,
+  LONG_EX24_VENTILATED_STORAGE,
+  LONG_EX24_WEATHER_SHELTER,
+  LONG_EX24_MATERIAL_EXAMINATION,
+  LONG_EX24_LENGTH_REFERENCE,
+  LONG_EX24_FOOD_EVIDENCE,
+  LONG_EX24_FOOD_STACK_SELECTION,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(

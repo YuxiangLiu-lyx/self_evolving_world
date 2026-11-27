@@ -1,0 +1,67 @@
+{
+  "archive": "experiment/ex21",
+  "through": 44,
+  "labels": "docs/presentation/labels/ex21-1-80",
+  "measures": {
+    "adoptedNames": 0,
+    "narratives": 0,
+    "narrativeContinuations": 0,
+    "nonTransactionalShare": 0,
+    "caresWithOwnLeaning": 0,
+    "normRepetitions": 0,
+    "attendedInvitations": 0,
+    "valuedObjects": 0
+  },
+  "detail": {
+    "adoptedNames": [],
+    "narratives": {
+      "items": [],
+      "continuations": []
+    },
+    "normRepetitions": [],
+    "valuedObjects": [],
+    "nonTransactional": {
+      "messages": 6,
+      "nonTransactional": 0
+    },
+    "caresLeanings": [
+      {
+        "actor": "lin",
+        "leaning": "freedom",
+        "first": null,
+        "versions": 1
+      },
+      {
+        "actor": "moss",
+        "leaning": "belonging",
+        "first": null,
+        "versions": 1
+      },
+      {
+        "actor": "sol",
+        "leaning": "beauty",
+        "first": null,
+        "versions": 1
+      },
+      {
+        "actor": "kai",
+        "leaning": "fairness",
+        "first": null,
+        "versions": 1
+      },
+      {
+        "actor": "wren",
+        "leaning": "mastery",
+        "first": null,
+        "versions": 1
+      },
+      {
+        "actor": "ivo",
+        "leaning": "calm",
+        "first": null,
+        "versions": 1
+      }
+    ],
+    "attendedInvitations": []
+  }
+}

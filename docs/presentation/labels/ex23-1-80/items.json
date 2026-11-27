@@ -1,0 +1,145 @@
+{
+  "format": "self-evolving-world/culture-label-items",
+  "version": 1,
+  "archive": "experiment/ex23",
+  "range": { "from": 1, "through": 80 },
+  "people": [
+    { "id": "lin", "name": "Lin" },
+    { "id": "moss", "name": "Moss" },
+    { "id": "sol", "name": "Sol" },
+    { "id": "kai", "name": "Kai" },
+    { "id": "wren", "name": "Wren" },
+    { "id": "ivo", "name": "Ivo" }
+  ],
+  "context": [],
+  "items": [
+    {
+      "id": "u0001",
+      "tick": 19,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["sol"],
+      "text": "Branch trial observations. I tested an owned branch sample at press intensity 0.25: it held, with recorded flexibility 0.2. This establishes only that trial condition, not structural safety. A wetting trial failed because no local water was accessible."
+    },
+    {
+      "id": "u0002",
+      "tick": 33,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["wren", "ivo"],
+      "text": "A small hazelnut sample opened with my stone on this rock; I separated a pale kernel from the casing. That establishes opening, not food safety: nutrition, toxins and preparation remain unknown. I have not eaten it."
+    },
+    {
+      "id": "u0003",
+      "tick": 38,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["kai", "wren"],
+      "text": "My own 0.1 hazelnut trial also opened with stone on stone and yielded separated kernel and casing. That confirms mechanical separation only; food safety, toxins and nutrition remain unknown. I have not tasted it."
+    },
+    {
+      "id": "u0004",
+      "tick": 45,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["kai", "ivo"],
+      "text": "My own 0.1 hazelnut trial fractured the casing with stone on this rock, then separated kernel and fragments. This confirms mechanical opening only; edibility, toxins and nutrition remain unknown. I have not eaten it."
+    },
+    {
+      "id": "u0005",
+      "tick": 66,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["kai", "ivo"],
+      "text": "Four abrasion strokes on my branch with my stone removed 0.04 kg of wood; the tip measured about 26 mm afterward. It was still unfinished at that point. I have not yet tested it in soil."
+    },
+    {
+      "id": "u0006",
+      "tick": 71,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["wren"],
+      "text": "My shaped branch displaced no forest soil at load 0.05: the end was too blunt at that load. It remains sound after that stroke. I will try 0.10 once; this does not yet establish a useful digging tool."
+    },
+    {
+      "id": "u0007",
+      "tick": 73,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["kai", "ivo"],
+      "text": "My shaped branch displaced no meadow soil at loads 0.05 and 0.15: both reported a tip too blunt at those loads. I saw your 0.10 forest stroke move a little soil. Different ground and tools limit comparison; I will test 0.25 once here."
+    },
+    {
+      "id": "u0008",
+      "tick": 73,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["wren"],
+      "text": "My seven-stroke shaped branch moved 0.00002 m3 of forest soil at load 0.10, penetrating about 8.7 mm. It remains sound with no cracks. Load 0.05 moved none. This verifies a small digging effect here, not performance in other soils."
+    },
+    {
+      "id": "u0009",
+      "tick": 76,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["lin", "kai", "ivo"],
+      "text": "My meadow stroke at load 0.25 displaced 0.000006 m3, penetrating about 5.8 mm. The branch is sound with no cracks after three use strokes. Loads 0.05 and 0.15 moved none here; this establishes only a small local digging effect."
+    }
+  ],
+  "mapping": {
+    "u0001": {
+      "tick": 19,
+      "actor": "moss",
+      "callId": "ordinary-36",
+      "eventId": "event-19-moss-193"
+    },
+    "u0002": {
+      "tick": 33,
+      "actor": "kai",
+      "callId": "ordinary-101",
+      "eventId": "event-33-kai-356"
+    },
+    "u0003": {
+      "tick": 38,
+      "actor": "ivo",
+      "callId": "ordinary-108",
+      "eventId": "event-38-ivo-431"
+    },
+    "u0004": {
+      "tick": 45,
+      "actor": "wren",
+      "callId": "ordinary-120",
+      "eventId": "event-45-wren-520"
+    },
+    "u0005": {
+      "tick": 66,
+      "actor": "wren",
+      "callId": "ordinary-152",
+      "eventId": "event-66-wren-746"
+    },
+    "u0006": {
+      "tick": 71,
+      "actor": "ivo",
+      "callId": "ordinary-169",
+      "eventId": "event-71-ivo-796"
+    },
+    "u0007": {
+      "tick": 73,
+      "actor": "wren",
+      "callId": "ordinary-170",
+      "eventId": "event-73-wren-821"
+    },
+    "u0008": {
+      "tick": 73,
+      "actor": "ivo",
+      "callId": "ordinary-173",
+      "eventId": "event-73-ivo-821"
+    },
+    "u0009": {
+      "tick": 76,
+      "actor": "wren",
+      "callId": "ordinary-177",
+      "eventId": "event-76-wren-858"
+    }
+  }
+}

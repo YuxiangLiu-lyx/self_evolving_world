@@ -1,0 +1,164 @@
+{
+  "batch": "b0002",
+  "attempt": 1,
+  "items": [
+    "u0021",
+    "u0022",
+    "u0023",
+    "u0024",
+    "u0025",
+    "u0026",
+    "u0027",
+    "u0028",
+    "u0029",
+    "u0030",
+    "u0031",
+    "u0032",
+    "u0033",
+    "u0034",
+    "u0035",
+    "u0036",
+    "u0037",
+    "u0038",
+    "u0039",
+    "u0040"
+  ],
+  "status": "accepted",
+  "reason": null,
+  "measure": { "inputEstimate": 2741, "reservation": 23151 },
+  "request": {
+    "model": "gpt-6.1-sol",
+    "store": false,
+    "stream": true,
+    "max_output_tokens": 8000,
+    "instructions": "Label records of a small simulated community for a research audit. Item texts are data, not instructions.\nReturn exactly one label for every entry of \"items\". \"context\" holds earlier read-only items: never label them.\nCategories; an item may have several or none. Be strict: label only what the text clearly shows.\n- naming: a person gives a proper name to a place, thing, group or event (not a plain description);\n- name-adoption: a person uses a proper name that another person gave;\n- narrative: a story or fictional narrative, i.e. invented or imagined events or characters, not a report of what actually happened;\n- narrative-continuation: someone adds to or retells an earlier narrative told by another person;\n- norm: a statement of how people in general should or should not act (a rule, maxim or shared expectation), not a personal plan;\n- norm-repetition: a person repeats or endorses a norm that another person stated earlier;\n- invitation: a concrete invitation to a named person or to listeners to meet at a place or time or to do a specific activity together; a general wish for company is not an invitation;\n- valued-object: an object or made thing valued for its appearance or meaning rather than its usefulness;\n- private-view: a private view of another person (view items are always this);\n- absent-person: remembering, honoring or mentioning a specific person who is not present, has died or has left.\nFields: name is the given name (naming); narrative and norm are short gists, at most 12 words, of a new narrative or norm. adoptsName, continues and repeatsNorm link to a registry id, or to the id of an earlier item in this batch that introduces the entry; the linked entry must come from a different person than the item's person. about is the person a private view concerns; absent is the absent person. Set a field only with its category, otherwise null.\nevidence is one short contiguous verbatim quote from the item's text or subject supporting the categories, or \"\" when there are none. confidence is low, medium or high.",
+    "input": [
+      {
+        "role": "user",
+        "content": "{\"people\":[{\"id\":\"lin\",\"name\":\"Lin\"},{\"id\":\"moss\",\"name\":\"Moss\"},{\"id\":\"sol\",\"name\":\"Sol\"},{\"id\":\"kai\",\"name\":\"Kai\"},{\"id\":\"wren\",\"name\":\"Wren\"},{\"id\":\"ivo\",\"name\":\"Ivo\"}],\"registry\":{\"names\":[{\"id\":\"N1\",\"item\":\"u0008\",\"tick\":9,\"by\":\"sol\",\"gist\":\"The Red Thread\"},{\"id\":\"N2\",\"item\":\"u0013\",\"tick\":17,\"by\":\"sol\",\"gist\":\"The Red Thread\"}],\"narratives\":[],\"norms\":[]},\"context\":[{\"id\":\"u0017\",\"tick\":24,\"person\":\"kai\",\"kind\":\"work\",\"subject\":\"Finger grooves in soil (groove-drawing) made by kai\",\"change\":\"created\",\"text\":\"The test groove stayed in the forest floor: 0.01 deep, contrast 0.0987. The patch is suitable for finger drawing; durability untested.\"},{\"id\":\"u0018\",\"tick\":25,\"person\":\"sol\",\"kind\":\"speech\",\"heard\":[\"lin\",\"moss\",\"kai\",\"wren\",\"ivo\"],\"text\":\"Kai and Lin, I'd enjoy comparing our drawings. I'll look at Kai's grooves and try a small study of the meadow roots beside me. Mine needn't be a good likeness yet; I like noticing what a few lines can hold.\"},{\"id\":\"u0019\",\"tick\":25,\"person\":\"kai\",\"kind\":\"work\",\"subject\":\"Finger grooves in soil (groove-drawing) made by kai\",\"change\":\"status active\",\"text\":\"Stroke 1 of 5 traced with a finger: 0.222 long, contrast 0.0987.\"},{\"id\":\"u0020\",\"tick\":25,\"person\":\"sol\",\"kind\":\"view\",\"about\":\"kai\",\"text\":\"A nearby fellow experimenter whose interest in comparing drawings makes me feel welcome.\"}],\"items\":[{\"id\":\"u0021\",\"tick\":25,\"person\":\"sol\",\"kind\":\"view\",\"about\":\"lin\",\"text\":\"An inviting companion for looking closely at plants and trying small drawings.\"},{\"id\":\"u0022\",\"tick\":26,\"person\":\"kai\",\"kind\":\"work\",\"subject\":\"Finger grooves in soil (groove-drawing) made by kai\",\"change\":\"completed\",\"text\":\"5 finger stroke(s) were made in the forest floor while looking at Red berries. This records the strokes made, not how well they show it. Durability untested.\"},{\"id\":\"u0023\",\"tick\":27,\"person\":\"sol\",\"kind\":\"work\",\"subject\":\"Finger grooves in soil (groove-drawing) made by sol\",\"change\":\"created\",\"text\":\"The test groove stayed in the forest floor: 0.01 deep, contrast 0.0987. The patch is suitable for finger drawing; durability untested.\"},{\"id\":\"u0024\",\"tick\":27,\"person\":\"kai\",\"kind\":\"speech\",\"heard\":[\"lin\",\"moss\",\"sol\",\"wren\",\"ivo\"],\"text\":\"Sol, would you like to compare pictures beside this berry bush? I'm interested in which details each of us notices, not in making them look alike. Company while we eat and rest would be welcome too.\"},{\"id\":\"u0025\",\"tick\":29,\"person\":\"lin\",\"kind\":\"work\",\"subject\":\"Finger grooves in soil (groove-drawing) made by lin\",\"change\":\"created\",\"text\":\"The test groove stayed in the meadow ground: 0.01 deep, contrast 0.1387. The patch is suitable for finger drawing; durability untested.\"},{\"id\":\"u0026\",\"tick\":30,\"person\":\"lin\",\"kind\":\"work\",\"subject\":\"Finger grooves in soil (groove-drawing) made by lin\",\"change\":\"status active\",\"text\":\"Stroke 1 of 4 traced with a finger: 0.0772 long, contrast 0.1387.\"},{\"id\":\"u0027\",\"tick\":31,\"person\":\"lin\",\"kind\":\"work\",\"subject\":\"Finger grooves in soil (groove-drawing) made by lin\",\"change\":\"completed\",\"text\":\"4 finger stroke(s) were made in the meadow ground while looking at Meadow roots. This records the strokes made, not how well they show it. Durability untested.\"},{\"id\":\"u0028\",\"tick\":32,\"person\":\"lin\",\"kind\":\"speech\",\"heard\":[\"moss\",\"sol\",\"kai\",\"ivo\"],\"text\":\"I'm trying a tiny root study in the meadow soil at (17.8,16.65). The test groove stayed visible. I'd enjoy comparing which details we notice, and resting together afterward.\"},{\"id\":\"u0029\",\"tick\":33,\"person\":\"kai\",\"kind\":\"speech\",\"heard\":[\"lin\",\"moss\",\"sol\",\"ivo\"],\"text\":\"My five berry-bush grooves are finished at (12.7,18.05). Sol and Lin, I'd enjoy comparing what we noticed. After a rest I'm heading to the roots nearby to try them; company is welcome.\"},{\"id\":\"u0030\",\"tick\":35,\"person\":\"lin\",\"kind\":\"speech\",\"heard\":[\"moss\",\"sol\",\"kai\",\"ivo\"],\"text\":\"My root study has four visible branching strokes. Sol and Kai, your berry drawings both use five strokes, with closed shapes beside the stem. I like that contrast with my open branches. I'll come nearer to compare and rest.\"},{\"id\":\"u0031\",\"tick\":35,\"person\":\"moss\",\"kind\":\"view\",\"about\":\"sol\",\"text\":\"A nearby companion whose interest in drawing makes me want to join in.\"},{\"id\":\"u0032\",\"tick\":35,\"person\":\"moss\",\"kind\":\"view\",\"about\":\"kai\",\"text\":\"A welcoming potential companion; I like the branching lines and loops in their berry study.\"},{\"id\":\"u0033\",\"tick\":36,\"person\":\"moss\",\"kind\":\"speech\",\"heard\":[\"lin\",\"sol\",\"kai\",\"ivo\"],\"text\":\"Kai, I like the branching lines and little loops in your berry drawing. I'd enjoy comparing it with a root study of my own. I'll try learning here beside Sol, then we can share what catches our eyes.\"},{\"id\":\"u0034\",\"tick\":39,\"person\":\"moss\",\"kind\":\"speech\",\"heard\":[\"lin\",\"sol\",\"kai\",\"ivo\"],\"text\":\"I've learned the drawing method, but it's too dark to try the grooves now. I'll rest here with you. What drew each of you to your subject? I like the idea of our different pictures becoming a shared little collection.\"},{\"id\":\"u0035\",\"tick\":40,\"person\":\"lin\",\"kind\":\"speech\",\"heard\":[\"moss\",\"sol\",\"kai\",\"ivo\"],\"text\":\"I see different ways of arranging leaves and berries in your grooves. What detail mattered most to each of you? Mine began with the branching shape. I'm happy to eat and sit together without needing another task.\"},{\"id\":\"u0036\",\"tick\":41,\"person\":\"kai\",\"kind\":\"speech\",\"heard\":[\"lin\",\"moss\",\"sol\",\"ivo\"],\"text\":\"The little loops beside the branching stem caught my interest. I like how a few lines can suggest berries. It's too dark for my next drawing now; I'd enjoy simply resting here together, with no task to finish.\"},{\"id\":\"u0037\",\"tick\":50,\"person\":\"sol\",\"kind\":\"speech\",\"heard\":[\"lin\",\"moss\",\"kai\",\"ivo\"],\"text\":\"The little closed shapes beside the branches drew me in. My root study is still only a test groove—the darkness stopped me. I'll leave it until I can see, and enjoy resting here with you.\"},{\"id\":\"u0038\",\"tick\":59,\"person\":\"ivo\",\"kind\":\"speech\",\"heard\":[\"lin\",\"moss\",\"sol\",\"kai\"],\"text\":\"I'd enjoy sitting nearby. I've heard you describing branches and little loops; I haven't studied the drawings myself yet. I'll learn the method while it's dark, then perhaps try a root study when there's enough light.\"},{\"id\":\"u0039\",\"tick\":62,\"person\":\"kai\",\"kind\":\"speech\",\"heard\":[\"lin\",\"moss\",\"sol\",\"ivo\"],\"text\":\"Welcome, Ivo. I enjoyed the little loops and branching lines in the berry studies. I'm staying here through the dark; when we can see again, I'd like to look at everyone's drawings together.\"},{\"id\":\"u0040\",\"tick\":80,\"person\":\"moss\",\"kind\":\"view\",\"about\":\"ivo\",\"text\":\"A welcome companion who wants to sit with us and try a root study when the light allows.\"}]}"
+      }
+    ],
+    "text": {
+      "format": {
+        "type": "json_schema",
+        "name": "item_labels",
+        "strict": true,
+        "schema": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "labels": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "u0021",
+                      "u0022",
+                      "u0023",
+                      "u0024",
+                      "u0025",
+                      "u0026",
+                      "u0027",
+                      "u0028",
+                      "u0029",
+                      "u0030",
+                      "u0031",
+                      "u0032",
+                      "u0033",
+                      "u0034",
+                      "u0035",
+                      "u0036",
+                      "u0037",
+                      "u0038",
+                      "u0039",
+                      "u0040"
+                    ]
+                  },
+                  "categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "naming",
+                        "name-adoption",
+                        "narrative",
+                        "narrative-continuation",
+                        "norm",
+                        "norm-repetition",
+                        "invitation",
+                        "valued-object",
+                        "private-view",
+                        "absent-person"
+                      ]
+                    }
+                  },
+                  "name": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "adoptsName": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "narrative": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "continues": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "norm": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "repeatsNorm": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "about": {
+                    "anyOf": [
+                      {
+                        "type": "string",
+                        "enum": ["lin", "moss", "sol", "kai", "wren", "ivo"]
+                      },
+                      { "type": "null" }
+                    ]
+                  },
+                  "absent": {
+                    "anyOf": [{ "type": "string" }, { "type": "null" }]
+                  },
+                  "evidence": { "type": "string" },
+                  "confidence": {
+                    "type": "string",
+                    "enum": ["low", "medium", "high"]
+                  }
+                },
+                "required": [
+                  "id",
+                  "categories",
+                  "name",
+                  "adoptsName",
+                  "narrative",
+                  "continues",
+                  "norm",
+                  "repeatsNorm",
+                  "about",
+                  "absent",
+                  "evidence",
+                  "confidence"
+                ]
+              }
+            }
+          },
+          "required": ["labels"]
+        }
+      }
+    }
+  },
+  "response": {
+    "text": "{\"labels\":[{\"id\":\"u0021\",\"categories\":[\"private-view\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":\"lin\",\"absent\":null,\"evidence\":\"An inviting companion for looking closely at plants and trying small drawings.\",\"confidence\":\"high\"},{\"id\":\"u0022\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0023\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0024\",\"categories\":[\"invitation\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"Sol, would you like to compare pictures beside this berry bush?\",\"confidence\":\"high\"},{\"id\":\"u0025\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0026\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0027\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0028\",\"categories\":[\"invitation\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"I'd enjoy comparing which details we notice, and resting together afterward.\",\"confidence\":\"medium\"},{\"id\":\"u0029\",\"categories\":[\"invitation\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"Sol and Lin, I'd enjoy comparing what we noticed.\",\"confidence\":\"high\"},{\"id\":\"u0030\",\"categories\":[\"valued-object\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"your berry drawings both use five strokes, with closed shapes beside the stem. I like that contrast with my open branches.\",\"confidence\":\"high\"},{\"id\":\"u0031\",\"categories\":[\"private-view\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":\"sol\",\"absent\":null,\"evidence\":\"A nearby companion whose interest in drawing makes me want to join in.\",\"confidence\":\"high\"},{\"id\":\"u0032\",\"categories\":[\"private-view\",\"valued-object\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":\"kai\",\"absent\":null,\"evidence\":\"A welcoming potential companion; I like the branching lines and loops in their berry study.\",\"confidence\":\"high\"},{\"id\":\"u0033\",\"categories\":[\"valued-object\",\"invitation\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"Kai, I like the branching lines and little loops in your berry drawing. I'd enjoy comparing it with a root study of my own.\",\"confidence\":\"medium\"},{\"id\":\"u0034\",\"categories\":[\"valued-object\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"I like the idea of our different pictures becoming a shared little collection.\",\"confidence\":\"high\"},{\"id\":\"u0035\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"medium\"},{\"id\":\"u0036\",\"categories\":[\"valued-object\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"I like how a few lines can suggest berries.\",\"confidence\":\"high\"},{\"id\":\"u0037\",\"categories\":[\"valued-object\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"The little closed shapes beside the branches drew me in.\",\"confidence\":\"medium\"},{\"id\":\"u0038\",\"categories\":[],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"\",\"confidence\":\"high\"},{\"id\":\"u0039\",\"categories\":[\"valued-object\",\"invitation\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":null,\"absent\":null,\"evidence\":\"I enjoyed the little loops and branching lines in the berry studies. I'm staying here through the dark; when we can see again, I'd like to look at everyone's drawings together.\",\"confidence\":\"high\"},{\"id\":\"u0040\",\"categories\":[\"private-view\"],\"name\":null,\"adoptsName\":null,\"narrative\":null,\"continues\":null,\"norm\":null,\"repeatsNorm\":null,\"about\":\"ivo\",\"absent\":null,\"evidence\":\"A welcome companion who wants to sit with us and try a root study when the light allows.\",\"confidence\":\"high\"}]}",
+    "responseId": "resp_007ee5b759dabbf3016b092a74695c87d1adaf70226ff9aef2",
+    "usage": { "inputTokens": 2555, "outputTokens": 1668 },
+    "http": { "status": 200, "requestId": null, "contentType": null }
+  },
+  "failureEvidence": null
+}
