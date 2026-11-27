@@ -1,9 +1,11 @@
 import {
   initialLongWorld,
   LONG_SCENARIOS,
+  longCultureScenario,
   longObjective,
 } from '../apps/simulator/src/long-scenario.js';
 import type { LongScenario } from '../apps/simulator/src/long-scenario.js';
+import { longAllocationNote, parseLongAllocation } from './long-allocation.js';
 import { longPreflight } from './long-preflight.js';
 import {
   importLongWorld,
@@ -66,7 +68,8 @@ import {
 } from './continuous-analysis.js';
 
 const USAGE = `Usage:
-  pnpm experiment:continuous -- new open|long|long-fixes|long-culture|long-culture-incentives|long-culture-v2|long-culture-v2-incentives|long-culture-v3|long-culture-v3-incentives|collective-a
+  pnpm experiment:continuous -- new open|long|long-fixes|long-culture|long-culture-incentives|long-culture-v2|long-culture-v2-incentives|long-culture-v2-oldgoal|long-culture-v3|long-culture-v3-incentives|collective-a
+  pnpm experiment:continuous -- new long-culture-TAG [--seed N] [--development N] [--tokens N]
   pnpm experiment:continuous -- new collective-b exA
   pnpm experiment:continuous -- new long-culture-v2 --import exN --newcomers file.json
   pnpm experiment:continuous -- continue exN
@@ -82,8 +85,14 @@ try {
   let id: string, state: V7Execution, token: string | undefined;
   if (command === 'new') {
     const scenario = target;
+    const long: LongScenario | undefined = LONG_SCENARIOS.find(
+      (s) => s === scenario,
+    );
     // Opt-in import: a completed culture window as genesis, plus newcomers.
     const importing = scenario === 'long-culture-v2' && extra === '--import';
+    // Only the long culture tags take allocation options; every other tag takes none.
+    const allocates =
+      !importing && long !== undefined && longCultureScenario(long);
     if (
       !['open', ...LONG_SCENARIOS, 'collective-a', 'collective-b'].includes(
         scenario ?? '',
@@ -92,11 +101,18 @@ try {
         ? rest.length !== 3 ||
           !/^ex[1-9]\d*$/.test(rest[0] ?? '') ||
           rest[1] !== '--newcomers'
-        : (scenario === 'collective-b'
+        : !allocates &&
+          ((scenario === 'collective-b'
             ? !/^ex[1-9]\d*$/.test(extra ?? '')
-            : extra) || rest.length)
+            : extra) ||
+            rest.length))
     )
       throw new Error(USAGE);
+    // Set once at genesis, before the first call; no flag keeps the tag's frozen values.
+    const allocation = allocates
+      ? parseLongAllocation(extra === undefined ? [] : [extra, ...rest])
+      : {};
+    const note = longAllocationNote(allocation);
     checkExperiments(root);
     const source = importing ? readLongImportSource(root, rest[0] ?? '') : null;
     const newcomers = source
@@ -114,16 +130,13 @@ try {
           })
         : null;
     const comparison = scenario?.startsWith('collective-') ?? false;
-    const long: LongScenario | undefined = LONG_SCENARIOS.find(
-      (s) => s === scenario,
-    );
     const arm = scenario === 'collective-a' ? 'A' : 'B';
     const genesis =
       imported('long-preflight')?.world ??
       (comparison
         ? initialCollectiveWorld('collective-preflight', arm)
         : long
-          ? initialLongWorld('long-preflight', long)
+          ? initialLongWorld('long-preflight', long, allocation)
           : initialOpenWorld());
     const physicalHash = comparison
       ? continuousHash(collectivePhysicalGenesis(genesis))
@@ -186,7 +199,7 @@ try {
         (comparison
           ? initialCollectiveWorld(`collective-${id}`, arm)
           : long
-            ? initialLongWorld(`long-${id}`, long)
+            ? initialLongWorld(`long-${id}`, long, allocation)
             : initialOpenWorld(`open-${id}`)),
     );
     if (comparison) state.windowTarget = 200;
@@ -197,8 +210,10 @@ try {
       objective: comparison
         ? COLLECTIVE_OBJECTIVE
         : state.world.config.longDevelopment
-          ? longObjective(state.world.config.longDevelopment)
+          ? `${longObjective(state.world.config.longDevelopment)}${note ? ` ${note}` : ''}`
           : OPEN_OBJECTIVE,
+      // The verifier rebuilds the genesis of a culture run with this recorded allocation.
+      ...(note ? { allocation } : {}),
       schedule: 'continuous-v1',
       controller: 'chatgpt-plan',
       steps: 0,
@@ -241,7 +256,7 @@ try {
         : 'Initial open-development-v1 fresh policy, inheritSkills=false, with only the explicit authored baseline. No historical generated skills, objects, rewards or mastery. Offline policies and composition fixtures are excluded from ordinary inputs.',
     );
     console.log(
-      `Allocated ${id} (${scenario ?? ''}${source ? ` imported from ${source.proof.experiment} at round ${String(source.proof.round)}` : ''}).`,
+      `Allocated ${id} (${scenario ?? ''}${source ? ` imported from ${source.proof.experiment} at round ${String(source.proof.round)}` : ''}).${note ? ` ${note}` : ''}`,
     );
   } else {
     if (!target || !/^ex[1-9]\d*$/.test(target)) throw new Error(USAGE);

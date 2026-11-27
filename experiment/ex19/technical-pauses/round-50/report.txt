@@ -1,0 +1,74 @@
+# ex19: Continuous World and Persistent Wellbeing
+
+## Scope and observation window
+
+As the culture v2 run, with the ex15 goal sentence in place of the open goal and the value leaning shown only as a tendencies field, as in ex15; no particular outcome, activity or invention is required. Frozen ordinary/world/development attempt ceilings: 1800/300/8. Shared ordinary/world token ceiling: 1500000.
+
+Observed 50 of 80 target rounds. State: paused. A long-development decision failed; its complete request, response or uncertainty and token charge are retained for current-conversation review. This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.
+
+## Measured outcome
+
+| Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | Learned-interface successful rounds |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| lin | true | 100 | 75 | 9.34 | 8.95 | 2 | 3 |
+| moss | true | 100 | 77 | 9.61 | 9.43 | 3 | 4 |
+| sol | true | 100 | 75 | 9.10 | 9.18 | 1 | 0 |
+| kai | true | 100 | 67 | 9.64 | 9.05 | 2 | 3 |
+| wren | true | 100 | 63 | 9.28 | 9.57 | 3 | 3 |
+| ivo | true | 100 | 81 | 9.41 | 9.34 | 2 | 1 |
+
+Requests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits. This fresh policy inherits no generated interfaces. The explicit authored allowlist, current-run package provenance, personal projects, verified knowledge, trials and persistent processes are retained separately in results.openDevelopment. Actor-written progress is a claim, not a physical outcome. Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.
+
+## Action distribution
+
+| Interface | Attempted | Successful rounds | Failed rounds |
+| --- | --- | --- | --- |
+| navigate | 80 | 78 | 2 |
+| gather | 21 | 19 | 2 |
+| eat | 18 | 18 | 0 |
+| rest | 98 | 98 | 0 |
+| probe | 8 | 8 | 0 |
+| learn | 11 | 11 | 0 |
+| request | 5 | 5 | 0 |
+| wait | 33 | 33 | 0 |
+| food-air-exposure-trial | 12 | 12 | 0 |
+| tell | 5 | 5 | 0 |
+| pickup | 3 | 3 | 0 |
+| message | 1 | 1 | 0 |
+| shell-compression-opening | 1 | 1 | 0 |
+| cutting-edge-assessment | 1 | 0 | 1 |
+| thin-slice-food-drying-trial | 3 | 1 | 2 |
+
+## Cost and limitations
+
+ordinary: 118 attempted calls, 7 failed/rejected; 893287 recorded input tokens and 49520 recorded output tokens; 0 attempts with unknown token usage; 1200.7 elapsed seconds.
+
+world: 12 attempted calls, 0 failed/rejected; 56873 recorded input tokens and 9565 recorded output tokens; 0 attempts with unknown token usage; 239.4 elapsed seconds.
+
+3 pre-counted conversation development handoffs, 0 failed validation attempts. 3 of them use the development budget; accepted handoffs that installed no package and changed no runtime source do not. Current-conversation development handoffs are counted before work. Internal coding/reasoning calls, tokens and preparation/review costs are not directly metered; these unknown costs are not zero.
+
+## Evidence and reproduction
+
+Configuration and isolated survival feasibility are in configuration.json and preflight.json. The feasibility oracle and isolated extension fixtures never enter ordinary decision context. Every actual inference has an immutable calls/ record, including transport failures. replay.json indexes checksummed segments; source-history.json binds retained source, packages, tests and activation boundaries. The observatory reconstructs saved rounds; playback cannot advance the world.
+
+Run `pnpm experiment:check` and `pnpm test` to validate saved evidence. Open `/observatory.html?experiment=ex19` for the game view. Use the current task's development handoff to continue a pending barrier; do not allocate a replacement run or repeat an uncertain call.
+
+## Forest lifecycle and environment
+
+Model: gpt-6.1-sol. Seed: 20261201. Observed seasons: spring. Deaths and respawns are retained with exact evidence and prior plans in results.json. Full-state replay remains independent of rendering. Monetary cost and internal developer usage are unknown; recorded role-specific tokens below are measured. These formal events are distinct from isolated forest-lab fixtures.
+
+Lin: 0 deaths, 3 remaining lives.
+
+Moss: 0 deaths, 3 remaining lives.
+
+Sol: 0 deaths, 3 remaining lives.
+
+Kai: 0 deaths, 3 remaining lives.
+
+Wren: 0 deaths, 3 remaining lives.
+
+Ivo: 0 deaths, 3 remaining lives.
+
+## Interpretation
+
+The current-conversation behavioral analysis accompanies this archive and traces actual problems, proposed functions, review, implementation, use and consequences. Shared object use is distinguished from explicit communication or consent. Novel names, proposals, installations and offspring counts are not happiness rewards. The observation window is resumable; completed capture is not world termination.

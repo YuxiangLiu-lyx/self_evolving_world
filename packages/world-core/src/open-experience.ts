@@ -79,6 +79,9 @@ export function openRoutine(
     'gather',
     'eat',
     'drop',
+    // ex22 sleep-in-place@1 recovers through rest's own code: the same subsistence routine,
+    // neither progress work nor relief from routine. Absent elsewhere, so other runs replay.
+    ...(world.revisions.includes('sleep-in-place@1') ? ['sleep-in-place'] : []),
   ];
   const meaningful = world.events.some(
     (e) =>

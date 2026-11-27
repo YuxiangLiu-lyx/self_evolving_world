@@ -1,0 +1,457 @@
+{
+  "format": "self-evolving-world/culture-label-items",
+  "version": 1,
+  "archive": "experiment/ex24",
+  "range": { "from": 1, "through": 80 },
+  "people": [
+    { "id": "lin", "name": "Lin" },
+    { "id": "moss", "name": "Moss" },
+    { "id": "sol", "name": "Sol" },
+    { "id": "kai", "name": "Kai" },
+    { "id": "wren", "name": "Wren" },
+    { "id": "ivo", "name": "Ivo" }
+  ],
+  "context": [],
+  "items": [
+    {
+      "id": "u0001",
+      "tick": 1,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["sol"],
+      "text": "Introductions and company. Hi Sol, I'm Moss. I'm heading to the meadow roots near (14.84, 18.71) to collect some food and rest nearby. I'd enjoy some company if you'd like to join me somewhere with room beside the patch. How are you doing?"
+    },
+    {
+      "id": "u0002",
+      "tick": 1,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "Hello, I'm Kai. I know these berries provide food and have no toxicity. I'll aim to take four from the nearby bush, leaving some for others. I'd like to cooperate on food and shelter, and share what we actually learn."
+    },
+    {
+      "id": "u0003",
+      "tick": 4,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "ivo"],
+      "text": "The nearby bush is crowded and our gathering conflicted. I'll move east to another visible berry patch so we needn't compete here."
+    },
+    {
+      "id": "u0004",
+      "tick": 4,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss"],
+      "text": "Food and company. I'm well, thank you. The first berry bush is crowded, so I'm going west to the berries near (10.37, 16.12) for food and rest. I'd enjoy company later; let's leave each other room to gather."
+    },
+    {
+      "id": "u0005",
+      "tick": 11,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "Thanks for making room, Lin. I've eaten and recovered my energy. I'll investigate the nearby dry grass and how we could make weather shelter. I'll share tested findings; I don't yet know what materials or methods will work."
+    },
+    {
+      "id": "u0006",
+      "tick": 14,
+      "person": "moss",
+      "kind": "view",
+      "about": "sol",
+      "text": "A welcoming neighbor who appreciates company and enough room to gather."
+    },
+    {
+      "id": "u0007",
+      "tick": 14,
+      "person": "moss",
+      "kind": "view",
+      "about": "kai",
+      "text": "A potential collaborator who is investigating shelter and offering to share tested findings."
+    },
+    {
+      "id": "u0008",
+      "tick": 15,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["sol"],
+      "text": "Company with room to gather. Thanks, Sol. I've collected roots and rested. I'll come to the open space east of you, around (12.5, 16.5), leaving your berry patch clear. I'd enjoy hearing what you'd like to do next, or simply resting nearby together."
+    },
+    {
+      "id": "u0009",
+      "tick": 16,
+      "person": "sol",
+      "kind": "view",
+      "about": "moss",
+      "text": "A considerate potential companion; I welcome their offer of quiet company and room to gather."
+    },
+    {
+      "id": "u0010",
+      "tick": 19,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss"],
+      "text": "Rest and Westward Lanterns. Quiet company sounds lovely. I'm eating a few berries and resting here, west of your proposed spot. I think of this patch as Westward Lanterns. Once I've recovered, I'd enjoy looking for a beautiful place together, without rushing or crowding the food plants."
+    },
+    {
+      "id": "u0011",
+      "tick": 20,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "ivo"],
+      "text": "My shelter inspection found this spot overlaps the berry bush and branches, so I won't build here. The design needs measured rods, binding and dry covering; nearby dry grass does not qualify. I'll examine branches first."
+    },
+    {
+      "id": "u0012",
+      "tick": 21,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["kai"],
+      "text": "Company and shelter cooperation. I've gathered meadow roots and eaten; I know they provide 14 nutrition with no toxicity. I'm moving to open space near (12.5, 16.5) for company with Sol. I'd enjoy helping with shelter when you know what materials or work would be useful. What have you found?"
+    },
+    {
+      "id": "u0013",
+      "tick": 23,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "ivo"],
+      "text": "Thanks, Moss. The first shelter site overlaps plants and branches. We need measured rods, binding, covering and bedding; dry grass won't qualify. Branch observation showed stock, not dimensions. I'll investigate measuring materials."
+    },
+    {
+      "id": "u0014",
+      "tick": 27,
+      "person": "sol",
+      "kind": "name",
+      "sign": "name",
+      "subject": "Red berries",
+      "text": "Westward Lanterns"
+    },
+    {
+      "id": "u0015",
+      "tick": 29,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss"],
+      "text": "A small walk west. Westward Lanterns has its name now. I'm rested and taking a short walk northwest toward the berries at (8.66, 14.19), to look closely rather than gather more. You're welcome to join me at a little distance; no need to share a standing spot or hurry."
+    },
+    {
+      "id": "u0016",
+      "tick": 30,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "ivo"],
+      "text": "I've learned material examination. Accurate dimensions need a calibrated reference, which we haven't established. I'll inspect a branch and investigate that missing tool before promising a shelter or asking anyone to gather supplies."
+    },
+    {
+      "id": "u0017",
+      "tick": 34,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "Moss, thanks for offering help. Shelter construction is still blocked by unverified materials and no established measuring standard. Please don't gather for it yet. I'd enjoy company while we rest; I have berries for my own meals."
+    },
+    {
+      "id": "u0018",
+      "tick": 37,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss"],
+      "text": "A little farther west. The western berries are plentiful here. I'm continuing toward the hazelnut plant at (5.4, 12.5), just to look, then resting nearby. I like the idea of calling this western corner Low Amber. Quiet company is still welcome, with room for each of us."
+    },
+    {
+      "id": "u0019",
+      "tick": 38,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo"],
+      "text": "I inspected a meadow root, but darkness prevented visual checks; that did not establish food safety. Moss, I saw you eat roots. Have you learned anything about their safety or preparation? I still have known-safe berries."
+    },
+    {
+      "id": "u0020",
+      "tick": 40,
+      "person": "wren",
+      "kind": "work",
+      "subject": "Ventilated branch rack (ventilated-food-rack) made by wren",
+      "change": "created",
+      "text": "Five pieces are reserved and stay carried until paid rounds lay them; a progress record holds the site, recipe, capacity and costs."
+    },
+    {
+      "id": "u0021",
+      "tick": 42,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo"],
+      "text": "My non-ingestive root assessment was inconclusive: safety and preparation remain unknown. I'll stick with known-safe berries for now and take a short walk east. No storage benefit has been tested by me."
+    },
+    {
+      "id": "u0022",
+      "tick": 43,
+      "person": "wren",
+      "kind": "work",
+      "subject": "Ventilated branch rack (ventilated-food-rack) made by wren",
+      "change": "completed",
+      "text": "Round 3 of 3: the last crosspiece is laid and the stability and load check passed. The rack holds up to 4 separated units in one layer, rated 74.06489796 kg. Preservation is not shown by building it."
+    },
+    {
+      "id": "u0023",
+      "tick": 44,
+      "person": "sol",
+      "kind": "name",
+      "sign": "name",
+      "subject": "Hazelnuts",
+      "text": "Low Amber"
+    },
+    {
+      "id": "u0024",
+      "tick": 48,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "wren", "ivo"],
+      "text": "I'm keeping shelter work paused: I still lack a calibrated measuring reference. For now I'd enjoy some company. What would each of you like to do beyond gathering food and resting?"
+    },
+    {
+      "id": "u0025",
+      "tick": 54,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["ivo"],
+      "text": "Beyond food and shelter, I'd like the freedom to wander and notice new places. I'm taking a short walk toward the willow northeast, then returning. I'd enjoy hearing what places others find interesting."
+    },
+    {
+      "id": "u0026",
+      "tick": 55,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "ivo"],
+      "text": "Kai, I enjoy practical experiments. My rack trial showed equal root decay over seven rainy rounds: no demonstrated benefit, not a safety test. I'll pause storage trials until drier conditions and study food evidence next."
+    },
+    {
+      "id": "u0027",
+      "tick": 63,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "ivo"],
+      "text": "Kai, I'd enjoy company. My rainy rack trial showed no preservation benefit. A length-reference procedure is available, but it still needs a real calibrated source; I will study its limits after gathering fresh food."
+    },
+    {
+      "id": "u0028",
+      "tick": 70,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["sol", "kai"],
+      "text": "Sol, I'd enjoy quiet company. A tiny invented story: a lantern tired of showing the way, so its friends sat beside it until dawn. What stories or small pleasures do you like? No hurry to answer."
+    },
+    {
+      "id": "u0029",
+      "tick": 73,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "sol", "ivo"],
+      "text": "Moss, I liked your lantern story. Here's an invented sequel: at dawn its friends brought no grand answers, only berries and another story. I'd enjoy sitting quietly nearby and hearing what happens next."
+    },
+    {
+      "id": "u0030",
+      "tick": 75,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss", "kai"],
+      "text": "Moss, I like quiet company and small names for places. An invented ending: the lantern slept while its friends watched the dawn; afterward, it shone simply because it loved the colors. I'm staying near Westward Lanterns for food and rest."
+    },
+    {
+      "id": "u0031",
+      "tick": 76,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["ivo"],
+      "text": "Ivo, I'd like life to include more than meals and rest. What would you enjoy exploring or making? I'm taking a break near these berries, and I'd welcome company without any obligation to work."
+    }
+  ],
+  "mapping": {
+    "u0001": {
+      "tick": 1,
+      "actor": "moss",
+      "callId": "ordinary-6",
+      "eventId": "event-1-moss-4"
+    },
+    "u0002": {
+      "tick": 1,
+      "actor": "kai",
+      "callId": "ordinary-12",
+      "eventId": "event-1-kai-4"
+    },
+    "u0003": {
+      "tick": 4,
+      "actor": "lin",
+      "callId": "ordinary-21",
+      "eventId": "event-4-lin-39"
+    },
+    "u0004": {
+      "tick": 4,
+      "actor": "sol",
+      "callId": "ordinary-24",
+      "eventId": "event-4-sol-39"
+    },
+    "u0005": {
+      "tick": 11,
+      "actor": "kai",
+      "callId": "ordinary-32",
+      "eventId": "event-11-kai-136"
+    },
+    "u0006": {
+      "tick": 14,
+      "actor": "moss",
+      "callId": "ordinary-43",
+      "eventId": null
+    },
+    "u0007": {
+      "tick": 14,
+      "actor": "moss",
+      "callId": "ordinary-43",
+      "eventId": null
+    },
+    "u0008": {
+      "tick": 15,
+      "actor": "moss",
+      "callId": "ordinary-43",
+      "eventId": "event-15-moss-190"
+    },
+    "u0009": {
+      "tick": 16,
+      "actor": "sol",
+      "callId": "ordinary-50",
+      "eventId": null
+    },
+    "u0010": {
+      "tick": 19,
+      "actor": "sol",
+      "callId": "ordinary-50",
+      "eventId": "event-19-sol-226"
+    },
+    "u0011": {
+      "tick": 20,
+      "actor": "kai",
+      "callId": "ordinary-56",
+      "eventId": "event-20-kai-233"
+    },
+    "u0012": {
+      "tick": 21,
+      "actor": "moss",
+      "callId": "ordinary-49",
+      "eventId": "event-21-moss-254"
+    },
+    "u0013": {
+      "tick": 23,
+      "actor": "kai",
+      "callId": "ordinary-60",
+      "eventId": "event-23-kai-273"
+    },
+    "u0014": {
+      "tick": 27,
+      "actor": "sol",
+      "callId": "ordinary-50",
+      "eventId": "event-27-sol-321"
+    },
+    "u0015": {
+      "tick": 29,
+      "actor": "sol",
+      "callId": "ordinary-69",
+      "eventId": "event-29-sol-337"
+    },
+    "u0016": {
+      "tick": 30,
+      "actor": "kai",
+      "callId": "ordinary-70",
+      "eventId": "event-30-kai-346"
+    },
+    "u0017": {
+      "tick": 34,
+      "actor": "kai",
+      "callId": "ordinary-81",
+      "eventId": "event-34-kai-388"
+    },
+    "u0018": {
+      "tick": 37,
+      "actor": "sol",
+      "callId": "ordinary-89",
+      "eventId": "event-37-sol-428"
+    },
+    "u0019": {
+      "tick": 38,
+      "actor": "lin",
+      "callId": "ordinary-97",
+      "eventId": "event-38-lin-443"
+    },
+    "u0020": {
+      "tick": 40,
+      "actor": "wren",
+      "callId": "ordinary-92",
+      "eventId": "event-40-wren-472"
+    },
+    "u0021": {
+      "tick": 42,
+      "actor": "lin",
+      "callId": "ordinary-103",
+      "eventId": "event-42-lin-493"
+    },
+    "u0022": {
+      "tick": 43,
+      "actor": "wren",
+      "callId": "ordinary-92",
+      "eventId": "event-43-wren-505"
+    },
+    "u0023": {
+      "tick": 44,
+      "actor": "sol",
+      "callId": "ordinary-89",
+      "eventId": "event-44-sol-514"
+    },
+    "u0024": {
+      "tick": 48,
+      "actor": "kai",
+      "callId": "ordinary-110",
+      "eventId": "event-48-kai-551"
+    },
+    "u0025": {
+      "tick": 54,
+      "actor": "lin",
+      "callId": "ordinary-117",
+      "eventId": "event-54-lin-617"
+    },
+    "u0026": {
+      "tick": 55,
+      "actor": "wren",
+      "callId": "ordinary-114",
+      "eventId": "event-55-wren-629"
+    },
+    "u0027": {
+      "tick": 63,
+      "actor": "wren",
+      "callId": "ordinary-126",
+      "eventId": "event-63-wren-717"
+    },
+    "u0028": {
+      "tick": 70,
+      "actor": "moss",
+      "callId": "ordinary-129",
+      "eventId": "event-70-moss-784"
+    },
+    "u0029": {
+      "tick": 73,
+      "actor": "kai",
+      "callId": "ordinary-137",
+      "eventId": "event-73-kai-808"
+    },
+    "u0030": {
+      "tick": 75,
+      "actor": "sol",
+      "callId": "ordinary-145",
+      "eventId": "event-75-sol-827"
+    },
+    "u0031": {
+      "tick": 76,
+      "actor": "lin",
+      "callId": "ordinary-146",
+      "eventId": "event-76-lin-836"
+    }
+  }
+}

@@ -408,8 +408,10 @@ export interface V7CultureOptions {
   /** Culture v2 ordinary prompt: health and safety are the only required goal, everything
    * else is open, and the value leaning is stated to the person in the second person.
    * Absent in ex15 and earlier, whose prompt stays unchanged. `open-2` (culture v3) adds
-   * "with whom" to the open goal and states that rest restores only missing energy. */
-  goal?: 'open' | 'open-2';
+   * "with whom" to the open goal and states that rest restores only missing energy.
+   * `original` (culture v2 old-goal) keeps the ex15 goal sentence and shows the leaning
+   * only as the `tendencies` field, as in ex15; its ordinary input carries no goal marker. */
+  goal?: 'open' | 'open-2' | 'original';
 }
 export interface V7Configuration {
   longDevelopment?: {
@@ -432,6 +434,7 @@ export interface V7Configuration {
       | 'culture-incentives'
       | 'culture-v2'
       | 'culture-v2-incentives'
+      | 'culture-v2-oldgoal'
       | 'culture-v3'
       | 'culture-v3-incentives'
       | 'culture-v2-import';

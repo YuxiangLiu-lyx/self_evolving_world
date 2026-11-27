@@ -1,0 +1,122 @@
+{
+  "archive": "experiment/ex20",
+  "through": 80,
+  "labels": "docs/presentation/labels/ex20-1-80",
+  "measures": {
+    "adoptedNames": 0,
+    "narratives": 0,
+    "narrativeContinuations": 0,
+    "nonTransactionalShare": 0,
+    "caresWithOwnLeaning": 5,
+    "normRepetitions": 3,
+    "attendedInvitations": 1,
+    "valuedObjects": 2
+  },
+  "detail": {
+    "adoptedNames": [],
+    "narratives": {
+      "items": [],
+      "continuations": []
+    },
+    "normRepetitions": [
+      {
+        "item": "u0015",
+        "person": "sol",
+        "entry": "R1",
+        "by": "kai"
+      },
+      {
+        "item": "u0024",
+        "person": "moss",
+        "entry": "R1",
+        "by": "kai"
+      },
+      {
+        "item": "u0031",
+        "person": "sol",
+        "entry": "R1",
+        "by": "kai"
+      }
+    ],
+    "valuedObjects": [
+      {
+        "object": "mark-11-sol-117",
+        "items": ["u0014", "u0020"]
+      },
+      {
+        "object": "mark-26-moss-335",
+        "items": ["u0030", "u0031"]
+      }
+    ],
+    "nonTransactional": {
+      "messages": 21,
+      "nonTransactional": 0
+    },
+    "caresLeanings": [
+      {
+        "actor": "lin",
+        "leaning": "freedom",
+        "first": {
+          "tick": 62,
+          "text": "Staying alive and independent, exploring at my own pace, and making room for curiosity, creativity and freely chosen company.",
+          "matches": ["freely"]
+        },
+        "versions": 2
+      },
+      {
+        "actor": "moss",
+        "leaning": "belonging",
+        "first": null,
+        "versions": 1
+      },
+      {
+        "actor": "sol",
+        "leaning": "beauty",
+        "first": {
+          "tick": 1,
+          "text": "Staying well enough to notice beauty; making modest things honestly, without confusing a lovely idea with a finished work.",
+          "matches": ["beauty"]
+        },
+        "versions": 2
+      },
+      {
+        "actor": "kai",
+        "leaning": "fairness",
+        "first": {
+          "tick": 1,
+          "text": "Staying healthy, treating neighbors fairly, and building a life with friendship, useful discoveries, and shared opportunities.",
+          "matches": ["fairly"]
+        },
+        "versions": 1
+      },
+      {
+        "actor": "wren",
+        "leaning": "mastery",
+        "first": {
+          "tick": 1,
+          "text": "Staying healthy while developing grounded practical mastery; learning which local resources can reliably support an independent life.",
+          "matches": ["practical mastery"]
+        },
+        "versions": 2
+      },
+      {
+        "actor": "ivo",
+        "leaning": "calm",
+        "first": {
+          "tick": 1,
+          "text": "Staying healthy and safe, living calmly, and gradually finding worthwhile ways to spend my time.",
+          "matches": ["calmly"]
+        },
+        "versions": 1
+      }
+    ],
+    "attendedInvitations": [
+      {
+        "invitation": "sign-12-moss-136",
+        "host": "moss",
+        "round": 18,
+        "present": ["lin", "moss", "sol"]
+      }
+    ]
+  }
+}

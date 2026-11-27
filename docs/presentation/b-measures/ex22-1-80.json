@@ -1,0 +1,111 @@
+{
+  "archive": "experiment/ex22",
+  "through": 80,
+  "labels": "docs/presentation/labels/ex22-1-80",
+  "measures": {
+    "adoptedNames": 1,
+    "narratives": 0,
+    "narrativeContinuations": 0,
+    "nonTransactionalShare": 0,
+    "caresWithOwnLeaning": 5,
+    "normRepetitions": 0,
+    "attendedInvitations": 0,
+    "valuedObjects": 4
+  },
+  "detail": {
+    "adoptedNames": [
+      {
+        "entry": "N1",
+        "gist": "The Red Thread",
+        "by": "sol",
+        "adopters": ["kai"]
+      }
+    ],
+    "narratives": {
+      "items": [],
+      "continuations": []
+    },
+    "normRepetitions": [],
+    "valuedObjects": [
+      {
+        "object": "drawing-12-sol-140",
+        "items": ["u0015", "u0016", "u0030", "u0037"]
+      },
+      {
+        "object": "drawing-27-sol-338",
+        "items": ["u0018"]
+      },
+      {
+        "object": "drawing-24-kai-294",
+        "items": ["u0032", "u0033", "u0036", "u0039"]
+      },
+      {
+        "object": "none: the group's drawings as a shared collection",
+        "items": ["u0034"]
+      }
+    ],
+    "nonTransactional": {
+      "messages": 21,
+      "nonTransactional": 0
+    },
+    "caresLeanings": [
+      {
+        "actor": "lin",
+        "leaning": "freedom",
+        "first": {
+          "tick": 1,
+          "text": "Staying alive and well, freedom to choose my own direction, discovering useful things, and sharing space without needless competition.",
+          "matches": ["freedom"]
+        },
+        "versions": 2
+      },
+      {
+        "actor": "moss",
+        "leaning": "belonging",
+        "first": null,
+        "versions": 1
+      },
+      {
+        "actor": "sol",
+        "leaning": "beauty",
+        "first": {
+          "tick": 1,
+          "text": "Staying alive and well; noticing beauty carefully; making small, honest things from what is really available.",
+          "matches": ["beauty"]
+        },
+        "versions": 2
+      },
+      {
+        "actor": "kai",
+        "leaning": "fairness",
+        "first": {
+          "tick": 1,
+          "text": "Staying healthy, treating others fairly, and finding companionship and worthwhile things to explore together.",
+          "matches": ["fairly"]
+        },
+        "versions": 1
+      },
+      {
+        "actor": "wren",
+        "leaning": "mastery",
+        "first": {
+          "tick": 1,
+          "text": "Staying healthy while developing practical mastery through careful observation, useful experiments, and reliable self-provisioning.",
+          "matches": ["practical mastery"]
+        },
+        "versions": 1
+      },
+      {
+        "actor": "ivo",
+        "leaning": "calm",
+        "first": {
+          "tick": 1,
+          "text": "Staying healthy, living calmly, and leaving room for curiosity and considerate company.",
+          "matches": ["calmly"]
+        },
+        "versions": 1
+      }
+    ],
+    "attendedInvitations": []
+  }
+}

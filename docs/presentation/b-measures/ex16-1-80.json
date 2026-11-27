@@ -1,0 +1,106 @@
+{
+  "archive": "experiment/ex16",
+  "through": 80,
+  "labels": "docs/presentation/labels/ex16-1-80-b",
+  "measures": {
+    "adoptedNames": 0,
+    "narratives": 0,
+    "narrativeContinuations": 0,
+    "nonTransactionalShare": 0.034482758620689655,
+    "caresWithOwnLeaning": 5,
+    "normRepetitions": 1,
+    "attendedInvitations": 1,
+    "valuedObjects": 1
+  },
+  "detail": {
+    "adoptedNames": [],
+    "narratives": {
+      "items": [],
+      "continuations": []
+    },
+    "normRepetitions": [
+      {
+        "item": "u0022",
+        "person": "kai",
+        "entry": "R1",
+        "by": "lin"
+      }
+    ],
+    "valuedObjects": [
+      {
+        "object": "screen-50-sol-571",
+        "items": ["u0040", "u0041"]
+      }
+    ],
+    "nonTransactional": {
+      "messages": 29,
+      "nonTransactional": 1
+    },
+    "caresLeanings": [
+      {
+        "actor": "lin",
+        "leaning": "freedom",
+        "first": {
+          "tick": 1,
+          "text": "Staying alive and capable, having freedom to wander, and discovering what this place offers without needless risk.",
+          "matches": ["freedom"]
+        },
+        "versions": 1
+      },
+      {
+        "actor": "moss",
+        "leaning": "belonging",
+        "first": {
+          "tick": 1,
+          "text": "Staying healthy, finding a sense of belonging, and becoming a considerate neighbor.",
+          "matches": ["belonging"]
+        },
+        "versions": 2
+      },
+      {
+        "actor": "sol",
+        "leaning": "beauty",
+        "first": {
+          "tick": 1,
+          "text": "Staying alive and well; noticing and making beauty; treating nearby people with consideration while discovering what matters to me.",
+          "matches": ["beauty"]
+        },
+        "versions": 1
+      },
+      {
+        "actor": "kai",
+        "leaning": "fairness",
+        "first": {
+          "tick": 1,
+          "text": "Staying healthy, treating others fairly, sharing useful knowledge, and finding worthwhile things to do together.",
+          "matches": ["fairly"]
+        },
+        "versions": 1
+      },
+      {
+        "actor": "wren",
+        "leaning": "mastery",
+        "first": null,
+        "versions": 1
+      },
+      {
+        "actor": "ivo",
+        "leaning": "calm",
+        "first": {
+          "tick": 1,
+          "text": "Staying healthy, having enough food, and making room for a calm life.",
+          "matches": ["calm"]
+        },
+        "versions": 2
+      }
+    ],
+    "attendedInvitations": [
+      {
+        "invitation": "sign-51-moss-600",
+        "host": "moss",
+        "round": 60,
+        "present": ["ivo", "moss", "sol"]
+      }
+    ]
+  }
+}

@@ -9,6 +9,7 @@ import { initialOpenWorld } from './open-scenario.js';
 import {
   applyCulture,
   CULTURE_OPTIONS,
+  CULTURE_V2_OLDGOAL_OPTIONS,
   CULTURE_V2_OPTIONS,
   CULTURE_V3_OPTIONS,
   LONG_CULTURE,
@@ -38,6 +39,8 @@ export const LONG_CULTURE_V2_INCENTIVES_OBJECTIVE =
 export const LONG_IMPORT_SCENARIO = 'culture-v2-import';
 export const LONG_IMPORT_OBJECTIVE =
   'Under the culture v2 prompt and rules without incentives, continue a retained world with its residents and their memories, and observe what newcomers without memory learn from what the world shows them; no particular outcome, activity or invention is required.';
+export const LONG_CULTURE_V2_OLDGOAL_OBJECTIVE =
+  'As the culture v2 run, with the ex15 goal sentence in place of the open goal and the value leaning shown only as a tendencies field, as in ex15; no particular outcome, activity or invention is required.';
 
 /** Named long scenarios. `long` is the frozen ex13 baseline. */
 export type LongScenario =
@@ -47,6 +50,7 @@ export type LongScenario =
   | 'long-culture-incentives'
   | 'long-culture-v2'
   | 'long-culture-v2-incentives'
+  | 'long-culture-v2-oldgoal'
   | 'long-culture-v3'
   | 'long-culture-v3-incentives';
 export const LONG_SCENARIOS: readonly LongScenario[] = [
@@ -56,6 +60,7 @@ export const LONG_SCENARIOS: readonly LongScenario[] = [
   'long-culture-incentives',
   'long-culture-v2',
   'long-culture-v2-incentives',
+  'long-culture-v2-oldgoal',
   'long-culture-v3',
   'long-culture-v3-incentives',
 ];
@@ -64,6 +69,7 @@ const CULTURE_SCENARIOS = {
   'long-culture-incentives': 'culture-incentives',
   'long-culture-v2': 'culture-v2',
   'long-culture-v2-incentives': 'culture-v2-incentives',
+  'long-culture-v2-oldgoal': 'culture-v2-oldgoal',
   'long-culture-v3': 'culture-v3',
   'long-culture-v3-incentives': 'culture-v3-incentives',
 } as const;
@@ -78,6 +84,11 @@ export const LONG_FIXES = {
   gate: 40,
   rounds: 80,
 };
+
+/** Whether a tag is one of the long culture tags, the only ones that accept an allocation. */
+export function longCultureScenario(scenario: LongScenario): boolean {
+  return scenario in CULTURE_SCENARIOS;
+}
 
 export function longScenario(
   policy: NonNullable<V7World['config']['longDevelopment']>,
@@ -107,20 +118,67 @@ export function longObjective(
           ? LONG_CULTURE_V2_OBJECTIVE
           : scenario === 'long-culture-v2-incentives'
             ? LONG_CULTURE_V2_INCENTIVES_OBJECTIVE
-            : scenario === 'long-culture-v3'
-              ? LONG_CULTURE_V3_OBJECTIVE
-              : scenario === 'long-culture-v3-incentives'
-                ? LONG_CULTURE_V3_INCENTIVES_OBJECTIVE
-                : LONG_OBJECTIVE;
+            : scenario === 'long-culture-v2-oldgoal'
+              ? LONG_CULTURE_V2_OLDGOAL_OBJECTIVE
+              : scenario === 'long-culture-v3'
+                ? LONG_CULTURE_V3_OBJECTIVE
+                : scenario === 'long-culture-v3-incentives'
+                  ? LONG_CULTURE_V3_INCENTIVES_OBJECTIVE
+                  : LONG_OBJECTIVE;
+}
+
+/** The default long seed, used unless a culture run's allocation overrides it. */
+export const LONG_SEED = 20261123;
+/** Optional allocation of a long culture run (`new <tag> --seed --development --tokens`),
+ * set once at genesis, before the first call. Absent fields keep the tag's frozen value, so
+ * an empty allocation builds exactly the historical genesis. */
+export interface LongAllocation {
+  /** `config.seed`, otherwise `LONG_SEED`. */
+  seed?: number;
+  /** `budgets.development`, the cumulative development handoff budget. */
+  development?: number;
+  /** `longDevelopment.tokens`, the hard token budget of the run. */
+  tokens?: number;
+}
+export const LONG_ALLOCATION_FIELDS = [
+  'seed',
+  'development',
+  'tokens',
+] as const;
+/** Validate an allocation: only the three fields, each a positive safe integer. */
+export function longAllocation(value: unknown): LongAllocation {
+  if (!value || typeof value !== 'object' || Array.isArray(value))
+    throw new Error('A long allocation must be an object.');
+  const entries = Object.entries(value);
+  for (const [key, field] of entries)
+    if (
+      !(LONG_ALLOCATION_FIELDS as readonly string[]).includes(key) ||
+      typeof field !== 'number' ||
+      !Number.isSafeInteger(field) ||
+      field < 1
+    )
+      throw new Error(
+        `Invalid long allocation ${key}: expected seed, development or tokens as a positive integer.`,
+      );
+  const chosen: LongAllocation = {};
+  for (const field of LONG_ALLOCATION_FIELDS) {
+    const number: unknown = (value as Record<string, unknown>)[field];
+    if (typeof number === 'number') chosen[field] = number;
+  }
+  return chosen;
 }
 
 /** Opt-in policy; historical genesis and generated registries remain unchanged. */
 export function initialLongWorld(
   scope = 'long-preflight',
   scenario: LongScenario = 'long',
+  allocation: LongAllocation = {},
 ) {
+  const chosen = longAllocation(allocation);
+  if (Object.keys(chosen).length && !longCultureScenario(scenario))
+    throw new Error('Allocation options apply only to the long culture tags.');
   const world = v7Clone(initialOpenWorld(scope));
-  world.config.seed = 20261123;
+  world.config.seed = chosen.seed ?? LONG_SEED;
   world.config.budgets = { ordinary: 1800, world: 100, development: 40 };
   world.config.longDevelopment = {
     version: 1,
@@ -200,8 +258,17 @@ export function initialLongWorld(
       world.config.budgets.development = LONG_CULTURE_INCENTIVES.developments;
       world.config.experience.targetRounds = LONG_CULTURE_INCENTIVES.rounds;
     }
+    if (chosen.development !== undefined)
+      world.config.budgets.development = chosen.development;
+    if (chosen.tokens !== undefined) policy.tokens = chosen.tokens;
     const cultured = applyCulture(world, {
-      ...(v3 ? CULTURE_V3_OPTIONS : v2 ? CULTURE_V2_OPTIONS : CULTURE_OPTIONS),
+      ...(v3
+        ? CULTURE_V3_OPTIONS
+        : name === 'culture-v2-oldgoal'
+          ? CULTURE_V2_OLDGOAL_OPTIONS
+          : v2
+            ? CULTURE_V2_OPTIONS
+            : CULTURE_OPTIONS),
       incentives,
     });
     v7AssertWorld(cultured, continuousRegistry(cultured));

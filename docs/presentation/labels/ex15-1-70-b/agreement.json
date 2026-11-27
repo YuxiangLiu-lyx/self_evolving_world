@@ -1,0 +1,65 @@
+{
+  "run": "ex15-1-70-b",
+  "overall": {
+    "entries": 26,
+    "verified": 26,
+    "pending": 0,
+    "agree": 22,
+    "partial": 0,
+    "disagree": 4,
+    "agreement": 0.8461538461538461,
+    "lenient": 0.8461538461538461
+  },
+  "positives": {
+    "entries": 6,
+    "verified": 6,
+    "pending": 0,
+    "agree": 3,
+    "partial": 0,
+    "disagree": 3,
+    "agreement": 0.5,
+    "lenient": 0.5
+  },
+  "negatives": {
+    "entries": 20,
+    "verified": 20,
+    "pending": 0,
+    "agree": 19,
+    "partial": 0,
+    "disagree": 1,
+    "agreement": 0.95,
+    "lenient": 0.95
+  },
+  "categories": {
+    "invitation": {
+      "entries": 3,
+      "verified": 3,
+      "pending": 0,
+      "agree": 0,
+      "partial": 0,
+      "disagree": 3,
+      "agreement": 0,
+      "lenient": 0
+    },
+    "private-view": {
+      "entries": 1,
+      "verified": 1,
+      "pending": 0,
+      "agree": 1,
+      "partial": 0,
+      "disagree": 0,
+      "agreement": 1,
+      "lenient": 1
+    },
+    "absent-person": {
+      "entries": 2,
+      "verified": 2,
+      "pending": 0,
+      "agree": 2,
+      "partial": 0,
+      "disagree": 0,
+      "agreement": 1,
+      "lenient": 1
+    }
+  }
+}

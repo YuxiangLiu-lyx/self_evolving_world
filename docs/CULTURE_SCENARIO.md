@@ -14,6 +14,7 @@ condition, not a causal comparison. See [ADR-0028](decisions/0028-culture-scenar
 | `pnpm experiment:continuous -- new long-culture-incentives`                       | `culture-incentives`    | on         |
 | `pnpm experiment:continuous -- new long-culture-v2`                               | `culture-v2`            | off        |
 | `pnpm experiment:continuous -- new long-culture-v2-incentives`                    | `culture-v2-incentives` | on         |
+| `pnpm experiment:continuous -- new long-culture-v2-oldgoal`                       | `culture-v2-oldgoal`    | off        |
 | `pnpm experiment:continuous -- new long-culture-v3`                               | `culture-v3`            | off        |
 | `pnpm experiment:continuous -- new long-culture-v3-incentives`                    | `culture-v3-incentives` | on         |
 | `pnpm experiment:continuous -- new long-culture-v2 --import exN --newcomers file` | `culture-v2-import`     | off        |
@@ -229,6 +230,69 @@ guidance about `name`, `mark`, `tell` or `invite`, prescribes no activity and co
 excluded word. Slack (part D) was not changed, because survival without `rest` was already
 11.9%: the share came from idle rest, not from survival need. One seed gives a case
 comparison: the adjustment may lower idle rest without changing what people do.
+
+## Culture v2 old-goal
+
+`long-culture-v2-oldgoal` (label `culture-v2-oldgoal`) asks whether the goal sentence is a
+cause of the differences between ex15 and the culture v2 runs. It is the culture v2 genesis
+with `culture.goal: 'original'` instead of `'open'`. The ordinary request differs from
+culture v2 in two places only:
+
+- **The goal sentence.** The open goal is replaced, in the instructions and in the packet
+  `goal`, by the sentence that opened the ex15 prompt, verbatim:
+
+  > Maintain health and tolerable risk, understand unknowns through evidence, develop
+  > reusable abilities and improve personal and shared living. Choose your own questions,
+  > projects and activities; none is required.
+
+  The ex15 packet `goal` carried an older wording of the same list (`OPEN_GOAL`). This tag
+  uses the prompt sentence in both places, as culture v2 does with its open goal.
+
+- **The leaning.** The sentence "You tend to value _leaning_." is removed. As in ex15, the
+  leaning appears only as the `leaning` field of `memory.tendencies` (and of `long:tendencies`
+  in `state` query results). The context header (`longContext`) carries no `goal` or `leaning` marker, as in
+  ex15, so neither the goal switch nor the scenario label reaches any agent.
+
+Everything else equals culture v2: world, seed, rules, budgets, compaction, limits, culture
+switches, the rest of the prompt (including the sentence beginning "Names, stories, views"),
+packet fields, output schema and the World Agent input. The prompt is the ex15 voice prompt
+with the v2 compaction sentence (`ORIGINAL_GOAL_ORDINARY`). The
+[test](../apps/simulator/test/long-culture-v2-oldgoal.test.ts) replaces the two places with
+placeholders and then asserts byte equality of all six round-0 ordinary requests. It also
+asserts byte equality of the World Agent request and of the genesis apart from the goal
+switch and the label. At round 0 no ordinary request contains culture, belief, religion,
+ritual, social, story, myth, legend or tradition in any case or inflection, except
+"stories" in that shared sentence.
+
+### Allocation options
+
+For every long culture tag, `new` also accepts `--seed N`, `--development N` and
+`--tokens N`. Each value must be a positive integer, and each flag may be given once:
+
+| Flag            | Field                    | Without the flag                              |
+| --------------- | ------------------------ | --------------------------------------------- |
+| `--seed`        | `config.seed`            | 20261123                                      |
+| `--development` | `budgets.development`    | 40, or 16 for an incentive tag                |
+| `--tokens`      | `longDevelopment.tokens` | 10,000,000, or 4,000,000 for an incentive tag |
+
+The values are set at genesis, before the first call, and the offline preflight runs on
+the same genesis, so it uses the chosen seed. Without flags the genesis is byte-identical
+to the tag's frozen genesis, and with flags it differs only in these three fields. The
+fields are in `configuration.json`. The manifest records them as `allocation` and appends
+one sentence to its objective. The checkpoint verifier rebuilds the genesis with the
+recorded allocation, so a later change to any of the three is rejected. The same flags on
+`long-culture-v2` and `long-culture-v2-oldgoal` give a pair the same seed and budgets.
+
+A different seed does not change the map, the authored objects, the people or the World
+Agent input; at round 0 it changes only the climate in the ordinary packet (see the
+[allocation tests](../scripts/long-allocation.test.ts)). Over a run it changes the seeded
+parts of the world:
+
+- the climate phases of rain, wind and weather temperature, which depend on the seed
+  modulo 11, 7 and 19, and through them plant growth and stock;
+- where spreading plants place their seedlings, which depends on the seed modulo 16;
+- the seeded per-item draws of material models, such as pole geometry and the nut,
+  exterior and joining models of developed interfaces.
 
 ## Import and newcomers
 

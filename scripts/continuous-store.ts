@@ -6,6 +6,7 @@ import {
 import { longImportConfig } from '../apps/simulator/src/long-import.js';
 import type { LongImportSource } from '../apps/simulator/src/long-import.js';
 import { longTokenBudget } from '../apps/simulator/src/long-tokens.js';
+import { readLongAllocation } from './long-allocation.js';
 import { collectiveSettle } from '@self-evolving-world/world-core';
 import { initialCollectiveWorld } from '../apps/simulator/src/collective-scenario.js';
 import { countedDevelopments } from '../apps/simulator/src/collective-controller.js';
@@ -134,6 +135,8 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
             ? initialLongWorld(
                 `long-${id}`,
                 longScenario(state.world.config.longDevelopment),
+                // A culture run's genesis allocation is recorded in its manifest.
+                readLongAllocation(root, id),
               ).config
             : state.world.config.collective
               ? initialCollectiveWorld(
