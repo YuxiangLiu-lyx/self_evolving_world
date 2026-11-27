@@ -70,4 +70,25 @@ Out of scope: changes to ex18 or any other archive, the transport and the v2 pro
 
 ## Results
 
-Pending.
+See the [run report](../../presentation/run-report-c-newcomers.md).
+
+- R1: ex25 was allocated with the planned command. ex18's saved world at round 120, its exact replay, the recorded round hash and the stage checkpoint all hash to `d21459c6…2e2d`; the archive records this as `importedFrom`, and ex18 is unchanged.
+- R2: `configuration.json` lists exactly the 10 planned `importChanges`; the design's table gives their old and new values.
+- R3: Tova (`curiosity`) at (9.23, 19.77) and Bram (`calm`) at (18.6, 10.4), with the residents' median temperament and no memory.
+- R4: 8 people × 100 rounds, ticks 120 → 220, window complete; all eight alive with health 100.
+  - 233 calls (210 ordinary, 23 World Agent) and 2,137,045 of 2,500,000 tokens.
+  - 5 of 12 handoffs counted, each a simplified but real mechanism. 3 rejected outputs were uncounted, and there was no technical pause.
+- R5, each answered in the report with round, call id and verbatim text:
+  1. Each newcomer saw the name only on Sol's sign: Bram from tick 133, Tova from tick 156. Bram first heard a lantern reference from Ivo at round 122. The first lantern text in Tova's input was Bram's sequel (tick 194).
+  2. Neither newcomer used the name, and nobody spoke it in rounds 120–220.
+  3. No resident addressed the tale to a newcomer. Bram received three residents' episodes in his input; Tova received none, because her six-entry heard list rolled before her next decision.
+  4. Bram continued the tale at round 190 after hearing Lin at round 186. Tova told no narrative.
+  5. Neither newcomer repeated a resident norm verbatim. The plan's phrase "quiet company, no need to talk" comes from ex16, not ex18.
+  6. One resident view of a newcomer: Moss's of Bram at round 196. No resident wrote a view of Tova.
+- R6: ex18 rounds 1–120 were labeled first to build the registry, then ex25 rounds 121–220, both blind.
+  - Agreement, verified by a Claude agent (not a human): 97.7% and 93.9%. All 18 ex25 negatives were re-checked, because there were fewer than 20.
+  - The five calls counted 18,435 tokens; the annotation ledger stands at 87,309 of 1,000,000.
+- R7: the archive, the companion analysis `experiment/analyses/ex25/pr-45-c-newcomers`, both label directories with verified timelines, the report, five highlights and fix-log section 12.
+  - The lead compared ex7–ex24 on the C branch after merging main; all replay identically.
+  - `pnpm validate` and CI `quality` and `pr-policy` had not run when this was written; their results belong to the PR.
+- Deviations: the norm phrase premise (R5.5); the leaning comparison of R3 could not be made, because Tova's input never held a resident's telling; the extra ex18 annotation pass. Limitations: one run, agent verification, sung words not counted (none were sung) and the heard-list cap ([fix-log 12](../../presentation/fix-log.md#12-experiment-c-newly-exposed-problems)).

@@ -416,8 +416,10 @@ reported without a hardship requirement, as in every slack scenario.
 Replay, analysis and the observatory start at the imported round: segments are named from
 it (`replay/execution-000120-000220.json`), the browser frames are the imported, middle and
 final rounds, and the slider starts at the imported round. Every earlier archive starts at
-round 0 and is unchanged. The viewer gives Tova and Bram their own body colors. No
-imported archive exists yet, so the browser capture of an imported window is untested.
+round 0 and is unchanged. The viewer gives Tova and Bram their own body colors. The
+browser capture of an imported window works for ex25, the first imported archive: its
+frames are rounds 120, 170 and 220, the slider starts at round 120 (120 / 220), and Tova
+and Bram are labelled on the map.
 
 ## A. Voice and private memory
 

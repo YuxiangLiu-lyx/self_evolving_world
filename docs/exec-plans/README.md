@@ -90,3 +90,5 @@ Plans must distinguish intended validation from actual passing results. Explain 
 - [PR-43](completed/pr-43-a-winter.md): experiment A (ex16 extended to round 400 as the pressure begins) and the blind GPT annotation tool with a separate ledger and verified labels.
 
 - [PR-44](completed/pr-44-b-goal-pairs.md): experiment B, old-goal and open-goal runs on three new seeds (ex19–ex24), with verified labels and the pre-registered pair measures.
+
+- [PR-45](completed/pr-45-c-newcomers.md): experiment C, ex18 imported at round 120 with two newcomers (ex25), with verified labels of both windows and the six newcomer observations.
