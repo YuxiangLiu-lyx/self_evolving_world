@@ -36,7 +36,7 @@ export const GROUP_FILES: Readonly<Record<string, readonly string[]>> = {
 const allGroups = Object.keys(GROUP_FILES);
 /** Validation, delivery and read-only metric tooling. */
 const TOOLING =
-  /^scripts\/(validat|harness|check-|pr-policy|publish-pr|github|documentation|unit-reporter|experiment-review|long-metrics|long-compatibility|culture-metrics)/;
+  /^scripts\/(validat|harness|check-|pr-policy|publish-pr|github|documentation|unit-reporter|experiment-review|long-metrics|long-compatibility|culture-metrics|culture-labels)/;
 const record = (value: unknown): Record<string, unknown> | null =>
   value && typeof value === 'object' && !Array.isArray(value)
     ? (value as Record<string, unknown>)

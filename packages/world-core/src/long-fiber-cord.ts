@@ -1379,3 +1379,22 @@ export const LONG_FIBER_CORD: V7Package = {
     }
   },
 };
+
+/** The fiber-cord@1 making rules and its sample and trial modes, exported unchanged for ex16
+ * hand-twist-sectioned-cord@1, which makes longer cords of the same kind in sections. The sample
+ * and trial modes announce fiber-cord-* events; a caller may rename them through its context. */
+export const FIBER_CORD_SECTIONING = {
+  SAMPLES,
+  LENGTH,
+  PLY,
+  TAKEUP,
+  STEP,
+  LOOK,
+  classesOf,
+  covered,
+  allocations,
+  relevant,
+  shape,
+  sample,
+  trial,
+};

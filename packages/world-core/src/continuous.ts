@@ -107,6 +107,12 @@ import { LONG_UNHEATED_FOOD_PREPARATION } from './long-unheated-food-preparation
 import { LONG_THERMAL_FOOD_PREPARATION } from './long-thermal-food-preparation.js';
 import { LONG_HEARTH_FOOD_PREPARATION } from './long-thermal-food.js';
 import { LONG_MECHANICAL_FOOD_HANDLING } from './long-mechanical-food-handling.js';
+import { LONG_FIBER_CORD_JOIN } from './long-fiber-cord-join.js';
+import { LONG_CROSSING_BINDING } from './long-crossing-binding.js';
+import { LONG_SECTIONED_CORD } from './long-sectioned-fiber-cord.js';
+import { LONG_CROSSING_LASHING } from './long-crossing-lashing.js';
+import { LONG_CROSSING_FRAPPING } from './long-crossing-frapping.js';
+import { LONG_EXTENDED_SECTIONED_CORD } from './long-extended-sectioned-cord.js';
 import { LONG_EX19_FOOD_AIR_EXPOSURE } from './long-ex19-food-air-exposure.js';
 import { LONG_EX19_THIN_SLICE_FOOD_DRYING } from './long-ex19-thin-slice-food-drying.js';
 import { LONG_EX19_CUTTING_EDGE_ASSESSMENT } from './long-ex19-cutting-edge-assessment.js';
@@ -234,6 +240,12 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_THERMAL_FOOD_PREPARATION,
   LONG_HEARTH_FOOD_PREPARATION,
   LONG_MECHANICAL_FOOD_HANDLING,
+  LONG_FIBER_CORD_JOIN,
+  LONG_CROSSING_BINDING,
+  LONG_SECTIONED_CORD,
+  LONG_CROSSING_LASHING,
+  LONG_CROSSING_FRAPPING,
+  LONG_EXTENDED_SECTIONED_CORD,
   LONG_EX19_FOOD_AIR_EXPOSURE,
   LONG_EX19_THIN_SLICE_FOOD_DRYING,
   LONG_EX19_CUTTING_EDGE_ASSESSMENT,

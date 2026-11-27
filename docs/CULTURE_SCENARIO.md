@@ -521,6 +521,65 @@ Term transmission counts sign texts seen within the vision radius (fix-log 7g). 
 excludes the idea's first users (7h), and `heard` events and signs are not environment
 vocabulary (8e).
 
+### Model labels
+
+`pnpm labels:culture` is a separate, model-assisted labeling pass for human verification. The
+rule-based analyzer never calls it, and its `modelLabels` field stays null. The pass labels every
+item of an archive with these categories; an item can have several or none:
+
+- `naming`: a person names a place, thing, group or event;
+- `name-adoption`: a person uses a name another person gave;
+- `narrative`: a story or fictional narrative;
+- `narrative-continuation`: someone extends or retells an earlier narrative;
+- `norm`: a normative statement about how people should act;
+- `norm-repetition`: a person repeats or endorses another person's norm;
+- `invitation`;
+- `valued-object`: an object valued for its appearance or meaning, not its function;
+- `private-view`: a private view of another person;
+- `absent-person`: remembering or mentioning a person who is not present, has died or has left.
+
+The subcommands are:
+
+1. `prepare experiment/exN [--from N] [--through N] [--out dir]` reads the archive with the
+   culture-metrics reader and writes `items.json`. Items are speech (told texts, messages and
+   public reports, with their hearers from `heard` events), names and marks (with what was named),
+   invitations (place, meeting round and note; the spoken note is labeled once, here), works (each
+   person-made object's creation, completion, status changes and first use by another person) and
+   owner-only private view updates. Each item has an opaque id, the round, the person, the kind
+   and the text; a separate local mapping gives its round, actor, call and event. The model input
+   never contains the scenario tag, scope, experiment number, file paths, call ids or event ids.
+   Items before `--from` are read-only context for a continuation. `prepare` prints the batches
+   and an offline token estimate; it calls no model.
+2. `label --out dir --ledger file --cap tokens --seed N` labels chronological batches (default 20
+   items, `--batch`), each with the 4 preceding items as read-only context (`--context`) and a
+   registry of the names, narratives and norms seen so far (id, first item, round, author and
+   gist). Requests go to the same Responses endpoint, with the same headers and streaming, as
+   `continuousProvider`, using a strict JSON schema; evidence is redacted the same way. A response
+   is rejected unless it matches the schema and labels each batch id exactly once, every set field
+   has its category, its evidence is a verbatim quote of the item, and every link names a known
+   entry from another person. The ledger file is cumulative across runs and archives: each call
+   counts its reported usage, or its reservation (request bytes, the output limit and 4,096) when
+   none was reported, and a batch whose reservation would exceed `--cap` is not started. A rejected
+   or failed call stops the run, and the next run sends that batch again as a new attempt. A
+   completed batch is never resent. `--batches N` stops after N calls, and
+   `--registry earlier/labels.json` seeds a continuation's registry from an earlier run.
+3. When every item is labeled, `label` writes `labels.json` (labels and the final registry),
+   `positives.json`, `negatives-sample.json` (20 items without a category, drawn with `--seed`),
+   `timeline.md` (one row per positive with its round, call, person, categories, text and links)
+   and `verification.json`, with an empty `verdict` (`agree`, `disagree` or `partial`) and
+   `note` per positive and sampled negative. `timeline --out dir --seed N` rewrites these files;
+   it refuses to replace a verification file holding verdicts unless `--force` is given.
+4. `report --out dir [--json file]` computes agreement rates from the filled verification file:
+   agreement (agree over verified entries) and lenient agreement (agree or partial), overall, for
+   positives, for negatives and per category.
+
+Outputs go to `docs/presentation/labels/<archive>-<from>-<through>/`, the default of `prepare`,
+with the ledger in `docs/presentation/labels/ledger.json`. The archive checks accept only
+numbered archives and paired companion analyses under `experiment/`, while presentation files are
+checked only for format and links; every output is written Prettier-formatted. Each call is kept
+in `calls/<batch>-<attempt>.json` with the redacted request, the response text, usage and ids,
+not the event stream. Labels are unverified model output until the verification file is filled in.
+
 ## Excluded vocabulary
 
 Nothing an ordinary agent can see contains _culture_, _cultural_, _belief_, _believe_,
