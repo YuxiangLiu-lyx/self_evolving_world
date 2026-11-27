@@ -17,6 +17,7 @@ import type {
 } from '@self-evolving-world/world-core';
 import { initialLongWorld } from '../src/long-scenario.js';
 import { CULTURE_EXCLUDED_WORDS } from '../src/long-culture.js';
+import { packagesBefore } from './support/goal-pair-package-snapshot.js';
 
 // Whole-world steps run slower on CI than locally; keep every test well inside this file's limit.
 vi.setConfig({ testTimeout: 180_000 });
@@ -238,7 +239,7 @@ describe('eat from the oldest owned food stack in ex24', () => {
     const pkg = V7_PACKAGES.find((p) => p.id === id);
     const ability = pkg?.abilities[0];
     if (!pkg || !ability) throw new Error('Missing package.');
-    expect(V7_PACKAGES.at(-1)).toBe(pkg);
+    expect(V7_PACKAGES.filter((p) => p.scope === pkg.scope).at(-1)).toBe(pkg);
     expect(
       continuousRegistry(g)
         .packages.filter((p) => !p.id.startsWith('foundation-'))
@@ -311,7 +312,7 @@ describe('eat from the oldest owned food stack in ex24', () => {
     expect(visible).not.toMatch(CULTURE_EXCLUDED_WORDS);
     expect(visible).not.toMatch(EXTRA_EXCLUDED);
     // Every package registered before this change, foundation-forest@1 included, is byte-identical.
-    const existing = V7_PACKAGES.slice(0, V7_PACKAGES.indexOf(pkg));
+    const existing = packagesBefore(pkg);
     expect(existing).toHaveLength(123);
     const map = Object.fromEntries(
       existing.map((p) => [`${p.id}@${String(p.version)}`, sha(p)]),

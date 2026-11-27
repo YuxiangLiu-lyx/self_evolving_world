@@ -17,6 +17,7 @@ import type {
 } from '@self-evolving-world/world-core';
 import { initialLongWorld } from '../src/long-scenario.js';
 import { CULTURE_EXCLUDED_WORDS } from '../src/long-culture.js';
+import { packagesBefore } from './support/goal-pair-package-snapshot.js';
 
 // Whole-world steps run slower on CI than locally; keep every test well inside this file's limit.
 vi.setConfig({ testTimeout: 120_000 });
@@ -441,7 +442,7 @@ describe('shape and use a wooden digging tool in ex23', () => {
     expect(visible).not.toMatch(CULTURE_EXCLUDED_WORDS);
     expect(visible).not.toMatch(EXTRA_EXCLUDED);
     // Every package registered before this change, the reused ones included, is byte-identical.
-    const existing = V7_PACKAGES.slice(0, V7_PACKAGES.indexOf(pkg));
+    const existing = packagesBefore(pkg);
     expect(existing).toHaveLength(116);
     const map = Object.fromEntries(
       existing.map((p) => [`${p.id}@${String(p.version)}`, sha(p)]),

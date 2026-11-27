@@ -6,7 +6,7 @@ import type { CultureInput } from './culture-metrics.js';
 
 /**
  * The seven outcome measures that experiment B registered before its runs
- * (docs/exec-plans/active/pr-44-b-goal-pairs.md, R5), computed per run over ticks 1–80.
+ * (docs/exec-plans/completed/pr-44-b-goal-pairs.md, R5), computed per run over ticks 1–80.
  *
  * Measures 3, 4 and 6 are rule-based and read the archive. Measures 1, 2, 5 and 7 read the
  * model labels of `pnpm labels:culture` and count only positives that the verification confirmed:
