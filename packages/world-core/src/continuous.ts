@@ -114,6 +114,11 @@ import { LONG_EX19_SHELL_COMPRESSION_OPENING } from './long-ex19-shell-compressi
 import { LONG_EX19_LEVER_MASS_COMPARATOR } from './long-ex19-lever-mass-comparison.js';
 import { LONG_EX20_SURFACE_MARKING } from './long-ex20-surface-marking.js';
 import { LONG_EX20_SAMPLE_OPENING } from './long-ex20-sample-opening.js';
+import { LONG_EX21_AIR_DRY_FOOD } from './long-ex21-air-dry-food.js';
+import { LONG_EX21_SMALL_COMBUSTION } from './long-ex21-small-combustion.js';
+import { LONG_EX21_BEAM_MASS_COMPARATOR } from './long-ex21-beam-mass-comparator.js';
+import { LONG_EX21_SAMPLE_DRYING } from './long-ex21-sample-drying.js';
+import { LONG_EX21_CONSTITUENT_TEST } from './long-ex21-constituent-test.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -223,6 +228,11 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_EX19_LEVER_MASS_COMPARATOR,
   LONG_EX20_SURFACE_MARKING,
   LONG_EX20_SAMPLE_OPENING,
+  LONG_EX21_AIR_DRY_FOOD,
+  LONG_EX21_SMALL_COMBUSTION,
+  LONG_EX21_BEAM_MASS_COMPARATOR,
+  LONG_EX21_SAMPLE_DRYING,
+  LONG_EX21_CONSTITUENT_TEST,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(

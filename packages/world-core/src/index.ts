@@ -215,6 +215,19 @@ export {
 export * from './open-foundation.js';
 export * from './open-physical.js';
 export * from './food-water.js';
+export {
+  SAMPLE_EXCHANGE,
+  equilibriumFraction,
+  sampleExchange,
+  sampleGeometry,
+  saturationDensity,
+} from './long-ex21-sample-drying-physics.js';
+export type {
+  SampleExchange,
+  SampleExchangeInput,
+  SampleForm,
+  SampleGeometry,
+} from './long-ex21-sample-drying-physics.js';
 export * from './open-processes.js';
 export * from './open-projects.js';
 export { openPlants, openAnimals } from './open-ecology.js';

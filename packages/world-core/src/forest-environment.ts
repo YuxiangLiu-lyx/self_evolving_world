@@ -15,6 +15,10 @@ import { refugePhysiology } from './open-shelter-exposure.js';
 import { simpleShelterPhysiology } from './long-shelter-exposure.js';
 import { sharedShelterPhysiology } from './long-shared-shelter-exposure.js';
 import { branchScreenPhysiology } from './long-branch-screen-exposure.js';
+import {
+  smallFireBurn,
+  smallFireExposure,
+} from './long-ex21-small-combustion-physics.js';
 import { openConditions } from './open-physical.js';
 import { forestEvent, forestClimate, forestGrowth } from './forest-climate.js';
 export { forestEvent, forestClimate, forestGrowth } from './forest-climate.js';
@@ -435,6 +439,12 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
       if (e) e.interface = 'tend-fire';
     },
   );
+  // ex21 small-combustion-source@1: heat from burning beds, only where that revision is installed.
+  actor.vitals.temperature = smallFireExposure(
+    world,
+    actor,
+    actor.vitals.temperature,
+  );
   const starvation = before.satiety <= 0 ? world.config.starvation : 0;
   const thermal =
     Math.max(0, 7 - actor.vitals.temperature, actor.vitals.temperature - 34) *
@@ -442,6 +452,7 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
   actor.vitals.health = v7RoundNumber(
     Math.max(0, before.health - starvation - thermal),
   );
+  smallFireBurn(world, actor);
   actor.vitals.satiety = v7RoundNumber(
     Math.max(0, before.satiety - world.config.hunger * world.config.dt),
   );

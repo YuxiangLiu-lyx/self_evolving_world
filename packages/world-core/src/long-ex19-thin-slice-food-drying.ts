@@ -927,3 +927,6 @@ export const LONG_EX19_THIN_SLICE_FOOD_DRYING = thinSliceFoodDryingPackage(
   'long-ex19',
   ['foundation-open@1', 'food-air-exposure-trial@1'],
 );
+
+/** The stone or flint usable-edge rule, shared with later reviewed cutting operations. */
+export { edgeProblem as thinSliceEdgeProblem };
