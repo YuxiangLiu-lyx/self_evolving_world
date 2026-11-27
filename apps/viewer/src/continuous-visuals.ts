@@ -173,6 +173,44 @@ export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
       .join('');
     return `<circle r=".5" fill="#cec5a0" fill-opacity=".12" stroke="#b0b68c" stroke-opacity=".5" stroke-width=".022" ${o.kind === 'stone-mosaic-work' ? 'stroke-dasharray=".06 .06"' : ''}/><g opacity="${o.kind === 'stone-mosaic-work' ? '.5' : '1'}">${stones}</g>${o.kind === 'stone-mosaic-work' ? `<text y="-.62" text-anchor="middle" fill="#f3dfb4" font-size=".19">${typeof o.data.elapsed === 'number' ? String(o.data.elapsed) : '?'} / 3</text>` : ''}`;
   },
+  // ex20 apply-marking-material@1: only actually deposited, visible marks, at their recorded colour,
+  // width and surface-local geometry; a failed or invisible transfer draws nothing at all.
+  'applied-mark': (o) =>
+    (Array.isArray(o.data.marks) ? o.data.marks : [])
+      .flatMap((m) => {
+        if (
+          !m ||
+          typeof m !== 'object' ||
+          Array.isArray(m) ||
+          m.visible !== true ||
+          !(Number(m.deposit) > 0) ||
+          typeof m.color !== 'string' ||
+          !/^#[a-f\d]{6}$/i.test(m.color)
+        )
+          return [];
+        const points = (Array.isArray(m.points) ? m.points : []).flatMap((p) =>
+          p &&
+          typeof p === 'object' &&
+          !Array.isArray(p) &&
+          typeof p.x === 'number' &&
+          typeof p.y === 'number'
+            ? [{ x: p.x, y: p.y }]
+            : [],
+        );
+        const first = points[0];
+        if (m.kind === 'dab')
+          return first && Number(m.radius) > 0
+            ? [
+                `<circle cx="${String(first.x)}" cy="${String(first.y)}" r="${String(Number(m.radius))}" fill="${m.color}"/>`,
+              ]
+            : [];
+        return points.length > 1 && Number(m.width) > 0
+          ? [
+              `<polyline points="${points.map((p) => `${String(p.x)},${String(p.y)}`).join(' ')}" fill="none" stroke="${m.color}" stroke-width="${String(Number(m.width))}" stroke-linecap="round" stroke-linejoin="round"/>`,
+            ]
+          : [];
+      })
+      .join(''),
   plant: source,
   // ex15 cultivation-trial@1: a soil position, dashed while worked; the unit is drawn only while
   // uncovered, a mound hides a covered one, and a sprout with verified stock only once established.

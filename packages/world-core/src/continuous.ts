@@ -112,6 +112,8 @@ import { LONG_EX19_THIN_SLICE_FOOD_DRYING } from './long-ex19-thin-slice-food-dr
 import { LONG_EX19_CUTTING_EDGE_ASSESSMENT } from './long-ex19-cutting-edge-assessment.js';
 import { LONG_EX19_SHELL_COMPRESSION_OPENING } from './long-ex19-shell-compression-opening.js';
 import { LONG_EX19_LEVER_MASS_COMPARATOR } from './long-ex19-lever-mass-comparison.js';
+import { LONG_EX20_SURFACE_MARKING } from './long-ex20-surface-marking.js';
+import { LONG_EX20_SAMPLE_OPENING } from './long-ex20-sample-opening.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -219,6 +221,8 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_EX19_CUTTING_EDGE_ASSESSMENT,
   LONG_EX19_SHELL_COMPRESSION_OPENING,
   LONG_EX19_LEVER_MASS_COMPARATOR,
+  LONG_EX20_SURFACE_MARKING,
+  LONG_EX20_SAMPLE_OPENING,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(
