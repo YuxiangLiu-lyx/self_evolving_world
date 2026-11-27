@@ -1,0 +1,655 @@
+{
+  "format": "self-evolving-world/culture-label-items",
+  "version": 1,
+  "archive": "experiment/ex16",
+  "range": { "from": 1, "through": 80 },
+  "people": [
+    { "id": "lin", "name": "Lin" },
+    { "id": "moss", "name": "Moss" },
+    { "id": "sol", "name": "Sol" },
+    { "id": "kai", "name": "Kai" },
+    { "id": "wren", "name": "Wren" },
+    { "id": "ivo", "name": "Ivo" }
+  ],
+  "context": [],
+  "items": [
+    {
+      "id": "u0001",
+      "tick": 1,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "Hello, I'm Moss. I'd like to get to know you. I'm gathering some meadow roots nearby; they're a food I know is safe. Does anyone want company or have a place they'd like to meet?"
+    },
+    {
+      "id": "u0002",
+      "tick": 1,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "Hello, I'm Kai. Berries are the food I currently know is safe. I'll take a modest share and leave some for others. I'd welcome sharing tested food knowledge and ideas for a fair camp."
+    },
+    {
+      "id": "u0003",
+      "tick": 3,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "Kai, I'd welcome a fair camp too. Meadow roots are a food I know is safe: nutrition 14, toxicity zero. I'm collecting six from the patch south of us, leaving the rest. I'd enjoy comparing notes together once we're fed."
+    },
+    {
+      "id": "u0004",
+      "tick": 3,
+      "person": "moss",
+      "kind": "view",
+      "about": "kai",
+      "text": "A neighbor who introduced themself, offered berry knowledge, and expressed interest in sharing and a fair camp. I'd like to get to know them."
+    },
+    {
+      "id": "u0005",
+      "tick": 4,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss", "kai"],
+      "text": "I'm Sol. I like the quiet beauty of this forest. I'm collecting a few berries and resting here; I'd welcome company, or hearing what you hope to make of this place."
+    },
+    {
+      "id": "u0006",
+      "tick": 5,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren"],
+      "text": "The first berry bush is empty, but I see stocked patches nearby. I'll take six berries from the patch south of us. Sol and Moss, I'd enjoy company while resting and comparing ideas for a fair camp."
+    },
+    {
+      "id": "u0007",
+      "tick": 5,
+      "person": "kai",
+      "kind": "view",
+      "about": "moss",
+      "text": "Seems welcoming and interested in sharing food knowledge and a fair camp."
+    },
+    {
+      "id": "u0008",
+      "tick": 5,
+      "person": "kai",
+      "kind": "view",
+      "about": "sol",
+      "text": "Seems drawn to quiet beauty and open to companionship."
+    },
+    {
+      "id": "u0009",
+      "tick": 9,
+      "person": "sol",
+      "kind": "view",
+      "about": "moss",
+      "text": "A prospective companion who speaks warmly of company and sharing food knowledge."
+    },
+    {
+      "id": "u0010",
+      "tick": 9,
+      "person": "sol",
+      "kind": "view",
+      "about": "kai",
+      "text": "A prospective companion whose interest in modest harvesting and a fair camp appeals to me."
+    },
+    {
+      "id": "u0011",
+      "tick": 11,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "ivo"],
+      "text": "I'm Lin. I value room to wander, and I'd enjoy company and comparing tested food knowledge. Berries are safe for me; I haven't established whether hazelnuts are safe. I'm going to study how to plant food."
+    },
+    {
+      "id": "u0012",
+      "tick": 11,
+      "person": "moss",
+      "kind": "view",
+      "about": "sol",
+      "text": "A neighbor who enjoys the forest's quiet beauty and has welcomed company. I'd like to spend time together."
+    },
+    {
+      "id": "u0013",
+      "tick": 12,
+      "person": "moss",
+      "kind": "view",
+      "about": "lin",
+      "text": "A neighbor who values room to wander, welcomes company, and is interested in learning cultivation. I'd enjoy comparing experiences without crowding them."
+    },
+    {
+      "id": "u0014",
+      "tick": 13,
+      "person": "ivo",
+      "kind": "view",
+      "about": "lin",
+      "text": "A nearby person interested in wandering, company, and learning to plant food; I would welcome comparing observations."
+    },
+    {
+      "id": "u0015",
+      "tick": 18,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "wren"],
+      "text": "Lin, Sol, Kai: I'd enjoy resting together. I know roots provide 14 nutrition and have no toxicity. I've gathered six, leaving fourteen in this patch. I'm studying cultivation too. What would make a shared camp welcoming to you?"
+    },
+    {
+      "id": "u0016",
+      "tick": 19,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "wren", "ivo"],
+      "text": "Moss, a welcoming camp would leave room for quiet and freedom to come and go. I'd enjoy resting together later. I'm trying one small berry planting nearby; I don't yet know whether it will establish."
+    },
+    {
+      "id": "u0017",
+      "tick": 19,
+      "person": "lin",
+      "kind": "view",
+      "about": "moss",
+      "text": "Welcoming and interested in sharing food knowledge and company; I appreciate the invitation without wanting obligations."
+    },
+    {
+      "id": "u0018",
+      "tick": 20,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "sol"],
+      "text": "A welcoming camp would leave food accessible to everyone and room for quiet company. I'd like to learn cultivation too, then compare what actually grows rather than assume planting will work."
+    },
+    {
+      "id": "u0019",
+      "tick": 21,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo"],
+      "text": "Moss and Kai, I'd enjoy a shared resting place among these trees. What would make it welcoming to you? I'm interested in learning a safe way to make a small, beautiful branch windbreak without damaging living trees."
+    },
+    {
+      "id": "u0020",
+      "tick": 21,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["lin", "sol", "wren"],
+      "text": "Hello Lin, I'm Ivo. I know meadow roots are safe: nutrition 14, toxicity zero. I'm resting with a small food reserve, then studying cultivation too. I'd enjoy comparing what we actually find, without rushing."
+    },
+    {
+      "id": "u0021",
+      "tick": 22,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["sol", "kai"],
+      "text": "Sol and Kai, I'd like quiet company, room to come and go, and food left accessible. Your windbreak idea sounds lovely, Sol. I'll explore whether fallen dry grass can make a small sitting mat without harming living trees."
+    },
+    {
+      "id": "u0022",
+      "tick": 25,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "sol"],
+      "text": "A welcoming camp would leave food accessible and room to come and go. I've learned cultivation; I'll try planting one berry in the nearby meadow. It may not establish. Your mat and windbreak ideas sound lovely."
+    },
+    {
+      "id": "u0023",
+      "tick": 26,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo"],
+      "text": "I'll test a small branch-screen site south of us, leaving berries and paths accessible. Nothing is built yet; I'll check the ground and a fallen branch before committing to construction."
+    },
+    {
+      "id": "u0024",
+      "tick": 31,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren"],
+      "text": "My first planting site was too crowded, so nothing was planted or spent. I'm setting that experiment aside for now and taking a quiet rest nearby. Company is welcome, with no need to talk."
+    },
+    {
+      "id": "u0025",
+      "tick": 32,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo"],
+      "text": "The test post went into the soil and held, then came out intact; nothing is built yet. I'll rest and collect fallen branches. The screen would have no roof, and its wind protection would not work in this strong wind."
+    },
+    {
+      "id": "u0026",
+      "tick": 36,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "ivo"],
+      "text": "The dry-grass sample held its crossings and tucked edge in my hand test. I'll try weaving one small mat here, clear of the plants. It isn't made yet, and I don't know how it will hold up in use."
+    },
+    {
+      "id": "u0027",
+      "tick": 37,
+      "person": "moss",
+      "kind": "work",
+      "subject": "Fiber mat (fiber-mat) made by moss",
+      "change": "created",
+      "text": "Square checked; four units of tested fiber were reserved and stay carried until the strip rounds use them."
+    },
+    {
+      "id": "u0028",
+      "tick": 37,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["sol"],
+      "text": "My planting trials found crowded or obstructed sites; no new plant is established. I'll gather a small berry reserve and rest. I'd like to study sitting mats for our shared place, keeping paths and food accessible."
+    },
+    {
+      "id": "u0029",
+      "tick": 43,
+      "person": "moss",
+      "kind": "work",
+      "subject": "Fiber mat (fiber-mat) made by moss",
+      "change": "completed",
+      "text": "Lift check passed: the mat kept its 0.45 m square when lifted and laid down; largest opening 0.00053514 m."
+    },
+    {
+      "id": "u0030",
+      "tick": 47,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "The small grass mat is assembled here, clear of the plants. I'll inspect it and try sitting on it before offering it for shared use; I don't yet know how it holds or slips."
+    },
+    {
+      "id": "u0031",
+      "tick": 50,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "The mat held during my sitting trial, without slipping or sharp loose stems. That doesn't establish warmth or extra comfort. It's here for shared use, one person at a time; quiet company is welcome."
+    },
+    {
+      "id": "u0032",
+      "tick": 50,
+      "person": "sol",
+      "kind": "work",
+      "subject": "Woven branch screen (branch-screen) made by sol",
+      "change": "created",
+      "text": "Site check and post trial passed; eleven branch units were reserved and stay carried until paid rounds install them."
+    },
+    {
+      "id": "u0033",
+      "tick": 51,
+      "person": "moss",
+      "kind": "invitation",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "meeting": { "x": 14.8, "y": 16.2, "round": 60 },
+      "text": "Quiet company near the little mat; bring yourself, not supplies. We can compare our experiments, or simply rest."
+    },
+    {
+      "id": "u0034",
+      "tick": 51,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "sol"],
+      "text": "Thank you, Moss. I'll join you nearby for some quiet company and leave the mat free. I've learned the weaving method, but haven't made or tested a mat myself. I appreciate keeping this place open to everyone."
+    },
+    {
+      "id": "u0035",
+      "tick": 53,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "sol"],
+      "text": "The approach I tried is blocked, so I'll rest here within speaking distance rather than crowd the plants or your work. Quiet company still sounds good; there's no need to bring anything."
+    },
+    {
+      "id": "u0036",
+      "tick": 54,
+      "person": "ivo",
+      "kind": "view",
+      "about": "moss",
+      "text": "A welcoming neighbor whose invitation to quiet company appeals to me."
+    },
+    {
+      "id": "u0037",
+      "tick": 57,
+      "person": "sol",
+      "kind": "work",
+      "subject": "Woven branch screen (branch-screen) made by sol",
+      "change": "completed",
+      "text": "The low-force stability check passed: the porous screen is complete. It shields only wind on its lee floor, under the coded rule."
+    },
+    {
+      "id": "u0038",
+      "tick": 60,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "kai"],
+      "text": "Moss, I'd welcome some quiet company beside your mat. My planting attempt found an occupied patch, so I haven't established a plot. For now I'm content to rest nearby and leave the mat available."
+    },
+    {
+      "id": "u0039",
+      "tick": 61,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "I'm glad to have a place to pause together. How have your planting and screen trials gone? No need to stop your work or talk if you'd rather enjoy the quiet."
+    },
+    {
+      "id": "u0040",
+      "tick": 61,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo"],
+      "text": "I'd welcome some quiet company, Moss. I've been weaving a little branch screen nearby. I like the pattern of the rods, though I won't assume it makes the resting place more comfortable."
+    },
+    {
+      "id": "u0041",
+      "tick": 70,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss", "kai", "ivo"],
+      "text": "The screen is finished: eleven pieces, with none missing or loose at inspection. The wind was too strong for its shelter effect. I like the woven pattern anyway. I'll sit quietly awhile, then gather some berries."
+    },
+    {
+      "id": "u0042",
+      "tick": 71,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "Sol, I'm glad you like the pattern, even without shelter from this wind. Ivo and Kai, I'm glad you're nearby too. I'll stay quietly a while, then collect some roots for later."
+    },
+    {
+      "id": "u0043",
+      "tick": 71,
+      "person": "moss",
+      "kind": "view",
+      "about": "ivo",
+      "text": "A neighbor who welcomed quiet company and candidly shared an unsuccessful planting attempt. I appreciate their considerate presence."
+    },
+    {
+      "id": "u0044",
+      "tick": 78,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "ivo"],
+      "text": "I tried one hazelnut: it supplied 18 satiety, with no observed toxicity. I'll keep a few for variety. I'd enjoy some quiet company nearby; no need to interrupt what you're doing."
+    },
+    {
+      "id": "u0045",
+      "tick": 79,
+      "person": "wren",
+      "kind": "work",
+      "subject": "Fiber mat (fiber-mat) made by wren",
+      "change": "created",
+      "text": "Square checked; four units of tested fiber were reserved and stay carried until the strip rounds use them."
+    }
+  ],
+  "mapping": {
+    "u0001": {
+      "tick": 1,
+      "actor": "moss",
+      "callId": "ordinary-6",
+      "eventId": "event-1-moss-4"
+    },
+    "u0002": {
+      "tick": 1,
+      "actor": "kai",
+      "callId": "ordinary-12",
+      "eventId": "event-1-kai-4"
+    },
+    "u0003": {
+      "tick": 3,
+      "actor": "moss",
+      "callId": "ordinary-23",
+      "eventId": "event-3-moss-31"
+    },
+    "u0004": {
+      "tick": 3,
+      "actor": "moss",
+      "callId": "ordinary-23",
+      "eventId": null
+    },
+    "u0005": {
+      "tick": 4,
+      "actor": "sol",
+      "callId": "ordinary-9",
+      "eventId": "event-4-sol-47"
+    },
+    "u0006": {
+      "tick": 5,
+      "actor": "kai",
+      "callId": "ordinary-24",
+      "eventId": "event-5-kai-59"
+    },
+    "u0007": {
+      "tick": 5,
+      "actor": "kai",
+      "callId": "ordinary-24",
+      "eventId": null
+    },
+    "u0008": {
+      "tick": 5,
+      "actor": "kai",
+      "callId": "ordinary-24",
+      "eventId": null
+    },
+    "u0009": {
+      "tick": 9,
+      "actor": "sol",
+      "callId": "ordinary-27",
+      "eventId": null
+    },
+    "u0010": {
+      "tick": 9,
+      "actor": "sol",
+      "callId": "ordinary-27",
+      "eventId": null
+    },
+    "u0011": {
+      "tick": 11,
+      "actor": "lin",
+      "callId": "ordinary-33",
+      "eventId": "event-11-lin-134"
+    },
+    "u0012": {
+      "tick": 11,
+      "actor": "moss",
+      "callId": "ordinary-36",
+      "eventId": null
+    },
+    "u0013": {
+      "tick": 12,
+      "actor": "moss",
+      "callId": "ordinary-39",
+      "eventId": null
+    },
+    "u0014": {
+      "tick": 13,
+      "actor": "ivo",
+      "callId": "ordinary-43",
+      "eventId": null
+    },
+    "u0015": {
+      "tick": 18,
+      "actor": "moss",
+      "callId": "ordinary-39",
+      "eventId": "event-18-moss-210"
+    },
+    "u0016": {
+      "tick": 19,
+      "actor": "lin",
+      "callId": "ordinary-48",
+      "eventId": "event-19-lin-222"
+    },
+    "u0017": {
+      "tick": 19,
+      "actor": "lin",
+      "callId": "ordinary-48",
+      "eventId": null
+    },
+    "u0018": {
+      "tick": 20,
+      "actor": "kai",
+      "callId": "ordinary-55",
+      "eventId": "event-20-kai-240"
+    },
+    "u0019": {
+      "tick": 21,
+      "actor": "sol",
+      "callId": "ordinary-44",
+      "eventId": "event-21-sol-255"
+    },
+    "u0020": {
+      "tick": 21,
+      "actor": "ivo",
+      "callId": "ordinary-43",
+      "eventId": "event-21-ivo-255"
+    },
+    "u0021": {
+      "tick": 22,
+      "actor": "moss",
+      "callId": "ordinary-59",
+      "eventId": "event-22-moss-273"
+    },
+    "u0022": {
+      "tick": 25,
+      "actor": "kai",
+      "callId": "ordinary-72",
+      "eventId": "event-25-kai-300"
+    },
+    "u0023": {
+      "tick": 26,
+      "actor": "sol",
+      "callId": "ordinary-78",
+      "eventId": "event-26-sol-310"
+    },
+    "u0024": {
+      "tick": 31,
+      "actor": "ivo",
+      "callId": "ordinary-81",
+      "eventId": "event-31-ivo-371"
+    },
+    "u0025": {
+      "tick": 32,
+      "actor": "sol",
+      "callId": "ordinary-96",
+      "eventId": "event-32-sol-386"
+    },
+    "u0026": {
+      "tick": 36,
+      "actor": "moss",
+      "callId": "ordinary-93",
+      "eventId": "event-36-moss-423"
+    },
+    "u0027": {
+      "tick": 37,
+      "actor": "moss",
+      "callId": "ordinary-93",
+      "eventId": "event-37-moss-437"
+    },
+    "u0028": {
+      "tick": 37,
+      "actor": "kai",
+      "callId": "ordinary-100",
+      "eventId": "event-37-kai-434"
+    },
+    "u0029": {
+      "tick": 43,
+      "actor": "moss",
+      "callId": "ordinary-93",
+      "eventId": "event-43-moss-503"
+    },
+    "u0030": {
+      "tick": 47,
+      "actor": "moss",
+      "callId": "ordinary-114",
+      "eventId": "event-47-moss-539"
+    },
+    "u0031": {
+      "tick": 50,
+      "actor": "moss",
+      "callId": "ordinary-119",
+      "eventId": "event-50-moss-570"
+    },
+    "u0032": {
+      "tick": 50,
+      "actor": "sol",
+      "callId": "ordinary-117",
+      "eventId": "event-50-sol-583"
+    },
+    "u0033": {
+      "tick": 51,
+      "actor": "moss",
+      "callId": "ordinary-119",
+      "eventId": "event-51-moss-601"
+    },
+    "u0034": {
+      "tick": 51,
+      "actor": "kai",
+      "callId": "ordinary-123",
+      "eventId": "event-51-kai-600"
+    },
+    "u0035": {
+      "tick": 53,
+      "actor": "kai",
+      "callId": "ordinary-126",
+      "eventId": "event-53-kai-623"
+    },
+    "u0036": {
+      "tick": 54,
+      "actor": "ivo",
+      "callId": "ordinary-128",
+      "eventId": null
+    },
+    "u0037": {
+      "tick": 57,
+      "actor": "sol",
+      "callId": "ordinary-129",
+      "eventId": "event-57-sol-661"
+    },
+    "u0038": {
+      "tick": 60,
+      "actor": "ivo",
+      "callId": "ordinary-128",
+      "eventId": "event-60-ivo-685"
+    },
+    "u0039": {
+      "tick": 61,
+      "actor": "moss",
+      "callId": "ordinary-119",
+      "eventId": "event-61-moss-703"
+    },
+    "u0040": {
+      "tick": 61,
+      "actor": "sol",
+      "callId": "ordinary-129",
+      "eventId": "event-61-sol-703"
+    },
+    "u0041": {
+      "tick": 70,
+      "actor": "sol",
+      "callId": "ordinary-134",
+      "eventId": "event-70-sol-783"
+    },
+    "u0042": {
+      "tick": 71,
+      "actor": "moss",
+      "callId": "ordinary-138",
+      "eventId": "event-71-moss-794"
+    },
+    "u0043": {
+      "tick": 71,
+      "actor": "moss",
+      "callId": "ordinary-138",
+      "eventId": null
+    },
+    "u0044": {
+      "tick": 78,
+      "actor": "lin",
+      "callId": "ordinary-148",
+      "eventId": "event-78-lin-870"
+    },
+    "u0045": {
+      "tick": 79,
+      "actor": "wren",
+      "callId": "ordinary-149",
+      "eventId": "event-79-wren-892"
+    }
+  }
+}

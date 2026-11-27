@@ -1,0 +1,79 @@
+{
+  "archive": "experiment/ex24",
+  "through": 80,
+  "labels": "docs/presentation/labels/ex24-1-80",
+  "measures": {
+    "adoptedNames": 0,
+    "narratives": 3,
+    "narrativeContinuations": 2,
+    "nonTransactionalShare": 0.041666666666666664,
+    "caresWithOwnLeaning": 3,
+    "normRepetitions": 0,
+    "attendedInvitations": 0,
+    "valuedObjects": 0
+  },
+  "detail": {
+    "adoptedNames": [],
+    "narratives": {
+      "items": ["u0028", "u0029", "u0030"],
+      "continuations": ["u0029", "u0030"]
+    },
+    "normRepetitions": [],
+    "valuedObjects": [],
+    "nonTransactional": {
+      "messages": 24,
+      "nonTransactional": 1
+    },
+    "caresLeanings": [
+      {
+        "actor": "lin",
+        "leaning": "freedom",
+        "first": {
+          "tick": 1,
+          "text": "Staying alive and capable while preserving freedom to explore, learn, and choose my own commitments.",
+          "matches": ["freedom"]
+        },
+        "versions": 2
+      },
+      {
+        "actor": "moss",
+        "leaning": "belonging",
+        "first": null,
+        "versions": 2
+      },
+      {
+        "actor": "sol",
+        "leaning": "beauty",
+        "first": {
+          "tick": 1,
+          "text": "Staying alive and well, noticing beauty, and making a place feel particular through small, honest acts.",
+          "matches": ["beauty"]
+        },
+        "versions": 1
+      },
+      {
+        "actor": "kai",
+        "leaning": "fairness",
+        "first": {
+          "tick": 1,
+          "text": "Staying alive and healthy, treating neighbors fairly, and building a cooperative life with room for curiosity and friendship.",
+          "matches": ["fairly"]
+        },
+        "versions": 1
+      },
+      {
+        "actor": "wren",
+        "leaning": "mastery",
+        "first": null,
+        "versions": 2
+      },
+      {
+        "actor": "ivo",
+        "leaning": "calm",
+        "first": null,
+        "versions": 1
+      }
+    ],
+    "attendedInvitations": []
+  }
+}
