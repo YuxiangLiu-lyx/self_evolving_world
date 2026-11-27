@@ -1,6 +1,7 @@
 import type {
   V7Data,
   V7Event,
+  V7Object,
   V7SatisfactionRule,
   V7World,
 } from './continuous-types.js';
@@ -105,6 +106,26 @@ const words = (text: string) =>
       .split(/[^a-z0-9-]+/)
       .filter(Boolean),
   );
+/** ex25 vocal-music@1: hummed or sung sound addresses no one and is not acting at or using
+ * anything, so its segments and their heard events never feed these rules. The check is
+ * false wherever that revision is absent, so every other world replays identically. */
+function soundOnly(world: V7World, e: V7Event): boolean {
+  return (
+    world.revisions.includes('vocal-music@1') &&
+    (e.interface === 'vocal-music' ||
+      (e.type === 'heard' && (e.data.kind === 'hum' || e.data.kind === 'sing')))
+  );
+}
+/** ex25 position-loose-material@1: a placed loose unit is only laid down, not made, and each
+ * pickup and new placement gives it a new footprint record, so it is never counted as made
+ * work. The check is false wherever that revision is absent, so every other world replays
+ * identically. */
+function positionedOnly(world: V7World, o: V7Object): boolean {
+  return (
+    world.revisions.includes('position-loose-material@1') &&
+    o.kind === 'placed-loose-material'
+  );
+}
 /** One real addressed contact per ordered pair and round, from the round's own events. */
 function contacts(world: V7World) {
   const result: { from: string; to: string; event: string }[] = [];
@@ -120,7 +141,9 @@ function contacts(world: V7World) {
       return;
     result.push({ from, to, event: event.id });
   };
-  for (const e of world.events.filter((e) => e.success)) {
+  for (const e of world.events.filter(
+    (e) => e.success && !soundOnly(world, e),
+  )) {
     if (e.type === 'message') add(e.actor, e.target, e);
     else if (e.type === 'given') add(e.actor, e.data.recipient, e);
     else if (e.type === 'finding-offered') add(e.actor, e.target, e);
@@ -250,6 +273,7 @@ export function expressionIncentives(world: V7World): void {
     (o) =>
       o.createdBy !== null &&
       o.revision !== 'foundation-expression@1' &&
+      !positionedOnly(world, o) &&
       world.actors.some((a) => a.id === o.createdBy),
   );
   const creditedMakers = new Set<string>();
@@ -259,7 +283,11 @@ export function expressionIncentives(world: V7World): void {
     for (const other of world.actors) {
       if (other.id === maker || other.vitals.health <= 0) continue;
       const acted = world.events.find(
-        (e) => e.actor === other.id && e.success && e.interface,
+        (e) =>
+          e.actor === other.id &&
+          e.success &&
+          e.interface &&
+          !soundOnly(world, e),
       );
       if (!acted) continue;
       const used = world.events.find(
@@ -267,7 +295,8 @@ export function expressionIncentives(world: V7World): void {
           e.actor === other.id &&
           e.success &&
           e.interface &&
-          e.target === object.id,
+          e.target === object.id &&
+          !soundOnly(world, e),
       );
       const sees =
         v7Distance(other.position, object.spatial) <= world.config.vision &&
