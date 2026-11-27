@@ -1172,3 +1172,20 @@ export const LONG_EX20_SURFACE_MARKING = surfaceMarkingPackage(
   'apply-marking-material',
   'long-ex20',
 );
+
+/** Declared contact constants, ground palette and pure helpers above, shared read-only with
+ * later ground work (ex22 draw-from-observation@1). Exporting them leaves the ex20 package, its
+ * text and its behavior unchanged. */
+export const SURFACE_MARKING_SHARED = {
+  reach: REACH,
+  width: WIDTH,
+  visible: VISIBLE,
+  step: STEP,
+  water: WATER,
+  tones: TONES,
+  groundNames: GROUND_NAMES,
+  rgb,
+  hex,
+  colorDistance: distance,
+  along,
+} as const;

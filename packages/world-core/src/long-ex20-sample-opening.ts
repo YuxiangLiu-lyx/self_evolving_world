@@ -1082,3 +1082,8 @@ export const LONG_EX20_SAMPLE_OPENING = sampleOpeningPackage(
   'long-ex20',
   [HAZELNUT_COMPOSITION],
 );
+
+/** The compression transmission law, bare-hand load and deterioration classes above, shared
+ * read-only with later shelling work (ex22 prepare-shelled-food@1). Exporting them leaves the
+ * ex20 package, its text and its behavior unchanged. */
+export const SAMPLE_OPENING_LAWS = { passes, handLoad, deterioration } as const;

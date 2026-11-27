@@ -211,6 +211,39 @@ export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
           : [];
       })
       .join(''),
+  // ex22 draw-from-observation@1: only grooves the soil actually kept and that are visible, at their
+  // recorded shaded colour, width and surface-local geometry; a failed test groove draws nothing.
+  'groove-drawing': (o) =>
+    (Array.isArray(o.data.grooves) ? o.data.grooves : [])
+      .flatMap((g) => {
+        if (
+          !g ||
+          typeof g !== 'object' ||
+          Array.isArray(g) ||
+          g.retained !== true ||
+          g.visible !== true ||
+          !(Number(g.depth) > 0) ||
+          !(Number(g.width) > 0) ||
+          typeof g.color !== 'string' ||
+          !/^#[a-f\d]{6}$/i.test(g.color)
+        )
+          return [];
+        const points = (Array.isArray(g.points) ? g.points : []).flatMap((p) =>
+          p &&
+          typeof p === 'object' &&
+          !Array.isArray(p) &&
+          typeof p.x === 'number' &&
+          typeof p.y === 'number'
+            ? [{ x: p.x, y: p.y }]
+            : [],
+        );
+        return points.length > 1
+          ? [
+              `<polyline points="${points.map((p) => `${String(p.x)},${String(p.y)}`).join(' ')}" fill="none" stroke="${g.color}" stroke-width="${String(Number(g.width))}" stroke-linecap="round" stroke-linejoin="round"/>`,
+            ]
+          : [];
+      })
+      .join(''),
   plant: source,
   // ex15 cultivation-trial@1: a soil position, dashed while worked; the unit is drawn only while
   // uncovered, a mound hides a covered one, and a sprout with verified stock only once established.

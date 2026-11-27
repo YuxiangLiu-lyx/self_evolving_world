@@ -119,6 +119,9 @@ import { LONG_EX21_SMALL_COMBUSTION } from './long-ex21-small-combustion.js';
 import { LONG_EX21_BEAM_MASS_COMPARATOR } from './long-ex21-beam-mass-comparator.js';
 import { LONG_EX21_SAMPLE_DRYING } from './long-ex21-sample-drying.js';
 import { LONG_EX21_CONSTITUENT_TEST } from './long-ex21-constituent-test.js';
+import { LONG_EX22_SHELLED_FOOD } from './long-ex22-shelled-food.js';
+import { LONG_EX22_OBSERVATIONAL_DRAWING } from './long-ex22-observational-drawing.js';
+import { LONG_EX22_SLEEP } from './long-ex22-sleep.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -233,6 +236,9 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_EX21_BEAM_MASS_COMPARATOR,
   LONG_EX21_SAMPLE_DRYING,
   LONG_EX21_CONSTITUENT_TEST,
+  LONG_EX22_SHELLED_FOOD,
+  LONG_EX22_OBSERVATIONAL_DRAWING,
+  LONG_EX22_SLEEP,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(

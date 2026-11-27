@@ -296,7 +296,8 @@ describe('ex21 targeted food-constituent test', () => {
     const pkg = V7_PACKAGES.find((p) => p.id === ID);
     const ability = pkg?.abilities[0];
     if (!pkg || !ability) throw new Error('Missing package.');
-    expect(V7_PACKAGES.at(-1)).toBe(pkg);
+    // Appended last when ex21 registered it; later runs' packages follow it.
+    expect(V7_PACKAGES.filter((p) => p.scope === 'long-ex21').at(-1)).toBe(pkg);
     expect(pkg.scope).toBe('long-ex21');
     expect(pkg.version).toBe(1);
     expect(pkg.dependencies).toEqual(['foundation-open@1']);

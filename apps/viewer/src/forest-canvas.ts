@@ -305,9 +305,14 @@ function object(
   if (o.kind === 'canopy-post') ellipse(c, 0.03, 0.03, 0.12, 0.06, '#1b302b40');
   else if (o.visual.component === 'sign')
     ellipse(c, 0.02, 0.16, 0.12, 0.05, '#1b302b40');
-  // A mark applied flat to the ground casts no shadow.
+  // A mark applied flat to the ground, or a groove in it, casts no shadow.
   else if (
-    !['rain-canopy', 'rain-canopy-work', 'applied-mark'].includes(o.kind)
+    ![
+      'rain-canopy',
+      'rain-canopy-work',
+      'applied-mark',
+      'groove-drawing',
+    ].includes(o.kind)
   )
     ellipse(c, 0.13, 0.12, 0.58, 0.22, '#1b302b40');
   if (packageVisual(c, o)) {
