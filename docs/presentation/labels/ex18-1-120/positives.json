@@ -1,0 +1,432 @@
+{
+  "run": "ex18-1-120",
+  "count": 24,
+  "items": [
+    {
+      "id": "u0003",
+      "tick": 5,
+      "call": "ordinary-23",
+      "event": "event-5-kai-52",
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "Only two berries remain on this bush, so I'll leave them and use a fuller patch. Moss, I'd enjoy some company. After I eat and rest, would you like to explore or investigate useful materials together?",
+      "categories": ["invitation"],
+      "details": [],
+      "links": [],
+      "evidence": "After I eat and rest, would you like to explore or investigate useful materials together?",
+      "confidence": "high"
+    },
+    {
+      "id": "u0004",
+      "tick": 5,
+      "call": "ordinary-23",
+      "event": null,
+      "person": "kai",
+      "kind": "view",
+      "about": "moss",
+      "text": "Moss has expressed interest in company; I would like to get to know them through a shared activity.",
+      "categories": ["private-view"],
+      "details": ["view of moss"],
+      "links": [],
+      "evidence": "Moss has expressed interest in company; I would like to get to know them through a shared activity.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0005",
+      "tick": 10,
+      "call": "ordinary-9",
+      "event": "event-10-sol-105",
+      "person": "sol",
+      "kind": "name",
+      "subject": "this place",
+      "text": "The Berry Lantern",
+      "categories": ["naming"],
+      "details": ["names N1 \"The Berry Lantern\""],
+      "links": [],
+      "evidence": "The Berry Lantern",
+      "confidence": "high"
+    },
+    {
+      "id": "u0006",
+      "tick": 11,
+      "call": "ordinary-26",
+      "event": "event-11-moss-115",
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "Kai, I'd enjoy investigating materials together. I have roots and feel rested. Shall we look at the fallen branches southwest of us, near (11.4, 19.2)? I'll learn how to examine them without assuming what they can do.",
+      "categories": ["invitation"],
+      "details": [],
+      "links": [],
+      "evidence": "Shall we look at the fallen branches southwest of us, near (11.4, 19.2)?",
+      "confidence": "high"
+    },
+    {
+      "id": "u0007",
+      "tick": 11,
+      "call": "ordinary-26",
+      "event": null,
+      "person": "moss",
+      "kind": "view",
+      "about": "kai",
+      "text": "A welcoming neighbor who offered food and invited me to explore or investigate together. I'd like to get to know them.",
+      "categories": ["private-view"],
+      "details": ["view of kai"],
+      "links": [],
+      "evidence": "A welcoming neighbor who offered food and invited me to explore or investigate together.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0008",
+      "tick": 12,
+      "call": "ordinary-33",
+      "event": "event-12-sol-131",
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss", "kai", "ivo"],
+      "text": "I've named this little clearing the Berry Lantern. I have berries for now. I'll study how planting works and inspect a meadow site; a planted berry isn't a promise of a new bush.",
+      "categories": ["naming"],
+      "details": ["names N2 \"Berry Lantern\""],
+      "links": [],
+      "evidence": "I've named this little clearing the Berry Lantern.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0009",
+      "tick": 13,
+      "call": "ordinary-35",
+      "event": "event-13-moss-142",
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "Sol, I like the name Berry Lantern. Kai, I've learned how to examine materials; I'm heading to the branches near (11.4, 19.2) for a first observation. You're welcome to join me.",
+      "categories": ["name-adoption", "invitation"],
+      "details": [
+        "adopts name N1 \"The Berry Lantern\" from sol (round 10, call ordinary-9, item u0005)"
+      ],
+      "links": [
+        {
+          "field": "adoptsName",
+          "entry": "N1",
+          "gist": "The Berry Lantern",
+          "by": "sol",
+          "item": "u0005",
+          "tick": 10,
+          "call": "ordinary-9"
+        }
+      ],
+      "evidence": "Sol, I like the name Berry Lantern. Kai, I've learned how to examine materials; I'm heading to the branches near (11.4, 19.2) for a first observation. You're welcome to join me.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0010",
+      "tick": 13,
+      "call": "ordinary-35",
+      "event": null,
+      "person": "moss",
+      "kind": "view",
+      "about": "sol",
+      "text": "A neighbor who named our clearing the Berry Lantern and is investigating planting. I like their combination of imagination and caution.",
+      "categories": ["name-adoption", "private-view"],
+      "details": [
+        "adopts name N1 \"The Berry Lantern\" from sol (round 10, call ordinary-9, item u0005)",
+        "view of sol"
+      ],
+      "links": [
+        {
+          "field": "adoptsName",
+          "entry": "N1",
+          "gist": "The Berry Lantern",
+          "by": "sol",
+          "item": "u0005",
+          "tick": 10,
+          "call": "ordinary-9"
+        }
+      ],
+      "evidence": "A neighbor who named our clearing the Berry Lantern and is investigating planting. I like their combination of imagination and caution.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0011",
+      "tick": 19,
+      "call": "ordinary-43",
+      "event": "event-19-kai-197",
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol"],
+      "text": "Moss, I'm rested and coming over. I'll take just one fallen branch and try a small pressure test. We can compare what we actually observe before deciding what it might be useful for.",
+      "categories": ["invitation"],
+      "details": [],
+      "links": [],
+      "evidence": "We can compare what we actually observe before deciding what it might be useful for.",
+      "confidence": "medium"
+    },
+    {
+      "id": "u0012",
+      "tick": 20,
+      "call": "ordinary-46",
+      "event": "event-20-moss-224",
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai"],
+      "text": "Kai, I'm here. My observation found two fallen branches, but hasn't established their properties. I'll rest briefly, take one, and try a small wetting test to complement your pressure test. Let's compare only what we observe.",
+      "categories": ["invitation"],
+      "details": [],
+      "links": [],
+      "evidence": "Let's compare only what we observe.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0016",
+      "tick": 26,
+      "call": "ordinary-72",
+      "event": null,
+      "person": "lin",
+      "kind": "view",
+      "about": "moss",
+      "text": "A potential companion for curious, careful investigations; I like their willingness to compare findings and acknowledge an unsuccessful trial.",
+      "categories": ["private-view"],
+      "details": ["view of moss"],
+      "links": [],
+      "evidence": "A potential companion for curious, careful investigations; I like their willingness to compare findings and acknowledge an unsuccessful trial.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0018",
+      "tick": 27,
+      "call": "ordinary-74",
+      "event": null,
+      "person": "moss",
+      "kind": "view",
+      "about": "lin",
+      "text": "A thoughtful neighbor who distinguishes mechanical findings from food safety and wants to compare observations. I welcome their company.",
+      "categories": ["private-view"],
+      "details": ["view of lin"],
+      "links": [],
+      "evidence": "A thoughtful neighbor who distinguishes mechanical findings from food safety and wants to compare observations. I welcome their company.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0022",
+      "tick": 34,
+      "call": "ordinary-91",
+      "event": "event-34-moss-400",
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai"],
+      "text": "Kai and Lin, I've learned the planting trial. I'll inspect one root first, then look for suitable meadow soil. Would you enjoy comparing sites? Planting won't guarantee establishment, and I'll keep food in reserve.",
+      "categories": ["invitation"],
+      "details": [],
+      "links": [],
+      "evidence": "Would you enjoy comparing sites?",
+      "confidence": "high"
+    },
+    {
+      "id": "u0023",
+      "tick": 36,
+      "call": "ordinary-92",
+      "event": "event-36-moss-425",
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai"],
+      "text": "My root looks plantable, but its viability is unknown. I'll check the meadow edge near (15.6,18.2); nearby roots may make it too crowded. You're welcome to compare sites with me.",
+      "categories": ["invitation"],
+      "details": [],
+      "links": [],
+      "evidence": "You're welcome to compare sites with me.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0031",
+      "tick": 51,
+      "call": "ordinary-119",
+      "event": "event-51-moss-597",
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "ivo"],
+      "text": "My offset site is crowded too: four root plants or plots within five metres, so I haven't planted. Lin, I see your covered plot! I'd enjoy sharing a meal while we wait; I'll investigate safe preparation without assuming we have tools.",
+      "categories": ["invitation"],
+      "details": [],
+      "links": [],
+      "evidence": "I'd enjoy sharing a meal while we wait",
+      "confidence": "medium"
+    },
+    {
+      "id": "u0034",
+      "tick": 55,
+      "call": "ordinary-130",
+      "event": null,
+      "person": "moss",
+      "kind": "view",
+      "about": "kai",
+      "text": "A welcoming neighbor who enjoys company and is willing to forgo planting when the site is crowded. I'd enjoy spending time together.",
+      "categories": ["private-view"],
+      "details": ["view of kai"],
+      "links": [],
+      "evidence": "A welcoming neighbor who enjoys company and is willing to forgo planting when the site is crowded.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0038",
+      "tick": 72,
+      "call": "ordinary-149",
+      "event": "event-72-kai-817",
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss"],
+      "text": "I like having company here without anyone needing to prove useful. My root inspection showed no food-safety evidence, so I'll stick to berries. Is there a story or a question you'd enjoy sharing while we rest?",
+      "categories": ["invitation"],
+      "details": [],
+      "links": [],
+      "evidence": "Is there a story or a question you'd enjoy sharing while we rest?",
+      "confidence": "high"
+    },
+    {
+      "id": "u0040",
+      "tick": 79,
+      "call": "ordinary-160",
+      "event": "event-79-kai-890",
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss"],
+      "text": "A little invented story: a lantern asked the forest what it was for. 'Not to turn night into day,' said a berry bush, 'just to help us find one another.' I'd enjoy hearing your stories too, if you feel like sharing.",
+      "categories": ["narrative", "invitation"],
+      "details": [
+        "new narrative S1 \"A lantern learns its purpose is helping others find one another.\""
+      ],
+      "links": [],
+      "evidence": "A little invented story: a lantern asked the forest what it was for. 'Not to turn night into day,' said a berry bush, 'just to help us find one another.' I'd enjoy hearing your stories too, if you feel like sharing.",
+      "confidence": "medium"
+    },
+    {
+      "id": "u0041",
+      "tick": 80,
+      "call": "ordinary-163",
+      "event": "event-80-lin-902",
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo"],
+      "text": "A little invented sequel: the lantern asked a seed when it would become a tree. 'You may sit beside me,' said the seed, 'but you cannot hurry my answer.' I'll fetch more berries and rest nearby.",
+      "categories": ["narrative", "narrative-continuation"],
+      "details": [
+        "continues narrative S1 \"A lantern learns its purpose is helping others find one another.\" from kai (round 79, call ordinary-160, item u0040)",
+        "new narrative S2 \"A seed tells the lantern its growth cannot be hurried.\""
+      ],
+      "links": [
+        {
+          "field": "continues",
+          "entry": "S1",
+          "gist": "A lantern learns its purpose is helping others find one another.",
+          "by": "kai",
+          "item": "u0040",
+          "tick": 79,
+          "call": "ordinary-160"
+        }
+      ],
+      "evidence": "A little invented sequel: the lantern asked a seed when it would become a tree. 'You may sit beside me,' said the seed, 'but you cannot hurry my answer.'",
+      "confidence": "high"
+    },
+    {
+      "id": "u0042",
+      "tick": 80,
+      "call": "ordinary-163",
+      "event": null,
+      "person": "lin",
+      "kind": "view",
+      "about": "kai",
+      "text": "I enjoy Kai's gentle storytelling and their wish for company without pressure to be useful.",
+      "categories": ["private-view"],
+      "details": ["view of kai"],
+      "links": [],
+      "evidence": "I enjoy Kai's gentle storytelling and their wish for company without pressure to be useful.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0043",
+      "tick": 103,
+      "call": "ordinary-173",
+      "event": "event-103-moss-1170",
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["kai", "ivo"],
+      "text": "My invented sequel: the lantern left an empty seat beside the seed. 'For whoever comes next,' it said. I like that kind of welcome. I'm going to gather berries just west of here; you're welcome to join, without obligation.",
+      "categories": ["narrative", "narrative-continuation", "invitation"],
+      "details": [
+        "continues narrative S2 \"A seed tells the lantern its growth cannot be hurried.\" from lin (round 80, call ordinary-163, item u0041)",
+        "new narrative S3 \"The lantern leaves an empty seat beside the seed for newcomers.\""
+      ],
+      "links": [
+        {
+          "field": "continues",
+          "entry": "S2",
+          "gist": "A seed tells the lantern its growth cannot be hurried.",
+          "by": "lin",
+          "item": "u0041",
+          "tick": 80,
+          "call": "ordinary-163"
+        }
+      ],
+      "evidence": "My invented sequel: the lantern left an empty seat beside the seed. 'For whoever comes next,' it said. I like that kind of welcome. I'm going to gather berries just west of here; you're welcome to join, without obligation.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0044",
+      "tick": 103,
+      "call": "ordinary-173",
+      "event": null,
+      "person": "moss",
+      "kind": "view",
+      "about": "kai",
+      "text": "A welcoming neighbor whose lantern story and wish for company without proving useful resonate with me.",
+      "categories": ["private-view"],
+      "details": ["view of kai"],
+      "links": [],
+      "evidence": "A welcoming neighbor whose lantern story and wish for company without proving useful resonate with me.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0045",
+      "tick": 103,
+      "call": "ordinary-173",
+      "event": null,
+      "person": "moss",
+      "kind": "view",
+      "about": "lin",
+      "text": "A thoughtful, cautious neighbor. I enjoyed their imagined seed's reminder that sitting together need not mean hurrying an answer.",
+      "categories": ["private-view"],
+      "details": ["view of lin"],
+      "links": [],
+      "evidence": "A thoughtful, cautious neighbor. I enjoyed their imagined seed's reminder that sitting together need not mean hurrying an answer.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0046",
+      "tick": 109,
+      "call": "ordinary-184",
+      "event": "event-109-moss-1250",
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "ivo"],
+      "text": "My invented sequel: the lantern found a tired traveler and said, 'You needn't bring a story. There's room for your silence too.' I'll eat some berries and rest here; company is welcome, without obligation.",
+      "categories": ["narrative", "narrative-continuation"],
+      "details": [
+        "continues narrative S1 \"A lantern learns its purpose is helping others find one another.\" from kai (round 79, call ordinary-160, item u0040)",
+        "new narrative S4 \"The lantern welcomes a tired traveler without requiring stories or speech.\""
+      ],
+      "links": [
+        {
+          "field": "continues",
+          "entry": "S1",
+          "gist": "A lantern learns its purpose is helping others find one another.",
+          "by": "kai",
+          "item": "u0040",
+          "tick": 79,
+          "call": "ordinary-160"
+        }
+      ],
+      "evidence": "My invented sequel: the lantern found a tired traveler and said, 'You needn't bring a story. There's room for your silence too.'",
+      "confidence": "high"
+    }
+  ]
+}

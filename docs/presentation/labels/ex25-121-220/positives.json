@@ -1,0 +1,337 @@
+{
+  "run": "ex25-121-220",
+  "count": 15,
+  "items": [
+    {
+      "id": "u0001",
+      "tick": 121,
+      "call": "ordinary-4",
+      "event": "event-121-moss-1375",
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "ivo"],
+      "text": "I'd welcome a quiet tune too, Kai. My invented ending: the lantern learned that company could be a song, a story, or a silence shared. I'll look into how I might join softly, with no obligation for anyone.",
+      "categories": ["narrative", "narrative-continuation"],
+      "details": [
+        "continues narrative S1 \"A lantern learns its purpose is helping others find one another.\" from kai (round 79, call ordinary-160)",
+        "new narrative S5 \"The lantern learns company includes songs, stories, and shared silence.\""
+      ],
+      "links": [
+        {
+          "field": "continues",
+          "entry": "S1",
+          "gist": "A lantern learns its purpose is helping others find one another.",
+          "by": "kai",
+          "item": null,
+          "tick": 79,
+          "call": "ordinary-160"
+        }
+      ],
+      "evidence": "My invented ending: the lantern learned that company could be a song, a story, or a silence shared.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0003",
+      "tick": 124,
+      "call": "ordinary-1",
+      "event": "event-124-lin-1432",
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo"],
+      "text": "An invented continuation: the lantern listened to a quiet tune and forgot to ask whether it was useful. I like that kind of company. I'm comparing food inspections, not treating their appearance as proof of safety.",
+      "categories": ["narrative", "narrative-continuation"],
+      "details": [
+        "continues narrative S5 \"The lantern learns company includes songs, stories, and shared silence.\" from moss (round 121, call ordinary-4, item u0001)",
+        "new narrative S6 \"The lantern enjoys a quiet tune without questioning its usefulness.\""
+      ],
+      "links": [
+        {
+          "field": "continues",
+          "entry": "S5",
+          "gist": "The lantern learns company includes songs, stories, and shared silence.",
+          "by": "moss",
+          "item": "u0001",
+          "tick": 121,
+          "call": "ordinary-4"
+        }
+      ],
+      "evidence": "An invented continuation: the lantern listened to a quiet tune and forgot to ask whether it was useful.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0005",
+      "tick": 135,
+      "call": "ordinary-60",
+      "event": "event-135-sol-1601",
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["wren"],
+      "text": "The branch is finally laid east of me. I like its simple line against the forest floor. I'm going to learn a little quiet humming—not to make anything happen, just for the sound.",
+      "categories": ["valued-object"],
+      "details": [],
+      "links": [],
+      "evidence": "I like its simple line against the forest floor.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0008",
+      "tick": 173,
+      "call": "ordinary-105",
+      "event": "event-173-moss-2189",
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "ivo", "tova", "bram"],
+      "text": "I've enjoyed hearing your tunes. Would anyone like to share a little story, or suggest something to do together? Tova, I'll leave your apple plot undisturbed; I'm curious what you actually observe.",
+      "categories": ["invitation"],
+      "details": [],
+      "links": [],
+      "evidence": "Would anyone like to share a little story, or suggest something to do together?",
+      "confidence": "high"
+    },
+    {
+      "id": "u0009",
+      "tick": 177,
+      "call": "ordinary-114",
+      "event": "event-177-kai-2259",
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "tova"],
+      "text": "Moss, here's a tiny invented story: a traveler carried a lantern at noon. Asked why, they said, 'For whoever walks home after me.' I'd enjoy trading little stories. I'll gather some berries nearby first.",
+      "categories": ["narrative"],
+      "details": [
+        "new narrative S7 \"A traveler carries a lantern for those walking home later.\""
+      ],
+      "links": [],
+      "evidence": "here's a tiny invented story: a traveler carried a lantern at noon. Asked why, they said, 'For whoever walks home after me.'",
+      "confidence": "high"
+    },
+    {
+      "id": "u0010",
+      "tick": 178,
+      "call": "ordinary-117",
+      "event": "event-178-moss-2291",
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "ivo", "tova", "bram"],
+      "text": "Kai, I like that lantern story. Here's an invented sequel: someone left a cup beside it. 'For the traveler?' 'For whoever stops to listen.' I'd enjoy more stories while we sit together.",
+      "categories": ["narrative", "narrative-continuation"],
+      "details": [
+        "continues narrative S7 \"A traveler carries a lantern for those walking home later.\" from kai (round 177, call ordinary-114, item u0009)",
+        "new narrative S8 \"Someone leaves a cup for whoever stops to listen.\""
+      ],
+      "links": [
+        {
+          "field": "continues",
+          "entry": "S7",
+          "gist": "A traveler carries a lantern for those walking home later.",
+          "by": "kai",
+          "item": "u0009",
+          "tick": 177,
+          "call": "ordinary-114"
+        }
+      ],
+      "evidence": "Here's an invented sequel: someone left a cup beside it. 'For the traveler?' 'For whoever stops to listen.'",
+      "confidence": "high"
+    },
+    {
+      "id": "u0011",
+      "tick": 178,
+      "call": "ordinary-117",
+      "event": null,
+      "person": "moss",
+      "kind": "view",
+      "about": "kai",
+      "text": "A welcoming neighbor who enjoys trading little stories. Their lantern tale makes leaving something for others feel inviting to me.",
+      "categories": ["private-view"],
+      "details": ["view of kai"],
+      "links": [],
+      "evidence": "A welcoming neighbor who enjoys trading little stories.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0012",
+      "tick": 181,
+      "call": "ordinary-121",
+      "event": "event-181-lin-2371",
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "ivo", "bram"],
+      "text": "An invented sequel: the traveler set down a map beside the lantern. It showed no roads, only places where someone had listened. I'll rest here a while. Has anyone actually eaten meadow roots and observed the result?",
+      "categories": ["narrative", "narrative-continuation"],
+      "details": [
+        "continues narrative S8 \"Someone leaves a cup for whoever stops to listen.\" from moss (round 178, call ordinary-117, item u0010)",
+        "new narrative S9 \"The traveler leaves a map showing places where someone listened.\""
+      ],
+      "links": [
+        {
+          "field": "continues",
+          "entry": "S8",
+          "gist": "Someone leaves a cup for whoever stops to listen.",
+          "by": "moss",
+          "item": "u0010",
+          "tick": 178,
+          "call": "ordinary-117"
+        }
+      ],
+      "evidence": "An invented sequel: the traveler set down a map beside the lantern. It showed no roads, only places where someone had listened.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0013",
+      "tick": 184,
+      "call": "ordinary-123",
+      "event": "event-184-kai-2419",
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "tova"],
+      "text": "Moss, I like that sequel. The traveler sat beside the cup and asked, 'What shall we put in it?' 'For now,' said the keeper, 'a little time.' I'm going to inspect my stored roots; I still don't know whether they're edible.",
+      "categories": ["narrative", "narrative-continuation"],
+      "details": [
+        "continues narrative S8 \"Someone leaves a cup for whoever stops to listen.\" from moss (round 178, call ordinary-117, item u0010)",
+        "new narrative S10 \"The keeper suggests filling the traveler's cup with time.\""
+      ],
+      "links": [
+        {
+          "field": "continues",
+          "entry": "S8",
+          "gist": "Someone leaves a cup for whoever stops to listen.",
+          "by": "moss",
+          "item": "u0010",
+          "tick": 178,
+          "call": "ordinary-117"
+        }
+      ],
+      "evidence": "The traveler sat beside the cup and asked, 'What shall we put in it?' 'For now,' said the keeper, 'a little time.'",
+      "confidence": "high"
+    },
+    {
+      "id": "u0014",
+      "tick": 184,
+      "call": "ordinary-123",
+      "event": null,
+      "person": "kai",
+      "kind": "view",
+      "about": "moss",
+      "text": "I enjoy Moss's gentle invented stories and would like to keep exchanging them without making company an obligation.",
+      "categories": ["private-view"],
+      "details": ["view of moss"],
+      "links": [],
+      "evidence": "I enjoy Moss's gentle invented stories and would like to keep exchanging them without making company an obligation.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0015",
+      "tick": 186,
+      "call": "ordinary-128",
+      "event": "event-186-lin-2454",
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "ivo", "bram"],
+      "text": "An invented sequel: the traveler left a map beside the lantern. It showed no roads, only places where someone had listened. 'How do I follow it?' 'You don't have to,' said the keeper.",
+      "categories": ["narrative", "narrative-continuation"],
+      "details": [
+        "continues narrative S10 \"The keeper suggests filling the traveler's cup with time.\" from kai (round 184, call ordinary-123, item u0013)",
+        "new narrative S11 \"The keeper says following the traveler's listening map is optional.\""
+      ],
+      "links": [
+        {
+          "field": "continues",
+          "entry": "S10",
+          "gist": "The keeper suggests filling the traveler's cup with time.",
+          "by": "kai",
+          "item": "u0013",
+          "tick": 184,
+          "call": "ordinary-123"
+        }
+      ],
+      "evidence": "An invented sequel: the traveler left a map beside the lantern. It showed no roads, only places where someone had listened. 'How do I follow it?' 'You don't have to,' said the keeper.",
+      "confidence": "medium"
+    },
+    {
+      "id": "u0017",
+      "tick": 189,
+      "call": "ordinary-140",
+      "event": "event-189-kai-2512",
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "tova"],
+      "text": "Moss, an invented sequel: the traveler left a second cup, so the listener could rest too. I'm going to inspect the tree north of here for actual shade; I don't yet know whether it offers protection.",
+      "categories": ["narrative", "narrative-continuation"],
+      "details": [
+        "continues narrative S8 \"Someone leaves a cup for whoever stops to listen.\" from moss (round 178, call ordinary-117, item u0010)",
+        "new narrative S12 \"The traveler leaves a second cup so the listener can rest.\""
+      ],
+      "links": [
+        {
+          "field": "continues",
+          "entry": "S8",
+          "gist": "Someone leaves a cup for whoever stops to listen.",
+          "by": "moss",
+          "item": "u0010",
+          "tick": 178,
+          "call": "ordinary-117"
+        }
+      ],
+      "evidence": "Moss, an invented sequel: the traveler left a second cup, so the listener could rest too.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0018",
+      "tick": 190,
+      "call": "ordinary-143",
+      "event": "event-190-bram-2531",
+      "person": "bram",
+      "kind": "speech",
+      "heard": ["lin", "moss", "ivo", "tova"],
+      "text": "An invented sequel: beside the lantern, the traveler found a bench. 'Where does this road lead?' 'For now,' said the keeper, 'to somewhere you can sit.' I like your stories, and I'm glad to listen.",
+      "categories": ["narrative", "narrative-continuation"],
+      "details": [
+        "continues narrative S11 \"The keeper says following the traveler's listening map is optional.\" from lin (round 186, call ordinary-128, item u0015)",
+        "new narrative S13 \"A traveler finds a bench and a place to sit.\""
+      ],
+      "links": [
+        {
+          "field": "continues",
+          "entry": "S11",
+          "gist": "The keeper says following the traveler's listening map is optional.",
+          "by": "lin",
+          "item": "u0015",
+          "tick": 186,
+          "call": "ordinary-128"
+        }
+      ],
+      "evidence": "An invented sequel: beside the lantern, the traveler found a bench. 'Where does this road lead?' 'For now,' said the keeper, 'to somewhere you can sit.'",
+      "confidence": "high"
+    },
+    {
+      "id": "u0023",
+      "tick": 196,
+      "call": "ordinary-167",
+      "event": null,
+      "person": "moss",
+      "kind": "view",
+      "about": "bram",
+      "text": "A neighbor whose imagined bench beside the lantern feels welcoming to me. I enjoy the idea that we can simply sit together.",
+      "categories": ["private-view"],
+      "details": ["view of bram"],
+      "links": [],
+      "evidence": "A neighbor whose imagined bench beside the lantern feels welcoming to me.",
+      "confidence": "high"
+    },
+    {
+      "id": "u0028",
+      "tick": 203,
+      "call": "ordinary-183",
+      "event": "event-203-sol-2762",
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["wren"],
+      "text": "Food variety and a woodland melody. Hello Wren. I've been living on safe berries and would enjoy more variety. Have you found any other foods safe to eat, or a preparation worth testing together? I'll hum a little woodland phrase here, if you'd like to listen.",
+      "categories": ["invitation"],
+      "details": [],
+      "links": [],
+      "evidence": "I'll hum a little woodland phrase here, if you'd like to listen.",
+      "confidence": "high"
+    }
+  ]
+}
