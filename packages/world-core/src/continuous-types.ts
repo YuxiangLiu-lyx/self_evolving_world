@@ -437,7 +437,8 @@ export interface V7Configuration {
       | 'culture-v2-oldgoal'
       | 'culture-v3'
       | 'culture-v3-incentives'
-      | 'culture-v2-import';
+      | 'culture-v2-import'
+      | 'culture-v2-villages';
     /** Opt-in culture scenario switches. Absent in ex13, long-fixes and earlier archives. */
     culture?: V7CultureOptions;
     /** Opt-in additional hard ceilings on the shared token ledger. Each applies to every
@@ -465,6 +466,11 @@ export interface V7Configuration {
     /** Opt-in (culture v2): every developed interface, as ordinary agents see it, must
      * serialize to at most this many code units. Absent in ex15 and earlier. */
     abilityTextLimit?: number;
+    /** Opt-in (culture v2 villages): the round at which the first observation window ends.
+     * It replaces `experience.targetRounds` as the window, which stays at the culture v2
+     * value because World Agent inputs show the experience configuration. Absent in every
+     * earlier run, whose first window is `experience.targetRounds`. */
+    firstWindow?: number;
     checkpoints: number[];
     cycle: number;
     pressureStart: number;

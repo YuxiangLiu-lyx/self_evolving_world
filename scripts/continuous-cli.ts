@@ -68,7 +68,7 @@ import {
 } from './continuous-analysis.js';
 
 const USAGE = `Usage:
-  pnpm experiment:continuous -- new open|long|long-fixes|long-culture|long-culture-incentives|long-culture-v2|long-culture-v2-incentives|long-culture-v2-oldgoal|long-culture-v3|long-culture-v3-incentives|collective-a
+  pnpm experiment:continuous -- new open|long|long-fixes|long-culture|long-culture-incentives|long-culture-v2|long-culture-v2-incentives|long-culture-v2-oldgoal|long-culture-v3|long-culture-v3-incentives|long-culture-v2-villages|collective-a
   pnpm experiment:continuous -- new long-culture-TAG [--seed N] [--development N] [--tokens N]
   pnpm experiment:continuous -- new collective-b exA
   pnpm experiment:continuous -- new long-culture-v2 --import exN --newcomers file.json

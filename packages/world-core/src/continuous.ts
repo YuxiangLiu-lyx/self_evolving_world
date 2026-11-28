@@ -143,6 +143,13 @@ import { LONG_EX25_LOOSE_PLACEMENT } from './long-ex25-loose-placement.js';
 import { LONG_EX25_FRICTION_HEAT } from './long-ex25-friction-heat.js';
 import { LONG_EX25_FOOD_SEPARATION } from './long-ex25-food-processing.js';
 import { LONG_EX25_HEAT_EXPOSURE } from './long-ex25-heat-exposure.js';
+import { LONG_EX26_BOUNDED_SEARCH } from './long-ex26-bounded-search.js';
+import { LONG_EX26_CONVERSATION } from './long-ex26-conversation.js';
+import { LONG_EX26_TEND_PLANTS } from './long-ex26-tend-plants.js';
+import { LONG_EX26_FOOD_ASSESSMENT } from './long-ex26-food-assessment.js';
+import { LONG_EX26_SEARCH_RECHECK } from './long-ex26-search-recheck.js';
+import { LONG_EX26_SEARCH_LOW_HEALTH } from './long-ex26-search-low-health.js';
+import { LONG_EX26_FOOD_FORAGING } from './long-ex26-food-foraging.js';
 
 /** Append reviewed package versions here; historical handlers retain their versioned identities. */
 export const V7_PACKAGES: V7Package[] = [
@@ -281,6 +288,13 @@ export const V7_PACKAGES: V7Package[] = [
   LONG_EX25_FRICTION_HEAT,
   LONG_EX25_FOOD_SEPARATION,
   LONG_EX25_HEAT_EXPOSURE,
+  LONG_EX26_BOUNDED_SEARCH,
+  LONG_EX26_CONVERSATION,
+  LONG_EX26_TEND_PLANTS,
+  LONG_EX26_FOOD_ASSESSMENT,
+  LONG_EX26_SEARCH_RECHECK,
+  LONG_EX26_SEARCH_LOW_HEALTH,
+  LONG_EX26_FOOD_FORAGING,
 ];
 export const continuousRegistry = (world?: V7World) =>
   v7Registry(

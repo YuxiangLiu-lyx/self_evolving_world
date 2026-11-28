@@ -230,6 +230,42 @@ describe('shared vocabulary', () => {
     ]);
   });
 
+  it('counts words another interface spoke through tell only when the told text is exact', () => {
+    const spoken = round(4, idle, {
+      events: [
+        event(4, 'moss', 'told', {
+          interface: 'reciprocal-conversation',
+          data: { text: 'The pale roots catch my eye.' },
+        }),
+        event(4, 'sol', 'told', {
+          interface: 'reciprocal-conversation',
+          data: { text: 'session-4-sol: Sol joins the conversation.' },
+        }),
+      ],
+    });
+    spoken.actions.moss = {
+      interface: 'reciprocal-conversation',
+      args: { mode: 'contribute', text: 'The pale roots catch my eye.' },
+    };
+    spoken.actions.sol = {
+      interface: 'reciprocal-conversation',
+      args: { mode: 'join', text: 'Glad to.' },
+    };
+    spoken.actions.lin = {
+      interface: 'reciprocal-conversation',
+      args: { mode: 'contribute', text: 'Words nobody was told.' },
+    };
+    expect(utterances(world([spoken]))).toEqual([
+      {
+        actor: 'moss',
+        tick: 4,
+        kind: 'public',
+        text: 'The pale roots catch my eye.',
+        recipient: null,
+      },
+    ]);
+  });
+
   it('skips the controller fallback intention written after a failed decision', () => {
     const fallback =
       'One failed-decision interval; the next decision remains budgeted.';

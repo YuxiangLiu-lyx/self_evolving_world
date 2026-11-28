@@ -177,6 +177,10 @@ export function openAnimals(world: V7World): void {
     animal.data.health ??= 100;
     animal.data.satiety ??= 70;
     animal.data.group ??= species;
+    // Peers share the group, which defaults to the species and is always the species in
+    // every archive before the culture v2 villages genesis, so grouping there is unchanged.
+    const group =
+      typeof animal.data.group === 'string' ? animal.data.group : species;
     if (Number(animal.data.health) <= 0) {
       animal.data.mode = 'dead';
       animal.visual.state = 'dead';
@@ -189,6 +193,7 @@ export function openAnimals(world: V7World): void {
       (o) =>
         o.id !== animal.id &&
         o.data.species === species &&
+        (typeof o.data.group === 'string' ? o.data.group : species) === group &&
         Number(o.data.health ?? 100) > 0,
     );
     const nearest = world.actors
@@ -403,7 +408,7 @@ export function openAnimals(world: V7World): void {
         homeY: animal.spatial.y,
         health: 65,
         satiety: 40,
-        group: species,
+        group,
         parents: [animal.id, animal.data.mate ?? null],
         nextBreeding: world.tick + 600,
         mode: 'grouping',

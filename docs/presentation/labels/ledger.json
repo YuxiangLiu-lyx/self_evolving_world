@@ -326,6 +326,58 @@
       "counted": 3546,
       "responseId": "resp_06368691f4d25c76016b0a031ead8c87d1af5559024bb4c584",
       "at": "2026-11-27T22:24:49.679Z"
+    },
+    {
+      "run": "ex26-1-100",
+      "batch": "b0001",
+      "attempt": 1,
+      "items": 20,
+      "status": "accepted",
+      "inputTokens": 2258,
+      "outputTokens": 1425,
+      "reserved": 21883,
+      "counted": 3683,
+      "responseId": "resp_04df5d7716cbdf0f016b0a57e4561c87d1b32ab2d7a1d69af3",
+      "at": "2026-11-28T04:26:41.468Z"
+    },
+    {
+      "run": "ex26-1-100",
+      "batch": "b0002",
+      "attempt": 1,
+      "items": 5,
+      "status": "accepted",
+      "inputTokens": 1545,
+      "outputTokens": 387,
+      "reserved": 19027,
+      "counted": 1932,
+      "responseId": "resp_07f7f2ac98ce2c8e016b0a5802111c87d193b354221e6a5899",
+      "at": "2026-11-28T04:26:50.677Z"
+    },
+    {
+      "run": "ex26-1-162",
+      "batch": "b0001",
+      "attempt": 1,
+      "items": 20,
+      "status": "accepted",
+      "inputTokens": 2258,
+      "outputTokens": 1539,
+      "reserved": 21883,
+      "counted": 3797,
+      "responseId": "resp_087a2c7aa715f531016b0a9419f68887d1ad7374198a02546f",
+      "at": "2026-11-28T08:43:37.955Z"
+    },
+    {
+      "run": "ex26-1-162",
+      "batch": "b0002",
+      "attempt": 1,
+      "items": 10,
+      "status": "accepted",
+      "inputTokens": 1923,
+      "outputTokens": 826,
+      "reserved": 20608,
+      "counted": 2749,
+      "responseId": "resp_0423ab7f57e116fa016b0a943a87c487d18654d3c025e984b6",
+      "at": "2026-11-28T08:43:55.802Z"
     }
   ]
 }

@@ -258,6 +258,12 @@ unchanged:
   of whose interfaces serializes to more than 3,500 code units, naming the interface, its
   length and the limit. A rejected submission is a counted failed handoff.
 
+`long-culture-v2-villages` keeps all three options and adds `longDevelopment.firstWindow: 100`
+(absent in every earlier run). The first observation window ends at that round instead of
+`experience.targetRounds`, which World Agent inputs show and which therefore keeps the culture v2
+value. Its map, food, budgets and separation proof are in
+[Culture Scenario](CULTURE_SCENARIO.md#villages).
+
 ## Continuing an archive after shared code changed
 
 `continue` and `extend` refuse an archive whose runtime sources differ from its last recorded source revision. A handoff in any run changes shared runtime code, so after another run has developed, a paused or completed archive can no longer continue on main. The user approved the following procedure in PR-42 (ex16 and ex17):

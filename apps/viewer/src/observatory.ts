@@ -8,6 +8,13 @@ import { collectiveMemberText } from './collective-view.js';
 import { renderExtraction } from './open-extraction-view.js';
 import { forestClimate } from '@self-evolving-world/world-core';
 import { drawForestCanvas } from './forest-canvas.js';
+import {
+  cameraRect,
+  fitCamera,
+  minimapPoint,
+  wideMap,
+  zoomLimit,
+} from './observatory-camera.js';
 import type { V7Cursor } from '@self-evolving-world/world-core';
 import {
   continuousScene,
@@ -91,6 +98,14 @@ async function asset(path: string): Promise<string> {
     throw new Error(`Archive unavailable (${String(response.status)}).`);
   return response.text();
 }
+const mapExtent = () => ({
+  width: frame?.width ?? 24,
+  height: frame?.height ?? 24,
+});
+const stageExtent = () => ({
+  width: scene.clientWidth,
+  height: scene.clientHeight,
+});
 function updateCamera(): void {
   if (frame?.continuous?.config.forest)
     drawForestCanvas(forestCanvas, frame, actor, camera, geometry);
@@ -98,14 +113,13 @@ function updateCamera(): void {
     'viewBox',
     `${String(camera.x)} ${String(camera.y)} ${String(camera.size)} ${String(camera.size)}`,
   );
-  mini.querySelector('[data-camera]')?.setAttribute('x', String(camera.x));
-  mini.querySelector('[data-camera]')?.setAttribute('y', String(camera.y));
+  const rect = cameraRect(camera, mapExtent(), stageExtent());
+  mini.querySelector('[data-camera]')?.setAttribute('x', String(rect.x));
+  mini.querySelector('[data-camera]')?.setAttribute('y', String(rect.y));
+  mini.querySelector('[data-camera]')?.setAttribute('width', String(rect.size));
   mini
     .querySelector('[data-camera]')
-    ?.setAttribute('width', String(camera.size));
-  mini
-    .querySelector('[data-camera]')
-    ?.setAttribute('height', String(camera.size));
+    ?.setAttribute('height', String(rect.height));
 }
 function focus(x: number, y: number): void {
   camera.x = x - camera.size / 2;
@@ -148,6 +162,12 @@ function render(): void {
   mini.setAttribute(
     'viewBox',
     `0 0 ${String(frame.width)} ${String(frame.height)}`,
+  );
+  // A wide map gets a minimap of its own proportions; every other map keeps the square.
+  mini.classList.toggle('wide', wideMap(frame));
+  mini.style.setProperty(
+    '--map-aspect',
+    `${String(frame.width)} / ${String(frame.height)}`,
   );
   if (follow && self) focus(self.position.x, self.position.y);
   else updateCamera();
@@ -615,7 +635,10 @@ function zoom(scale: number): void {
     x: camera.x + camera.size / 2,
     y: camera.y + camera.size / 2,
   };
-  camera.size = Math.max(3, Math.min(48, camera.size * scale));
+  camera.size = Math.max(
+    3,
+    Math.min(zoomLimit(mapExtent()), camera.size * scale),
+  );
   focus(center.x, center.y);
 }
 el('zoom-in').addEventListener('click', () => {
@@ -625,11 +648,7 @@ el('zoom-out').addEventListener('click', () => {
   zoom(1.33);
 });
 el('fit').addEventListener('click', () => {
-  camera = {
-    x: 0,
-    y: 0,
-    size: Math.max(frame?.width ?? 24, frame?.height ?? 24),
-  };
+  camera = fitCamera(mapExtent(), stageExtent());
   follow = false;
   el('follow').setAttribute('aria-pressed', 'false');
   updateCamera();
@@ -662,12 +681,13 @@ scene.addEventListener('pointerup', () => {
   drag = null;
 });
 mini.addEventListener('click', (e) => {
-  const rect = mini.getBoundingClientRect();
   camera.size = Math.min(camera.size, 12);
-  focus(
-    ((e.clientX - rect.left) / rect.width) * (frame?.width ?? 24),
-    ((e.clientY - rect.top) / rect.height) * (frame?.height ?? 24),
+  const point = minimapPoint(
+    { x: e.clientX, y: e.clientY },
+    mini.getBoundingClientRect(),
+    mapExtent(),
   );
+  focus(point.x, point.y);
 });
 try {
   const response = await fetch('./experiments/index.json', {

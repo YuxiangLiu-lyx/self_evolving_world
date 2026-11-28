@@ -16,6 +16,11 @@ import {
   LONG_CULTURE_INCENTIVES,
   LONG_CULTURE_V2,
 } from './long-culture.js';
+import {
+  LONG_CULTURE_VILLAGES,
+  VILLAGES_LAYOUT,
+  villagesWorld,
+} from './long-villages.js';
 
 export const LONG_OBJECTIVE =
   'Observe evidence-based open development, persistent projects, capability dependencies and actual benefits under frozen recurring pressures; no particular invention or activity is required.';
@@ -32,6 +37,8 @@ export const LONG_CULTURE_V3_OBJECTIVE =
   'As the culture v2 run, with the open goal also leaving open with whom to live and a stated fact that rest restores only missing energy; no particular outcome, activity or invention is required.';
 export const LONG_CULTURE_V3_INCENTIVES_OBJECTIVE =
   'As the culture v3 run, with bounded, decaying satisfaction from being answered or remembered, two-way contact and noticed own work; no particular outcome, activity or invention is required.';
+export const LONG_CULTURE_V2_VILLAGES_OBJECTIVE =
+  'As the culture v2 run, with the six people in two groups of three that start far apart, each with food nearby for about 80-100 rounds, and a richer regenerating food area between them; no particular outcome, activity or invention is required.';
 export const LONG_CULTURE_V2_INCENTIVES_OBJECTIVE =
   'As the culture v2 run, with bounded, decaying satisfaction from being answered or remembered, two-way contact and noticed own work; no particular outcome, activity or invention is required.';
 /** Scenario tag of a culture v2 world imported from a retained archive with newcomers
@@ -52,7 +59,8 @@ export type LongScenario =
   | 'long-culture-v2-incentives'
   | 'long-culture-v2-oldgoal'
   | 'long-culture-v3'
-  | 'long-culture-v3-incentives';
+  | 'long-culture-v3-incentives'
+  | 'long-culture-v2-villages';
 export const LONG_SCENARIOS: readonly LongScenario[] = [
   'long',
   'long-fixes',
@@ -63,6 +71,7 @@ export const LONG_SCENARIOS: readonly LongScenario[] = [
   'long-culture-v2-oldgoal',
   'long-culture-v3',
   'long-culture-v3-incentives',
+  'long-culture-v2-villages',
 ];
 const CULTURE_SCENARIOS = {
   'long-culture': 'culture',
@@ -72,6 +81,7 @@ const CULTURE_SCENARIOS = {
   'long-culture-v2-oldgoal': 'culture-v2-oldgoal',
   'long-culture-v3': 'culture-v3',
   'long-culture-v3-incentives': 'culture-v3-incentives',
+  'long-culture-v2-villages': 'culture-v2-villages',
 } as const;
 
 /** The fix-verification run: ex13 rules and seed with the three opt-in fixes and smaller limits.
@@ -124,7 +134,9 @@ export function longObjective(
                 ? LONG_CULTURE_V3_OBJECTIVE
                 : scenario === 'long-culture-v3-incentives'
                   ? LONG_CULTURE_V3_INCENTIVES_OBJECTIVE
-                  : LONG_OBJECTIVE;
+                  : scenario === 'long-culture-v2-villages'
+                    ? LONG_CULTURE_V2_VILLAGES_OBJECTIVE
+                    : LONG_OBJECTIVE;
 }
 
 /** The default long seed, used unless a culture run's allocation overrides it. */
@@ -226,7 +238,10 @@ export function initialLongWorld(
     const incentives = name.endsWith('incentives'),
       v3 = name.startsWith('culture-v3'),
       // Culture v3 keeps every culture v2 field; only the prompt wording differs.
-      v2 = v3 || name.startsWith('culture-v2');
+      v2 = v3 || name.startsWith('culture-v2'),
+      // The villages keep every culture v2 field and prompt; only the map, the starts,
+      // the food and the frozen budgets differ.
+      villages = name === 'culture-v2-villages';
     policy.scenario = name;
     policy.exactRecordWidth = LONG_CULTURE.exactRecordWidth;
     policy.guidance = [...LONG_CULTURE.guidance];
@@ -252,6 +267,15 @@ export function initialLongWorld(
       policy.abilityTextLimit = LONG_CULTURE_V2.abilityTextLimit;
       world.config.computation.inputBytes = LONG_CULTURE_V2.inputBytes;
     }
+    if (villages) {
+      policy.tokens = LONG_CULTURE_VILLAGES.tokens;
+      policy.checkpoints = [...LONG_CULTURE_VILLAGES.checkpoints];
+      policy.firstWindow = LONG_CULTURE_VILLAGES.firstWindow;
+      world.config.budgets.development = LONG_CULTURE_VILLAGES.developments;
+      world.config.computation.workPerRound =
+        LONG_CULTURE_VILLAGES.workPerRound;
+      villagesWorld(world);
+    }
     if (incentives) {
       policy.tokens = LONG_CULTURE_INCENTIVES.tokens;
       policy.checkpoints = [...LONG_CULTURE_INCENTIVES.checkpoints];
@@ -261,16 +285,20 @@ export function initialLongWorld(
     if (chosen.development !== undefined)
       world.config.budgets.development = chosen.development;
     if (chosen.tokens !== undefined) policy.tokens = chosen.tokens;
-    const cultured = applyCulture(world, {
-      ...(v3
-        ? CULTURE_V3_OPTIONS
-        : name === 'culture-v2-oldgoal'
-          ? CULTURE_V2_OLDGOAL_OPTIONS
-          : v2
-            ? CULTURE_V2_OPTIONS
-            : CULTURE_OPTIONS),
-      incentives,
-    });
+    const cultured = applyCulture(
+      world,
+      {
+        ...(v3
+          ? CULTURE_V3_OPTIONS
+          : name === 'culture-v2-oldgoal'
+            ? CULTURE_V2_OLDGOAL_OPTIONS
+            : v2
+              ? CULTURE_V2_OPTIONS
+              : CULTURE_OPTIONS),
+        incentives,
+      },
+      villages ? VILLAGES_LAYOUT : undefined,
+    );
     v7AssertWorld(cultured, continuousRegistry(cultured));
     return v7Freeze(cultured);
   }
