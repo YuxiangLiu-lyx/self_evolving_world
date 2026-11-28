@@ -56,8 +56,13 @@ export function openPreflight(
         )
       : world.actors) {
       const o = v7Observe(world, actor.id);
+      // `eat` takes whole units; an imported world can hold partly used items below one.
       const owned = world.stacks.find(
-        (s) => s.owner === actor.id && !s.reservedFor && food(s.resource),
+        (s) =>
+          s.owner === actor.id &&
+          !s.reservedFor &&
+          food(s.resource) &&
+          s.quantity >= 1,
       );
       const available = [
         ...o.objects,

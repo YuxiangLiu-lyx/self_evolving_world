@@ -34,6 +34,11 @@ export const LONG_CULTURE_V3_INCENTIVES_OBJECTIVE =
   'As the culture v3 run, with bounded, decaying satisfaction from being answered or remembered, two-way contact and noticed own work; no particular outcome, activity or invention is required.';
 export const LONG_CULTURE_V2_INCENTIVES_OBJECTIVE =
   'As the culture v2 run, with bounded, decaying satisfaction from being answered or remembered, two-way contact and noticed own work; no particular outcome, activity or invention is required.';
+/** Scenario tag of a culture v2 world imported from a retained archive with newcomers
+ * (`new long-culture-v2 --import exN --newcomers file`); see docs/CULTURE_SCENARIO.md. */
+export const LONG_IMPORT_SCENARIO = 'culture-v2-import';
+export const LONG_IMPORT_OBJECTIVE =
+  'Under the culture v2 prompt and rules without incentives, continue a retained world with its residents and their memories, and observe what newcomers without memory learn from what the world shows them; no particular outcome, activity or invention is required.';
 export const LONG_CULTURE_V2_OLDGOAL_OBJECTIVE =
   'As the culture v2 run, with the ex15 goal sentence in place of the open goal and the value leaning shown only as a tendencies field, as in ex15; no particular outcome, activity or invention is required.';
 
@@ -89,6 +94,9 @@ export function longScenario(
   policy: NonNullable<V7World['config']['longDevelopment']>,
 ): LongScenario {
   if (policy.scenario === 'fixes') return 'long-fixes';
+  // An imported world runs the culture v2 prompt and rules; its configuration is
+  // verified against longImportConfig, not against a genesis.
+  if (policy.scenario === LONG_IMPORT_SCENARIO) return 'long-culture-v2';
   const culture = Object.entries(CULTURE_SCENARIOS).find(
     ([, value]) => value === policy.scenario,
   );
@@ -98,6 +106,7 @@ export function longScenario(
 export function longObjective(
   policy: NonNullable<V7World['config']['longDevelopment']>,
 ): string {
+  if (policy.scenario === LONG_IMPORT_SCENARIO) return LONG_IMPORT_OBJECTIVE;
   const scenario = longScenario(policy);
   return scenario === 'long-fixes'
     ? LONG_FIXES_OBJECTIVE

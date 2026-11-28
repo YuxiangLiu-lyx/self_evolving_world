@@ -436,6 +436,19 @@ export const CONTINUOUS_VISUALS: Record<string, ContinuousVisual> = {
   berry: source,
   roots: source,
   'food-source': source,
+  // ex25 position-loose-material@1: one placed unit as its represented rod, at its recorded length,
+  // thickness and angle, in its material colour. The forest canvas draws package visuals
+  // unrotated, so the rod carries its own rotation, as rain-canopy does. Any state other than
+  // placed is a dashed outline only; nothing marks an arrangement, quality or success.
+  'placed-rod': (o) => {
+    const shape = o.spatial.shape;
+    if (shape.kind !== 'rectangle') return '';
+    const n = (x: number) => String(Math.round(x * 1000) / 1000),
+      l = shape.width,
+      d = shape.height,
+      laid = o.visual.state === 'placed';
+    return `<g transform="rotate(${n((o.spatial.angle * 180) / Math.PI)})"><rect x="${n(-l / 2)}" y="${n(-d / 2)}" width="${n(l)}" height="${n(d)}" rx="${n(d / 2)}" ${laid ? `fill="${color(o.visual.color)}" stroke="#4f3d2a" stroke-width=".006"` : 'fill="none" stroke="#c9b48a" stroke-width=".012" stroke-dasharray=".05 .04"'}/></g>`;
+  },
 };
 export function continuousObjectVisual(
   o: V7Object,

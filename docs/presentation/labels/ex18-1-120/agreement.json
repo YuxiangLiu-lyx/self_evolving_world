@@ -1,0 +1,95 @@
+{
+  "run": "ex18-1-120",
+  "overall": {
+    "entries": 44,
+    "verified": 44,
+    "pending": 0,
+    "agree": 43,
+    "partial": 0,
+    "disagree": 1,
+    "agreement": 0.9772727272727273,
+    "lenient": 0.9772727272727273
+  },
+  "positives": {
+    "entries": 24,
+    "verified": 24,
+    "pending": 0,
+    "agree": 24,
+    "partial": 0,
+    "disagree": 0,
+    "agreement": 1,
+    "lenient": 1
+  },
+  "negatives": {
+    "entries": 20,
+    "verified": 20,
+    "pending": 0,
+    "agree": 19,
+    "partial": 0,
+    "disagree": 1,
+    "agreement": 0.95,
+    "lenient": 0.95
+  },
+  "categories": {
+    "naming": {
+      "entries": 2,
+      "verified": 2,
+      "pending": 0,
+      "agree": 2,
+      "partial": 0,
+      "disagree": 0,
+      "agreement": 1,
+      "lenient": 1
+    },
+    "name-adoption": {
+      "entries": 2,
+      "verified": 2,
+      "pending": 0,
+      "agree": 2,
+      "partial": 0,
+      "disagree": 0,
+      "agreement": 1,
+      "lenient": 1
+    },
+    "narrative": {
+      "entries": 4,
+      "verified": 4,
+      "pending": 0,
+      "agree": 4,
+      "partial": 0,
+      "disagree": 0,
+      "agreement": 1,
+      "lenient": 1
+    },
+    "narrative-continuation": {
+      "entries": 3,
+      "verified": 3,
+      "pending": 0,
+      "agree": 3,
+      "partial": 0,
+      "disagree": 0,
+      "agreement": 1,
+      "lenient": 1
+    },
+    "invitation": {
+      "entries": 11,
+      "verified": 11,
+      "pending": 0,
+      "agree": 11,
+      "partial": 0,
+      "disagree": 0,
+      "agreement": 1,
+      "lenient": 1
+    },
+    "private-view": {
+      "entries": 9,
+      "verified": 9,
+      "pending": 0,
+      "agree": 9,
+      "partial": 0,
+      "disagree": 0,
+      "agreement": 1,
+      "lenient": 1
+    }
+  }
+}
