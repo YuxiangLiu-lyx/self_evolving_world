@@ -154,13 +154,15 @@ const contractOf = (e: V7Event | undefined) => {
 };
 
 describe('tending rooted plants in ex26', () => {
-  it('is registered last for long-ex26, with new names, learning 3, the size limit, no excluded word and every earlier package byte-identical', () => {
+  it('is registered third for long-ex26, with new names, learning 3, the size limit, no excluded word and every earlier package byte-identical', () => {
     const pkg = tendPackage();
     const ability = pkg.abilities[0];
     if (!ability) throw new Error('Missing ability.');
-    expect(V7_PACKAGES.at(-1)).toBe(pkg);
+    // The third long-ex26 package; later developments of this run append their own after it.
     expect(
-      V7_PACKAGES.filter((p) => p.scope === 'long-ex26').map((p) => p.id),
+      V7_PACKAGES.filter((p) => p.scope === 'long-ex26')
+        .map((p) => p.id)
+        .slice(0, 3),
     ).toEqual(['bounded-resource-search', 'reciprocal-conversation', id]);
     expect(pkg).toMatchObject({
       id,

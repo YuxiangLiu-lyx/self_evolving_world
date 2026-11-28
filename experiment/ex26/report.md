@@ -4,18 +4,18 @@
 
 As the culture v2 run, with the six people in two groups of three that start far apart, each with food nearby for about 80-100 rounds, and a richer regenerating food area between them; no particular outcome, activity or invention is required. Frozen ordinary/world/development attempt ceilings: 1800/300/16. Shared ordinary/world token ceiling: 3000000.
 
-Observed 100 of 100 target rounds. State: window-complete. Observation window reached 100; the world is resumable, not terminal. This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.
+Observed 162 of 200 target rounds. State: paused. A long-development decision failed; its complete request, response or uncertainty and token charge are retained for current-conversation review. This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.
 
 ## Measured outcome
 
 | Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | Learned-interface successful rounds |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| lin | true | 100 | 54 | 8.91 | 8.22 | 1 | 66 |
-| moss | true | 100 | 59.2 | 9.36 | 8.32 | 2 | 33 |
-| sol | true | 100 | 62 | 9.18 | 7.96 | 2 | 50 |
-| kai | true | 100 | 38 | 8.84 | 7.95 | 2 | 59 |
-| wren | true | 100 | 74 | 9.33 | 9.35 | 2 | 49 |
-| ivo | true | 100 | 86 | 9.08 | 9.30 | 1 | 56 |
+| lin | true | 84 | 0 | 8.15 | 4.87 | 3 | 114 |
+| moss | true | 100 | 31.4 | 8.71 | 6.89 | 3 | 78 |
+| sol | true | 100 | 22.2 | 8.71 | 7.79 | 3 | 92 |
+| kai | true | 20 | 0 | 7.73 | 2.89 | 4 | 84 |
+| wren | true | 100 | 54.2 | 9.08 | 8.01 | 3 | 71 |
+| ivo | true | 92 | 30.2 | 8.54 | 6.60 | 1 | 91 |
 
 Requests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits. This fresh policy inherits no generated interfaces. The explicit authored allowlist, current-run package provenance, personal projects, verified knowledge, trials and persistent processes are retained separately in results.openDevelopment. Actor-written progress is a claim, not a physical outcome. Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.
 
@@ -23,27 +23,30 @@ Requests, reviews, implementation, individual study, successful execution and la
 
 | Interface | Attempted | Successful rounds | Failed rounds |
 | --- | --- | --- | --- |
-| navigate | 44 | 44 | 0 |
-| message | 11 | 9 | 2 |
-| request | 4 | 4 | 0 |
-| gather | 7 | 7 | 0 |
-| bounded-resource-search | 303 | 303 | 0 |
-| eat | 29 | 29 | 0 |
-| rest | 149 | 149 | 0 |
+| navigate | 97 | 97 | 0 |
+| message | 12 | 10 | 2 |
+| request | 8 | 8 | 0 |
+| gather | 8 | 8 | 0 |
+| bounded-resource-search | 475 | 475 | 0 |
+| eat | 35 | 35 | 0 |
+| rest | 234 | 234 | 0 |
 | probe | 6 | 5 | 1 |
-| learn | 9 | 9 | 0 |
-| tell | 9 | 9 | 0 |
+| learn | 11 | 11 | 0 |
+| tell | 10 | 10 | 0 |
 | name | 1 | 1 | 0 |
 | reciprocal-conversation | 10 | 10 | 0 |
-| wait | 18 | 18 | 0 |
+| wait | 20 | 20 | 0 |
+| tend-rooted-plants | 1 | 1 | 0 |
+| bounded-resource-search-recheck | 38 | 38 | 0 |
+| bounded-resource-search-low-health | 6 | 6 | 0 |
 
 ## Cost and limitations
 
-ordinary: 164 attempted calls, 6 failed/rejected; 1099293 recorded input tokens and 69929 recorded output tokens; 1 attempts with unknown token usage; 1708.2 elapsed seconds.
+ordinary: 263 attempted calls, 13 failed/rejected; 1845108 recorded input tokens and 103448 recorded output tokens; 1 attempts with unknown token usage; 2608.5 elapsed seconds.
 
-world: 12 attempted calls, 0 failed/rejected; 49575 recorded input tokens and 7674 recorded output tokens; 0 attempts with unknown token usage; 186.8 elapsed seconds.
+world: 24 attempted calls, 0 failed/rejected; 108065 recorded input tokens and 15042 recorded output tokens; 0 attempts with unknown token usage; 368.4 elapsed seconds.
 
-5 pre-counted conversation development handoffs, 1 failed validation attempts. 4 of them use the development budget; accepted handoffs that installed no package and changed no runtime source do not. Current-conversation development handoffs are counted before work. Internal coding/reasoning calls, tokens and preparation/review costs are not directly metered; these unknown costs are not zero.
+9 pre-counted conversation development handoffs, 1 failed validation attempts. 8 of them use the development budget; accepted handoffs that installed no package and changed no runtime source do not. Current-conversation development handoffs are counted before work. Internal coding/reasoning calls, tokens and preparation/review costs are not directly metered; these unknown costs are not zero.
 
 ## Evidence and reproduction
 

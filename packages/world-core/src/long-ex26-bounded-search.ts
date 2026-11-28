@@ -1075,3 +1075,28 @@ export const LONG_EX26_BOUNDED_SEARCH: V7Package = {
     return w;
   },
 };
+
+// Shared unchanged with bounded-resource-search-recheck@1 (long-ex26-search-recheck.ts).
+export type {
+  Run as SearchRun,
+  Fact as SearchFact,
+  Known as SearchKnown,
+  Limits as SearchLimits,
+};
+export {
+  NAVIGATE as SEARCH_NAVIGATE,
+  PROBE as SEARCH_PROBE,
+  GATHER as SEARCH_GATHER,
+  MAX as SEARCH_MAX,
+  shown as searchShown,
+  nothing as searchNothing,
+  num as searchNum,
+  used as searchUsed,
+  step as searchStep,
+  unsafe as searchUnsafe,
+  sources as searchSources,
+  note as searchNote,
+  binding as searchBinding,
+  fits as searchFits,
+  place as searchPlace,
+};

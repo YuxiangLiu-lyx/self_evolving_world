@@ -88,6 +88,22 @@ export function openRoutine(
     ...(world.revisions.includes('bounded-resource-search@1')
       ? ['bounded-resource-search']
       : []),
+    // ex26 bounded-resource-search-recheck@1 takes the same steps through the same code: the
+    // same subsistence routine. Absent elsewhere, so other runs replay.
+    ...(world.revisions.includes('bounded-resource-search-recheck@1')
+      ? ['bounded-resource-search-recheck']
+      : []),
+    // ex26 bounded-resource-search-low-health@1 takes the same steps through the same code: the
+    // same subsistence routine. Absent elsewhere, so other runs replay.
+    ...(world.revisions.includes('bounded-resource-search-low-health@1')
+      ? ['bounded-resource-search-low-health']
+      : []),
+    // ex26 bounded-food-foraging@1 takes one navigate, probe, gather or eat step per round through
+    // their own code: the same subsistence routine, its eating counted as eat's. Absent
+    // elsewhere, so other runs replay.
+    ...(world.revisions.includes('bounded-food-foraging@1')
+      ? ['bounded-food-foraging']
+      : []),
   ];
   // ex26 tend-rooted-plants@1: its inspection is probe's own observation and its other modes
   // change nothing, so each of its rounds counts as a probe round does: routine unless
@@ -96,6 +112,11 @@ export function openRoutine(
     'probe',
     ...(world.revisions.includes('tend-rooted-plants@1')
       ? ['tend-rooted-plants']
+      : []),
+    // ex26 assess-food-suitability@1: each round is probe's own observation or trial with an
+    // evidence report, so it counts as a probe round does. Absent elsewhere, so other runs replay.
+    ...(world.revisions.includes('assess-food-suitability@1')
+      ? ['assess-food-suitability']
       : []),
   ];
   const meaningful = world.events.some(
@@ -133,14 +154,41 @@ export function openRoutine(
     );
     // Its navigate steps reach new places as navigate does (only where that revision exists).
     const searched =
-      world.revisions.includes('bounded-resource-search@1') &&
-      world.events.some(
-        (e) =>
-          e.actor === actor.id &&
-          e.success &&
-          e.interface === 'bounded-resource-search' &&
-          (e.type === 'moved' || e.type === 'arrived'),
-      );
+      (world.revisions.includes('bounded-resource-search@1') &&
+        world.events.some(
+          (e) =>
+            e.actor === actor.id &&
+            e.success &&
+            e.interface === 'bounded-resource-search' &&
+            (e.type === 'moved' || e.type === 'arrived'),
+        )) ||
+      // The same for bounded-resource-search-recheck@1, only where that revision exists.
+      (world.revisions.includes('bounded-resource-search-recheck@1') &&
+        world.events.some(
+          (e) =>
+            e.actor === actor.id &&
+            e.success &&
+            e.interface === 'bounded-resource-search-recheck' &&
+            (e.type === 'moved' || e.type === 'arrived'),
+        )) ||
+      // The same for bounded-resource-search-low-health@1, only where that revision exists.
+      (world.revisions.includes('bounded-resource-search-low-health@1') &&
+        world.events.some(
+          (e) =>
+            e.actor === actor.id &&
+            e.success &&
+            e.interface === 'bounded-resource-search-low-health' &&
+            (e.type === 'moved' || e.type === 'arrived'),
+        )) ||
+      // The same for bounded-food-foraging@1, only where that revision exists.
+      (world.revisions.includes('bounded-food-foraging@1') &&
+        world.events.some(
+          (e) =>
+            e.actor === actor.id &&
+            e.success &&
+            e.interface === 'bounded-food-foraging' &&
+            (e.type === 'moved' || e.type === 'arrived'),
+        ));
     if (
       meaningful ||
       work ||

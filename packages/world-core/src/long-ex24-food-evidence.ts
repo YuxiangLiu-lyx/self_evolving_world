@@ -876,3 +876,8 @@ export const LONG_EX24_FOOD_EVIDENCE: V7Package = {
   resources: [],
   satisfaction: [],
 };
+
+/** The unchanged evidence citation that ex26 assess-food-suitability@1 reuses: one cited id
+ * resolved against the person's complete records and classified for one specimen. */
+export type { Cited as FoodEvidenceCited };
+export { cite as foodEvidenceCite };
