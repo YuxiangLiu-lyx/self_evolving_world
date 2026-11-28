@@ -575,6 +575,13 @@ Experiment C imported ex18's world at round 120 with two newcomers and ran it to
 - **Fix (proposed, not applied; a process rule)**: quote any premise about a source archive from that archive, with its round and call, when the plan is written, and check it before the run.
 - **Metrics**: plan premises about archives without an archive reference (one here).
 
+### 12f. The CI quality job outgrew its 25-minute limit
+
+- **Problem**: PR #39's `quality` job was cancelled at the 25-minute timeout twice in a row (25 min 22 s, then 25 min 21 s on a rerun), before its browser checks finished.
+- **Evidence**: in the rerun log, the full unit suite took 699 s, the archive and analysis checks ended at 23:58, and the job was cancelled at 23:59:43 during the end-to-end checks, after ex25's initial frame. PR #37 had also needed a rerun (18.6 min) after one cancellation.
+- **Fix (applied in this PR)**: `timeout-minutes` of the `quality` job in `.github/workflows/ci.yml` is raised from 25 to 45. This follows the earlier rule: rerun first, compare the durations, then raise the limit.
+- **Metrics**: `quality` job duration per PR, and cancellations at the limit.
+
 ## Limitations
 
 - Fixes 2–4 are turned on together in E1, so one run cannot separate their effects causally; section 5 attributes them by mechanism only. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.
