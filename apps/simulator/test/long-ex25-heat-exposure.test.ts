@@ -194,7 +194,8 @@ describe('heat exposure trial in ex25', () => {
     const pkg = exposure();
     const ability = pkg.abilities[0];
     if (!ability) throw new Error('Missing ability.');
-    expect(V7_PACKAGES.at(-1)).toBe(pkg);
+    // The last ex25 package; later experiments append their own after it.
+    expect(V7_PACKAGES.filter((p) => p.scope === 'long-ex25').at(-1)).toBe(pkg);
     expect(
       V7_PACKAGES.filter((p) => p.scope === 'long-ex25').map((p) => p.id),
     ).toEqual([

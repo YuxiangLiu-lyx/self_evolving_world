@@ -122,6 +122,7 @@ describe('genesis with an allocation', () => {
       'long-culture-v2-oldgoal',
       'long-culture-v3',
       'long-culture-v3-incentives',
+      'long-culture-v2-villages',
     ]);
     for (const tag of LONG_SCENARIOS)
       if (longCultureScenario(tag))

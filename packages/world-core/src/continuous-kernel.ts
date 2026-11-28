@@ -275,6 +275,11 @@ function navigation(
   );
   return { complete, writes: [] };
 }
+/** The kernel's own one-round navigate step, unchanged: speed x dt / travel factor along the
+ * observed route, the actual-obstacle check and the distance x 2 x carried-mass effort. ex26
+ * bounded-resource-search@1 moves a person only through it, once per round. Exporting it
+ * changes no behavior; the kernel still calls it for every navigate action. */
+export const v7NavigateStep = navigation;
 export function v7AssertWorld(world: V7World, registry?: V7Registry): void {
   collectiveAssert(world);
   v7Json(world.state);

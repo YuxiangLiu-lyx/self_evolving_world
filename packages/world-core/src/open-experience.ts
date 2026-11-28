@@ -82,6 +82,21 @@ export function openRoutine(
     // ex22 sleep-in-place@1 recovers through rest's own code: the same subsistence routine,
     // neither progress work nor relief from routine. Absent elsewhere, so other runs replay.
     ...(world.revisions.includes('sleep-in-place@1') ? ['sleep-in-place'] : []),
+    // ex26 bounded-resource-search@1 takes one navigate, probe or gather step per round through
+    // their own code: the same subsistence routine, neither progress work nor relief from
+    // routine. Absent elsewhere, so other runs replay.
+    ...(world.revisions.includes('bounded-resource-search@1')
+      ? ['bounded-resource-search']
+      : []),
+  ];
+  // ex26 tend-rooted-plants@1: its inspection is probe's own observation and its other modes
+  // change nothing, so each of its rounds counts as a probe round does: routine unless
+  // meaningful, never progress work. Absent elsewhere, so other runs replay.
+  const probing = [
+    'probe',
+    ...(world.revisions.includes('tend-rooted-plants@1')
+      ? ['tend-rooted-plants']
+      : []),
   ];
   const meaningful = world.events.some(
     (e) =>
@@ -111,12 +126,26 @@ export function openRoutine(
         e.success &&
         e.interface &&
         !survival.includes(e.interface) &&
-        !['learn', 'request', 'consult', 'probe'].includes(e.interface) &&
+        !['learn', 'request', 'consult', ...probing].includes(e.interface) &&
         (typeof e.data.remaining === 'number' ||
           typeof e.data.progress === 'number' ||
           typeof e.data.elapsed === 'number'),
     );
-    if (meaningful || work || (novelPlace && event?.interface === 'navigate'))
+    // Its navigate steps reach new places as navigate does (only where that revision exists).
+    const searched =
+      world.revisions.includes('bounded-resource-search@1') &&
+      world.events.some(
+        (e) =>
+          e.actor === actor.id &&
+          e.success &&
+          e.interface === 'bounded-resource-search' &&
+          (e.type === 'moved' || e.type === 'arrived'),
+      );
+    if (
+      meaningful ||
+      work ||
+      (novelPlace && (event?.interface === 'navigate' || searched))
+    )
       actor.extensionState['long:lastProgress'] = world.tick;
     progress =
       meaningful ||
@@ -130,7 +159,7 @@ export function openRoutine(
     (!world.config.longDevelopment || !progress) &&
     !!event &&
     (survival.includes(event.interface ?? '') ||
-      (event.interface === 'probe' && !meaningful));
+      (probing.includes(event.interface ?? '') && !meaningful));
   const history = actor.extensionState['open:routine'];
   const records = Array.isArray(history)
     ? history.filter((v): v is boolean => typeof v === 'boolean')
