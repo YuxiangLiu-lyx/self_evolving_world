@@ -582,6 +582,74 @@ Experiment C imported ex18's world at round 120 with two newcomers and ran it to
 - **Fix (applied in this PR)**: `timeout-minutes` of the `quality` job in `.github/workflows/ci.yml` is raised from 25 to 45. This follows the earlier rule: rerun first, compare the durations, then raise the limit.
 - **Metrics**: `quality` job duration per PR, and cancellations at the limit.
 
+## 13. Experiment D: newly exposed problems
+
+Experiment D ran two separated groups as ex26 until a rejection stop at round 162 ([PR-46](../exec-plans/completed/pr-46-d-villages.md), [run report](run-report-d-villages.md)).
+
+- 13a, 13b and 13e were fixed during the run.
+- 13c and 13d are proposals, and none of them is applied.
+- 13f records refused tool calls.
+
+### 13a. A merge oversight failed the first development handoff
+
+- **Problem**: after merging main into the D branch, the lead ran the villages tests and the compatibility checks, but not the full unit suite. `scripts/long-allocation.test.ts` still expected the seven culture tags of main and not the new eighth, `long-culture-v2-villages`. The first `develop` submission, which runs the full suite, therefore failed.
+- **Evidence**: `development-1` (round 0) is `failed`, and its validation output names `scripts/long-allocation.test.ts`. The failed attempt counted as a handoff, and the resubmission was refused ("No current, pre-counted development attempt"). `continue ex26` opened `development-2`, which installed the same package, `bounded-resource-search@1`. ex26 therefore spent 8 counted handoffs on 7 packages.
+- **Fix (applied)**: the test lists the new tag. Every later brief required the full `pnpm test` before the lead submitted, and all seven later submissions passed validation.
+- **Metrics**: failed development validations caused by the lead (one in ex26).
+
+### 13b. Words spoken through a conversation session were not label items
+
+- **Problem**: `utterances` in `scripts/culture-metrics.ts` read speech only from `tell` and `invite` actions. `reciprocal-conversation@1` delivers a contribution through tell's own handler, but under its own interface. The label items of the first pass over rounds 1–100 therefore missed Moss's contribution at round 58 and Sol's at rounds 61 and 62.
+- **Evidence**:
+  - The replay holds `told` events with interface `reciprocal-conversation` at rounds 58, 61 and 62.
+  - The first `prepare` produced 25 items for rounds 1–100. After the fix, rounds 1–162 produced 30 items, including u0022, u0024 and u0025.
+  - The first pass cost 5,615 annotation tokens (2 calls). It was set aside before verification, and its calls stay in `labels/ledger.json`.
+- **Fix (applied, commit `dc7a2f7`)**: a word sent by another interface counts when that round's `told` event carries exactly the person's `text` argument. Generated lines, such as session announcements, never match. A test covers the rule.
+  - Re-preparing the committed label items of ex18, ex20, ex23, ex24 and ex25 gives identical files.
+  - The culture metrics test pinned to retained archives still passes.
+- **Metrics**: `told` events whose interface is not `tell` and that have no label item (0 after the fix).
+
+### 13c. A false step guard ends a plan, which stopped ex26 at round 162
+
+- **Problem**: in `v7TaskAction` (`packages/world-core/src/continuous-tasks.ts`), a step whose guard is false ends the whole plan ("The actor-defined guard no longer holds."); it does not skip to the next step. A plan whose first step is guarded by a condition that is false now therefore yields no action and is rejected as "Expected a bounded executable personal plan."
+- **Evidence**:
+  - Kai's `ordinary-285`, `-286` and `-287` (round 162; health 20, satiety 0, no berry) each began with `eat` berry guarded by `self.inventory.berry >= 1`, followed by `rest`.
+  - The three consecutive rejections reached `rejectionRecovery.stopAfter: 3`, and `repair` refuses by design. The lead did not bypass the stop, so ex26 ends at round 162.
+  - The other rejections in ex26:
+    - eight outputs without the required `preferences` field (`ordinary-33`, `-58`, `-94`, `-163`, `-190`, `-241`, `-268`, `-275`; the B pattern of fix-log 11a);
+    - one tell over 240 characters (`ordinary-88`).
+- **Fix (proposed, not applied; a protocol change)**: in a new run version, either state in the plan instructions that a guard is a stop condition, or give guards a skip mode. ex7–ex26 replay their recorded rule and must stay unchanged.
+- **Metrics**: rejected plans whose first-step guard is false at decision time (3 in ex26), and rejection stops per run.
+
+### 13d. Tending plants has no hand-changeable condition to act on
+
+- **Problem**: Wren asked to tend depleted food plants (round 99). The plant model (`openPlants` with `forestGrowth`) has light, temperature, moisture, season, waterlogging and harvest depletion, but no soil crust, compaction, nutrients or competing plants. `tend-rooted-plants@1` therefore reports "no corrective work indicated" for prepare and maintain, at no cost, and its useful mode is inspection.
+- **Evidence**:
+  - `experiment/ex26/development/` declaration 5.
+  - The handoff's 120-round test: plants match round by round with and without the package.
+  - Wren's plants regrow ten times slower than normal by design (`VILLAGE_FOOD.plantSlowdown`).
+  - Wren used the interface once, an inspection of `start-4-roots` at round 110. It reported growth 25.4 of the 180 needed per unit, "so at least 179 more rounds even at the best possible rate".
+- **Fix (proposed, not applied; a scenario change)**: if tending should become possible, a new scenario version would need explicit soil or competition state from genesis on. Adding such state during a run would fabricate improvement.
+- **Metrics**: requested interfaces that can only report that nothing applies (one in ex26).
+
+### 13e. The low-health search first counted starvation as an injury
+
+- **Problem**: the first version of `bounded-resource-search-low-health@1` kept the inherited stop for "an injury in the last round", and starvation damage is an `injured` event. The mode would have stopped the round after satiety reached 0, which defeats the requested `minHealth` threshold.
+- **Evidence**: the lead's review of the handoff report before submission. `forest-environment.ts` records starvation and thermal damage in the `injured` event's data.
+- **Fix (applied before submission)**: in the low-health mode only, damage that is exactly the world's starvation amount (8) is governed by `minHealth`. Any other injury still stops the search. Tests cover a run from health 36 that stops at 20 without dying.
+- **Metrics**: handoffs revised by the lead before submission (one in ex26).
+
+### 13f. Session-side refusals interrupted two tool calls
+
+- **Problem**: two tool calls were refused with "The user doesn't want to take this action right now. STOP what you are doing and wait for the user to tell you how to proceed."
+  - A subagent's Read of `apps/simulator/test/long-ex26-search-recheck.test.ts` during handoff 7.
+  - The lead's Write of an experiment A supplement plan in another worktree.
+- **Evidence**: the user later confirmed that both were session-side refusals or interruptions, not directory permissions. Neither call was retried by another path or method.
+  - The handoff resumed on the user's instruction, at no cost to the run.
+  - The supplement was cancelled by the user, and its local branch was deleted.
+- **Fix (applied as a rule)**: on a refusal, note the path, time and message, skip the step and continue unaffected work. The final summary lists every refusal.
+- **Metrics**: refused tool calls per experiment (2 during D).
+
 ## Limitations
 
 - Fixes 2–4 are turned on together in E1, so one run cannot separate their effects causally; section 5 attributes them by mechanism only. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.
