@@ -1,0 +1,766 @@
+{
+  "format": "self-evolving-world/culture-imagery",
+  "version": 1,
+  "runs": [
+    {
+      "run": "ex15",
+      "lineage": "ex15",
+      "seed": 20261123,
+      "spoken": 31
+    },
+    {
+      "run": "ex16",
+      "lineage": "ex16",
+      "seed": 20261123,
+      "spoken": 54
+    },
+    {
+      "run": "ex17",
+      "lineage": "ex17",
+      "seed": 20261123,
+      "spoken": 46
+    },
+    {
+      "run": "ex18",
+      "lineage": "ex18",
+      "seed": 20261123,
+      "spoken": 39
+    },
+    {
+      "run": "ex19",
+      "lineage": "ex19",
+      "seed": 20261201,
+      "spoken": 11
+    },
+    {
+      "run": "ex20",
+      "lineage": "ex20",
+      "seed": 20261201,
+      "spoken": 22
+    },
+    {
+      "run": "ex21",
+      "lineage": "ex21",
+      "seed": 20261202,
+      "spoken": 6
+    },
+    {
+      "run": "ex22",
+      "lineage": "ex22",
+      "seed": 20261202,
+      "spoken": 22
+    },
+    {
+      "run": "ex23",
+      "lineage": "ex23",
+      "seed": 20261203,
+      "spoken": 9
+    },
+    {
+      "run": "ex24",
+      "lineage": "ex24",
+      "seed": 20261203,
+      "spoken": 26
+    },
+    {
+      "run": "ex25",
+      "lineage": "ex18",
+      "seed": 20261123,
+      "spoken": 29
+    },
+    {
+      "run": "ex26",
+      "lineage": "ex26",
+      "seed": 20261123,
+      "spoken": 24
+    }
+  ],
+  "motifs": [
+    {
+      "motif": "lantern",
+      "lineages": ["ex18", "ex24"],
+      "runs": ["ex18", "ex24", "ex25"],
+      "seeds": [20261123, 20261203],
+      "uses": 22,
+      "speakers": 12,
+      "inWorldText": ["ex25"],
+      "first": {
+        "run": "ex18",
+        "tick": 10,
+        "actor": "sol",
+        "kind": "name",
+        "text": "The Berry Lantern"
+      }
+    },
+    {
+      "motif": "quiet company",
+      "lineages": ["ex16", "ex17", "ex18", "ex20", "ex24"],
+      "runs": ["ex16", "ex17", "ex20", "ex24", "ex25"],
+      "seeds": [20261123, 20261201, 20261203],
+      "uses": 33,
+      "speakers": 13,
+      "inWorldText": ["ex25"],
+      "first": {
+        "run": "ex16",
+        "tick": 20,
+        "actor": "kai",
+        "kind": "public",
+        "text": "A welcoming camp would leave food accessible to everyone and room for quiet company. I'd like to learn cultivation too, then compare what actually grows rather than assume planting will work."
+      }
+    },
+    {
+      "motif": "no obligation",
+      "lineages": ["ex16", "ex18", "ex24"],
+      "runs": ["ex16", "ex18", "ex24", "ex25"],
+      "seeds": [20261123, 20261203],
+      "uses": 8,
+      "speakers": 7,
+      "inWorldText": ["ex25"],
+      "first": {
+        "run": "ex16",
+        "tick": 116,
+        "actor": "sol",
+        "kind": "public",
+        "text": "I tried a hazelnut: it supplied 18 satiety with no observed toxicity. I'm returning for a quiet pause beside the woven screen. Its gaps and crossing branches still appeal to me; company is welcome, without any obligation."
+      }
+    },
+    {
+      "motif": "no pressure",
+      "lineages": ["ex18"],
+      "runs": ["ex18"],
+      "seeds": [20261123],
+      "uses": 3,
+      "speakers": 2,
+      "inWorldText": ["ex25"],
+      "first": {
+        "run": "ex18",
+        "tick": 60,
+        "actor": "moss",
+        "kind": "public",
+        "text": "The three roots are dry-brushed, still raw, and not made safer. Lin, no pressure to try one. I'm happy to rest here together. What would each of you like this little gathering place to become?"
+      }
+    },
+    {
+      "motif": "no hurry",
+      "lineages": ["ex16", "ex17", "ex24"],
+      "runs": ["ex16", "ex17", "ex24"],
+      "seeds": [20261123, 20261203],
+      "uses": 5,
+      "speakers": 5,
+      "inWorldText": ["ex25"],
+      "first": {
+        "run": "ex16",
+        "tick": 195,
+        "actor": "ivo",
+        "kind": "public",
+        "text": "I'm taking an unhurried pause near these berries. Quiet company is welcome, with no need to talk or change your plans. Berries have been safe in my own meals so far."
+      }
+    },
+    {
+      "motif": "beyond supplies",
+      "lineages": ["ex26"],
+      "runs": ["ex26"],
+      "seeds": [20261123],
+      "uses": 4,
+      "speakers": 3,
+      "inWorldText": [],
+      "first": {
+        "run": "ex26",
+        "tick": 23,
+        "actor": "kai",
+        "kind": "message",
+        "text": "Food update and companionship. The northern berry patch at 132.79, 12.42 is now empty too. I have two berries left, good health, and enough food in me for a short northern search. I would also enjoy spending time together, not only discussing supplies. Would you like a conversation after our foraging? Where would suit you?"
+      }
+    },
+    {
+      "motif": "garden",
+      "lineages": ["ex17", "ex20"],
+      "runs": ["ex17", "ex20"],
+      "seeds": [20261123, 20261201],
+      "uses": 2,
+      "speakers": 2,
+      "inWorldText": [],
+      "first": {
+        "run": "ex17",
+        "tick": 39,
+        "actor": "sol",
+        "kind": "public",
+        "text": "I've finished studying cultivation. After a short rest I'll walk east toward Moss's suggested meadow and inspect a root and a possible site. I like the thought of a small shared garden, but won't assume anything will grow."
+      }
+    },
+    {
+      "motif": "thread",
+      "lineages": ["ex22"],
+      "runs": ["ex22"],
+      "seeds": [20261202],
+      "uses": 3,
+      "speakers": 2,
+      "inWorldText": [],
+      "first": {
+        "run": "ex22",
+        "tick": 9,
+        "actor": "sol",
+        "kind": "name",
+        "text": "The Red Thread"
+      }
+    },
+    {
+      "motif": "dawn",
+      "lineages": ["ex24"],
+      "runs": ["ex24"],
+      "seeds": [20261203],
+      "uses": 3,
+      "speakers": 3,
+      "inWorldText": [],
+      "first": {
+        "run": "ex24",
+        "tick": 70,
+        "actor": "moss",
+        "kind": "public",
+        "text": "Sol, I'd enjoy quiet company. A tiny invented story: a lantern tired of showing the way, so its friends sat beside it until dawn. What stories or small pleasures do you like? No hurry to answer."
+      }
+    },
+    {
+      "motif": "traveler",
+      "lineages": ["ex18"],
+      "runs": ["ex18", "ex25"],
+      "seeds": [20261123],
+      "uses": 8,
+      "speakers": 5,
+      "inWorldText": ["ex25"],
+      "first": {
+        "run": "ex18",
+        "tick": 109,
+        "actor": "moss",
+        "kind": "public",
+        "text": "My invented sequel: the lantern found a tired traveler and said, 'You needn't bring a story. There's room for your silence too.' I'll eat some berries and rest here; company is welcome, without obligation."
+      }
+    },
+    {
+      "motif": "keeper",
+      "lineages": ["ex18"],
+      "runs": ["ex25"],
+      "seeds": [20261123],
+      "uses": 3,
+      "speakers": 3,
+      "inWorldText": [],
+      "first": {
+        "run": "ex25",
+        "tick": 184,
+        "actor": "kai",
+        "kind": "public",
+        "text": "Moss, I like that sequel. The traveler sat beside the cup and asked, 'What shall we put in it?' 'For now,' said the keeper, 'a little time.' I'm going to inspect my stored roots; I still don't know whether they're edible."
+      }
+    },
+    {
+      "motif": "silence",
+      "lineages": ["ex16", "ex18"],
+      "runs": ["ex16", "ex18", "ex25"],
+      "seeds": [20261123],
+      "uses": 4,
+      "speakers": 4,
+      "inWorldText": ["ex25", "ex26"],
+      "first": {
+        "run": "ex16",
+        "tick": 204,
+        "actor": "moss",
+        "kind": "public",
+        "text": "Ivo, I'd enjoy a quiet pause nearby. Thank you for welcoming company; there's no need to keep a conversation going. I like having neighbors with whom silence is welcome."
+      }
+    },
+    {
+      "motif": "song or tune",
+      "lineages": ["ex18"],
+      "runs": ["ex18", "ex25"],
+      "seeds": [20261123],
+      "uses": 8,
+      "speakers": 5,
+      "inWorldText": ["ex25"],
+      "first": {
+        "run": "ex18",
+        "tick": 117,
+        "actor": "kai",
+        "kind": "public",
+        "text": "I liked the lantern's welcome for silence. I'm curious about making a little music here, too—perhaps a quiet hummed tune, with no obligation to join. I'll see what I can actually learn to do."
+      }
+    }
+  ],
+  "words": [
+    {
+      "word": "resting",
+      "lineages": ["ex15", "ex17", "ex18", "ex20", "ex22", "ex24", "ex26"],
+      "runs": ["ex15", "ex17", "ex18", "ex20", "ex22", "ex24", "ex26"],
+      "uses": 15
+    },
+    {
+      "word": "enjoy",
+      "lineages": ["ex16", "ex17", "ex18", "ex20", "ex22", "ex24"],
+      "runs": ["ex16", "ex17", "ex18", "ex20", "ex22", "ex24"],
+      "uses": 84
+    },
+    {
+      "word": "company",
+      "lineages": ["ex16", "ex17", "ex18", "ex20", "ex22", "ex24"],
+      "runs": ["ex16", "ex17", "ex18", "ex20", "ex22", "ex24"],
+      "uses": 71
+    },
+    {
+      "word": "quiet",
+      "lineages": ["ex16", "ex17", "ex18", "ex20", "ex24", "ex26"],
+      "runs": ["ex16", "ex17", "ex18", "ex20", "ex24", "ex26"],
+      "uses": 65
+    },
+    {
+      "word": "comparing",
+      "lineages": ["ex16", "ex17", "ex18", "ex20", "ex22", "ex26"],
+      "runs": ["ex16", "ex17", "ex18", "ex20", "ex22", "ex26"],
+      "uses": 22
+    },
+    {
+      "word": "hearing",
+      "lineages": ["ex16", "ex17", "ex18", "ex20", "ex22", "ex24"],
+      "runs": ["ex16", "ex17", "ex18", "ex20", "ex22", "ex24"],
+      "uses": 11
+    },
+    {
+      "word": "sharing",
+      "lineages": ["ex15", "ex16", "ex17", "ex18", "ex20", "ex26"],
+      "runs": ["ex15", "ex16", "ex17", "ex18", "ex20", "ex26"],
+      "uses": 11
+    },
+    {
+      "word": "modest",
+      "lineages": ["ex15", "ex16", "ex17", "ex20", "ex22", "ex26"],
+      "runs": ["ex15", "ex16", "ex17", "ex20", "ex22", "ex26"],
+      "uses": 10
+    },
+    {
+      "word": "crowded",
+      "lineages": ["ex15", "ex16", "ex17", "ex18", "ex24"],
+      "runs": ["ex15", "ex16", "ex17", "ex18", "ex24"],
+      "uses": 11
+    },
+    {
+      "word": "useful",
+      "lineages": ["ex17", "ex18", "ex21", "ex23", "ex24"],
+      "runs": ["ex17", "ex18", "ex21", "ex23", "ex24"],
+      "uses": 10
+    },
+    {
+      "word": "enjoyed",
+      "lineages": ["ex16", "ex17", "ex18", "ex20", "ex22"],
+      "runs": ["ex16", "ex17", "ex20", "ex22", "ex25"],
+      "uses": 9
+    },
+    {
+      "word": "investigate",
+      "lineages": ["ex15", "ex16", "ex18", "ex20", "ex21"],
+      "runs": ["ex15", "ex16", "ex18", "ex20", "ex21"],
+      "uses": 9
+    },
+    {
+      "word": "provide",
+      "lineages": ["ex15", "ex16", "ex18", "ex20", "ex24"],
+      "runs": ["ex15", "ex16", "ex20", "ex24", "ex25"],
+      "uses": 9
+    },
+    {
+      "word": "south",
+      "lineages": ["ex16", "ex17", "ex18", "ex20", "ex22"],
+      "runs": ["ex16", "ex17", "ex18", "ex20", "ex22"],
+      "uses": 9
+    },
+    {
+      "word": "assuming",
+      "lineages": ["ex15", "ex16", "ex17", "ex18", "ex22"],
+      "runs": ["ex15", "ex16", "ex17", "ex18", "ex22"],
+      "uses": 7
+    },
+    {
+      "word": "practical",
+      "lineages": ["ex15", "ex17", "ex20", "ex22", "ex24"],
+      "runs": ["ex15", "ex17", "ex20", "ex22", "ex24"],
+      "uses": 7
+    },
+    {
+      "word": "assume",
+      "lineages": ["ex15", "ex16", "ex17", "ex18", "ex20"],
+      "runs": ["ex15", "ex16", "ex17", "ex18", "ex20"],
+      "uses": 6
+    },
+    {
+      "word": "afterward",
+      "lineages": ["ex17", "ex18", "ex22", "ex23", "ex24"],
+      "runs": ["ex17", "ex18", "ex22", "ex23", "ex24"],
+      "uses": 5
+    },
+    {
+      "word": "heading",
+      "lineages": ["ex17", "ex18", "ex22", "ex24", "ex26"],
+      "runs": ["ex17", "ex18", "ex22", "ex24", "ex26"],
+      "uses": 5
+    },
+    {
+      "word": "beside",
+      "lineages": ["ex17", "ex18", "ex20", "ex22"],
+      "runs": ["ex17", "ex18", "ex20", "ex22"],
+      "uses": 12
+    },
+    {
+      "word": "compare",
+      "lineages": ["ex16", "ex18", "ex20", "ex22"],
+      "runs": ["ex16", "ex18", "ex20", "ex22"],
+      "uses": 12
+    },
+    {
+      "word": "notice",
+      "lineages": ["ex17", "ex22", "ex24", "ex26"],
+      "runs": ["ex17", "ex22", "ex24", "ex26"],
+      "uses": 10
+    },
+    {
+      "word": "showed",
+      "lineages": ["ex17", "ex18", "ex19", "ex24"],
+      "runs": ["ex17", "ex18", "ex19", "ex24"],
+      "uses": 9
+    },
+    {
+      "word": "simply",
+      "lineages": ["ex16", "ex20", "ex22", "ex24"],
+      "runs": ["ex16", "ex20", "ex22", "ex24"],
+      "uses": 9
+    },
+    {
+      "word": "establish",
+      "lineages": ["ex17", "ex18", "ex21", "ex24"],
+      "runs": ["ex17", "ex18", "ex21", "ex24"],
+      "uses": 8
+    },
+    {
+      "word": "gathering",
+      "lineages": ["ex16", "ex18", "ex20", "ex22"],
+      "runs": ["ex16", "ex18", "ex20", "ex22"],
+      "uses": 8
+    },
+    {
+      "word": "explore",
+      "lineages": ["ex16", "ex17", "ex18", "ex22"],
+      "runs": ["ex16", "ex17", "ex18", "ex22"],
+      "uses": 7
+    },
+    {
+      "word": "trying",
+      "lineages": ["ex16", "ex18", "ex20", "ex22"],
+      "runs": ["ex16", "ex18", "ex20", "ex22"],
+      "uses": 7
+    },
+    {
+      "word": "construction",
+      "lineages": ["ex15", "ex16", "ex18", "ex24"],
+      "runs": ["ex15", "ex16", "ex18", "ex24"],
+      "uses": 6
+    },
+    {
+      "word": "different",
+      "lineages": ["ex16", "ex17", "ex22", "ex23"],
+      "runs": ["ex16", "ex17", "ex22", "ex23"],
+      "uses": 6
+    },
+    {
+      "word": "hurry",
+      "lineages": ["ex16", "ex17", "ex18", "ex24"],
+      "runs": ["ex16", "ex17", "ex18", "ex24"],
+      "uses": 6
+    },
+    {
+      "word": "staying",
+      "lineages": ["ex17", "ex18", "ex22", "ex24"],
+      "runs": ["ex17", "ex18", "ex22", "ex24"],
+      "uses": 6
+    },
+    {
+      "word": "answer",
+      "lineages": ["ex16", "ex17", "ex18", "ex24"],
+      "runs": ["ex16", "ex17", "ex18", "ex24"],
+      "uses": 5
+    },
+    {
+      "word": "eaten",
+      "lineages": ["ex19", "ex20", "ex21", "ex22"],
+      "runs": ["ex19", "ex20", "ex21", "ex22"],
+      "uses": 5
+    },
+    {
+      "word": "farther",
+      "lineages": ["ex15", "ex17", "ex24", "ex26"],
+      "runs": ["ex15", "ex17", "ex24", "ex26"],
+      "uses": 5
+    },
+    {
+      "word": "happy",
+      "lineages": ["ex16", "ex18", "ex20", "ex22"],
+      "runs": ["ex16", "ex18", "ex20", "ex22"],
+      "uses": 5
+    },
+    {
+      "word": "interest",
+      "lineages": ["ex16", "ex17", "ex20", "ex22"],
+      "runs": ["ex16", "ex17", "ex20", "ex22"],
+      "uses": 5
+    },
+    {
+      "word": "patche",
+      "lineages": ["ex15", "ex16", "ex17", "ex18"],
+      "runs": ["ex15", "ex16", "ex17", "ex18"],
+      "uses": 5
+    },
+    {
+      "word": "exploring",
+      "lineages": ["ex18", "ex20", "ex21", "ex24"],
+      "runs": ["ex18", "ex20", "ex21", "ex24"],
+      "uses": 4
+    },
+    {
+      "word": "possible",
+      "lineages": ["ex17", "ex18", "ex20", "ex21"],
+      "runs": ["ex17", "ex20", "ex21", "ex25"],
+      "uses": 4
+    },
+    {
+      "word": "reserve",
+      "lineages": ["ex15", "ex17", "ex18"],
+      "runs": ["ex15", "ex17", "ex18"],
+      "uses": 12
+    },
+    {
+      "word": "lovely",
+      "lineages": ["ex16", "ex17", "ex24"],
+      "runs": ["ex16", "ex17", "ex24"],
+      "uses": 8
+    },
+    {
+      "word": "obligation",
+      "lineages": ["ex16", "ex18", "ex24"],
+      "runs": ["ex16", "ex18", "ex24"],
+      "uses": 8
+    },
+    {
+      "word": "welcoming",
+      "lineages": ["ex16", "ex18", "ex20"],
+      "runs": ["ex16", "ex18", "ex20"],
+      "uses": 8
+    },
+    {
+      "word": "wetting",
+      "lineages": ["ex15", "ex18", "ex23"],
+      "runs": ["ex15", "ex18", "ex23"],
+      "uses": 6
+    },
+    {
+      "word": "examine",
+      "lineages": ["ex15", "ex18", "ex22"],
+      "runs": ["ex15", "ex18", "ex22"],
+      "uses": 5
+    },
+    {
+      "word": "finished",
+      "lineages": ["ex15", "ex17", "ex22"],
+      "runs": ["ex15", "ex17", "ex22"],
+      "uses": 5
+    },
+    {
+      "word": "metre",
+      "lineages": ["ex15", "ex17", "ex18"],
+      "runs": ["ex15", "ex17", "ex18"],
+      "uses": 5
+    },
+    {
+      "word": "suitable",
+      "lineages": ["ex17", "ex18", "ex21"],
+      "runs": ["ex17", "ex18", "ex21"],
+      "uses": 5
+    },
+    {
+      "word": "bring",
+      "lineages": ["ex16", "ex18", "ex26"],
+      "runs": ["ex16", "ex18", "ex26"],
+      "uses": 4
+    },
+    {
+      "word": "checking",
+      "lineages": ["ex15", "ex18", "ex26"],
+      "runs": ["ex15", "ex18", "ex26"],
+      "uses": 4
+    },
+    {
+      "word": "introduction",
+      "lineages": ["ex20", "ex24", "ex26"],
+      "runs": ["ex20", "ex24", "ex26"],
+      "uses": 4
+    },
+    {
+      "word": "investigating",
+      "lineages": ["ex15", "ex18", "ex20"],
+      "runs": ["ex15", "ex18", "ex20"],
+      "uses": 4
+    },
+    {
+      "word": "noticed",
+      "lineages": ["ex16", "ex22", "ex26"],
+      "runs": ["ex16", "ex22", "ex26"],
+      "uses": 4
+    },
+    {
+      "word": "space",
+      "lineages": ["ex15", "ex16", "ex24"],
+      "runs": ["ex15", "ex16", "ex24"],
+      "uses": 4
+    },
+    {
+      "word": "avoid",
+      "lineages": ["ex15", "ex17", "ex18"],
+      "runs": ["ex15", "ex17", "ex18"],
+      "uses": 3
+    },
+    {
+      "word": "beautiful",
+      "lineages": ["ex16", "ex17", "ex24"],
+      "runs": ["ex16", "ex17", "ex24"],
+      "uses": 3
+    },
+    {
+      "word": "interested",
+      "lineages": ["ex16", "ex18", "ex22"],
+      "runs": ["ex16", "ex18", "ex22"],
+      "uses": 3
+    },
+    {
+      "word": "interesting",
+      "lineages": ["ex17", "ex20", "ex24"],
+      "runs": ["ex17", "ex20", "ex24"],
+      "uses": 3
+    },
+    {
+      "word": "liked",
+      "lineages": ["ex18", "ex20", "ex24"],
+      "runs": ["ex18", "ex20", "ex24"],
+      "uses": 3
+    },
+    {
+      "word": "needing",
+      "lineages": ["ex17", "ex18", "ex22"],
+      "runs": ["ex17", "ex18", "ex22"],
+      "uses": 3
+    },
+    {
+      "word": "seven",
+      "lineages": ["ex17", "ex23", "ex24"],
+      "runs": ["ex17", "ex23", "ex24"],
+      "uses": 3
+    },
+    {
+      "word": "southwest",
+      "lineages": ["ex15", "ex16", "ex18"],
+      "runs": ["ex15", "ex16", "ex18"],
+      "uses": 3
+    },
+    {
+      "word": "suggest",
+      "lineages": ["ex18", "ex20", "ex22"],
+      "runs": ["ex20", "ex22", "ex25"],
+      "uses": 3
+    },
+    {
+      "word": "western",
+      "lineages": ["ex16", "ex24", "ex26"],
+      "runs": ["ex16", "ex24", "ex26"],
+      "uses": 3
+    }
+  ],
+  "transmission": [
+    {
+      "directory": "ex15-1-70-b",
+      "adoptions": 0,
+      "continuations": 0,
+      "repetitions": 0,
+      "verified": 26
+    },
+    {
+      "directory": "ex16-1-400",
+      "adoptions": 0,
+      "continuations": 0,
+      "repetitions": 1,
+      "verified": 56
+    },
+    {
+      "directory": "ex16-1-80-b",
+      "adoptions": 0,
+      "continuations": 0,
+      "repetitions": 1,
+      "verified": 41
+    },
+    {
+      "directory": "ex18-1-120",
+      "adoptions": 2,
+      "continuations": 3,
+      "repetitions": 0,
+      "verified": 44
+    },
+    {
+      "directory": "ex19-1-80",
+      "adoptions": 0,
+      "continuations": 0,
+      "repetitions": 0,
+      "verified": 12
+    },
+    {
+      "directory": "ex20-1-80",
+      "adoptions": 0,
+      "continuations": 0,
+      "repetitions": 3,
+      "verified": 37
+    },
+    {
+      "directory": "ex21-1-80",
+      "adoptions": 0,
+      "continuations": 0,
+      "repetitions": 0,
+      "verified": 7
+    },
+    {
+      "directory": "ex22-1-80",
+      "adoptions": 1,
+      "continuations": 0,
+      "repetitions": 0,
+      "verified": 40
+    },
+    {
+      "directory": "ex23-1-80",
+      "adoptions": 0,
+      "continuations": 0,
+      "repetitions": 0,
+      "verified": 9
+    },
+    {
+      "directory": "ex24-1-80",
+      "adoptions": 0,
+      "continuations": 2,
+      "repetitions": 0,
+      "verified": 31
+    },
+    {
+      "directory": "ex25-121-220",
+      "adoptions": 0,
+      "continuations": 6,
+      "repetitions": 0,
+      "verified": 33
+    },
+    {
+      "directory": "ex26-1-162",
+      "adoptions": 0,
+      "continuations": 0,
+      "repetitions": 0,
+      "verified": 30
+    }
+  ]
+}
