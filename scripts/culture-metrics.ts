@@ -729,6 +729,30 @@ export function utterances(input: CultureInput): Utterance[] {
             text: said,
             recipient: to ?? null,
           });
+      } else if (
+        action.interface !== 'name' &&
+        action.interface !== 'mark' &&
+        text(args.text)
+      ) {
+        // Words another interface delivered through tell's own handler, such as a
+        // conversation contribution: counted only when this round's told event carries
+        // exactly the person's text argument, so generated lines are never counted.
+        const said = text(args.text);
+        const told = round.events.some(
+          (e) =>
+            e.actor === actor.id &&
+            e.success &&
+            e.type === 'told' &&
+            text(object(e.data).text) === said,
+        );
+        if (told && !sent.has(`${actor.id}\u0000${said}`))
+          out.push({
+            actor: actor.id,
+            tick: round.tick,
+            kind: 'public',
+            text: said,
+            recipient: null,
+          });
       }
       if (action.interface === 'name' || action.interface === 'mark')
         for (const k of ['name', 'label', 'title', 'text', 'mark', 'symbol'])
