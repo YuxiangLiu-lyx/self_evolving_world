@@ -63,6 +63,8 @@ let id = '',
   index: SceneIndex | null = null,
   legacy: Timeline | null = null,
   tick = 0,
+  // First recorded round: 0, or the imported genesis round of an imported run.
+  minimum = 0,
   maximum = 0,
   actor = 'lin',
   privateView = false,
@@ -463,8 +465,8 @@ function inspect(objectId: string): void {
 }
 async function seek(requested: number): Promise<void> {
   const token = ++sequence;
-  tick = Math.max(0, Math.min(maximum, requested));
-  const at = compare ? Math.max(0, tick - 1) : tick;
+  tick = Math.max(minimum, Math.min(maximum, requested));
+  const at = compare ? Math.max(minimum, tick - 1) : tick;
   try {
     if (legacy) {
       const world = legacy.frames[at];
@@ -541,10 +543,12 @@ async function open(
           type: 'module',
         }),
       );
+      minimum = index.segments[0]?.start ?? 0;
       maximum = index.observed;
       camera = { x: 0, y: 0, size: 24 };
     } else {
       legacy = parseReplay(source);
+      minimum = 0;
       maximum = legacy.frames.length - 1;
       camera = {
         x: 0,
@@ -555,6 +559,7 @@ async function open(
         ),
       };
     }
+    slider.min = String(minimum);
     slider.max = String(maximum);
     select('archive').value = id;
     (el('classic-link') as HTMLAnchorElement).href = legacy
@@ -565,12 +570,12 @@ async function open(
     if (url.searchParams.has('round'))
       url.searchParams.set(
         'round',
-        String(Math.max(0, Math.min(maximum, Math.trunc(initialRound)))),
+        String(Math.max(minimum, Math.min(maximum, Math.trunc(initialRound)))),
       );
     if (url.searchParams.has('actor'))
       url.searchParams.set('actor', initialActor);
     history.replaceState(null, '', url);
-    await seek(Math.max(0, Math.min(maximum, Math.trunc(initialRound))));
+    await seek(Math.max(minimum, Math.min(maximum, Math.trunc(initialRound))));
   } catch (error) {
     if (token !== sequence) return;
     status(error instanceof Error ? error.message : 'Archive failed.', true);

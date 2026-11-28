@@ -1,0 +1,188 @@
+{
+  "format": "self-evolving-world/culture-label-items",
+  "version": 1,
+  "archive": "experiment/ex19",
+  "range": { "from": 1, "through": 80 },
+  "people": [
+    { "id": "lin", "name": "Lin" },
+    { "id": "moss", "name": "Moss" },
+    { "id": "sol", "name": "Sol" },
+    { "id": "kai", "name": "Kai" },
+    { "id": "wren", "name": "Wren" },
+    { "id": "ivo", "name": "Ivo" }
+  ],
+  "context": [],
+  "items": [
+    {
+      "id": "u0001",
+      "tick": 20,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "wren", "ivo"],
+      "text": "I've eaten berries: my recorded nutrition is 8 and toxicity 0. I have one hazelnut sample, but its nutrition and toxicity remain unknown to me. Does anyone have personally tested findings about hazelnuts?"
+    },
+    {
+      "id": "u0002",
+      "tick": 24,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["kai"],
+      "text": "My whole-root trial ran 8 rounds: exposed and carried roots each gained 9.205 decay, difference zero. No preservation benefit shown; water and contamination unmeasured. I have no hazelnut findings. Roots I ate gave nutrition 14, toxicity 0."
+    },
+    {
+      "id": "u0003",
+      "tick": 27,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai"],
+      "text": "My 9-round root trial showed equal decay in the exposed and carried samples: both gained 10.4105, with no rain. This did not establish drying, preservation or safety; ground contamination was not assessed."
+    },
+    {
+      "id": "u0004",
+      "tick": 30,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "ivo"],
+      "text": "My 10-round whole-berry trial showed equal decay gains: 12.0331 exposed and carried, with no rain. Water was not measured; drying, preservation and safety remain unverified. Ground contamination was not assessed."
+    },
+    {
+      "id": "u0005",
+      "tick": 31,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["kai"],
+      "text": "Hazelnut trial status. I have two hazelnuts and have learned a mechanical opening method, but have not opened or eaten them. Nutrition and toxicity remain unknown. I will inspect one and collect stone pressure-tool candidates; opening would not establish food safety."
+    },
+    {
+      "id": "u0006",
+      "tick": 37,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "sol", "wren", "ivo"],
+      "text": "My 10-round whole-berry trial: exposed and carried berries each gained 11.4403 decay; difference zero, no rain. Water was not measured. No preservation or safety benefit established; ground contamination unassessed."
+    },
+    {
+      "id": "u0007",
+      "tick": 63,
+      "person": "moss",
+      "kind": "speech",
+      "heard": [],
+      "text": "My 13-round root trial: sliced sample gained 9.6614 model decay versus 15.2059 for its carried whole control; no rain. Slices looked shrivelled. Form and handling differed; water, contamination, preservation and safety remain unverified."
+    },
+    {
+      "id": "u0008",
+      "tick": 67,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "sol", "wren", "ivo"],
+      "text": "My 11-round sliced-berry trial: decay gain 9.233 versus 13.060 in carried whole control; slices shrivelled, no rain. Form, location and handling differ. Water unmeasured; ground contamination, preservation and safety unverified."
+    },
+    {
+      "id": "u0009",
+      "tick": 68,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai"],
+      "text": "My sliced-root pilot after 11 rounds: decay gain 8.643; visibly shrivelled, no rain. No control. Mass and water unmeasured; ground contamination, safety and preservation unverified. I plan to study relative-mass measurement."
+    },
+    {
+      "id": "u0010",
+      "tick": 69,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["kai", "wren", "ivo"],
+      "text": "My 11-round sliced-berry trial: model decay gain 9.389 vs 13.623 in carried whole control; shrivelled, no rain. Form, location and handling differ. Mass/water unmeasured; ground contamination, safety and preservation unverified."
+    },
+    {
+      "id": "u0011",
+      "tick": 72,
+      "person": "moss",
+      "kind": "work",
+      "subject": "Lever comparator (lever-comparator) made by moss",
+      "change": "created",
+      "text": "Paid assembly round 1 of 3: beam seat on the support checked; the beam and reference are reserved. An unfinished comparator gives no reading."
+    },
+    {
+      "id": "u0012",
+      "tick": 73,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["lin"],
+      "text": "My 15-round sliced-root trial: decay gain 11.236 vs 18.662 for carried whole control; slices shrivelled, no rain. Form, location and handling differ. Mass/water unmeasured; ground contamination, safety and preservation unverified."
+    }
+  ],
+  "mapping": {
+    "u0001": {
+      "tick": 20,
+      "actor": "kai",
+      "callId": "ordinary-52",
+      "eventId": "event-20-kai-213"
+    },
+    "u0002": {
+      "tick": 24,
+      "actor": "wren",
+      "callId": "ordinary-61",
+      "eventId": "event-24-wren-279"
+    },
+    "u0003": {
+      "tick": 27,
+      "actor": "moss",
+      "callId": "ordinary-64",
+      "eventId": "event-27-moss-317"
+    },
+    "u0004": {
+      "tick": 30,
+      "actor": "lin",
+      "callId": "ordinary-80",
+      "eventId": "event-30-lin-354"
+    },
+    "u0005": {
+      "tick": 31,
+      "actor": "ivo",
+      "callId": "ordinary-84",
+      "eventId": "event-31-ivo-367"
+    },
+    "u0006": {
+      "tick": 37,
+      "actor": "kai",
+      "callId": "ordinary-95",
+      "eventId": "event-37-kai-445"
+    },
+    "u0007": {
+      "tick": 63,
+      "actor": "moss",
+      "callId": "ordinary-146",
+      "eventId": "event-63-moss-776"
+    },
+    "u0008": {
+      "tick": 67,
+      "actor": "kai",
+      "callId": "ordinary-153",
+      "eventId": "event-67-kai-835"
+    },
+    "u0009": {
+      "tick": 68,
+      "actor": "wren",
+      "callId": "ordinary-157",
+      "eventId": "event-68-wren-854"
+    },
+    "u0010": {
+      "tick": 69,
+      "actor": "lin",
+      "callId": "ordinary-160",
+      "eventId": "event-69-lin-872"
+    },
+    "u0011": {
+      "tick": 72,
+      "actor": "moss",
+      "callId": "ordinary-165",
+      "eventId": "event-72-moss-923"
+    },
+    "u0012": {
+      "tick": 73,
+      "actor": "ivo",
+      "callId": "ordinary-168",
+      "eventId": "event-73-ivo-940"
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "run": "ex20-1-80",
+  "overall": {
+    "entries": 37,
+    "verified": 37,
+    "pending": 0,
+    "agree": 33,
+    "partial": 1,
+    "disagree": 3,
+    "agreement": 0.8918918918918919,
+    "lenient": 0.918918918918919
+  },
+  "positives": {
+    "entries": 17,
+    "verified": 17,
+    "pending": 0,
+    "agree": 13,
+    "partial": 1,
+    "disagree": 3,
+    "agreement": 0.7647058823529411,
+    "lenient": 0.8235294117647058
+  },
+  "negatives": {
+    "entries": 20,
+    "verified": 20,
+    "pending": 0,
+    "agree": 20,
+    "partial": 0,
+    "disagree": 0,
+    "agreement": 1,
+    "lenient": 1
+  },
+  "categories": {
+    "naming": {
+      "entries": 1,
+      "verified": 1,
+      "pending": 0,
+      "agree": 1,
+      "partial": 0,
+      "disagree": 0,
+      "agreement": 1,
+      "lenient": 1
+    },
+    "norm": {
+      "entries": 2,
+      "verified": 2,
+      "pending": 0,
+      "agree": 2,
+      "partial": 0,
+      "disagree": 0,
+      "agreement": 1,
+      "lenient": 1
+    },
+    "norm-repetition": {
+      "entries": 3,
+      "verified": 3,
+      "pending": 0,
+      "agree": 2,
+      "partial": 1,
+      "disagree": 0,
+      "agreement": 0.6666666666666666,
+      "lenient": 1
+    },
+    "invitation": {
+      "entries": 6,
+      "verified": 6,
+      "pending": 0,
+      "agree": 5,
+      "partial": 1,
+      "disagree": 0,
+      "agreement": 0.8333333333333334,
+      "lenient": 1
+    },
+    "valued-object": {
+      "entries": 8,
+      "verified": 8,
+      "pending": 0,
+      "agree": 4,
+      "partial": 1,
+      "disagree": 3,
+      "agreement": 0.5,
+      "lenient": 0.625
+    },
+    "private-view": {
+      "entries": 3,
+      "verified": 3,
+      "pending": 0,
+      "agree": 3,
+      "partial": 0,
+      "disagree": 0,
+      "agreement": 1,
+      "lenient": 1
+    }
+  }
+}

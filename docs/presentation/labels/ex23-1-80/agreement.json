@@ -1,0 +1,34 @@
+{
+  "run": "ex23-1-80",
+  "overall": {
+    "entries": 9,
+    "verified": 9,
+    "pending": 0,
+    "agree": 9,
+    "partial": 0,
+    "disagree": 0,
+    "agreement": 1,
+    "lenient": 1
+  },
+  "positives": {
+    "entries": 0,
+    "verified": 0,
+    "pending": 0,
+    "agree": 0,
+    "partial": 0,
+    "disagree": 0,
+    "agreement": null,
+    "lenient": null
+  },
+  "negatives": {
+    "entries": 9,
+    "verified": 9,
+    "pending": 0,
+    "agree": 9,
+    "partial": 0,
+    "disagree": 0,
+    "agreement": 1,
+    "lenient": 1
+  },
+  "categories": {}
+}

@@ -1,0 +1,551 @@
+{
+  "format": "self-evolving-world/culture-label-items",
+  "version": 1,
+  "archive": "experiment/ex20",
+  "range": { "from": 1, "through": 80 },
+  "people": [
+    { "id": "lin", "name": "Lin" },
+    { "id": "moss", "name": "Moss" },
+    { "id": "sol", "name": "Sol" },
+    { "id": "kai", "name": "Kai" },
+    { "id": "wren", "name": "Wren" },
+    { "id": "ivo", "name": "Ivo" }
+  ],
+  "context": [],
+  "items": [
+    {
+      "id": "u0001",
+      "tick": 1,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["sol"],
+      "text": "Introductions and a shared meeting place. Hello Sol, I'm Moss. I'm going to collect some meadow roots south of here; I know roots provide food without toxicity. I'd enjoy getting acquainted. Have you found a good place to meet or rest?"
+    },
+    {
+      "id": "u0002",
+      "tick": 1,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "Hello, I'm Kai. I know the red berries are safe food. I'll gather a modest supply and leave some for others. I'd welcome sharing food knowledge and working out fair use of nearby resources."
+    },
+    {
+      "id": "u0003",
+      "tick": 3,
+      "person": "sol",
+      "kind": "name",
+      "sign": "name",
+      "subject": "this place",
+      "text": "The Redberry Pause"
+    },
+    {
+      "id": "u0004",
+      "tick": 11,
+      "person": "sol",
+      "kind": "work",
+      "subject": "Red berries mark (applied-mark) made by sol",
+      "change": "created",
+      "text": "The pressed sample left a visible mark on the forest floor (contrast 0.14). 0.6 is reserved for drawing. Durability untested."
+    },
+    {
+      "id": "u0005",
+      "tick": 12,
+      "person": "moss",
+      "kind": "invitation",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "meeting": { "x": 14.99, "y": 17.7, "round": 18 },
+      "text": "A small neighborly pause: introductions, food knowledge, and ideas for something we could make together. All welcome."
+    },
+    {
+      "id": "u0006",
+      "tick": 13,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "wren", "ivo"],
+      "text": "I have ten roots in reserve; I tested eating roots and know they provide nutrition without toxicity. Kai told me red berries are safe. I'd enjoy hearing what each of you likes doing, or helping with a small shared drawing."
+    },
+    {
+      "id": "u0007",
+      "tick": 13,
+      "person": "sol",
+      "kind": "work",
+      "subject": "Red berries mark (applied-mark) made by sol",
+      "change": "status active",
+      "text": "Stroke 1 of 3 drawn: 0.1275 deposited, contrast 0.14."
+    },
+    {
+      "id": "u0008",
+      "tick": 15,
+      "person": "sol",
+      "kind": "work",
+      "subject": "Red berries mark (applied-mark) made by sol",
+      "change": "completed",
+      "text": "3 visible stroke(s) drawn on the forest floor; they meet in a branching pattern. Unused reserve returned. Durability untested."
+    },
+    {
+      "id": "u0009",
+      "tick": 16,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss", "kai", "wren", "ivo"],
+      "text": "Moss, I'd like to join your pause. I'm Sol. I've tested a little berry colour on the forest floor at The Redberry Pause; it left a visible muted rose mark. I'm trying a tiny branching drawing there."
+    },
+    {
+      "id": "u0010",
+      "tick": 18,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren"],
+      "text": "I'm Kai. I'd like to join your pause after a short rest. I've eaten red berries safely and have four left. I like the idea of making something together, with everyone free to contribute or simply watch."
+    },
+    {
+      "id": "u0011",
+      "tick": 19,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "wren", "ivo"],
+      "text": "I'm Lin. I enjoy exploring at my own pace. One bare-hand squeeze left a hazelnut intact; its contents and food safety are still unknown to me. Next I'll investigate a stone as a possible opening tool. What do you enjoy making?"
+    },
+    {
+      "id": "u0012",
+      "tick": 22,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "kai", "ivo"],
+      "text": "I'm Wren. Roots have safely fed me; I have five in reserve before my next meal. I'm investigating hazelnuts, but have not established their safety. I enjoy careful practical experiments and would welcome comparing findings."
+    },
+    {
+      "id": "u0013",
+      "tick": 23,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss", "kai", "wren", "ivo"],
+      "text": "I like the thought of making something small together. Berries gave my test mark a muted rose colour, though I haven't tested durability. What materials or places have caught your eye?"
+    },
+    {
+      "id": "u0014",
+      "tick": 24,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "wren", "ivo"],
+      "text": "Sol, your berry colour interests me. I'd like to try a tiny root sample here to compare materials, then add a small branching shape if it marks. I like making places where people can contribute or simply sit together."
+    },
+    {
+      "id": "u0015",
+      "tick": 24,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss", "kai", "wren", "ivo"],
+      "text": "The little berry drawing now has three visible strokes meeting in a branch on the forest floor at The Redberry Pause. Its durability is untested. I'm happy to sit together; anyone may add an idea or simply watch."
+    },
+    {
+      "id": "u0016",
+      "tick": 24,
+      "person": "moss",
+      "kind": "view",
+      "about": "sol",
+      "text": "A welcoming fellow experimenter; I enjoy their interest in small shared drawings."
+    },
+    {
+      "id": "u0017",
+      "tick": 24,
+      "person": "moss",
+      "kind": "view",
+      "about": "kai",
+      "text": "An inviting neighbor who makes room for both contributing and watching."
+    },
+    {
+      "id": "u0018",
+      "tick": 26,
+      "person": "moss",
+      "kind": "work",
+      "subject": "Meadow roots mark (applied-mark) made by moss",
+      "change": "created",
+      "text": "The pressed sample left a visible mark on the meadow ground (contrast 0.1272). 0.3 is reserved for drawing. Durability untested."
+    },
+    {
+      "id": "u0019",
+      "tick": 28,
+      "person": "moss",
+      "kind": "work",
+      "subject": "Meadow roots mark (applied-mark) made by moss",
+      "change": "status active",
+      "text": "Stroke 1 of 3 drawn: 0.05625 deposited, contrast 0.1272."
+    },
+    {
+      "id": "u0020",
+      "tick": 28,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "sol", "wren"],
+      "text": "Sol, your berry drawing sounds interesting. Moss, thanks for welcoming everyone. What would each of you enjoy adding or trying? I'd like us to choose something together, rather than assume everyone wants the same thing."
+    },
+    {
+      "id": "u0021",
+      "tick": 28,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "kai", "ivo"],
+      "text": "My own single bare-hand hazelnut squeeze also left it intact, with no visible crack. Its contents and safety remain unknown. I'll test a stone sample before choosing opening equipment."
+    },
+    {
+      "id": "u0022",
+      "tick": 30,
+      "person": "moss",
+      "kind": "work",
+      "subject": "Meadow roots mark (applied-mark) made by moss",
+      "change": "completed",
+      "text": "3 visible stroke(s) drawn on the meadow ground; they meet in a branching pattern. Unused reserve returned. Durability untested."
+    },
+    {
+      "id": "u0023",
+      "tick": 31,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["sol", "kai", "ivo"],
+      "text": "My root test left a pale mark here; durability is untested. I've tried a little sprout beside it. Sol, I liked your branching idea. Kai and everyone nearby: you're welcome to look, suggest something, or rest together."
+    },
+    {
+      "id": "u0024",
+      "tick": 33,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["sol", "kai", "ivo"],
+      "text": "Kai, I'd enjoy choosing together. My little root sprout now has three visible strokes. Would you prefer another drawing, exchanging practical findings, or simply resting here? Watching is welcome too; I'll rest for a while."
+    },
+    {
+      "id": "u0025",
+      "tick": 34,
+      "person": "kai",
+      "kind": "work",
+      "subject": "Red berries mark (applied-mark) made by kai",
+      "change": "created",
+      "text": "The pressed sample left a visible mark on the forest floor (contrast 0.14). 0.3 is reserved for drawing. Durability untested."
+    },
+    {
+      "id": "u0026",
+      "tick": 36,
+      "person": "kai",
+      "kind": "work",
+      "subject": "Red berries mark (applied-mark) made by kai",
+      "change": "status active",
+      "text": "Stroke 1 of 3 drawn: 0.06375 deposited, contrast 0.14."
+    },
+    {
+      "id": "u0027",
+      "tick": 38,
+      "person": "kai",
+      "kind": "work",
+      "subject": "Red berries mark (applied-mark) made by kai",
+      "change": "completed",
+      "text": "3 visible stroke(s) drawn on the forest floor; they meet in a branching pattern. Unused reserve returned. Durability untested."
+    },
+    {
+      "id": "u0028",
+      "tick": 39,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "sol"],
+      "text": "Moss, I'd like a little drawing and a quiet rest together. My berry test left a muted rose mark; durability is unknown. I'm keeping the strokes closer to my hand. I enjoy your company; nobody needs to contribute materials."
+    },
+    {
+      "id": "u0029",
+      "tick": 41,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["wren", "ivo"],
+      "text": "I have a whole stone now. My tested stone sample held a 0.5 press without flexing, but is now fractional. I saw that darkness blocked your trial; I'll rest before trying my whole stone with the nearby rock as support."
+    },
+    {
+      "id": "u0030",
+      "tick": 45,
+      "person": "sol",
+      "kind": "view",
+      "about": "moss",
+      "text": "A welcoming neighbor whose little pale sprout feels gentle and companionable to me."
+    },
+    {
+      "id": "u0031",
+      "tick": 48,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo"],
+      "text": "Moss, I like the pale sprout beside the berry branches. To me they feel like a tiny garden made of gestures. I'll sit nearby for a while; quiet company is welcome, with no need to make anything more."
+    },
+    {
+      "id": "u0032",
+      "tick": 48,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "sol"],
+      "text": "My berry drawing now has three visible strokes meeting in a branch. Its durability is still untested. Moss and Sol, I enjoyed making something alongside you. I'll eat and rest here; company or quiet are both welcome."
+    },
+    {
+      "id": "u0033",
+      "tick": 54,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "sol"],
+      "text": "I've enjoyed our little gathering place. I'm going to look at the nearby root plant, keeping berries for food until I know more. Quiet company is welcome, and there's no need to follow."
+    },
+    {
+      "id": "u0034",
+      "tick": 67,
+      "person": "lin",
+      "kind": "work",
+      "subject": "Red berries mark (applied-mark) made by lin",
+      "change": "created",
+      "text": "The pressed sample left a visible mark on the meadow ground (contrast 0.1061). 0.3 is reserved for drawing. Durability untested."
+    },
+    {
+      "id": "u0035",
+      "tick": 69,
+      "person": "lin",
+      "kind": "work",
+      "subject": "Red berries mark (applied-mark) made by lin",
+      "change": "status active",
+      "text": "Stroke 1 of 3 drawn: 0.06375 deposited, contrast 0.1061."
+    },
+    {
+      "id": "u0036",
+      "tick": 71,
+      "person": "lin",
+      "kind": "work",
+      "subject": "Red berries mark (applied-mark) made by lin",
+      "change": "completed",
+      "text": "3 visible stroke(s) drawn on the meadow ground; they meet in a branching pattern. Unused reserve returned. Durability untested."
+    },
+    {
+      "id": "u0037",
+      "tick": 72,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["wren", "ivo"],
+      "text": "I've been making a tiny branching drawing with berry juice here on the meadow ground. The test dab was visible but muted; durability remains untested. You're welcome to look or simply keep me company."
+    }
+  ],
+  "mapping": {
+    "u0001": {
+      "tick": 1,
+      "actor": "moss",
+      "callId": "ordinary-6",
+      "eventId": "event-1-moss-4"
+    },
+    "u0002": {
+      "tick": 1,
+      "actor": "kai",
+      "callId": "ordinary-12",
+      "eventId": "event-1-kai-4"
+    },
+    "u0003": {
+      "tick": 3,
+      "actor": "sol",
+      "callId": "ordinary-9",
+      "eventId": "event-3-sol-27"
+    },
+    "u0004": {
+      "tick": 11,
+      "actor": "sol",
+      "callId": "ordinary-32",
+      "eventId": "event-11-sol-121"
+    },
+    "u0005": {
+      "tick": 12,
+      "actor": "moss",
+      "callId": "ordinary-36",
+      "eventId": "event-12-moss-137"
+    },
+    "u0006": {
+      "tick": 13,
+      "actor": "moss",
+      "callId": "ordinary-36",
+      "eventId": "event-13-moss-149"
+    },
+    "u0007": {
+      "tick": 13,
+      "actor": "sol",
+      "callId": "ordinary-40",
+      "eventId": "event-13-sol-151"
+    },
+    "u0008": {
+      "tick": 15,
+      "actor": "sol",
+      "callId": "ordinary-40",
+      "eventId": "event-15-sol-184"
+    },
+    "u0009": {
+      "tick": 16,
+      "actor": "sol",
+      "callId": "ordinary-40",
+      "eventId": "event-16-sol-191"
+    },
+    "u0010": {
+      "tick": 18,
+      "actor": "kai",
+      "callId": "ordinary-50",
+      "eventId": "event-18-kai-217"
+    },
+    "u0011": {
+      "tick": 19,
+      "actor": "lin",
+      "callId": "ordinary-47",
+      "eventId": "event-19-lin-234"
+    },
+    "u0012": {
+      "tick": 22,
+      "actor": "wren",
+      "callId": "ordinary-53",
+      "eventId": "event-22-wren-268"
+    },
+    "u0013": {
+      "tick": 23,
+      "actor": "sol",
+      "callId": "ordinary-40",
+      "eventId": "event-23-sol-288"
+    },
+    "u0014": {
+      "tick": 24,
+      "actor": "moss",
+      "callId": "ordinary-54",
+      "eventId": "event-24-moss-306"
+    },
+    "u0015": {
+      "tick": 24,
+      "actor": "sol",
+      "callId": "ordinary-59",
+      "eventId": "event-24-sol-306"
+    },
+    "u0016": {
+      "tick": 24,
+      "actor": "moss",
+      "callId": "ordinary-54",
+      "eventId": null
+    },
+    "u0017": {
+      "tick": 24,
+      "actor": "moss",
+      "callId": "ordinary-54",
+      "eventId": null
+    },
+    "u0018": {
+      "tick": 26,
+      "actor": "moss",
+      "callId": "ordinary-62",
+      "eventId": "event-26-moss-339"
+    },
+    "u0019": {
+      "tick": 28,
+      "actor": "moss",
+      "callId": "ordinary-67",
+      "eventId": "event-28-moss-356"
+    },
+    "u0020": {
+      "tick": 28,
+      "actor": "kai",
+      "callId": "ordinary-50",
+      "eventId": "event-28-kai-354"
+    },
+    "u0021": {
+      "tick": 28,
+      "actor": "wren",
+      "callId": "ordinary-66",
+      "eventId": "event-28-wren-354"
+    },
+    "u0022": {
+      "tick": 30,
+      "actor": "moss",
+      "callId": "ordinary-67",
+      "eventId": "event-30-moss-391"
+    },
+    "u0023": {
+      "tick": 31,
+      "actor": "moss",
+      "callId": "ordinary-67",
+      "eventId": "event-31-moss-398"
+    },
+    "u0024": {
+      "tick": 33,
+      "actor": "moss",
+      "callId": "ordinary-76",
+      "eventId": "event-33-moss-418"
+    },
+    "u0025": {
+      "tick": 34,
+      "actor": "kai",
+      "callId": "ordinary-80",
+      "eventId": "event-34-kai-442"
+    },
+    "u0026": {
+      "tick": 36,
+      "actor": "kai",
+      "callId": "ordinary-83",
+      "eventId": "event-36-kai-467"
+    },
+    "u0027": {
+      "tick": 38,
+      "actor": "kai",
+      "callId": "ordinary-83",
+      "eventId": "event-38-kai-487"
+    },
+    "u0028": {
+      "tick": 39,
+      "actor": "kai",
+      "callId": "ordinary-83",
+      "eventId": "event-39-kai-494"
+    },
+    "u0029": {
+      "tick": 41,
+      "actor": "lin",
+      "callId": "ordinary-87",
+      "eventId": "event-41-lin-528"
+    },
+    "u0030": {
+      "tick": 45,
+      "actor": "sol",
+      "callId": "ordinary-92",
+      "eventId": null
+    },
+    "u0031": {
+      "tick": 48,
+      "actor": "sol",
+      "callId": "ordinary-92",
+      "eventId": "event-48-sol-588"
+    },
+    "u0032": {
+      "tick": 48,
+      "actor": "kai",
+      "callId": "ordinary-90",
+      "eventId": "event-48-kai-588"
+    },
+    "u0033": {
+      "tick": 54,
+      "actor": "kai",
+      "callId": "ordinary-100",
+      "eventId": "event-54-kai-639"
+    },
+    "u0034": {
+      "tick": 67,
+      "actor": "lin",
+      "callId": "ordinary-117",
+      "eventId": "event-67-lin-758"
+    },
+    "u0035": {
+      "tick": 69,
+      "actor": "lin",
+      "callId": "ordinary-121",
+      "eventId": "event-69-lin-784"
+    },
+    "u0036": {
+      "tick": 71,
+      "actor": "lin",
+      "callId": "ordinary-121",
+      "eventId": "event-71-lin-808"
+    },
+    "u0037": {
+      "tick": 72,
+      "actor": "lin",
+      "callId": "ordinary-121",
+      "eventId": "event-72-lin-820"
+    }
+  }
+}

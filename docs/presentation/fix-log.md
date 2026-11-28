@@ -470,6 +470,118 @@ Experiment A extended ex16 from round 250 to 400 ([PR-43](../exec-plans/complete
 - **Fix (proposed, not applied)**: require a place, time or named activity in the schema (an `invitation` field), or verify invitations against `invited` events only.
 - **Metrics**: invitation precision on the next verified sample.
 
+## 11. Experiment B: newly exposed problems
+
+Experiment B ran three seed pairs of the old-goal and open-goal arms, ex19–ex24 ([PR-44](../exec-plans/completed/pr-44-b-goal-pairs.md), [run report](run-report-b-goal-pairs.md)). 11d–11g are applied fixes or process rules now in force; 11a–11c and 11h are proposals.
+
+### 11a. A rejection stop ended ex21 at round 44
+
+- **Problem**: the culture v2 recovery stops a run for review after three consecutive rejected outputs (`rejectionRecovery.stopAfter: 3`), and `repair` refuses to resume it by design. A person who keeps omitting one required plan field therefore ends the whole run.
+- **Evidence**:
+  - Moss's `ordinary-137`, `-138` and `-139` at tick 44 of ex21 were rejected with "Expected the registered task plan shape."; each omitted the required `preferences` field. The lead did not bypass the stop, so ex21 covers 44 of 80 rounds.
+  - Two-rejection pauses of the same kind came earlier: ex19 rounds 39 (Lin) and 50 (Kai), ex21 round 20 (Lin).
+  - 29 of B's 32 rejected outputs were this error, and all 29 omitted `preferences`: 23 in the old-goal arm (24 rejected of 445 ordinary calls) and 6 in the open-goal arm (8 of 375). In ticks 1–80, ex15 had 8 rejected of 147, ex16 4 of 140, ex17 0 of 110 and ex18 3 of 151.
+- **Fix (proposed, not applied; a scenario change)**: in a new run version, either accept an omitted `preferences` as an empty list, or return the validation message to the person in the next decision's input. Either change must not apply to B's archives, whose inputs are frozen.
+- **Metrics**: rejected outputs per ordinary call, the share that omit `preferences`, and rejection stops per run.
+
+### 11b. The token budget ended ex19 at round 76
+
+- **Problem**: B fixed the hard token budget at 1,500,000 per run (R2). A run with many calls exhausts it before round 80.
+- **Evidence**: ex19 stopped at round 76 with 1,463,499 tokens on its ledger, because the frozen budget could not reserve the next complete attempt. It made 176 calls (161 ordinary, 15 World Agent). ex23 reached round 80 with 1,410,016 tokens and 179 calls. The open-goal runs used 1,011,619–1,140,358 tokens.
+- **Fix (proposed, not applied; a user decision for the next allocation)**: size the budget from measured usage, for example the largest B ledger at round 80 plus one attempt's reservation, or report a run that stops on its budget separately from runs that complete their window, as this report does.
+- **Metrics**: ledger at the last round, and rounds reached per run.
+
+### 11c. `repair` can start while a pause capture is still running
+
+- **Problem**: after a technical pause, the develop process captures the paused archive's screenshots. If `repair` starts before that capture finishes, the capture fails.
+- **Evidence**: at ex21's round-20 rejection pause, the capture failed with "Invalid or unfinished continuous archive". The retained `technical-pauses/round-20/recovery.json` records `captureStatus: running`. The simulation was preserved, and the final capture of round 44 ran normally.
+- **Fix (proposed, not applied)**: let `repair` refuse, or wait, while the latest pause's capture is still running.
+- **Metrics**: technical pauses whose `captureStatus` is not `completed` (1 in B).
+
+### 11d. Permission denials and the rules that followed
+
+- **Problem**: the permission system refused two writes. One was the implementing agent's new source file for ex23's watering handoff, which paused that handoff. The other was the lead's brief in a newly created worktree, `sew-lab`. The user said neither denial was intended.
+- **Evidence**: the ex23 handoff resumed under a scope the user narrowed (see the [run report](run-report-b-goal-pairs.md#handoffs)). `sew-lab` (branch `tmp/b-labels`) was used only to label ex19–ex22; its results were moved into the B worktree, and it is no longer used.
+- **Fix (applied as process rules by the user)**: no new worktrees; test a target location with a harmless file before writing there; report a denial with its full path and message, without a workaround.
+- **Metrics**: denials per experiment, and workarounds after a denial (none should occur).
+
+### 11e. A zsh loop passed an empty seed
+
+- **Problem**: an earlier labeling loop relied on word splitting of an unquoted variable, which zsh does not do by default. The `--seed` argument was empty.
+- **Evidence**: that run made no model call. The lead re-ran it with explicit seeds, and each label directory's negative sample now records the archive's own seed (20261201–20261203 for B, 20261123 for the references).
+- **Fix (applied)**: one explicit command per label run instead of a word-split loop.
+- **Metrics**: label directories whose `negatives-sample.json` seed differs from the archive seed (0).
+
+### 11f. Handoffs need hooks in shared runtime modules
+
+- **Problem**: some B packages could only work through hooks in shared runtime modules, which every archive replays.
+- **Evidence**: ex21 `small-combustion-source` (`forest-environment`: warmth and burns), ex22 `sleep-in-place` (`open-experience`: the routine list), ex23 `rooted-plant-watering` (`open-physical` `openConditions`: root-zone water), ex24 `prepare-ventilated-food-storage` (`forest-environment`: a decay multiplier of 0.8, the specification's declared coefficient) and ex24 `construct-weather-shelter` (`forest-environment`: exposure). The ex19 lever comparator was refactored into a factory.
+- **Fix (applied)**: each hook is gated on its own package revision, so it changes nothing in a world that has not installed the package. Every archive, ex7–ex24, replays byte-identically on the merged code.
+- **Metrics**: compatibility digests of ex7–ex24 after each merge (all identical).
+
+### 11g. A subagent wrote to `/tmp/null`
+
+- **Problem**: temporary files outside the worktree can collide across agents.
+- **Evidence**: a subagent briefly wrote `/tmp/null` and deleted it. That also removed an older `/tmp/null` left by the D subagent.
+- **Fix (applied as a brief rule)**: temporary files go only in the worktree's git-ignored `validation-results/scratch/`, never in `/tmp`.
+- **Metrics**: files written outside the worktree during an experiment (none should occur).
+
+### 11h. The annotation ledger total was overstated after A
+
+- **Problem**: the experiment A report and the PR-43 results give the annotation ledger after A as 31,004 tokens, which counts the two calibration calls twice. A share computed from that figure understates B's annotation cost.
+- **Evidence**: before B, the six calls in `labels/ledger.json` sum to 23,408 tokens: 7,596 for the two calibration calls and 15,812 for the four ex16-1-400 batches. B's 14 calls sum to 45,466, and the ledger now stands at 68,874.
+- **Fix (proposed, not applied)**: correct the A figure, and take ledger totals from the file with a command rather than by hand.
+- **Metrics**: report figures that differ from the ledger file's sums (0).
+
+## 12. Experiment C: newly exposed problems
+
+Experiment C imported ex18's world at round 120 with two newcomers and ran it to round 220 as ex25 ([PR-45](../exec-plans/completed/pr-45-c-newcomers.md), [run report](run-report-c-newcomers.md)). 12d records a merge that was resolved; 12a–12c and 12e are proposals, and none of them is applied.
+
+### 12a. The heard-list cap hides earlier speech from a person who does not decide for a while
+
+- **Problem**: a listener's heard list keeps only the six most recent entries (`EXPRESSION_LIMITS.heard: 6`, `.slice(-6)` in `packages/world-core/src/expression.ts`), and every hummed segment of `vocal-music@1` is an entry too. A person whose plan runs for many rounds can therefore hear speech that never reaches any of their decisions. A `heard` event alone does not show that a person received a text.
+- **Evidence**:
+  - Tova decided at tick 170 and next at tick 194, and received 17 heard entries in between (10 tells, 7 hum segments). At tick 194 (`ordinary-159`) her six entries were Bram's tell of round 190, Moss's of 191, Kai's of 193 and three of Bram's hum segments. Kai's lantern story (177), Moss's sequel (178), Kai's sequels (184, 189) and Moss's round-173 line addressed to her by name never reached her input. The first lantern text she received was the other newcomer's.
+  - Of the 11 tells Tova heard, 4 reached an input; of Bram's 17, 12 did. Two resident statements Bram heard at round 204 (Lin: "company is welcome, with no task attached"; Moss: "I'd enjoy quiet company while we keep ourselves fed") rolled out before his next call at tick 212, displaced by Lin's three hum segments, Moss's round-210 tell and two of Moss's hum segments.
+  - The plan's comparison of the two newcomers' leanings could not be made, because their exposures differed for this reason.
+- **Fix (proposed, not applied; a scenario change)**: in a new run version, keep the heard entries since the person's last decision under a byte budget instead of a fixed count, or fold the segments of one hummed bout into one entry. ex7–ex25 replay their recorded lists and must stay unchanged, so the change applies only to new runs.
+- **Metrics**: per person, heard tells that never reach an input (Tova 7 of 11, Bram 5 of 17 in ex25); the share of heard-list entries that are hum segments at each decision.
+
+### 12b. Sung words are not counted by the labels or the culture metrics
+
+- **Problem**: `vocal-music@1` can sing, with optional words carried in its events and heard entries. The label tool builds items only from speech, private messages, names, invitations, works and private views (`scripts/culture-labels.ts`), and no culture script reads vocal-music events. A sung name, saying or story would be invisible to the labels and to `pnpm metrics:culture`.
+- **Evidence**: no harm in ex25: all 46 vocal-music actions, 45 segments and 23 planned vocal-music steps were hums with empty words, so nothing was missed. The gap is in the tools, not in this run's results.
+- **Fix (proposed, not applied)**: give a later label version a `song` item for each sung bout with non-empty words, and count sung words in the metrics' speech totals, leaving hums out. Earlier label directories stay as they are.
+- **Metrics**: sung bouts with words per run, and their share among label items.
+
+### 12c. The inherited thermal assessment says no heat source is represented
+
+- **Problem**: ex18's `thermal-food-preparation@1`, inherited in ex25 through `development.inherited`, says that "heating is refused before any cost because no heat source or heat transfer into food is represented." ex25's `friction-heating-trial@1` can form an ember, and the inherited thermal assessment lists a glowing ember as a reachable heat source while heating stays refused (`experiment/ex25/development/development-3-declaration.json`). Once an ember can exist, the stated reason is inaccurate: only the heat transfer into food is missing.
+- **Evidence**: Wren mastered the thermal assessment at round 173, ran it at round 174 and then requested the friction trial (`event-175-wren-2226`). No ember formed in ex25: the wood's water share is 0.5 and rain stayed above the 0.15 limit, so her bout of rounds 192–194 peaked near 100 °C (`event-194-wren-2615`). The wording therefore misled nobody in this run.
+- **Fix (proposed, not applied)**: in a future scope, a new revision whose text gives the actual reason ("no heat transfer into food is represented"). ex18's and ex25's ability text is part of their replayed inputs and stays unchanged.
+- **Metrics**: ability texts whose stated reason contradicts a package installed in the same world (one known: this one).
+
+### 12d. The import and allocation options conflicted in a merge
+
+- **Problem**: experiment C's import (`--import exN --newcomers file`) and experiment B's allocation options (`--seed`, `--development`, `--tokens`, F-145) were developed in parallel on different branches and touch the same code paths.
+- **Evidence**: merging main into the C branch (`af5d620`) met nine files changed on both sides. Six had conflicting hunks: `scripts/continuous-cli.ts` (5: the option checks of `new`, both genesis calls and the allocation note), `scripts/continuous-store.ts` (1: the derived configuration that checkpoints are verified against), `apps/simulator/src/long-scenario.ts` (1: the scenario constants), `docs/CULTURE_SCENARIO.md` (2), `docs/DEVELOPMENT.md` (1) and `docs/PRODUCT.md` (1). In the merged CLI the two paths are exclusive: an import takes no allocation option, and its limits are frozen in `LONG_IMPORT`. After the merge the lead compared ex7–ex24 on the C branch, and all replayed identically.
+- **Fix (applied as resolved; proposed as a process rule)**: merge main into a long-lived experiment branch before starting a feature that touches the shared CLI or genesis code, and keep each `new` mode's option parsing in its own function.
+- **Metrics**: conflicting hunks per merge of main into an experiment branch, and archives whose replay changes after such a merge (0).
+
+### 12e. The plan's norm phrase was not in the source run
+
+- **Problem**: the plan's R5.5 asked whether a newcomer follows "a resident norm such as 'quiet company, no need to talk'". That phrase does not occur in ex18, the source of ex25's residents, nor in ex25.
+- **Evidence**: a case-insensitive search of ex18 and ex25 finds neither "quiet company, no need to talk" nor "no need to talk". The phrase paraphrases ex16, where Ivo said "Company is welcome, with no need to talk." at round 31 and "Quiet company is welcome, with no need to talk or change your plans." at round 195 (`labels/ex16-1-400/items.json`, u0024 and u0059). ex18's own statements are "without obligation", "no pressure", "without pressure", "without anyone needing to prove useful", "room for your silence too" and "no obligation to join", and its labels have no `norm` item. The report searched for these as well.
+- **Fix (proposed, not applied; a process rule)**: quote any premise about a source archive from that archive, with its round and call, when the plan is written, and check it before the run.
+- **Metrics**: plan premises about archives without an archive reference (one here).
+
+### 12f. The CI quality job outgrew its 25-minute limit
+
+- **Problem**: PR #39's `quality` job was cancelled at the 25-minute timeout twice in a row (25 min 22 s, then 25 min 21 s on a rerun), before its browser checks finished.
+- **Evidence**: in the rerun log, the full unit suite took 699 s, the archive and analysis checks ended at 23:58, and the job was cancelled at 23:59:43 during the end-to-end checks, after ex25's initial frame. PR #37 had also needed a rerun (18.6 min) after one cancellation.
+- **Fix (applied in this PR)**: `timeout-minutes` of the `quality` job in `.github/workflows/ci.yml` is raised from 25 to 45. This follows the earlier rule: rerun first, compare the durations, then raise the limit.
+- **Metrics**: `quality` job duration per PR, and cancellations at the limit.
+
 ## Limitations
 
 - Fixes 2–4 are turned on together in E1, so one run cannot separate their effects causally; section 5 attributes them by mechanism only. Each switch can be turned on alone; a short run with only `plan-horizon` would show its effect on decision frequency.

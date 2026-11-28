@@ -9,7 +9,10 @@ import {
   digest,
   writeExperimentJson,
 } from '../../../scripts/experiments.js';
-import { CONTINUOUS_ASSERTIONS } from '../../../scripts/continuous-analysis.js';
+import {
+  CONTINUOUS_ASSERTIONS,
+  continuousFrameTicks,
+} from '../../../scripts/continuous-analysis.js';
 import { continuousRead } from '../../../scripts/continuous-store.js';
 import type {
   V7ReplayIndex,
@@ -69,7 +72,9 @@ for (const id of ids)
     test.setTimeout(180_000);
     const record = validateExperiment(root, id, !!capture),
       directory = record.directory,
-      index = continuousRead<V7ReplayIndex>(resolve(directory, 'replay.json'));
+      index = continuousRead<V7ReplayIndex>(resolve(directory, 'replay.json')),
+      // 0, or the imported genesis round of an imported run.
+      start = index.segments[0]?.start ?? 0;
     await page.route('**/experiments/index.json', (route) =>
       route.fulfill({
         contentType: 'application/json',
@@ -99,7 +104,7 @@ for (const id of ids)
     await page.goto(`/observatory.html?experiment=${id}`);
     // Wait for the initial asynchronous reconstruction before seeking again.
     await expect(page.locator('#round')).toHaveText(
-      `0 / ${String(index.observed)}`,
+      `${String(start)} / ${String(index.observed)}`,
       { timeout: 90_000 },
     );
     console.log(
@@ -109,7 +114,7 @@ for (const id of ids)
         durationMs: Math.round(performance.now() - opened),
       }),
     );
-    const ticks = [0, Math.floor(index.observed / 2), index.observed],
+    const ticks = continuousFrameTicks(start, index.observed),
       scenes = ['initial', 'midpoint', 'final'];
     for (const [i, tick] of ticks.entries()) {
       if (i > 0) await page.locator('#time').fill(String(tick));
@@ -182,14 +187,14 @@ for (const id of ids)
       if (capture)
         copyFileSync(path, resolve(directory, `${String(scenes[i])}.png`));
     }
-    if (index.observed > 1) {
-      await page.locator('#time').fill('0');
+    if (index.observed - start > 1) {
+      await page.locator('#time').fill(String(start));
       await expect(page.locator('#round')).toHaveText(
-        `0 / ${String(index.observed)}`,
+        `${String(start)} / ${String(index.observed)}`,
       );
       await page.locator('#play').click();
       await expect(page.locator('#round')).not.toHaveText(
-        `0 / ${String(index.observed)}`,
+        `${String(start)} / ${String(index.observed)}`,
       );
       await page.locator('#play').click();
     }

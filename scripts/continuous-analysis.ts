@@ -390,7 +390,7 @@ export function continuousReport(
   const forestSummary = state.world.config.forest
     ? `## Forest lifecycle and environment\n\nModel: ${state.model}. Seed: ${String(state.world.config.seed)}. Observed seasons: ${results.forest?.seasons.map((s) => (typeof s === 'string' ? s : 'unknown')).join(', ') ?? 'unknown'}. Deaths and respawns are retained with exact evidence and prior plans in results.json. Full-state replay remains independent of rendering. Monetary cost and internal developer usage are unknown; recorded role-specific tokens below are measured. These formal events are distinct from isolated forest-lab fixtures.\n\n${state.world.actors.map((a) => `${a.name}: ${String(a.life?.deaths ?? 0)} deaths, ${String((a.life?.total ?? 0) - (a.life?.deaths ?? 0))} remaining lives.`).join('\n\n')}\n\n`
     : '';
-  return `# ${id}: Continuous World and Persistent Wellbeing\n\n## Scope and observation window\n\n${state.world.config.longDevelopment ? `${longObjective(state.world.config.longDevelopment)} Frozen ordinary/world/development attempt ceilings: ${String(state.world.config.budgets.ordinary)}/${String(state.world.config.budgets.world)}/${String(state.world.config.budgets.development)}. Shared ordinary/world token ceiling: ${String(state.world.config.longDevelopment.tokens)}.` : state.world.config.collective ? COLLECTIVE_OBJECTIVE : state.world.config.development ? OPEN_OBJECTIVE : state.world.config.experience ? EXPERIENCE_OBJECTIVE : CONTINUOUS_OBJECTIVE}\n\nObserved ${String(state.world.tick)} of ${String(state.windowTarget)} target rounds. State: ${state.phase}. ${state.reason ?? ''} This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.\n\n## Measured outcome\n\n| Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | ${state.world.config.experience ? 'Learned-interface successful rounds' : 'New-ability successful rounds'} |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n${results.actors.map((a) => `| ${a.id} | ${String(a.alive)} | ${String(a.finalVitals.health)} | ${String(a.finalVitals.satiety)} | ${a.meanWellbeing.toFixed(2)} | ${a.finalWellbeing.total.toFixed(2)} | ${String(a.newlyMastered.length)} | ${String(a.successfulNewAbilityUses)} |`).join('\n')}\n\nRequests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits.${state.world.config.development ? ' This fresh policy inherits no generated interfaces. The explicit authored allowlist, current-run package provenance, personal projects, verified knowledge, trials and persistent processes are retained separately in results.openDevelopment. Actor-written progress is a claim, not a physical outcome.' : state.world.config.experience ? ' In this policy the table includes personally learned baseline interfaces; results.experience separately lists newly developed interfaces, personal mastery, completed operations and pre-action reference invalidations. The initial ex8 catalogue is not new ex9 discovery.' : ''} Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.\n\n## Action distribution\n\n| Interface | Attempted | Successful rounds | Failed rounds |\n| --- | --- | --- | --- |\n${Object.entries(
+  return `# ${id}: Continuous World and Persistent Wellbeing\n\n## Scope and observation window\n\n${state.world.config.longDevelopment ? `${longObjective(state.world.config.longDevelopment)} Frozen ordinary/world/development attempt ceilings: ${String(state.world.config.budgets.ordinary)}/${String(state.world.config.budgets.world)}/${String(state.world.config.budgets.development)}. Shared ordinary/world token ceiling: ${String(state.world.config.longDevelopment.tokens)}.` : state.world.config.collective ? COLLECTIVE_OBJECTIVE : state.world.config.development ? OPEN_OBJECTIVE : state.world.config.experience ? EXPERIENCE_OBJECTIVE : CONTINUOUS_OBJECTIVE}\n\nObserved ${String(state.world.tick)} of ${String(state.windowTarget)} target rounds. State: ${state.phase}. ${state.reason ?? ''} This is one exploratory combined experiment; no individual mechanism has a causal estimate. No model-weight training occurred.\n\n## Measured outcome\n\n| Actor | Alive | Health | Satiety | Mean happiness | Final happiness | Newly mastered | ${state.world.config.experience ? 'Learned-interface successful rounds' : 'New-ability successful rounds'} |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n${results.actors.map((a) => `| ${a.id} | ${String(a.alive)} | ${String(a.finalVitals.health)} | ${String(a.finalVitals.satiety)} | ${a.meanWellbeing.toFixed(2)} | ${a.finalWellbeing.total.toFixed(2)} | ${String(a.newlyMastered.length)} | ${String(a.successfulNewAbilityUses)} |`).join('\n')}\n\nRequests, reviews, implementation, individual study, successful execution and lasting satisfaction are separate records in calls, source-history, replay events and results.json. Event counts are not unique skills or demonstrated lasting benefits.${state.world.config.development ? (state.world.config.development.inherited?.length ? ` This imported world keeps the installed interfaces of ${state.world.config.development.inherited.join(', ')}; new interfaces use ${state.world.config.development.scope}.` : ' This fresh policy inherits no generated interfaces.') + ' The explicit authored allowlist, current-run package provenance, personal projects, verified knowledge, trials and persistent processes are retained separately in results.openDevelopment. Actor-written progress is a claim, not a physical outcome.' : state.world.config.experience ? ' In this policy the table includes personally learned baseline interfaces; results.experience separately lists newly developed interfaces, personal mastery, completed operations and pre-action reference invalidations. The initial ex8 catalogue is not new ex9 discovery.' : ''} Initial survival interfaces and established perennial food are authored baseline, not autonomous discoveries.\n\n## Action distribution\n\n| Interface | Attempted | Successful rounds | Failed rounds |\n| --- | --- | --- | --- |\n${Object.entries(
     results.actions,
   )
     .map(
@@ -418,6 +418,11 @@ export function continuousArtifactFiles(
   )
     throw new Error('Invalid continuous artifact index.');
   return list as string[];
+}
+/** The initial, midpoint and final rounds captured in the browser; `start` is 0 except in
+ * an imported run, whose first recorded round is its imported genesis round. */
+export function continuousFrameTicks(start: number, final: number): number[] {
+  return [start, start + Math.floor((final - start) / 2), final];
 }
 export function readContinuousExperiment(
   root: string,
@@ -457,9 +462,12 @@ export function readContinuousExperiment(
     frames.push(...(frames.length ? values.slice(1) : values));
     rounds.push(...segment.rounds);
   }
+  // An imported run's first frame is its imported genesis round; every other run's is 0.
+  const start = frames[0]?.tick ?? 0,
+    frameTicks = continuousFrameTicks(start, state.world.tick);
   if (
     continuousHash(frames.at(-1)) !== continuousHash(state.world) ||
-    frames.length !== state.world.tick + 1
+    frames.length !== state.world.tick - start + 1
   )
     throw new Error(
       'Reconstructed final state differs from the durable checkpoint.',
@@ -561,8 +569,7 @@ export function readContinuousExperiment(
       browser.replayHash !==
         continuousHash(readFileSync(resolve(directory, 'replay.json'))) ||
       v7Signature(browser.assertions) !== v7Signature(CONTINUOUS_ASSERTIONS) ||
-      v7Signature(browser.frameTicks) !==
-        v7Signature([0, Math.floor(state.world.tick / 2), state.world.tick]) ||
+      v7Signature(browser.frameTicks) !== v7Signature(frameTicks) ||
       browser.errors.length
     )
       throw new Error('Missing current continuous browser evidence.');
@@ -582,10 +589,7 @@ export function readContinuousExperiment(
       initial: frames[0],
       final: state.world,
       frames: Object.fromEntries(
-        [0, Math.floor(state.world.tick / 2), state.world.tick].map((tick) => [
-          tick,
-          frames[tick],
-        ]),
+        frameTicks.map((tick) => [tick, frames[tick - start]]),
       ),
     },
     results,

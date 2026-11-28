@@ -215,6 +215,19 @@ export {
 export * from './open-foundation.js';
 export * from './open-physical.js';
 export * from './food-water.js';
+export {
+  SAMPLE_EXCHANGE,
+  equilibriumFraction,
+  sampleExchange,
+  sampleGeometry,
+  saturationDensity,
+} from './long-ex21-sample-drying-physics.js';
+export type {
+  SampleExchange,
+  SampleExchangeInput,
+  SampleForm,
+  SampleGeometry,
+} from './long-ex21-sample-drying-physics.js';
 export * from './open-processes.js';
 export * from './open-projects.js';
 export { openPlants, openAnimals } from './open-ecology.js';
@@ -235,6 +248,11 @@ export { collectiveFoodProfile } from './collective-food-profile.js';
 export { leanExposure } from './collective-shelter-exposure.js';
 export { simpleShelterExposure } from './long-shelter-exposure.js';
 export { sharedShelterExposure } from './long-shared-shelter-exposure.js';
+export {
+  WEATHER_SHELTER,
+  shelterMeasure,
+  weatherShelterExposure,
+} from './long-ex24-weather-shelter-physics.js';
 export { branchScreenExposure } from './long-branch-screen-exposure.js';
 export { collectiveJobs } from './collective-work.js';
 

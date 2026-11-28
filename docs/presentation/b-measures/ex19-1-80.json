@@ -1,0 +1,71 @@
+{
+  "archive": "experiment/ex19",
+  "through": 80,
+  "labels": "docs/presentation/labels/ex19-1-80",
+  "measures": {
+    "adoptedNames": 0,
+    "narratives": 0,
+    "narrativeContinuations": 0,
+    "nonTransactionalShare": 0,
+    "caresWithOwnLeaning": 1,
+    "normRepetitions": 0,
+    "attendedInvitations": 0,
+    "valuedObjects": 0
+  },
+  "detail": {
+    "adoptedNames": [],
+    "narratives": {
+      "items": [],
+      "continuations": []
+    },
+    "normRepetitions": [],
+    "valuedObjects": [],
+    "nonTransactional": {
+      "messages": 11,
+      "nonTransactional": 0
+    },
+    "caresLeanings": [
+      {
+        "actor": "lin",
+        "leaning": "freedom",
+        "first": null,
+        "versions": 1
+      },
+      {
+        "actor": "moss",
+        "leaning": "belonging",
+        "first": null,
+        "versions": 1
+      },
+      {
+        "actor": "sol",
+        "leaning": "beauty",
+        "first": {
+          "tick": 1,
+          "text": "Staying healthy, learning through real observations, and building a comfortable life with room for beauty and shared benefit.",
+          "matches": ["beauty"]
+        },
+        "versions": 1
+      },
+      {
+        "actor": "kai",
+        "leaning": "fairness",
+        "first": null,
+        "versions": 2
+      },
+      {
+        "actor": "wren",
+        "leaning": "mastery",
+        "first": null,
+        "versions": 1
+      },
+      {
+        "actor": "ivo",
+        "leaning": "calm",
+        "first": null,
+        "versions": 1
+      }
+    ],
+    "attendedInvitations": []
+  }
+}

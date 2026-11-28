@@ -1,11 +1,13 @@
 import type {
   V7Ability,
   V7ActionContext,
+  V7Actor,
   V7CultureOptions,
   V7Data,
   V7HandlerResult,
   V7Object,
   V7Package,
+  V7Point,
   V7Schema,
   V7World,
 } from './continuous-types.js';
@@ -317,6 +319,48 @@ function heardList(value: unknown): V7Data[] {
       )
     : [];
 }
+/** Everyone who hears a sound made at a position: every other living person within the
+ * hearing radius (the configured vision radius), seen or not, in world order. Shared by
+ * tell and invite, and called by reviewed sound such as ex25's vocal-music@1. */
+export function expressionHearers(
+  world: V7World,
+  source: string,
+  position: V7Point,
+): V7Actor[] {
+  return world.actors.filter(
+    (listener) =>
+      !(
+        listener.id === source ||
+        listener.vitals.health <= 0 ||
+        v7Distance(listener.position, position) > world.config.vision
+      ),
+  );
+}
+/** One private heard event for a listener, kept in the listener's bounded heard list. */
+export function expressionHear(
+  world: V7World,
+  listener: V7Actor,
+  description: string,
+  data: V7Data,
+  target: string | null = null,
+): void {
+  world.events.push({
+    id: v7Id(world, 'event'),
+    tick: world.tick,
+    actor: listener.id,
+    type: 'heard',
+    interface: null,
+    success: true,
+    description,
+    position: null,
+    target,
+    data,
+  });
+  listener.extensionState['expression:heard'] = [
+    ...heardList(listener.extensionState['expression:heard']),
+    { tick: world.tick, ...data },
+  ].slice(-EXPRESSION_LIMITS.heard);
+}
 /** Spoken words reach every living person within hearing range at the speaker's
  * position; each listener receives a private heard event and a bounded heard list. */
 function deliver(world: V7World): void {
@@ -335,13 +379,7 @@ function deliver(world: V7World): void {
     const invitation = e.type === 'invited';
     const place = invitation ? meetingOf(e.data.meeting) : null;
     const away: string[] = [];
-    for (const listener of world.actors) {
-      if (
-        listener.id === speaker.id ||
-        listener.vitals.health <= 0 ||
-        v7Distance(listener.position, position) > world.config.vision
-      )
-        continue;
+    for (const listener of expressionHearers(world, speaker.id, position)) {
       if (
         place &&
         v7Distance(listener.position, place) > EXPRESSION_LIMITS.meetingRadius
@@ -356,23 +394,13 @@ function deliver(world: V7World): void {
           ? { sign: e.data.sign ?? null, meeting: e.data.meeting ?? null }
           : {}),
       };
-      world.events.push({
-        id: v7Id(world, 'event'),
-        tick: world.tick,
-        actor: listener.id,
-        type: 'heard',
-        interface: null,
-        success: true,
-        description: invitation ? e.description : `${speaker.name}: ${text}`,
-        position: null,
-        target:
-          invitation && typeof e.data.sign === 'string' ? e.data.sign : null,
+      expressionHear(
+        world,
+        listener,
+        invitation ? e.description : `${speaker.name}: ${text}`,
         data,
-      });
-      listener.extensionState['expression:heard'] = [
-        ...heardList(listener.extensionState['expression:heard']),
-        { tick: world.tick, ...data },
-      ].slice(-EXPRESSION_LIMITS.heard);
+        invitation && typeof e.data.sign === 'string' ? e.data.sign : null,
+      );
     }
     // Hidden bookkeeping: who heard the invitation while away from the place, so that
     // attendance can tell people who came from people who were already there.

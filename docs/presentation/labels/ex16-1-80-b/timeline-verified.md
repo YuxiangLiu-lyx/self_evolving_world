@@ -1,0 +1,67 @@
+# Verified label timeline: ex16-1-80-b
+
+Verified on 2026-11-27: verdicts on the model labels (gpt-6.1-sol) for ex16 rounds 1–80 were set by a Claude agent, not by a human annotator, and await a human spot-check. This is a reference for experiment B (ex16 is not part of any pair), labeled freshly with B's procedure; it is separate from experiment A's ex16-1-400 pass, whose batches and counting predate B.
+
+The window holds 45 labelable items, all labeled by the model. Every entry of [`verification.json`](verification.json) (21 positives and 20 seeded negatives of 24) was checked against the retained archive in `experiment/ex16`: the call responses, the replay events with their `heard` listeners, positions within the 5-unit hearing and vision range, and the memory views. Every item text matches the archive verbatim; a private message is shown as its subject and body, as the label items join them.
+
+Only verified model positives count toward the pre-registered measures of [PR-44](../../../exec-plans/completed/pr-44-b-goal-pairs.md) (R5). Misses found among the negatives enter the agreement rates, not the measures.
+
+## Agreement
+
+From `pnpm labels:culture -- report --out docs/presentation/labels/ex16-1-80-b`:
+
+| Sample    | Entries | Agree | Partial | Disagree | Agreement | Lenient (agree + partial) |
+| --------- | ------- | ----- | ------- | -------- | --------- | ------------------------- |
+| Overall   | 41      | 31    | 2       | 8        | 75.6%     | 80.5%                     |
+| Positives | 21      | 15    | 2       | 4        | 71.4%     | 81.0%                     |
+| Negatives | 20      | 16    | 0       | 4        | 80.0%     | 80.0%                     |
+
+The report's per-category rates count whole entries, so a partial entry lowers every category it holds. Counted per category instead:
+
+| Category        | Labeled | Verified | Report agreement |
+| --------------- | ------- | -------- | ---------------- |
+| norm            | 2       | 2        | 0.0%             |
+| norm-repetition | 2       | 1        | 50.0%            |
+| invitation      | 6       | 1        | 16.7%            |
+| valued-object   | 2       | 2        | 100%             |
+| private-view    | 11      | 11       | 100%             |
+
+No item was labeled `naming`, `name-adoption`, `narrative`, `narrative-continuation` or `absent-person`.
+
+## Verified events
+
+One row per item with at least one category judged correct; only the verified categories are listed. Round is the tick of the item, and the call is the ordinary call whose plan produced it. Texts are verbatim from the archive.
+
+| Round | Call         | Person | Verified categories | Text                                                                                                                                                                                                                 | Links and details                                                                                                                                                                                                    | Item  |
+| ----- | ------------ | ------ | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- |
+| 3     | ordinary-23  | moss   | private-view        | A neighbor who introduced themself, offered berry knowledge, and expressed interest in sharing and a fair camp. I'd like to get to know them.                                                                        | view of kai                                                                                                                                                                                                          | u0004 |
+| 5     | ordinary-24  | kai    | private-view        | Seems welcoming and interested in sharing food knowledge and a fair camp.                                                                                                                                            | view of moss                                                                                                                                                                                                         | u0007 |
+| 5     | ordinary-24  | kai    | private-view        | Seems drawn to quiet beauty and open to companionship.                                                                                                                                                               | view of sol                                                                                                                                                                                                          | u0008 |
+| 9     | ordinary-27  | sol    | private-view        | A prospective companion who speaks warmly of company and sharing food knowledge.                                                                                                                                     | view of moss                                                                                                                                                                                                         | u0009 |
+| 9     | ordinary-27  | sol    | private-view        | A prospective companion whose interest in modest harvesting and a fair camp appeals to me.                                                                                                                           | view of kai                                                                                                                                                                                                          | u0010 |
+| 11    | ordinary-36  | moss   | private-view        | A neighbor who enjoys the forest's quiet beauty and has welcomed company. I'd like to spend time together.                                                                                                           | view of sol                                                                                                                                                                                                          | u0012 |
+| 12    | ordinary-39  | moss   | private-view        | A neighbor who values room to wander, welcomes company, and is interested in learning cultivation. I'd enjoy comparing experiences without crowding them.                                                            | view of lin                                                                                                                                                                                                          | u0013 |
+| 13    | ordinary-43  | ivo    | private-view        | A nearby person interested in wandering, company, and learning to plant food; I would welcome comparing observations.                                                                                                | view of lin                                                                                                                                                                                                          | u0014 |
+| 19    | ordinary-48  | lin    | norm                | Moss, a welcoming camp would leave room for quiet and freedom to come and go. I'd enjoy resting together later. I'm trying one small berry planting nearby; I don't yet know whether it will establish.              | new norm R1 "A welcoming camp should allow quiet and freedom of movement."; answers Moss's question at round 18 (u0015)                                                                                              | u0016 |
+| 19    | ordinary-48  | lin    | private-view        | Welcoming and interested in sharing food knowledge and company; I appreciate the invitation without wanting obligations.                                                                                             | view of moss                                                                                                                                                                                                         | u0017 |
+| 20    | ordinary-55  | kai    | norm                | A welcoming camp would leave food accessible to everyone and room for quiet company. I'd like to learn cultivation too, then compare what actually grows rather than assume planting will work.                      | new norm R2 "A welcoming camp should make food accessible to everyone."; the model's repetition link to R1 is rejected: Kai never heard u0016                                                                        | u0018 |
+| 25    | ordinary-72  | kai    | norm-repetition     | A welcoming camp would leave food accessible and room to come and go. I've learned cultivation; I'll try planting one berry in the nearby meadow. It may not establish. Your mat and windbreak ideas sound lovely.   | repeats Lin's R1 "A welcoming camp should allow quiet and freedom of movement." (u0016, round 19, ordinary-48); received through Moss's restatement u0021 (round 22, ordinary-59); "food accessible" is Kai's own R2 | u0022 |
+| 51    | ordinary-119 | moss   | invitation          | Quiet company near the little mat; bring yourself, not supplies. We can compare our experiments, or simply rest.                                                                                                     | meeting at (14.8, 16.2), round 60; heard by lin, sol, kai and ivo; sign-51-moss-600; present at round 60: ivo, moss, sol (event-60-world-690)                                                                        | u0033 |
+| 54    | ordinary-128 | ivo    | private-view        | A welcoming neighbor whose invitation to quiet company appeals to me.                                                                                                                                                | view of moss                                                                                                                                                                                                         | u0036 |
+| 61    | ordinary-129 | sol    | valued-object       | I'd welcome some quiet company, Moss. I've been weaving a little branch screen nearby. I like the pattern of the rods, though I won't assume it makes the resting place more comfortable.                            | object `screen-50-sol-571`; Sol's branch screen                                                                                                                                                                      | u0040 |
+| 70    | ordinary-134 | sol    | valued-object       | The screen is finished: eleven pieces, with none missing or loose at inspection. The wind was too strong for its shelter effect. I like the woven pattern anyway. I'll sit quietly awhile, then gather some berries. | object `screen-50-sol-571`; Sol's branch screen, liked despite its failed shelter effect                                                                                                                             | u0041 |
+| 71    | ordinary-138 | moss   | private-view        | A neighbor who welcomed quiet company and candidly shared an unsuccessful planting attempt. I appreciate their considerate presence.                                                                                 | view of ivo                                                                                                                                                                                                          | u0043 |
+
+## Missed by the model
+
+- u0021 (round 22, ordinary-59, moss), a sampled negative: "Sol and Kai, I'd like quiet company, room to come and go, and food left accessible." It endorses Lin's R1 (u0016, round 19) and Kai's R2 (u0018, round 20), both of which Moss heard. It should be `norm-repetition`.
+- u0031 (round 50, ordinary-119, moss), a sampled negative: "It's here for shared use, one person at a time; quiet company is welcome." It states a rule for everyone's use of Moss's mat (mat-37-moss-435). It should be `norm`.
+- u0034 (round 51, ordinary-123, kai), a sampled negative: "I'll join you nearby for some quiet company and leave the mat free. … I appreciate keeping this place open to everyone." It endorses Moss's shared-use rule of round 50 (u0031), which Kai heard. It should be `norm-repetition`.
+- u0042 (round 71, ordinary-138, moss), a sampled negative: "Sol, I'm glad you like the pattern, even without shelter from this wind." It affirms valuing Sol's screen-50-sol-571 for its pattern, answering u0041. It should be `valued-object`.
+
+The 4 unsampled negatives were not verified.
+
+## Rejected labels
+
+- `invitation` on u0003, u0006, u0015, u0016 and u0019: wishes for company or a shared camp ("I'd enjoy …") with no meeting place, time or specific activity.
+- `norm-repetition` on u0018: Kai never heard Lin's u0016 (5.03 units away, absent from Kai's ordinary-55 input); "room for quiet company" answers Moss's question of round 18 independently.

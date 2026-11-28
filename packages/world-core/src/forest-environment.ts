@@ -15,6 +15,12 @@ import { refugePhysiology } from './open-shelter-exposure.js';
 import { simpleShelterPhysiology } from './long-shelter-exposure.js';
 import { sharedShelterPhysiology } from './long-shared-shelter-exposure.js';
 import { branchScreenPhysiology } from './long-branch-screen-exposure.js';
+import { ventilatedRackDecay } from './long-ex24-ventilated-storage-physics.js';
+import { weatherShelterPhysiology } from './long-ex24-weather-shelter-physics.js';
+import {
+  smallFireBurn,
+  smallFireExposure,
+} from './long-ex21-small-combustion-physics.js';
 import { openConditions } from './open-physical.js';
 import { forestEvent, forestClimate, forestGrowth } from './forest-climate.js';
 export { forestEvent, forestClimate, forestGrowth } from './forest-climate.js';
@@ -286,16 +292,19 @@ export function forestEnvironment(world: V7World): void {
               .map((o) => Math.max(0.1, Number(o.data.preservation ?? 1))),
           )
         : 1;
+      const increment = rootAge(
+        world,
+        stack,
+        preservationAge(
+          stack,
+          Math.max(0.15, (temperature + 4) / 24) * preservation,
+        ),
+      );
+      // ex24 prepare-ventilated-food-storage@1: the increment is returned unchanged unless that
+      // revision is installed and this stack is the recorded lot on an intact rack.
       stack.decay =
         (stack.decay ?? 0) +
-        rootAge(
-          world,
-          stack,
-          preservationAge(
-            stack,
-            Math.max(0.15, (temperature + 4) / 24) * preservation,
-          ),
-        );
+        ventilatedRackDecay(world, stack, increment, temperature);
       if (stack.decay >= lifetime) {
         forestEvent(
           world,
@@ -338,21 +347,27 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
             v7Interior(actor.position, o.spatial),
         )
       : undefined;
+  // ex24 construct-weather-shelter@1: returns its input unchanged unless that revision is
+  // installed and the person is the admitted occupant of a shelter; it never stacks.
   const exposure = shelterTemperature(
     before.temperature,
-    branchScreenPhysiology(
+    weatherShelterPhysiology(
       world,
       actor,
-      sharedShelterPhysiology(
+      branchScreenPhysiology(
         world,
         actor,
-        simpleShelterPhysiology(
+        sharedShelterPhysiology(
           world,
           actor,
-          leanPhysiology(
+          simpleShelterPhysiology(
             world,
             actor,
-            refugePhysiology(world, actor, climate.temperature),
+            leanPhysiology(
+              world,
+              actor,
+              refugePhysiology(world, actor, climate.temperature),
+            ),
           ),
         ),
       ),
@@ -435,6 +450,12 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
       if (e) e.interface = 'tend-fire';
     },
   );
+  // ex21 small-combustion-source@1: heat from burning beds, only where that revision is installed.
+  actor.vitals.temperature = smallFireExposure(
+    world,
+    actor,
+    actor.vitals.temperature,
+  );
   const starvation = before.satiety <= 0 ? world.config.starvation : 0;
   const thermal =
     Math.max(0, 7 - actor.vitals.temperature, actor.vitals.temperature - 34) *
@@ -442,6 +463,7 @@ export function forestPhysiology(world: V7World, actor: V7Actor): void {
   actor.vitals.health = v7RoundNumber(
     Math.max(0, before.health - starvation - thermal),
   );
+  smallFireBurn(world, actor);
   actor.vitals.satiety = v7RoundNumber(
     Math.max(0, before.satiety - world.config.hunger * world.config.dt),
   );

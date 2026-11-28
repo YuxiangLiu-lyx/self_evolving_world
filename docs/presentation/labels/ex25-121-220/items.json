@@ -1,0 +1,484 @@
+{
+  "format": "self-evolving-world/culture-label-items",
+  "version": 1,
+  "archive": "experiment/ex25",
+  "range": { "from": 121, "through": 220 },
+  "people": [
+    { "id": "lin", "name": "Lin" },
+    { "id": "moss", "name": "Moss" },
+    { "id": "sol", "name": "Sol" },
+    { "id": "kai", "name": "Kai" },
+    { "id": "wren", "name": "Wren" },
+    { "id": "ivo", "name": "Ivo" },
+    { "id": "tova", "name": "Tova" },
+    { "id": "bram", "name": "Bram" }
+  ],
+  "context": [],
+  "items": [
+    {
+      "id": "u0001",
+      "tick": 121,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "ivo"],
+      "text": "I'd welcome a quiet tune too, Kai. My invented ending: the lantern learned that company could be a song, a story, or a silence shared. I'll look into how I might join softly, with no obligation for anyone."
+    },
+    {
+      "id": "u0002",
+      "tick": 122,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["lin", "moss", "bram"],
+      "text": "I like the lantern's empty seat. I'll gather a modest berry reserve to the east, then take a quiet pause. No story is needed from me just now."
+    },
+    {
+      "id": "u0003",
+      "tick": 124,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo"],
+      "text": "An invented continuation: the lantern listened to a quiet tune and forgot to ask whether it was useful. I like that kind of company. I'm comparing food inspections, not treating their appearance as proof of safety."
+    },
+    {
+      "id": "u0004",
+      "tick": 132,
+      "person": "sol",
+      "kind": "work",
+      "subject": "Placed branch (placed-loose-material) made by sol",
+      "change": "created",
+      "text": "Stage 2 of 2: moved item-128-sol-1488 out of your inventory through ordinary drop (0.5 energy) and laid it at (13.3, 9.4), angle 0 rad, as ground item item-132-sol-1552: one branch unit, a 0.991 x 0.04 m rod, origin canopy-74. Anyone may pick it up."
+    },
+    {
+      "id": "u0005",
+      "tick": 135,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["wren"],
+      "text": "The branch is finally laid east of me. I like its simple line against the forest floor. I'm going to learn a little quiet humming—not to make anything happen, just for the sound."
+    },
+    {
+      "id": "u0006",
+      "tick": 171,
+      "person": "tova",
+      "kind": "speech",
+      "heard": ["lin", "moss", "kai", "ivo", "bram"],
+      "text": "I've planted one apple at 15.3, 17.75. Covering it worked, but it hasn't established or produced food. I'll watch what actually happens before calling this a success."
+    },
+    {
+      "id": "u0007",
+      "tick": 173,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo", "tova", "bram"],
+      "text": "My hazelnut plot has no visible sprout or food after 122 rounds. The observation window ended inconclusively, not as proof of failure. I'm going to examine the meadow roots; I don't yet know whether they're safe food."
+    },
+    {
+      "id": "u0008",
+      "tick": 173,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "ivo", "tova", "bram"],
+      "text": "I've enjoyed hearing your tunes. Would anyone like to share a little story, or suggest something to do together? Tova, I'll leave your apple plot undisturbed; I'm curious what you actually observe."
+    },
+    {
+      "id": "u0009",
+      "tick": 177,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "tova"],
+      "text": "Moss, here's a tiny invented story: a traveler carried a lantern at noon. Asked why, they said, 'For whoever walks home after me.' I'd enjoy trading little stories. I'll gather some berries nearby first."
+    },
+    {
+      "id": "u0010",
+      "tick": 178,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "ivo", "tova", "bram"],
+      "text": "Kai, I like that lantern story. Here's an invented sequel: someone left a cup beside it. 'For the traveler?' 'For whoever stops to listen.' I'd enjoy more stories while we sit together."
+    },
+    {
+      "id": "u0011",
+      "tick": 178,
+      "person": "moss",
+      "kind": "view",
+      "about": "kai",
+      "text": "A welcoming neighbor who enjoys trading little stories. Their lantern tale makes leaving something for others feel inviting to me."
+    },
+    {
+      "id": "u0012",
+      "tick": 181,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "ivo", "bram"],
+      "text": "An invented sequel: the traveler set down a map beside the lantern. It showed no roads, only places where someone had listened. I'll rest here a while. Has anyone actually eaten meadow roots and observed the result?"
+    },
+    {
+      "id": "u0013",
+      "tick": 184,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "tova"],
+      "text": "Moss, I like that sequel. The traveler sat beside the cup and asked, 'What shall we put in it?' 'For now,' said the keeper, 'a little time.' I'm going to inspect my stored roots; I still don't know whether they're edible."
+    },
+    {
+      "id": "u0014",
+      "tick": 184,
+      "person": "kai",
+      "kind": "view",
+      "about": "moss",
+      "text": "I enjoy Moss's gentle invented stories and would like to keep exchanging them without making company an obligation."
+    },
+    {
+      "id": "u0015",
+      "tick": 186,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "ivo", "bram"],
+      "text": "An invented sequel: the traveler left a map beside the lantern. It showed no roads, only places where someone had listened. 'How do I follow it?' 'You don't have to,' said the keeper."
+    },
+    {
+      "id": "u0016",
+      "tick": 186,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "tova"],
+      "text": "The roots show no visible spoilage, but that doesn't establish safety, and brushing them won't make them safe. I'll leave them uneaten. I'm also interested in finding actual shade as the weather warms."
+    },
+    {
+      "id": "u0017",
+      "tick": 189,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "tova"],
+      "text": "Moss, an invented sequel: the traveler left a second cup, so the listener could rest too. I'm going to inspect the tree north of here for actual shade; I don't yet know whether it offers protection."
+    },
+    {
+      "id": "u0018",
+      "tick": 190,
+      "person": "bram",
+      "kind": "speech",
+      "heard": ["lin", "moss", "ivo", "tova"],
+      "text": "An invented sequel: beside the lantern, the traveler found a bench. 'Where does this road lead?' 'For now,' said the keeper, 'to somewhere you can sit.' I like your stories, and I'm glad to listen."
+    },
+    {
+      "id": "u0019",
+      "tick": 191,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "ivo", "tova", "bram"],
+      "text": "Kai, I like the second cup. I'll inspect the nearby tree at (14.4,17.2) for possible shade while you check north. We can compare what we actually find; I don't yet know whether either offers protection."
+    },
+    {
+      "id": "u0020",
+      "tick": 193,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["moss", "ivo", "tova", "bram"],
+      "text": "Moss, our paths crossed and neither move succeeded. I'll detour east before going north, leaving your route clear. I still haven't verified any shade."
+    },
+    {
+      "id": "u0021",
+      "tick": 194,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo", "bram"],
+      "text": "Bram, I saw you eat a hazelnut and gain satiety. Have you personally observed any harm or necessary preparation? My pressure test and visual inspection did not establish safety."
+    },
+    {
+      "id": "u0022",
+      "tick": 196,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "tova", "bram"],
+      "text": "Kai, the tree inspection showed branches and ground conditions, but did not establish shade. I'm resting and investigating actual heat protection. Bram, I liked your bench story: company needn't mean another journey."
+    },
+    {
+      "id": "u0023",
+      "tick": 196,
+      "person": "moss",
+      "kind": "view",
+      "about": "bram",
+      "text": "A neighbor whose imagined bench beside the lantern feels welcoming to me. I enjoy the idea that we can simply sit together."
+    },
+    {
+      "id": "u0024",
+      "tick": 199,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo", "bram"],
+      "text": "Ivo, I saw you eat meadow roots and gain satiety. Have you noticed any harm or needed preparation? I have two untreated roots, but looking at them did not establish safety. I've just learned a method for testing mechanical food separation."
+    },
+    {
+      "id": "u0025",
+      "tick": 201,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["lin", "kai", "bram"],
+      "text": "Lin, I ate two untreated meadow roots at tick 197 and gained 28 satiety. My recorded root knowledge says nutrition 14, toxicity 0; my health is still 100. I haven't tested preparation methods."
+    },
+    {
+      "id": "u0026",
+      "tick": 201,
+      "person": "bram",
+      "kind": "speech",
+      "heard": ["lin", "moss", "ivo"],
+      "text": "Lin, my retained hazelnut finding is nutrition 18 and toxicity 0, observed at round 188. I have eaten them without observed health loss; I did not establish any need for preparation. That finding is about hazelnuts, not other foods."
+    },
+    {
+      "id": "u0027",
+      "tick": 202,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo", "bram"],
+      "text": "Thank you, Ivo and Bram. Those are useful eating observations, distinct from shell-opening tests. I'll try one of my meadow roots and compare my own result; I won't assume that handling food makes it safer."
+    },
+    {
+      "id": "u0028",
+      "tick": 203,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["wren"],
+      "text": "Food variety and a woodland melody. Hello Wren. I've been living on safe berries and would enjoy more variety. Have you found any other foods safe to eat, or a preparation worth testing together? I'll hum a little woodland phrase here, if you'd like to listen."
+    },
+    {
+      "id": "u0029",
+      "tick": 203,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "ivo"],
+      "text": "Moss, thank you. I'll stop the tree detour: your inspection didn't establish shade. I'm recovering here and learning to measure local heat exposure before choosing another place."
+    },
+    {
+      "id": "u0030",
+      "tick": 204,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "kai", "ivo", "bram"],
+      "text": "My root trial gave 14 satiety; my health is still 100. That agrees with Ivo's report for this food. I'm staying nearby for a quiet tune and some rest—company is welcome, with no task attached."
+    },
+    {
+      "id": "u0031",
+      "tick": 204,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "bram"],
+      "text": "My heat inspection predicts cooling here, but I am measuring the actual trend. Trees provide no modeled shade; cooler ground candidates are predictions, not measurements. I'd enjoy quiet company while we keep ourselves fed."
+    },
+    {
+      "id": "u0032",
+      "tick": 205,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["sol"],
+      "text": "Food observations and a hazelnut trial. I've repeatedly eaten meadow roots: my recorded meals provided nutrition, with zero toxicity in the recorded eating observation. That is evidence for those roots, not every unknown food. Dry-brushing berries did not establish safety, and my heat assessment found no represented food-heating source. I'm gathering one hazelnut to inspect and test shell opening, not yet recommending it as food. I'd enjoy comparing findings."
+    },
+    {
+      "id": "u0033",
+      "tick": 210,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "kai", "wren", "ivo", "bram"],
+      "text": "The berry approach was blocked, so I'm trying the nearby roots instead. Lin, I'd enjoy your quiet tune. Here is a little answering hum; no task or reply needed."
+    }
+  ],
+  "mapping": {
+    "u0001": {
+      "tick": 121,
+      "actor": "moss",
+      "callId": "ordinary-4",
+      "eventId": "event-121-moss-1375"
+    },
+    "u0002": {
+      "tick": 122,
+      "actor": "ivo",
+      "callId": "ordinary-15",
+      "eventId": "event-122-ivo-1394"
+    },
+    "u0003": {
+      "tick": 124,
+      "actor": "lin",
+      "callId": "ordinary-1",
+      "eventId": "event-124-lin-1432"
+    },
+    "u0004": {
+      "tick": 132,
+      "actor": "sol",
+      "callId": "ordinary-54",
+      "eventId": "event-132-sol-1555"
+    },
+    "u0005": {
+      "tick": 135,
+      "actor": "sol",
+      "callId": "ordinary-60",
+      "eventId": "event-135-sol-1601"
+    },
+    "u0006": {
+      "tick": 171,
+      "actor": "tova",
+      "callId": "ordinary-99",
+      "eventId": "event-171-tova-2148"
+    },
+    "u0007": {
+      "tick": 173,
+      "actor": "lin",
+      "callId": "ordinary-102",
+      "eventId": "event-173-lin-2189"
+    },
+    "u0008": {
+      "tick": 173,
+      "actor": "moss",
+      "callId": "ordinary-105",
+      "eventId": "event-173-moss-2189"
+    },
+    "u0009": {
+      "tick": 177,
+      "actor": "kai",
+      "callId": "ordinary-114",
+      "eventId": "event-177-kai-2259"
+    },
+    "u0010": {
+      "tick": 178,
+      "actor": "moss",
+      "callId": "ordinary-117",
+      "eventId": "event-178-moss-2291"
+    },
+    "u0011": {
+      "tick": 178,
+      "actor": "moss",
+      "callId": "ordinary-117",
+      "eventId": null
+    },
+    "u0012": {
+      "tick": 181,
+      "actor": "lin",
+      "callId": "ordinary-121",
+      "eventId": "event-181-lin-2371"
+    },
+    "u0013": {
+      "tick": 184,
+      "actor": "kai",
+      "callId": "ordinary-123",
+      "eventId": "event-184-kai-2419"
+    },
+    "u0014": {
+      "tick": 184,
+      "actor": "kai",
+      "callId": "ordinary-123",
+      "eventId": null
+    },
+    "u0015": {
+      "tick": 186,
+      "actor": "lin",
+      "callId": "ordinary-128",
+      "eventId": "event-186-lin-2454"
+    },
+    "u0016": {
+      "tick": 186,
+      "actor": "kai",
+      "callId": "ordinary-131",
+      "eventId": "event-186-kai-2454"
+    },
+    "u0017": {
+      "tick": 189,
+      "actor": "kai",
+      "callId": "ordinary-140",
+      "eventId": "event-189-kai-2512"
+    },
+    "u0018": {
+      "tick": 190,
+      "actor": "bram",
+      "callId": "ordinary-143",
+      "eventId": "event-190-bram-2531"
+    },
+    "u0019": {
+      "tick": 191,
+      "actor": "moss",
+      "callId": "ordinary-146",
+      "eventId": "event-191-moss-2546"
+    },
+    "u0020": {
+      "tick": 193,
+      "actor": "kai",
+      "callId": "ordinary-155",
+      "eventId": "event-193-kai-2590"
+    },
+    "u0021": {
+      "tick": 194,
+      "actor": "lin",
+      "callId": "ordinary-137",
+      "eventId": "event-194-lin-2613"
+    },
+    "u0022": {
+      "tick": 196,
+      "actor": "moss",
+      "callId": "ordinary-167",
+      "eventId": "event-196-moss-2649"
+    },
+    "u0023": {
+      "tick": 196,
+      "actor": "moss",
+      "callId": "ordinary-167",
+      "eventId": null
+    },
+    "u0024": {
+      "tick": 199,
+      "actor": "lin",
+      "callId": "ordinary-168",
+      "eventId": "event-199-lin-2689"
+    },
+    "u0025": {
+      "tick": 201,
+      "actor": "ivo",
+      "callId": "ordinary-188",
+      "eventId": "event-201-ivo-2728"
+    },
+    "u0026": {
+      "tick": 201,
+      "actor": "bram",
+      "callId": "ordinary-195",
+      "eventId": "event-201-bram-2728"
+    },
+    "u0027": {
+      "tick": 202,
+      "actor": "lin",
+      "callId": "ordinary-196",
+      "eventId": "event-202-lin-2745"
+    },
+    "u0028": {
+      "tick": 203,
+      "actor": "sol",
+      "callId": "ordinary-183",
+      "eventId": "event-203-sol-2762"
+    },
+    "u0029": {
+      "tick": 203,
+      "actor": "kai",
+      "callId": "ordinary-186",
+      "eventId": "event-203-kai-2762"
+    },
+    "u0030": {
+      "tick": 204,
+      "actor": "lin",
+      "callId": "ordinary-201",
+      "eventId": "event-204-lin-2778"
+    },
+    "u0031": {
+      "tick": 204,
+      "actor": "moss",
+      "callId": "ordinary-180",
+      "eventId": "event-204-moss-2778"
+    },
+    "u0032": {
+      "tick": 205,
+      "actor": "wren",
+      "callId": "ordinary-204",
+      "eventId": "event-205-wren-2799"
+    },
+    "u0033": {
+      "tick": 210,
+      "actor": "moss",
+      "callId": "ordinary-207",
+      "eventId": "event-210-moss-2874"
+    }
+  }
+}

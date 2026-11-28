@@ -1,8 +1,12 @@
 import {
   initialLongWorld,
+  LONG_IMPORT_SCENARIO,
   longScenario,
 } from '../apps/simulator/src/long-scenario.js';
+import { longImportConfig } from '../apps/simulator/src/long-import.js';
+import type { LongImportSource } from '../apps/simulator/src/long-import.js';
 import { longTokenBudget } from '../apps/simulator/src/long-tokens.js';
+import { readLongAllocation } from './long-allocation.js';
 import { collectiveSettle } from '@self-evolving-world/world-core';
 import { initialCollectiveWorld } from '../apps/simulator/src/collective-scenario.js';
 import { countedDevelopments } from '../apps/simulator/src/collective-controller.js';
@@ -93,6 +97,24 @@ export interface V7ReplayIndex {
 export function continuousWorking(root: string, id: string): string {
   return resolve(root, 'validation-results/continuous', id);
 }
+/** The import source an imported archive records in its manifest (`importedFrom`). */
+export function importSource(root: string, id: string): LongImportSource {
+  const source = continuousRead<{ importedFrom?: Record<string, unknown> }>(
+    resolve(root, 'experiment', id, 'manifest.json'),
+  ).importedFrom;
+  if (
+    typeof source?.experiment !== 'string' ||
+    typeof source.scope !== 'string' ||
+    typeof source.round !== 'number' ||
+    !Number.isSafeInteger(source.round)
+  )
+    throw new Error('An imported archive must record its import source.');
+  return {
+    experiment: source.experiment,
+    scope: source.scope,
+    round: source.round,
+  };
+}
 export function readContinuousExecution(root: string, id: string): V7Execution {
   const path = resolve(root, 'experiment', id, 'execution.json');
   let state = continuousRead<V7Execution>(path);
@@ -107,29 +129,33 @@ export function readContinuousExecution(root: string, id: string): V7Execution {
     !Array.isArray(state.developments) ||
     v7Signature(state.world.config) !==
       v7Signature(
-        state.world.config.longDevelopment
-          ? initialLongWorld(
-              `long-${id}`,
-              longScenario(state.world.config.longDevelopment),
-            ).config
-          : state.world.config.collective
-            ? initialCollectiveWorld(
-                `collective-${id}`,
-                state.world.config.collective.arm,
+        state.world.config.longDevelopment?.scenario === LONG_IMPORT_SCENARIO
+          ? longImportConfig(`long-${id}`, importSource(root, id))
+          : state.world.config.longDevelopment
+            ? initialLongWorld(
+                `long-${id}`,
+                longScenario(state.world.config.longDevelopment),
+                // A culture run's genesis allocation is recorded in its manifest.
+                readLongAllocation(root, id),
               ).config
-            : state.world.config.development
-              ? {
-                  ...OPEN_CONFIG,
-                  development: {
-                    ...OPEN_CONFIG.development,
-                    scope: `open-${id}`,
-                  },
-                }
-              : state.world.config.experience
-                ? FOREST_EXPERIENCE_CONFIG
-                : state.world.config.forest
-                  ? FOREST_CONFIG
-                  : V7_CONFIG,
+            : state.world.config.collective
+              ? initialCollectiveWorld(
+                  `collective-${id}`,
+                  state.world.config.collective.arm,
+                ).config
+              : state.world.config.development
+                ? {
+                    ...OPEN_CONFIG,
+                    development: {
+                      ...OPEN_CONFIG.development,
+                      scope: `open-${id}`,
+                    },
+                  }
+                : state.world.config.experience
+                  ? FOREST_EXPERIENCE_CONFIG
+                  : state.world.config.forest
+                    ? FOREST_CONFIG
+                    : V7_CONFIG,
       )
   )
     throw new Error(
@@ -467,7 +493,8 @@ export function buildContinuousReplay(
   let start = initial;
   let initialCursors: Record<string, V7Cursor> = {};
   // Segment size is a storage/cache choice, not a world or observation-window limit.
-  for (let first = 1; first <= state.world.tick; first += 100) {
+  // An imported run starts at the tick of its imported genesis; every other run at 0.
+  for (let first = initial.tick + 1; first <= state.world.tick; first += 100) {
     const rounds: V7StoredRound[] = [];
     let last = start;
     for (
@@ -532,17 +559,17 @@ export function buildContinuousReplay(
     initialCursors = rounds.at(-1)?.tasks ?? {};
   }
   if (!index.segments.length) {
-    const path = 'replay/part-000000.json';
+    const path = `replay/part-${String(initial.tick).padStart(6, '0')}.json`;
     immutable(resolve(directory, path), {
       version: 7,
-      start: 0,
+      start: initial.tick,
       initial,
       rounds: [],
     });
     index.segments.push({
       path,
-      start: 0,
-      end: 0,
+      start: initial.tick,
+      end: initial.tick,
       sha256: createHash('sha256')
         .update(readFileSync(resolve(directory, path)))
         .digest('hex'),

@@ -63,4 +63,5 @@ For a material change to an accepted decision, create a new ADR and mark the old
 - [0028](0028-culture-scenario.md): opt-in culture scenario with separately switchable voice, differentiation, symbols, slack, density and derived-evidence incentives, plus a frozen early token ceiling.
 
 - [0029](0029-culture-v2.md): culture v2 run version with lossless context compaction, an open-goal prompt, uncounted rejection and empty handoffs, and a developed-interface size limit.
+- [0030](0030-checkpoint-import.md): import a retained checkpoint as a new genesis, with inherited development scopes and newcomers.
 - [0031](0031-villages.md): two villages on a wide map with a separation proof, herd groups, a first-window setting and a larger computation budget for this tag.

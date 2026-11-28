@@ -39,13 +39,16 @@ import type { SceneFrame } from './continuous-scene.js';
 import { CONTINUOUS_VISUALS } from './continuous-visuals.js';
 import { COLLECTIVE_COLORS } from './collective-view.js';
 
-/** Body colors of the long-run people; the culture scenario's three newcomers get their own. */
+/** Body colors of the long-run people; the culture scenario's three newcomers get their own,
+ * and so do the two newcomers of an imported run. */
 const PERSON_COLORS: Record<string, string> = {
   lin: '#c5aa73',
   moss: '#83a99e',
   kai: '#9fa3c9',
   wren: '#c99a6b',
   ivo: '#8fb98a',
+  tova: '#d1c26b',
+  bram: '#7ea7c4',
 };
 const visualCache = new Map<string, HTMLImageElement>();
 function packageVisual(c: CanvasRenderingContext2D, o: V7Object): boolean {
@@ -305,7 +308,15 @@ function object(
   if (o.kind === 'canopy-post') ellipse(c, 0.03, 0.03, 0.12, 0.06, '#1b302b40');
   else if (o.visual.component === 'sign')
     ellipse(c, 0.02, 0.16, 0.12, 0.05, '#1b302b40');
-  else if (!['rain-canopy', 'rain-canopy-work'].includes(o.kind))
+  // A mark applied flat to the ground, or a groove in it, casts no shadow.
+  else if (
+    ![
+      'rain-canopy',
+      'rain-canopy-work',
+      'applied-mark',
+      'groove-drawing',
+    ].includes(o.kind)
+  )
     ellipse(c, 0.13, 0.12, 0.58, 0.22, '#1b302b40');
   if (packageVisual(c, o)) {
     c.restore();

@@ -127,6 +127,9 @@ const GENESIS_AT_0190CB5: Record<string, string> = {
     '8eb3b2e717dd440f8846c9d2aee04f7a41ffa0289910d75a5c36a4295f37c517',
   'long-culture-v2-incentives':
     'be7f8458e22876ed578d94ade6f14ada6ace6c0cdb96ca568c518dc357dff7a6',
+  // Added on main by experiment B (PR #38); this hash was computed on main 227c272, without villages.
+  'long-culture-v2-oldgoal':
+    'c804493b003ecd71811f4ca029d495281131e3b84e667e9362c16e60f0b2a7b2',
   'long-culture-v3':
     '35642c140b1a061d835b9358c9cb0da47778fe1c450ef6a8dc9c385b376274bf',
   'long-culture-v3-incentives':

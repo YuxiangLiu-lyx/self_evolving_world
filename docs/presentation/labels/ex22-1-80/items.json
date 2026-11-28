@@ -1,0 +1,590 @@
+{
+  "format": "self-evolving-world/culture-label-items",
+  "version": 1,
+  "archive": "experiment/ex22",
+  "range": { "from": 1, "through": 80 },
+  "people": [
+    { "id": "lin", "name": "Lin" },
+    { "id": "moss", "name": "Moss" },
+    { "id": "sol", "name": "Sol" },
+    { "id": "kai", "name": "Kai" },
+    { "id": "wren", "name": "Wren" },
+    { "id": "ivo", "name": "Ivo" }
+  ],
+  "context": [],
+  "items": [
+    {
+      "id": "u0001",
+      "tick": 1,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "wren", "ivo"],
+      "text": "I'm Lin. I'll gather some berries and leave some on the bush. I'd welcome company or tested advice about other foods; I want room to explore without taking needless risks."
+    },
+    {
+      "id": "u0002",
+      "tick": 1,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "I'm Moss. I'm spending some time by the meadow roots just south of here, gathering food and resting. Company is welcome; I'd enjoy hearing what you hope to do here."
+    },
+    {
+      "id": "u0003",
+      "tick": 1,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "Hello, I'm Kai. I know these red berries are safe food. I'll take a modest share and leave plenty. I'd enjoy comparing observations and hearing what each of you hopes to do here."
+    },
+    {
+      "id": "u0004",
+      "tick": 3,
+      "person": "moss",
+      "kind": "view",
+      "about": "lin",
+      "text": "An inviting potential companion who wants exploration without needless risk."
+    },
+    {
+      "id": "u0005",
+      "tick": 3,
+      "person": "moss",
+      "kind": "view",
+      "about": "kai",
+      "text": "A welcoming potential companion interested in comparing observations."
+    },
+    {
+      "id": "u0006",
+      "tick": 8,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "Lin, Kai, everyone: I know meadow roots are safe food too. I'm gathering a modest reserve here and leaving the rest. I'd enjoy company while resting—what would you like to explore or make together?"
+    },
+    {
+      "id": "u0007",
+      "tick": 9,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "ivo"],
+      "text": "Moss, I'd enjoy comparing food discoveries. I'll examine the meadow roots nearby; I saw Ivo eat one successfully. I'm also looking for a practical way to prepare hazelnuts, without assuming they're ready to eat."
+    },
+    {
+      "id": "u0008",
+      "tick": 9,
+      "person": "sol",
+      "kind": "name",
+      "sign": "name",
+      "subject": "Red berries",
+      "text": "The Red Thread"
+    },
+    {
+      "id": "u0009",
+      "tick": 9,
+      "person": "lin",
+      "kind": "view",
+      "about": "moss",
+      "text": "Welcoming company and a promising partner for comparing practical food discoveries."
+    },
+    {
+      "id": "u0010",
+      "tick": 12,
+      "person": "sol",
+      "kind": "work",
+      "subject": "Finger grooves in soil (groove-drawing) made by sol",
+      "change": "created",
+      "text": "The test groove stayed in the forest floor: 0.01 deep, contrast 0.0987. The patch is suitable for finger drawing; durability untested."
+    },
+    {
+      "id": "u0011",
+      "tick": 13,
+      "person": "sol",
+      "kind": "work",
+      "subject": "Finger grooves in soil (groove-drawing) made by sol",
+      "change": "status active",
+      "text": "Stroke 1 of 5 traced with a finger: 0.2009 long, contrast 0.0987."
+    },
+    {
+      "id": "u0012",
+      "tick": 14,
+      "person": "sol",
+      "kind": "work",
+      "subject": "Finger grooves in soil (groove-drawing) made by sol",
+      "change": "completed",
+      "text": "5 finger stroke(s) were made in the forest floor while looking at Red berries. This records the strokes made, not how well they show it. Durability untested."
+    },
+    {
+      "id": "u0013",
+      "tick": 17,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss", "kai", "wren", "ivo"],
+      "text": "I made a tiny drawing of the berry plant in the soil at (13.4,16.4): five visible finger grooves, no pigment. I call the plant The Red Thread. I'm coming toward the meadow roots; I'd enjoy company and comparing what we notice."
+    },
+    {
+      "id": "u0014",
+      "tick": 19,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "The first berry bush was nearly empty, so I moved to a fuller patch. I'm keeping a small food reserve. I'd enjoy company and comparing practical observations—what would you like to explore or make here?"
+    },
+    {
+      "id": "u0015",
+      "tick": 21,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "Sol, I like the idea of your Red Thread drawing. I'll try learning to draw this fuller berry bush in the soil beside me. I'd enjoy comparing our pictures and what we notice, if you'd like."
+    },
+    {
+      "id": "u0016",
+      "tick": 24,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "wren", "ivo"],
+      "text": "I've now eaten both berries and meadow roots: both fed me without observed harm; one root restored 14 satiety. I have a small root reserve. Sol and Kai, your drawings interest me—I'd like to try drawing the roots here."
+    },
+    {
+      "id": "u0017",
+      "tick": 24,
+      "person": "kai",
+      "kind": "work",
+      "subject": "Finger grooves in soil (groove-drawing) made by kai",
+      "change": "created",
+      "text": "The test groove stayed in the forest floor: 0.01 deep, contrast 0.0987. The patch is suitable for finger drawing; durability untested."
+    },
+    {
+      "id": "u0018",
+      "tick": 25,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss", "kai", "wren", "ivo"],
+      "text": "Kai and Lin, I'd enjoy comparing our drawings. I'll look at Kai's grooves and try a small study of the meadow roots beside me. Mine needn't be a good likeness yet; I like noticing what a few lines can hold."
+    },
+    {
+      "id": "u0019",
+      "tick": 25,
+      "person": "kai",
+      "kind": "work",
+      "subject": "Finger grooves in soil (groove-drawing) made by kai",
+      "change": "status active",
+      "text": "Stroke 1 of 5 traced with a finger: 0.222 long, contrast 0.0987."
+    },
+    {
+      "id": "u0020",
+      "tick": 25,
+      "person": "sol",
+      "kind": "view",
+      "about": "kai",
+      "text": "A nearby fellow experimenter whose interest in comparing drawings makes me feel welcome."
+    },
+    {
+      "id": "u0021",
+      "tick": 25,
+      "person": "sol",
+      "kind": "view",
+      "about": "lin",
+      "text": "An inviting companion for looking closely at plants and trying small drawings."
+    },
+    {
+      "id": "u0022",
+      "tick": 26,
+      "person": "kai",
+      "kind": "work",
+      "subject": "Finger grooves in soil (groove-drawing) made by kai",
+      "change": "completed",
+      "text": "5 finger stroke(s) were made in the forest floor while looking at Red berries. This records the strokes made, not how well they show it. Durability untested."
+    },
+    {
+      "id": "u0023",
+      "tick": 27,
+      "person": "sol",
+      "kind": "work",
+      "subject": "Finger grooves in soil (groove-drawing) made by sol",
+      "change": "created",
+      "text": "The test groove stayed in the forest floor: 0.01 deep, contrast 0.0987. The patch is suitable for finger drawing; durability untested."
+    },
+    {
+      "id": "u0024",
+      "tick": 27,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "Sol, would you like to compare pictures beside this berry bush? I'm interested in which details each of us notices, not in making them look alike. Company while we eat and rest would be welcome too."
+    },
+    {
+      "id": "u0025",
+      "tick": 29,
+      "person": "lin",
+      "kind": "work",
+      "subject": "Finger grooves in soil (groove-drawing) made by lin",
+      "change": "created",
+      "text": "The test groove stayed in the meadow ground: 0.01 deep, contrast 0.1387. The patch is suitable for finger drawing; durability untested."
+    },
+    {
+      "id": "u0026",
+      "tick": 30,
+      "person": "lin",
+      "kind": "work",
+      "subject": "Finger grooves in soil (groove-drawing) made by lin",
+      "change": "status active",
+      "text": "Stroke 1 of 4 traced with a finger: 0.0772 long, contrast 0.1387."
+    },
+    {
+      "id": "u0027",
+      "tick": 31,
+      "person": "lin",
+      "kind": "work",
+      "subject": "Finger grooves in soil (groove-drawing) made by lin",
+      "change": "completed",
+      "text": "4 finger stroke(s) were made in the meadow ground while looking at Meadow roots. This records the strokes made, not how well they show it. Durability untested."
+    },
+    {
+      "id": "u0028",
+      "tick": 32,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "ivo"],
+      "text": "I'm trying a tiny root study in the meadow soil at (17.8,16.65). The test groove stayed visible. I'd enjoy comparing which details we notice, and resting together afterward."
+    },
+    {
+      "id": "u0029",
+      "tick": 33,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "ivo"],
+      "text": "My five berry-bush grooves are finished at (12.7,18.05). Sol and Lin, I'd enjoy comparing what we noticed. After a rest I'm heading to the roots nearby to try them; company is welcome."
+    },
+    {
+      "id": "u0030",
+      "tick": 35,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "ivo"],
+      "text": "My root study has four visible branching strokes. Sol and Kai, your berry drawings both use five strokes, with closed shapes beside the stem. I like that contrast with my open branches. I'll come nearer to compare and rest."
+    },
+    {
+      "id": "u0031",
+      "tick": 35,
+      "person": "moss",
+      "kind": "view",
+      "about": "sol",
+      "text": "A nearby companion whose interest in drawing makes me want to join in."
+    },
+    {
+      "id": "u0032",
+      "tick": 35,
+      "person": "moss",
+      "kind": "view",
+      "about": "kai",
+      "text": "A welcoming potential companion; I like the branching lines and loops in their berry study."
+    },
+    {
+      "id": "u0033",
+      "tick": 36,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "Kai, I like the branching lines and little loops in your berry drawing. I'd enjoy comparing it with a root study of my own. I'll try learning here beside Sol, then we can share what catches our eyes."
+    },
+    {
+      "id": "u0034",
+      "tick": 39,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "kai", "ivo"],
+      "text": "I've learned the drawing method, but it's too dark to try the grooves now. I'll rest here with you. What drew each of you to your subject? I like the idea of our different pictures becoming a shared little collection."
+    },
+    {
+      "id": "u0035",
+      "tick": 40,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "ivo"],
+      "text": "I see different ways of arranging leaves and berries in your grooves. What detail mattered most to each of you? Mine began with the branching shape. I'm happy to eat and sit together without needing another task."
+    },
+    {
+      "id": "u0036",
+      "tick": 41,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "ivo"],
+      "text": "The little loops beside the branching stem caught my interest. I like how a few lines can suggest berries. It's too dark for my next drawing now; I'd enjoy simply resting here together, with no task to finish."
+    },
+    {
+      "id": "u0037",
+      "tick": 50,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss", "kai", "ivo"],
+      "text": "The little closed shapes beside the branches drew me in. My root study is still only a test groove—the darkness stopped me. I'll leave it until I can see, and enjoy resting here with you."
+    },
+    {
+      "id": "u0038",
+      "tick": 59,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "kai"],
+      "text": "I'd enjoy sitting nearby. I've heard you describing branches and little loops; I haven't studied the drawings myself yet. I'll learn the method while it's dark, then perhaps try a root study when there's enough light."
+    },
+    {
+      "id": "u0039",
+      "tick": 62,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "ivo"],
+      "text": "Welcome, Ivo. I enjoyed the little loops and branching lines in the berry studies. I'm staying here through the dark; when we can see again, I'd like to look at everyone's drawings together."
+    },
+    {
+      "id": "u0040",
+      "tick": 80,
+      "person": "moss",
+      "kind": "view",
+      "about": "ivo",
+      "text": "A welcome companion who wants to sit with us and try a root study when the light allows."
+    }
+  ],
+  "mapping": {
+    "u0001": {
+      "tick": 1,
+      "actor": "lin",
+      "callId": "ordinary-3",
+      "eventId": "event-1-lin-4"
+    },
+    "u0002": {
+      "tick": 1,
+      "actor": "moss",
+      "callId": "ordinary-6",
+      "eventId": "event-1-moss-4"
+    },
+    "u0003": {
+      "tick": 1,
+      "actor": "kai",
+      "callId": "ordinary-12",
+      "eventId": "event-1-kai-4"
+    },
+    "u0004": {
+      "tick": 3,
+      "actor": "moss",
+      "callId": "ordinary-21",
+      "eventId": null
+    },
+    "u0005": {
+      "tick": 3,
+      "actor": "moss",
+      "callId": "ordinary-21",
+      "eventId": null
+    },
+    "u0006": {
+      "tick": 8,
+      "actor": "moss",
+      "callId": "ordinary-21",
+      "eventId": "event-8-moss-88"
+    },
+    "u0007": {
+      "tick": 9,
+      "actor": "lin",
+      "callId": "ordinary-30",
+      "eventId": "event-9-lin-101"
+    },
+    "u0008": {
+      "tick": 9,
+      "actor": "sol",
+      "callId": "ordinary-9",
+      "eventId": "event-9-sol-102"
+    },
+    "u0009": {
+      "tick": 9,
+      "actor": "lin",
+      "callId": "ordinary-30",
+      "eventId": null
+    },
+    "u0010": {
+      "tick": 12,
+      "actor": "sol",
+      "callId": "ordinary-36",
+      "eventId": "event-12-sol-143"
+    },
+    "u0011": {
+      "tick": 13,
+      "actor": "sol",
+      "callId": "ordinary-41",
+      "eventId": "event-13-sol-157"
+    },
+    "u0012": {
+      "tick": 14,
+      "actor": "sol",
+      "callId": "ordinary-41",
+      "eventId": "event-14-sol-171"
+    },
+    "u0013": {
+      "tick": 17,
+      "actor": "sol",
+      "callId": "ordinary-44",
+      "eventId": "event-17-sol-192"
+    },
+    "u0014": {
+      "tick": 19,
+      "actor": "kai",
+      "callId": "ordinary-27",
+      "eventId": "event-19-kai-220"
+    },
+    "u0015": {
+      "tick": 21,
+      "actor": "kai",
+      "callId": "ordinary-50",
+      "eventId": "event-21-kai-252"
+    },
+    "u0016": {
+      "tick": 24,
+      "actor": "lin",
+      "callId": "ordinary-55",
+      "eventId": "event-24-lin-292"
+    },
+    "u0017": {
+      "tick": 24,
+      "actor": "kai",
+      "callId": "ordinary-56",
+      "eventId": "event-24-kai-297"
+    },
+    "u0018": {
+      "tick": 25,
+      "actor": "sol",
+      "callId": "ordinary-59",
+      "eventId": "event-25-sol-309"
+    },
+    "u0019": {
+      "tick": 25,
+      "actor": "kai",
+      "callId": "ordinary-56",
+      "eventId": "event-25-kai-310"
+    },
+    "u0020": {
+      "tick": 25,
+      "actor": "sol",
+      "callId": "ordinary-59",
+      "eventId": null
+    },
+    "u0021": {
+      "tick": 25,
+      "actor": "sol",
+      "callId": "ordinary-59",
+      "eventId": null
+    },
+    "u0022": {
+      "tick": 26,
+      "actor": "kai",
+      "callId": "ordinary-56",
+      "eventId": "event-26-kai-329"
+    },
+    "u0023": {
+      "tick": 27,
+      "actor": "sol",
+      "callId": "ordinary-61",
+      "eventId": "event-27-sol-340"
+    },
+    "u0024": {
+      "tick": 27,
+      "actor": "kai",
+      "callId": "ordinary-56",
+      "eventId": "event-27-kai-336"
+    },
+    "u0025": {
+      "tick": 29,
+      "actor": "lin",
+      "callId": "ordinary-66",
+      "eventId": "event-29-lin-374"
+    },
+    "u0026": {
+      "tick": 30,
+      "actor": "lin",
+      "callId": "ordinary-70",
+      "eventId": "event-30-lin-384"
+    },
+    "u0027": {
+      "tick": 31,
+      "actor": "lin",
+      "callId": "ordinary-70",
+      "eventId": "event-31-lin-397"
+    },
+    "u0028": {
+      "tick": 32,
+      "actor": "lin",
+      "callId": "ordinary-70",
+      "eventId": "event-32-lin-405"
+    },
+    "u0029": {
+      "tick": 33,
+      "actor": "kai",
+      "callId": "ordinary-69",
+      "eventId": "event-33-kai-416"
+    },
+    "u0030": {
+      "tick": 35,
+      "actor": "lin",
+      "callId": "ordinary-77",
+      "eventId": "event-35-lin-441"
+    },
+    "u0031": {
+      "tick": 35,
+      "actor": "moss",
+      "callId": "ordinary-79",
+      "eventId": null
+    },
+    "u0032": {
+      "tick": 35,
+      "actor": "moss",
+      "callId": "ordinary-79",
+      "eventId": null
+    },
+    "u0033": {
+      "tick": 36,
+      "actor": "moss",
+      "callId": "ordinary-79",
+      "eventId": "event-36-moss-461"
+    },
+    "u0034": {
+      "tick": 39,
+      "actor": "moss",
+      "callId": "ordinary-87",
+      "eventId": "event-39-moss-493"
+    },
+    "u0035": {
+      "tick": 40,
+      "actor": "lin",
+      "callId": "ordinary-77",
+      "eventId": "event-40-lin-506"
+    },
+    "u0036": {
+      "tick": 41,
+      "actor": "kai",
+      "callId": "ordinary-92",
+      "eventId": "event-41-kai-524"
+    },
+    "u0037": {
+      "tick": 50,
+      "actor": "sol",
+      "callId": "ordinary-95",
+      "eventId": "event-50-sol-594"
+    },
+    "u0038": {
+      "tick": 59,
+      "actor": "ivo",
+      "callId": "ordinary-98",
+      "eventId": "event-59-ivo-665"
+    },
+    "u0039": {
+      "tick": 62,
+      "actor": "kai",
+      "callId": "ordinary-100",
+      "eventId": "event-62-kai-699"
+    },
+    "u0040": {
+      "tick": 80,
+      "actor": "moss",
+      "callId": "ordinary-129",
+      "eventId": null
+    }
+  }
+}

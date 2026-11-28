@@ -1,0 +1,467 @@
+{
+  "format": "self-evolving-world/culture-label-items",
+  "version": 1,
+  "archive": "experiment/ex15",
+  "range": { "from": 1, "through": 70 },
+  "people": [
+    { "id": "lin", "name": "Lin" },
+    { "id": "moss", "name": "Moss" },
+    { "id": "sol", "name": "Sol" },
+    { "id": "kai", "name": "Kai" },
+    { "id": "wren", "name": "Wren" },
+    { "id": "ivo", "name": "Ivo" }
+  ],
+  "context": [],
+  "items": [
+    {
+      "id": "u0001",
+      "tick": 1,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "I know red berries provide 8 nutrition with no toxicity. I'll collect a modest share, then learn to exchange findings. I would welcome observations about food preparation and shelter."
+    },
+    {
+      "id": "u0002",
+      "tick": 5,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin", "moss", "sol", "wren", "ivo"],
+      "text": "This berry patch is empty now. I saw another berry patch near (8.66,14.19) at round 3; I will check it and take a modest share. Red berries are known to provide 8 nutrition with no toxicity."
+    },
+    {
+      "id": "u0003",
+      "tick": 8,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "kai", "ivo"],
+      "text": "Only four berries remained when I arrived. I am gathering those, then investigating shelter. Berries have known nutrition 8 and toxicity 0. Has anyone tested local building materials or weather protection?"
+    },
+    {
+      "id": "u0004",
+      "tick": 9,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol"],
+      "text": "I'm Moss. I ate a meadow root and gained 14 satiety; roots are a food I know has zero toxicity. I have a modest reserve and am learning to examine materials. I'd welcome sharing findings about food preparation and shelter."
+    },
+    {
+      "id": "u0005",
+      "tick": 9,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss", "kai"],
+      "text": "I'm Sol. My starting food knowledge identifies red berries as safe, with nutrition 8. I'm investigating practical shelter; I'd welcome observations about materials or places to rest."
+    },
+    {
+      "id": "u0006",
+      "tick": 9,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["kai"],
+      "text": "I know meadow roots provide 14 nutrition and have zero toxicity. I'm collecting four from the patch near (10.1,12), leaving some for others. I'd like to investigate replenishing food together."
+    },
+    {
+      "id": "u0007",
+      "tick": 13,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["moss", "sol", "wren", "ivo"],
+      "text": "I learned a single-person shelter method: it requires 13 branches, 4 vines and 6 bark, then 12 work rounds. No shelter built yet. I'll collect branches at (17.2,13.3). Has anyone located vines or bark? Sol, let's coordinate materials."
+    },
+    {
+      "id": "u0008",
+      "tick": 14,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol", "wren"],
+      "text": "I saw birch bark at (12.2,21.3), stock 11; I'll collect 6 for shelter work. A branch held a 0.25 press load, flexibility 0.2; that does not establish roof safety. I'll test wetting next. No vines located yet."
+    },
+    {
+      "id": "u0009",
+      "tick": 14,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin"],
+      "text": "Shelter coordination and bark source. I mastered a shared shelter method: two bays need 26 branches, 8 vines and 12 bark, plus 24 work rounds. Birch bark at (12.2,21.3) had 11 units at tick 13. I plan to collect 5, leaving 6 for your single bay. No vines located yet. Let's avoid starting construction until materials and a clear site are secured."
+    },
+    {
+      "id": "u0010",
+      "tick": 14,
+      "person": "sol",
+      "kind": "view",
+      "about": "lin",
+      "text": "A potential building partner; I want to coordinate supplies openly and avoid competing for scarce materials."
+    },
+    {
+      "id": "u0011",
+      "tick": 20,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["lin", "wren"],
+      "text": "I cold-combined three berries in three work rounds. The prepared stack is complete, but this method does not cook or preserve food or add nutrition. I have roots and will investigate a small cultivation trial."
+    },
+    {
+      "id": "u0012",
+      "tick": 21,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["sol"],
+      "text": "Sol, I saw you collect five bark. I'll try collecting one more so our combined supply reaches six, then coordinate a real transfer. My earlier approach was blocked; I'll approach from the east. No shelter safety established yet."
+    },
+    {
+      "id": "u0013",
+      "tick": 21,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss"],
+      "text": "Moss, I collected 5 bark; 6 remain at the birch for your planned collection. I have not built anything. I will rest here and study food preparation. No vines located by me yet."
+    },
+    {
+      "id": "u0014",
+      "tick": 22,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["lin", "ivo"],
+      "text": "I saw vines at (8.2,13.3), stock 12 when seen at round 14; current stock is unknown. My cultivation method needs fewer than three root plants within five metres. No planting trial yet; I am scouting the northeastern meadow."
+    },
+    {
+      "id": "u0015",
+      "tick": 23,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss"],
+      "text": "Moss, I heard your revised plan to collect one bark. My five are still available for a coordinated transfer; nothing built yet. Lin is out of my messaging range. I will eat, recover energy and learn food preparation here."
+    },
+    {
+      "id": "u0016",
+      "tick": 28,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin"],
+      "text": "I ate one meadow root at tick 25: it provided 14 nutrition, with zero toxicity recorded. Nearby roots at (10.37,13.88) had 19 units at tick 27. I kept one harvested root and am learning cultivation; no planting tested yet."
+    },
+    {
+      "id": "u0017",
+      "tick": 31,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss"],
+      "text": "Moss, I still hold five bark for shelter work. Your handoff was out of reach; let's coordinate before another attempt. I'm collecting a few meadow roots, then studying cultivation. No vines or built shelter confirmed."
+    },
+    {
+      "id": "u0018",
+      "tick": 33,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol"],
+      "text": "Sol, this bark is for shelter supplies. My branch held a 0.25 press trial; wetting failed for lack of accessible water. Neither establishes roof safety. I'll study root cultivation next. No vines found by me yet."
+    },
+    {
+      "id": "u0019",
+      "tick": 33,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin", "moss"],
+      "text": "Moss, these five bark are for coordinated shelter work with Lin. I'm gathering four roots from the nearby abundant patch, then resting and learning cultivation. Vines and a finished shelter remain unconfirmed."
+    },
+    {
+      "id": "u0020",
+      "tick": 33,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["lin"],
+      "text": "I learned root cultivation, but it requires ordinary meadow soil, space from objects, and fewer than three nearby root plants. This forest patch is unsuitable. I'm scouting east; I have not planted anything."
+    },
+    {
+      "id": "u0021",
+      "tick": 34,
+      "person": "wren",
+      "kind": "speech",
+      "heard": ["ivo"],
+      "text": "I see your trial north of us, Ivo. I'll try one root farther northeast near (20,5.3), leaving your position alone. My carried root is older; whether it establishes before spoiling is uncertain."
+    },
+    {
+      "id": "u0022",
+      "tick": 37,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["lin", "sol"],
+      "text": "I've learned the root-planting method. I'll try one root near the southeastern meadow edge, away from crowded patches. Darkness can stall establishment; a planted root is not yet a crop. I hold Sol's five bark for shelter work."
+    },
+    {
+      "id": "u0023",
+      "tick": 40,
+      "person": "lin",
+      "kind": "speech",
+      "heard": ["sol"],
+      "text": "Shelter materials coordination. I carry 9 branches; my single bay still needs 4 branches, 4 vines and 6 bark. Wren reported vines at (8.2,13.3), stock 12 at tick 14; I am approaching to check. Moss planned to gather 6 bark and you 5 from the same 11-unit source, so let's coordinate existing bark rather than assume more remains. No construction yet."
+    },
+    {
+      "id": "u0024",
+      "tick": 40,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["wren"],
+      "text": "My root trial at (18,7.2) was covered at round 34. At round 38 it was still planted, with establishment about 0.105 and no harvest stock. Survival remains uncertain; please leave it undisturbed."
+    },
+    {
+      "id": "u0025",
+      "tick": 41,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["lin"],
+      "text": "Existing bark consolidated with Moss. I gathered five bark and transferred them to Moss, then passed along the additional one bark I received from Moss. Those transfers are complete; please coordinate that six-bark supply with Moss rather than assuming eleven remain at the tree. I have learned root cultivation and will attempt one small planting east of my current position. No crop or shelter is established by this message."
+    },
+    {
+      "id": "u0026",
+      "tick": 42,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss"],
+      "text": "The central meadow has several root patches within five metres, so I am checking the southern edge before planting. Darkness may stall establishment. I have not planted a crop; the six transferred bark are with Moss."
+    },
+    {
+      "id": "u0027",
+      "tick": 48,
+      "person": "ivo",
+      "kind": "speech",
+      "heard": ["kai", "wren"],
+      "text": "Wren, I learned shared shelter: two bays need 26 branches, 8 vines, 12 bark and 24 work rounds. Nothing built. Bark supply is unknown. My root trial has no harvest yet; I will inspect fallen branches southwest of here."
+    },
+    {
+      "id": "u0028",
+      "tick": 57,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["sol"],
+      "text": "Sol: forest vines are visible at (19.2,26.3), stock 12. I still hold six bark for shelter work. My root at (16.8,24.5) is planted but has zero establishment so far; darkness may stall it. I'm studying food preparation next."
+    },
+    {
+      "id": "u0029",
+      "tick": 60,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss"],
+      "text": "My root trial at (15.3,25) is planted, not established. I'll try collecting eight vines at (19.2,26.3) for coordinated shelter work. Please coordinate before collecting the same supply; I won't count any shelter as built."
+    },
+    {
+      "id": "u0030",
+      "tick": 64,
+      "person": "moss",
+      "kind": "speech",
+      "heard": ["sol"],
+      "text": "Sol, I collected four vines; eight remain there now. I hold six bark too. Two shelter bays require 26 branches, eight vines and 12 bark total. I'll prepare my two ageing roots, rest here and study shared-shelter construction."
+    },
+    {
+      "id": "u0031",
+      "tick": 66,
+      "person": "kai",
+      "kind": "speech",
+      "heard": ["wren"],
+      "text": "My root planting at (22,11) is covered but not established: at tick 64 it was a seedling with zero establishment in darkness. I will investigate fallen-branch bark for shelter materials next."
+    },
+    {
+      "id": "u0032",
+      "tick": 69,
+      "person": "sol",
+      "kind": "speech",
+      "heard": ["moss"],
+      "text": "Moss, I now carry eight harvested vines. My message to Lin failed because Lin isn't visible. You reported six bark and four vines; two shared bays still need 12 bark and 26 branches total. I'll rest, then study bark recovery."
+    }
+  ],
+  "mapping": {
+    "u0001": {
+      "tick": 1,
+      "actor": "kai",
+      "callId": "ordinary-14",
+      "eventId": "event-1-kai-4"
+    },
+    "u0002": {
+      "tick": 5,
+      "actor": "kai",
+      "callId": "ordinary-25",
+      "eventId": "event-5-kai-56"
+    },
+    "u0003": {
+      "tick": 8,
+      "actor": "lin",
+      "callId": "ordinary-20",
+      "eventId": "event-8-lin-84"
+    },
+    "u0004": {
+      "tick": 9,
+      "actor": "moss",
+      "callId": "ordinary-22",
+      "eventId": "event-9-moss-95"
+    },
+    "u0005": {
+      "tick": 9,
+      "actor": "sol",
+      "callId": "ordinary-9",
+      "eventId": "event-9-sol-95"
+    },
+    "u0006": {
+      "tick": 9,
+      "actor": "wren",
+      "callId": "ordinary-17",
+      "eventId": "event-9-wren-95"
+    },
+    "u0007": {
+      "tick": 13,
+      "actor": "lin",
+      "callId": "ordinary-46",
+      "eventId": "event-13-lin-146"
+    },
+    "u0008": {
+      "tick": 14,
+      "actor": "moss",
+      "callId": "ordinary-49",
+      "eventId": "event-14-moss-163"
+    },
+    "u0009": {
+      "tick": 14,
+      "actor": "sol",
+      "callId": "ordinary-54",
+      "eventId": "event-14-sol-163"
+    },
+    "u0010": {
+      "tick": 14,
+      "actor": "sol",
+      "callId": "ordinary-54",
+      "eventId": null
+    },
+    "u0011": {
+      "tick": 20,
+      "actor": "ivo",
+      "callId": "ordinary-58",
+      "eventId": "event-20-ivo-219"
+    },
+    "u0012": {
+      "tick": 21,
+      "actor": "moss",
+      "callId": "ordinary-61",
+      "eventId": "event-21-moss-239"
+    },
+    "u0013": {
+      "tick": 21,
+      "actor": "sol",
+      "callId": "ordinary-62",
+      "eventId": "event-21-sol-239"
+    },
+    "u0014": {
+      "tick": 22,
+      "actor": "wren",
+      "callId": "ordinary-55",
+      "eventId": "event-22-wren-248"
+    },
+    "u0015": {
+      "tick": 23,
+      "actor": "sol",
+      "callId": "ordinary-69",
+      "eventId": "event-23-sol-259"
+    },
+    "u0016": {
+      "tick": 28,
+      "actor": "kai",
+      "callId": "ordinary-80",
+      "eventId": "event-28-kai-309"
+    },
+    "u0017": {
+      "tick": 31,
+      "actor": "sol",
+      "callId": "ordinary-85",
+      "eventId": "event-31-sol-334"
+    },
+    "u0018": {
+      "tick": 33,
+      "actor": "moss",
+      "callId": "ordinary-83",
+      "eventId": "event-33-moss-363"
+    },
+    "u0019": {
+      "tick": 33,
+      "actor": "sol",
+      "callId": "ordinary-89",
+      "eventId": "event-33-sol-363"
+    },
+    "u0020": {
+      "tick": 33,
+      "actor": "kai",
+      "callId": "ordinary-88",
+      "eventId": "event-33-kai-363"
+    },
+    "u0021": {
+      "tick": 34,
+      "actor": "wren",
+      "callId": "ordinary-92",
+      "eventId": "event-34-wren-376"
+    },
+    "u0022": {
+      "tick": 37,
+      "actor": "moss",
+      "callId": "ordinary-98",
+      "eventId": "event-37-moss-411"
+    },
+    "u0023": {
+      "tick": 40,
+      "actor": "lin",
+      "callId": "ordinary-78",
+      "eventId": "event-40-lin-439"
+    },
+    "u0024": {
+      "tick": 40,
+      "actor": "ivo",
+      "callId": "ordinary-102",
+      "eventId": "event-40-ivo-439"
+    },
+    "u0025": {
+      "tick": 41,
+      "actor": "sol",
+      "callId": "ordinary-107",
+      "eventId": "event-41-sol-458"
+    },
+    "u0026": {
+      "tick": 42,
+      "actor": "sol",
+      "callId": "ordinary-110",
+      "eventId": "event-42-sol-467"
+    },
+    "u0027": {
+      "tick": 48,
+      "actor": "ivo",
+      "callId": "ordinary-120",
+      "eventId": "event-48-ivo-521"
+    },
+    "u0028": {
+      "tick": 57,
+      "actor": "moss",
+      "callId": "ordinary-134",
+      "eventId": "event-57-moss-603"
+    },
+    "u0029": {
+      "tick": 60,
+      "actor": "sol",
+      "callId": "ordinary-144",
+      "eventId": "event-60-sol-634"
+    },
+    "u0030": {
+      "tick": 64,
+      "actor": "moss",
+      "callId": "ordinary-148",
+      "eventId": "event-64-moss-685"
+    },
+    "u0031": {
+      "tick": 66,
+      "actor": "kai",
+      "callId": "ordinary-150",
+      "eventId": "event-66-kai-705"
+    },
+    "u0032": {
+      "tick": 69,
+      "actor": "sol",
+      "callId": "ordinary-153",
+      "eventId": "event-69-sol-737"
+    }
+  }
+}
